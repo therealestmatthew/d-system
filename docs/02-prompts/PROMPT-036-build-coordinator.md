@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-16'
-updated: '2026-09-22'
+updated: '2026-10-05'
 systems: [sys-realization, sys-backlog, sys-governance]
 depends_on: [doc-prompt-pack-protocol, doc-backlog-decisions, doc-irs-orchestrator-design, doc-idea-realization-system-plan]
 ---
@@ -264,9 +264,22 @@ those items to the validator and adversary templates instead of running them you
 the tracker which items were delegated for this reason. This is not a gap in verification, it is
 where that judgment belongs.
 
-**6. Adversarial review.** Dispatch the **adversary template**. This is a `GOV-003` condition for
-completion, not an optional extra. Its findings are fixed — within the two-cycle cap — or explicitly
-reported as accepted, in the evidence file and the close-out.
+**6. Adversarial review.** This is a `GOV-003` condition for completion, not an optional extra.
+Every build review is dispatched and briefed by a coordinator, never by whoever built the phase
+(`GOV-017`, "Build reviews"; `REQ-030` R03).
+
+- **Run as the Batch Runner under `GOV-017`**, send the Session Manager `REVIEW-REQUEST <branch>
+  <tip>` and wait for `VERDICT`. It runs the review runner, dispatches the reviewers and returns the
+  verdict records. Commit them unchanged on the branch.
+- **Run alone**, you built nothing yourself (your creators did), so you dispatch. Run
+  `uv run python tools/run_review_checks.py <phase-id> <tip>` (`OPS-029`). Dispatch the **adversary
+  template** as the gating reviewer, and `review-judge` in shadow with the same brief. Write one
+  verdict record per reviewer under `docs/08-governance/reviews/verdicts/`
+  (`schemas/review-verdict.schema.json`): `gating: true` for the adversary, `gating: false` for the
+  judge, each finding copied unchanged.
+
+The gating verdict's findings are fixed — within the two-cycle cap — or explicitly reported as
+accepted, in the evidence file and the close-out. A fix after a `reject` goes back for a new review.
 
 **7. Hand off.** Write the phase's session record in its worktree (`--next-code session`), release
 every `_tmpagent/` claim opened for it, then `git rebase dev` and re-run governance and `pytest`.
@@ -274,8 +287,8 @@ every `_tmpagent/` claim opened for it, then `git rebase dev` and re-run governa
 integrate.** Run `tools/check_no_private_content.py` with changes staged.
 
 **8. Ask the owner to merge.** Present `git diff dev..agent/<phase-id> --stat`, the green
-post-rebase output, the adversary's verdict, and the phase id. **Wait.** An unanswered question is
-not a yes.
+post-rebase output, the verdict records (gating and shadow), and the phase id. **Wait.** An
+unanswered question is not a yes.
 
 **9. Integrate, complete, clean up.** After the owner's yes: **copy any gitignored evidence out of
 the worktree first**, then `git merge --ff-only agent/<phase-id>`, `git worktree remove`,
@@ -293,9 +306,11 @@ owner-approved integration — and record that in the tracker.
 ## Dispatch templates
 
 Every dispatch opens with the idempotency sentence — *"Assess the current state of the repository
-against the deliverables below; do only what is missing; report what already existed."* — names the
-`general-purpose` charter, runs on **Sonnet** unless the owner said otherwise at kickoff, and
-carries absolute paths only.
+against the deliverables below; do only what is missing; report what already existed."* — runs on
+**Sonnet** unless the owner said otherwise at kickoff, and carries absolute paths only. The
+**Creator** and **Blocker resolver** templates name the `general-purpose` charter. The **Validator**
+and **Adversary** templates do not: each is dispatched as a dedicated reviewer type, whose own
+definition is its charter, and briefed under `GOV-017`'s brief rule ("Build reviews").
 
 **Creator.** Give it: the phase id and title; the absolute path of `backlog.yaml` and the phase's
 `- id:` anchor; absolute paths of the documents its `plan` and `sources` name; its `scope`,
@@ -307,12 +322,16 @@ allocates a new document code, tell it `--next-code` takes the **exact** schema 
 abbreviation: one of `plan`, `adr`, `architecture`, `prompt`, `session`, `requirement`,
 `walkthrough`, `operation`, `governance` — `requirement`, never `req`. ≤15-line return.
 
-**Validator.** Give it: the worktree path, the commit range, and the phase's `acceptance` and
-`verification` verbatim. **Nothing else** — not the creator's rationale, not its report. It runs
-the commands, reads the diff against the acceptance, returns a ≤15-line verdict and its evidence
-file path. It changes nothing.
+**Validator.** Dispatch `subagent_type: demo-validator-code`, not `general-purpose`. Give it: the
+worktree path, the commit range and its `git diff` output, and the phase's `scope`, `acceptance` and
+`verification` verbatim. **Nothing else** — not the creator's rationale, not its report, not
+commit messages. It runs the commands, reads the diff against the acceptance, returns a ≤15-line
+verdict and its evidence file path. It changes nothing.
 
-**Adversary.** Give it: the worktree path, the commit range, the phase's `acceptance`, and the
+**Adversary.** Dispatch `subagent_type: demo-adversary`, not `general-purpose`; it is the gating
+reviewer in step 6. Give it the `GOV-017` brief: the phase id, its `scope`, `acceptance` and
+`verification` verbatim, the commit range and its `git diff` output, the path to the runner's
+`manifest.json`, and the worktree path. Nothing the creator wrote goes in. Add the
 instruction to assume the work is broken and hunt for where it fails when executed or merged —
 acceptance satisfied in appearance only, deliverables overreaching the declaration, tests that
 assert nothing, a green command that does not exercise the claim it stands for. Read-and-run only;

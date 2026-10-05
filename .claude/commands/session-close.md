@@ -47,7 +47,7 @@ one is plausible.
 provides for owner-directed work with no backlog phase, and requires a `kind: session` record for it
 all the same. Take `checkpoint`'s "Sessions with no claimed phase" branch and carry it through the
 steps below: steps 2, 3, 4, 5, 7, 8 and 9 apply unchanged in substance, step 6 has no phase to
-complete, and the review in step 3 judges the self-declared conditions instead of a backlog
+complete, and the review in step 3 judges the owner's instruction as given instead of a backlog
 acceptance list. Step 8 matters most here, not least: an unclaimed session's work found
 uncommitted in the primary checkout has no branch and no integration procedure to catch it, so that
 step is the only thing that does.
@@ -82,39 +82,58 @@ step 3 — do not make it guess:
   `status: active` — `git log --oneline -- docs/09-backlog/backlog.yaml` will show it — use
   `<that commit>..HEAD`, and say in the report that the session broke the worktree rule.
 
-## 3. Launch an independent sub-agent review
+## 3. Get the independent review — requested from the coordinator, never dispatched by the builder
 
-Use the **Agent tool with a fresh, non-fork subagent** (never `subagent_type: fork` — a fork inherits
-this session's own context and conclusions, which defeats the entire point of a second opinion). Give
-it, in the prompt itself since it starts with nothing:
+Every build review is dispatched and briefed by the coordinator, never by the session that built
+the phase (`GOV-017`, "Build reviews"; `REQ-030` R03, R04). Which path applies depends on who is
+running this command.
 
-- The phase id, its `scope`, `acceptance` and `verification` lists from `docs/09-backlog/backlog.yaml`
-  (paste them; do not just name the file). **For an unclaimed session there is no such list**: paste
-  instead the owner's instruction as given, the wording of the self-declared acceptance conditions
-  (the conditions only, without the record's verdicts), and the three repository-wide gates — and
-  say plainly
-  that these conditions were written by the session being reviewed, so the reviewer weighs whether
-  they are a fair reading of the instruction as well as whether they hold.
-- The exact commit range from step 2, and instructions to run `git diff <range>` and `git log
-  <range>` itself.
-- **Never the session record.** Do not give the reviewer the record's path or content, or any other
-  account of what the session did or why. The reviewer is a validator, and `GOV-014`'s Validator
-  contract gives a validator the requirement and the diff only, never the developer's rationale; a
-  reviewer that reads the record judges the session's account instead of the work (owner ruling of
-  2026-09-23).
-- Its job, stated plainly: independently decide, from the diff and its own run of the verification
-  commands, whether each acceptance condition actually holds. Report clean findings explicitly when
-  that is the honest result; "no discrepancies found" is a valid finding, not a failure to find
-  one.
+**A building session asks.** If this session built the phase, it does not dispatch a reviewer. It
+sends the coordinator — under `GOV-017` the Session Manager — `REVIEW-REQUEST <branch> <tip>`,
+naming the branch and the commit from step 2, and nothing else, then waits for `VERDICT`. The
+coordinator runs the review runner, dispatches the reviewers with its own brief, and returns the
+verdict records. Commit those records unchanged on the branch. Do not proceed to step 6 before
+`VERDICT` arrives, and do not treat a pending review as passed.
 
-Wait for its report. Do not paraphrase away an uncomfortable finding, and do not proceed to step 6 by
-assuming the review passed before it actually returns.
+**A session that did not build the phase may dispatch.** When the owner runs this command in their
+own session, or a coordinator runs it for a phase its creators built, it dispatches directly under
+the same brief rule:
+
+1. Run `uv run python tools/run_review_checks.py <phase-id> <tip>` (`OPS-029`). It runs the phase's
+   `verification` list and the four gate checks at the tip in a detached worktree and writes the
+   manifest under `_working/review-checks/<phase-id>/<commit12>/`.
+2. Dispatch the gating reviewer, a dedicated type (`demo-adversary` or `demo-validator-code`), and,
+   while `review-judge` is in shadow, `review-judge` as well. Use the Agent tool with a fresh,
+   non-fork subagent of that type; a fork inherits the dispatching session's context and
+   conclusions, which defeats a second opinion.
+3. Give each the same brief, in the prompt itself since it starts with nothing, holding only these
+   inputs, none of which the building session wrote:
+   - the phase id and its `scope`, `acceptance` and `verification` entries, pasted from `dev`'s
+     `docs/09-backlog/backlog.yaml`. **For an unclaimed session there is no such list**: paste the
+     owner's instruction as the owner gave it, and the three repository-wide gates;
+   - the commit range from step 2 and the output of `git diff <range>` (the judge has no shell, so
+     it needs the diff text);
+   - the path to the runner's `manifest.json`;
+   - its job, stated plainly: decide independently, from the diff and the runner's evidence, whether
+     each acceptance condition holds. "No discrepancies found" is a valid finding when it is the
+     honest result.
+4. Write one verdict record per reviewer under `docs/08-governance/reviews/verdicts/`
+   (`schemas/review-verdict.schema.json`): `gating: true` for the gating reviewer, `gating: false`
+   for the judge. Copy every finding without changing it.
+
+Never put the session record, commit messages, `git log` output, or any other account of what the
+session did or why into the brief. `GOV-014`'s Validator contract gives a validator the requirement
+and the diff only. A reviewer that reads the builder's account judges the account instead of the
+work (owner ruling of 2026-09-23).
+
+Wait for every reviewer's reply. Do not paraphrase away an uncomfortable finding.
 
 ## 4. Record the review verbatim
 
-Add a `## Review` section to the session record, after the sections `checkpoint` maintains. Paste the
-sub-agent's findings — condition by condition — rather than your own summary of them. If it found
-nothing wrong, the section says exactly that.
+Add a `## Review` section to the session record, after the sections `checkpoint` maintains. Name
+each verdict record by path and its verdict, gating or shadow, and paste the gating reviewer's
+findings — condition by condition — rather than your own summary of them. If it found nothing wrong,
+the section says exactly that. State how each finding was handled: fixed (where) or accepted (why).
 
 ## 5. Record the depth a checkpoint skips
 

@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-10-04'
+updated: '2026-10-05'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-multi-session-coordination-protocol, doc-build-coordinator, doc-prompt-queued-phase-review-pack]
 ---
@@ -32,7 +32,12 @@ catalog regeneration in the completion edit. Item 1 was revised on 2026-09-24 (`
 rule. Item 11 was added on 2026-09-26 from the owner's ruling of 2026-09-23 that a failing
 pre-commit hook is never bypassed with `--no-verify` (`GOV-017`, "The merge gate"). The Owner Terminal
 starter and kickoff step 6 were added on 2026-10-01 from the owner's ruling of that day
-that made the Owner Terminal part of the protocol (`GOV-017`, "The Owner Terminal").
+that made the Owner Terminal part of the protocol (`GOV-017`, "The Owner Terminal"). Kickoff step 7,
+contract item 4 and the Batch Runner and Builder roles were revised on 2026-10-05 (`phase-asr-04`,
+`REQ-030` R03, R04, R10) so that the Session Manager dispatches every build review and a building
+session sends `REVIEW-REQUEST` instead of dispatching its own (`GOV-017`, "Build reviews"). The
+owner ruled that this takes effect from the next run's starters; sessions already running when it
+merged keep the flow their starters gave them.
 
 ## Kickoff for the Session Manager
 
@@ -56,6 +61,12 @@ from PROMPT-037.
 6. If I run an Owner Terminal (GOV-017, "The Owner Terminal"), check it in ListAgents, show me
    its starter from PROMPT-037 as plain text, and send it once I approve. Queue owner-only
    commands there as they come up.
+7. You dispatch every build review (GOV-017, "Build reviews"). On REVIEW-REQUEST, run
+   tools/run_review_checks.py, dispatch the gating reviewer (demo-adversary or
+   demo-validator-code) and review-judge in shadow with the brief GOV-017 allows and nothing the
+   builder wrote, write the verdict records, record their sha256 in
+   _working/session-manager/verdicts.sha256, and send VERDICT. Check review-judge is available
+   before the first dispatch.
 ```
 
 ## Shared contract
@@ -89,7 +100,10 @@ Roster
 2. CLAIMS: max_active is 3. Claim only a phase I assigned, and only inside a granted turn.
 3. Everything else runs in a worktree: ../d-system-worktrees/<id> on branch agent/<id>.
    Exception: reports under _working/session-manager/ (gitignored) need no turn.
-4. MERGE: send READY <branch> with (a) the phase's review verdict, every finding fixed or
+4. REVIEW and MERGE: when the build is ready, send REVIEW-REQUEST <branch> <tip> and wait. Do
+   not dispatch your own reviewer. I run the review runner, dispatch the reviewers and send
+   VERDICT with the verdict records and their sha256; commit them unchanged on your branch.
+   Then send READY <branch> with (a) the verdict record paths, every finding fixed or
    explicitly accepted, and (b) the tail of the post-rebase `uv run python -m src.governance`,
    `uv run pytest`, `uv run ruff check src/ test/ tools/` and `uv run mypy src/` runs (dev's
    baseline is 0 ruff findings, 0 mypy errors; the gate is clean), and (c) the output of
@@ -101,7 +115,9 @@ Roster
    recorded in your session record; I relay no GRANTED merge without it. For a claimed
    phase, also include `uv run python -m src.governance --containment <phase-id>` as a
    report; it never blocks. The owner approves every
-   merge; I relay, and a GRANTED merge from me is the owner's approval. Merge only after
+   merge; I relay, and a GRANTED merge from me is the owner's approval. At the gate I re-run
+   your phase with tools/run_review_checks.py and check each verdict record's sha256 against
+   the value I recorded; a changed or missing record refuses the branch. Merge only after
    GRANTED merge. Inside that turn: (i) if dev moved, rebase, re-run all four, report the new
    tip and wait for my go; (ii) in every case, run
    `uv run python tools/git-hooks/refuse_dirty_integration.py` in the primary checkout and
@@ -143,6 +159,8 @@ Changes to how PROMPT-036 runs:
 - Before you open the next batch, send NEXT-BATCH <batch-id> so I can check slots against the
   Builders first.
 - The batch table's status commit (open or close) goes through TURN? batch <batch-id>.
+- Its step 6 adversarial review goes through REVIEW-REQUEST to me (contract item 4): I dispatch
+  the reviewers and send VERDICT. Do not dispatch the adversary template yourself.
 - Its post-rebase run and merge follow contract item 4: all four gate checks, and the
   dirty-integration check before the ff-merge.
 
@@ -164,8 +182,10 @@ On ASSIGN:
    it in the worktree once created.
 2. Make the claim commit (plus catalog regen) only inside a granted turn: TURN? claim <phase-id>.
 3. Build and verify in the worktree.
-4. Run /session-close up to and including its independent review, fix or accept every finding, and
-   send READY. The phase stays active: /session-close cannot complete it before the merge.
+4. Run /session-close up to and including its independent review: its step 3 has you send
+   REVIEW-REQUEST to me, not dispatch a reviewer. Commit the verdict records I send unchanged, fix
+   or accept every finding, and send READY. The phase stays active: /session-close cannot complete
+   it before the merge.
 5. On GRANTED merge, follow contract item 4: dirty-integration check, ff-merge, then the
    completion edit on dev as GOV-003 sanctions, with the catalog regenerated by --catalog and
    committed with it, then governance (no pytest). Send TURN DONE, remove your worktree and branch, then send FREE.

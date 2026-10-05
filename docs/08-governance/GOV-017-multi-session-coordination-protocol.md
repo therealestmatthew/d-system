@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-10-04'
+updated: '2026-10-05'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-adr-multi-agent-concurrency, doc-coordinator-protocol, doc-build-coordinator, doc-backlog-decisions, doc-conversation-guidelines, doc-governance-operations]
 ---
@@ -77,11 +77,11 @@ runs commands reserved to the owner; it takes no turns and builds nothing.
   slots help only where that many mutually disjoint phases exist, and every extra claim adds rebases
   and merge approvals. The Batch Runner's batches run one phase at a time, so it needs one slot; the
   two Builders take the other two.
-- **No dedicated reviewer session.** Both build paths already require an independent review before
-  a phase completes: `PROMPT-036` step 6 dispatches an adversary, and `/session-close` step 3
-  launches a review sub-agent. A reviewer session would repeat that work. The one check those reviews
-  cannot make — whether a branch still passes after peers' merges — the Session Manager makes itself
-  as part of the merge gate below.
+- **No dedicated reviewer session.** Build reviews are subagents the Session Manager dispatches, as
+  *Build reviews* below requires: the session that built a phase asks for its review and never
+  dispatches it. A reviewer session would add a second coordinator for the same dispatches. The one
+  check a review cannot make — whether a branch still passes after peers' merges — the Session
+  Manager makes itself as part of the merge gate below.
 - **A standby builder instead of a third builder.** A third builder would have no slot to claim.
   The standby builder is ready the moment a slot frees and does claim-free review work until then.
 - **A scout.** Finding phases that are disjoint from each other and from active claims, and noticing
@@ -155,12 +155,68 @@ opens another batch, and Prompt Planner sends `PROMPT-FOR` before the owner past
 execution session, so the Session Manager can check it against that session's role, slot and the
 lock. All three rules in this section are owner rulings of 2026-09-22.
 
+## Build reviews
+
+**The assurance dispatch rule.** Every build review is dispatched and briefed by the coordinator,
+never by the session that built the phase (`REQ-030` R03, `PLAN-047` D3). Under this protocol the
+coordinator is the Session Manager. A building session sends `REVIEW-REQUEST` and waits for
+`VERDICT`. When the owner runs `/session-close` in their own session, that session did not build the
+phase and may dispatch directly, under the same brief rule. A `PROMPT-036` run outside this protocol
+is the coordinator for the phases its creators built, and dispatches under the same rule. Run as the
+Batch Runner under this protocol, it sends `REVIEW-REQUEST` like a Builder.
+
+**The brief.** The brief is the reviewer's whole input. It holds:
+
+- the phase id and its `scope`, `acceptance` and `verification` entries, copied from `dev`'s
+  `backlog.yaml`;
+- the commit range under review and the output of `git diff <range>`. The judge has no shell, so
+  the diff text itself goes in the brief;
+- the path to the runner's `manifest.json` under `_working/review-checks/<phase-id>/<commit12>/`.
+  Each entry's `file` is relative to the root of the checkout that ran the runner, and every
+  evidence file sits beside the manifest.
+
+The brief may not contain anything the builder wrote: not the session record, not commit messages or
+`git log` output, not the text of `REVIEW-REQUEST` or `READY` beyond the branch and its tip, not a
+summary of what the builder says it did or why, and not the builder's own review. A reviewer that
+reads the builder's account judges the account instead of the work (owner ruling, 2026-09-23).
+
+**The review.** On `REVIEW-REQUEST`, the Session Manager:
+
+1. runs `uv run python tools/run_review_checks.py <phase-id> <tip>`
+   ([OPS-029](OPS-029-run-review-checks.md)), which runs the phase's `verification` list and the
+   four gate checks at the tip in a detached worktree and writes the manifest;
+2. dispatches the **gating reviewer** — a dedicated reviewer type, `demo-adversary` or
+   `demo-validator-code`, never a `general-purpose` agent — and, during shadow, the **shadow
+   judge**, `review-judge`. Both get the same brief. Before the first dispatch of a run, check that
+   `review-judge` is among the available agent types;
+3. writes one verdict record per reviewer under `docs/08-governance/reviews/verdicts/`, named
+   `<verdict_id>.json` and valid against `schemas/review-verdict.schema.json` (`REQ-030` R05,
+   `PLAN-047` D4). It copies each finding without changing it, keeps the reviewer's raw reply as an
+   evidence file under `_working/session-manager/review-replies/`, and puts that reply's sha256 in
+   the record. The gating reviewer's record carries `gating: true`; the judge's carries
+   `gating: false`. The directory is created by the first record written;
+4. records each verdict record's sha256 in `_working/session-manager/verdicts.sha256`, one
+   `sha256sum` line per file, and sends `VERDICT` with the record paths and their sha256.
+
+The building session commits the records unchanged on its branch. It fixes or explicitly accepts
+each finding; a `reject` verdict means a fix and a new `REVIEW-REQUEST`, which produces new records
+beside the old ones. Every build review is recorded this way, gating and shadow alike (`REQ-030`
+R05, R06), from `phase-asr-04` on. A sampled re-review (`PLAN-047` D6,
+[OPS-030](OPS-030-draw-rereview-sample.md)) is recorded the same way with `gating: false`, because
+the merge it would have decided has already happened.
+
+**Leaving shadow.** The judge's verdicts decide nothing while it runs in shadow. It leaves shadow
+when the owner decides so on a comparison table built from the verdict records, after at least ten
+reviewed phases, and that decision is recorded in `GOV-003` (owner ruling at G3, 2026-09-24).
+Until then every build review runs both reviewers, and only the gating verdict decides.
+
 ## The merge gate
 
 A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. Approval is relayed:
 
-1. The session sends `READY` with the phase's own review verdict — every finding either fixed or
-   explicitly accepted — and the tail of its post-rebase runs of the four gate checks:
+1. The session sends `READY` with the paths of the verdict records the Session Manager handed it,
+   committed unchanged on the branch, and every finding either fixed or explicitly accepted. It also
+   sends the tail of its post-rebase runs of the four gate checks:
    `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/ tools/` and
    `uv run mypy src/`. `dev`'s baseline is 0 ruff findings and 0 mypy errors, so each check must report
    zero findings; matching the previous count is not enough.
@@ -182,11 +238,22 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
    For a claimed phase, `READY` also carries the report of
    `uv run python -m src.governance --containment <phase-id>`, which diffs the active branch against
    the phase's declared paths (`phase-dgov-06`, `REQ-015` R12-R13). That report never blocks.
-2. The Session Manager re-runs the four gate checks on the branch tip in a detached temporary
-   worktree (`git worktree add --detach ../d-system-worktrees/verify-<phase-id> <branch>`, removed
-   afterwards), so it touches neither the primary checkout nor the session's worktree.
-3. The Session Manager brings the merge to the owner with the session's and its own results for the
-   four gate checks and `git diff --stat dev..<branch>`.
+2. The Session Manager re-runs the checks on the branch tip with the review runner,
+   `uv run python tools/run_review_checks.py <phase-id> <tip>`. Its manifest is this step's re-run:
+   it runs the phase's `verification` list and the four gate checks in a detached worktree it
+   removes afterwards, so it touches neither the primary checkout nor the session's worktree
+   (`PLAN-047` D2). A branch with no phase has nothing for the runner to read, so for unclaimed work
+   the Session Manager re-runs the four gate checks in a detached temporary worktree
+   (`git worktree add --detach ../d-system-worktrees/verify-<slug> <branch>`, removed afterwards).
+
+   In the same step it checks the verdict records. In a checkout of the branch tip, it runs
+   `sha256sum -c _working/session-manager/verdicts.sha256` over the lines for this phase's records.
+   Every line must report `OK`. A line reporting `FAILED`, or a handed record missing from the
+   branch, refuses the branch. The Session Manager names the file and reports the difference to the
+   owner as a finding (`REQ-030` R10, `PLAN-047` D4).
+3. The Session Manager brings the merge to the owner with the session's results, its own runner
+   manifest, the gating verdict and the shadow judge's verdict, the verdict-record check, and
+   `git diff --stat dev..<branch>`.
 4. On the owner's yes, it sends `GRANTED merge` and gives the session the lock. If `dev` has moved
    since step 2, the session rebases and re-runs the four gate checks while holding the lock, and
    reports the new tip; the Session Manager re-runs step 2 on that tip before the session
@@ -288,7 +355,9 @@ sent to the name `Session Manager`.
 | `GRANTED <purpose>` | Session Manager | The recipient holds the lock; states the `dev` commit it was granted at |
 | `QUEUED <n>` | Session Manager | The recipient is n-th in line |
 | `TURN DONE <sha>` | lock holder | Lock released; the checkout is clean and `dev` is pushed to `origin` |
-| `READY <branch>` | builder, batch runner | Ready to integrate, with the review findings resolved and post-rebase output |
+| `REVIEW-REQUEST <branch> <tip>` | builder, batch runner | Asks the Session Manager for the phase's build review at that commit. Not `REVIEW`, which assigns standby work |
+| `VERDICT <phase-id>` | Session Manager | The build review is done: each verdict record's path, its sha256 and its verdict, gating and shadow. The session commits the records unchanged |
+| `READY <branch>` | builder, batch runner | Ready to integrate, with the verdict records committed unchanged, their findings resolved, and post-rebase output |
 | `GRANTED merge` | Session Manager | The owner approved; the recipient holds the lock for the merge and completion edit, and ends the turn with `TURN DONE` |
 | `REBASE` | Session Manager | `dev` moved; rebase at the next safe point |
 | `ASSIGN <phase-id>` | Session Manager | An owner-approved phase to build |
