@@ -33,7 +33,7 @@ from src.governance.codes import inspect_codes, inspect_register, next_code, ren
 from src.governance.idea_priority import inspect_idea_priority
 from src.governance.plan_phases import inspect_plan_phases
 from src.governance.regression import audit as audit_status_regression
-from src.governance.review_gate import REVIEWS_DIR, inspect_review_gate
+from src.governance.review_gate import REVIEWS_DIR, inspect_review_gate, shape_error
 from src.governance.staleness import catalog_errors, ideas_md_errors
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -424,7 +424,11 @@ def audit_review_gate(root: Path, catalog: dict[str, Any]) -> tuple[list[str], d
         if directory.is_dir():
             for path in sorted(directory.glob("*.json")):
                 location = path.relative_to(root).as_posix()
-                records[location] = json.loads(path.read_text(encoding="utf-8"))
+                record = json.loads(path.read_text(encoding="utf-8"))
+                problem = shape_error(record)
+                if problem:
+                    raise ValueError(f"{location} {problem}")
+                records[location] = record
         return inspect_review_gate(catalog.get("next_up", []), records)
     except (OSError, ValueError) as exc:
         return [f"review gate inputs: {exc}"], {}

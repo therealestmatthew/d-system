@@ -196,6 +196,28 @@ def test_an_unreadable_record_is_an_error(tmp_path: Path) -> None:
     assert errors[0].startswith("review gate inputs: ")
 
 
+@pytest.mark.parametrize(
+    ("body", "problem"),
+    [
+        ([], "is not a JSON object"),
+        ({"target": "phase-exa-01", "status": "dispositioned"}, "target is not an object"),
+        ({"target": {"phases": "phase-exa-01"}}, "target.phases is not a list"),
+        ({"target": {"later_added_phases": {}}}, "target.later_added_phases is not a list"),
+        ({"target": {"phases": []}, "findings": {}}, "findings is not a list"),
+        ({"target": {"phases": []}, "findings": ["F01"]}, "a finding is not an object"),
+        ({"target": {"phases": []}, "findings": [{"id": "F01", "dispositions": ["fixed"]}]},
+         "finding F01 has dispositions that are not a list of objects"),
+    ],
+)
+def test_a_wrongly_shaped_record_is_a_named_error(
+    tmp_path: Path, body: Any, problem: str
+) -> None:
+    """A hand-written record with the wrong shape fails by name, not with a traceback."""
+    root = build(tmp_path, [PHASE], {})
+    (root / REVIEWS_DIR / "bad.json").write_text(json.dumps(body))
+    assert errors_for(root) == [f"review gate inputs: {REVIEWS_DIR}/bad.json {problem}"]
+
+
 def test_the_exemption_is_exactly_req_028_r12s_nineteen() -> None:
     requirement = (ROOT / "docs/06-requirements/REQ-028-deterministic-guards.md").read_text()
     row = next(line for line in requirement.splitlines() if line.startswith("| R12 |"))

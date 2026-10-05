@@ -45,6 +45,32 @@ EXEMPT = frozenset(
 )
 
 
+def shape_error(record: Any) -> str | None:
+    """What makes a record unreadable by this check, or None. Records are hand-written, so a
+    wrong shape is reported by name rather than left to fail as an exception mid-check."""
+    if not isinstance(record, Mapping):
+        return "is not a JSON object"
+    target = record.get("target")
+    if target is not None and not isinstance(target, Mapping):
+        return "target is not an object"
+    for key in ("phases", "later_added_phases"):
+        value = (target or {}).get(key)
+        if value is not None and not isinstance(value, list):
+            return f"target.{key} is not a list"
+    findings = record.get("findings")
+    if findings is not None and not isinstance(findings, list):
+        return "findings is not a list"
+    for finding in findings or []:
+        if not isinstance(finding, Mapping):
+            return "a finding is not an object"
+        dispositions = finding.get("dispositions")
+        if dispositions is not None and not (
+            isinstance(dispositions, list) and all(isinstance(d, Mapping) for d in dispositions)
+        ):
+            return f"finding {finding.get('id')} has dispositions that are not a list of objects"
+    return None
+
+
 def listed_phases(record: Mapping[str, Any]) -> set[str]:
     """The phases a record reviewed, at either altitude."""
     target = record.get("target") or {}
