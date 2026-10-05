@@ -667,3 +667,18 @@ systems:
     .claude/commands/session-close.md; those are a later, separately-claimed phase once this analysis
     exists. Registered separately from sys-fw-analysis-patterns and sys-fw-analysis-sessions for the
     same concurrency reason.
+- id: sys-content
+  name: Build-in-public content series
+  domain: delivery
+  status: scaffold
+  owner: repository-owner
+  paths:
+  - content
+  depends_on: []
+  description: Planning material and drafts for a series of posts on X about D-System and the idea
+    realization engine, kept under the top-level content/ directory - the series strategy, the
+    ordered post queue, the house image style and one directory per post. The manual first step of
+    ideas 000015, 000016 and 000017. Not governed documentation - files carry no front matter or
+    document code and nothing in src/governance reads them - and nothing here is posted by an agent;
+    the owner publishes. Registered at draft maturity (owner, 2026-10-04), recorded as scaffold
+    because the schema has no draft value.
