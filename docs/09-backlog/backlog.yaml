@@ -6,7 +6,6 @@ next_up:
 - phase-cap-08
 - phase-irs-11
 - phase-irs-14
-- phase-dgov-01
 - phase-idg-12
 - phase-irs-05
 - phase-irs-07
@@ -10901,7 +10900,7 @@ items:
   - sys-governance
   owner: repository-owner
   agent: agent-batch-runner
-  status: active
+  status: complete
   priority: 1
   session_budget: 1
   depends_on: []
@@ -10928,8 +10927,20 @@ items:
   - docs/08-governance/GOV-001-protocol.md
   - src/governance/
   - test/
-  next_action: Write the rule before classifying. Deriving it from the corpus produces a rule shaped to
-    excuse whatever the corpus already does.
+  next_action: 'Complete. The rule is in GOV-001; --classify-requirements lists the 12 grandfathered
+    unpaired plans; the plain governance run enforces it forward. The plan-split loophole (review F02)
+    is a follow-up idea named in the session record.'
+  session: doc-session-mandatory-requirement-rule
+  completion_evidence:
+  - docs/08-governance/GOV-001-protocol.md
+  - src/governance/requirement_rule.py
+  - src/governance/__main__.py
+  - test/test_requirement_rule.py
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-dgov-01-demo-adversary.json
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-dgov-01-review-judge.json
+  result: 'Merged onto dev at d4c5f88 with the owner''s approval on 2026-10-05. A plan needs a paired requirement
+    once more than one backlog item names it; 12 existing plans are grandfathered. Gating review pass; F01 and
+    F02 accepted by the owner (F02 has a follow-up idea).'
 - id: phase-dgov-02
   title: Define document staleness and the retirement path
   plan: doc-document-backlog-governance

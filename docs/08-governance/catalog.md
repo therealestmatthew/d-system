@@ -508,7 +508,7 @@ CI regenerates it and fails on any difference.
 | PLAN-027 | doc-workbench-features-defects | draft | 8 | 0 | 4 | agent-builder-a, agent-demo-a, agent-prog, agent-standby-3 |
 | PLAN-028 | doc-workbench-architecture-quality | draft | 17 | 0 | 3 | agent-arch, agent-arch-vocab, agent-prog |
 | PLAN-029 | doc-idea-graph-lifecycle | active | 15 | 0 | 5 | agent-builder-a, agent-builder-b, agent-coord, agent-night |
-| PLAN-030 | doc-document-backlog-governance | active | 4 | 1 | 3 | agent-batch-runner, agent-builder-b, agent-coord, agent-night |
+| PLAN-030 | doc-document-backlog-governance | active | 4 | 0 | 4 | agent-batch-runner, agent-builder-b, agent-coord, agent-night |
 | PLAN-031 | doc-agent-engineering-delegation | active | 12 | 0 | 2 | agent-build, agent-night |
 | PLAN-032 | doc-autonomous-agent-operations | active | 4 | 0 | 3 | agent-coord, agent-night |
 | PLAN-033 | doc-retrieval-knowledge-infrastructure | active | 10 | 0 | 1 | agent-night |
