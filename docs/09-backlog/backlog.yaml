@@ -12886,7 +12886,7 @@ items:
   - sys-html
   owner: repository-owner
   agent: agent-batch-runner
-  status: active
+  status: complete
   priority: 3
   session_budget: 1
   depends_on:
@@ -12919,8 +12919,9 @@ items:
   - templates/README.md
   - docs/08-governance/OPS-033-template-library.md
   - docs/08-governance/codes.yaml
-  next_action: All acceptance met; coordinator-dispatched review gating PASS with its one major
-    resolved; awaiting the owner's merge approval via the Session Manager, then completion on dev.
+  next_action: Complete. Merged onto dev with the owner's overnight approval relayed by the Session
+    Manager (GOV-017 gating verdict PASS); the template library is in templates/html/library.yaml
+    and tools/template_library.py.
   session: doc-session-template-library
   completion_evidence:
   - templates/html/library.yaml
