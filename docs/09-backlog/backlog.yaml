@@ -198,7 +198,7 @@ items:
   - sys-projection
   owner: repository-owner
   agent: agent-batch-runner
-  status: active
+  status: complete
   priority: 1
   session_budget: 1
   depends_on:
@@ -219,8 +219,8 @@ items:
   - src/db/source_validation.py
   - test/test_source_validation.py
   - test/test_rebuild.py
-  next_action: Owner accepted the test/test_rebuild.py fixture on 2026-10-05; re-claimed with it
-    in the deliverables. Awaiting the merge via the Session Manager, then completion on dev.
+  next_action: Complete. Source references and duplicate IDs are checked in src/db/source_validation.py;
+    merged onto dev with the owner's approval of 2026-10-05, including the test/test_rebuild.py fixture.
   session: doc-session-source-references
   completion_evidence:
   - src/db/source_validation.py
