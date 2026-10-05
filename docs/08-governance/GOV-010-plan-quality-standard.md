@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-09-22'
+updated: '2026-10-05'
 systems: [sys-gov-docs]
 depends_on: [doc-idea-graph-lifecycle-requirements, doc-governance-protocol]
 ---
@@ -267,6 +267,40 @@ assumed.
 - **Does not.** `PLAN-002`'s implementation sequence has no dependency column. Its phase 4, the
   Session Briefing, reads the outputs of the signals built in phases 1 and 2, but that dependency is
   shown only in the separate Composition Map, not where the work is ordered.
+
+### P12. The plan names the threat surfaces its phases touch
+
+A plan names each threat surface its phases touch, and for each one says what protects it or points
+to the decision that does. The four surfaces are:
+
+- **Authentication:** who may call, open or use what the phase builds.
+- **Network exposure:** anything that listens, binds a host or port, or accepts a connection,
+  including an HTTP or websocket route.
+- **Secrets:** credentials, tokens, keys, and the private data root (`_private/`).
+- **Dependencies:** a new or changed third-party package or version (`pyproject.toml`, `uv.lock`,
+  `ts/package.json`, `ts/package-lock.json`).
+
+A plan whose phases touch none of them says so in one line. This is the plan-time half of the
+owner's 2026-09-23 ruling Q9; its diff-time half is the security review in `GOV-017`'s merge gate
+(`REQ-030` R08).
+
+**How a reviewer judges it.** Read each phase's `deliverables` and the code they name, and list the
+surfaces they touch. A route under `src/api/`, a process or terminal the code spawns, a bind host, a
+credential read from the environment, and a change to a dependency file each count. The plan must
+name every surface on that list. If the plan says nothing about threat surfaces, the judgement
+fails; it does not mean none is touched. If the plan names a decision without saying which surface
+that decision governs, the judgement also fails, because the reader cannot tell what is exposed.
+
+- **Meets it.** The live-demo plan (`PLAN-021`) says the terminal capability's security posture is
+  decided in `ADR-013`, which binds the route to loopback and gates it behind an environment flag.
+  The workbench features plan (`PLAN-027`) maps a requirement row, "An ADR covers gating, binding,
+  identity, auth, buffering, detach", to `phase-wbf-07`.
+- **Does not.** A plan whose phase lists `src/api/routes/demo_terminal.py` in its `deliverables` (a
+  websocket route that runs a shell) and whose text names neither a network nor an authentication
+  surface. That route listens for connections and gives whoever connects a shell. A plan that
+  says nothing of either leaves the reviewer to discover both from the code. Citing the terminal
+  decision only as a "boundary", without saying it governs binding and who may connect, fails in
+  the same way.
 
 ## Content judgements for requirements
 

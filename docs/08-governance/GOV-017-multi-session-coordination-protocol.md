@@ -221,6 +221,29 @@ R05, R06), from `phase-asr-04` on. A sampled re-review (`PLAN-047` D6,
 [OPS-030](OPS-030-draw-rereview-sample.md)) is recorded the same way with `gating: false`, because
 the merge it would have decided has already happened.
 
+**The security review.** A phase whose diff touches a threat surface also gets a diff-time security
+review before `READY` (owner ruling at G3 on `PLAN-047` OQ3, 2026-09-24: "the coordinator runs the
+built-in /security-review on qualifying phases, recorded as a verdict"; `REQ-030` R08). It is the
+diff-time half of ruling Q9, whose plan-time half is `GOV-010` P12.
+
+- **Trigger.** The coordinator runs it when either is true. First, the phase's plan names a threat
+  surface under `GOV-010` P12 (authentication, network exposure, secrets, dependencies). Second,
+  `git diff --name-only <range>` lists a path that touches one: anything under `src/api/` or
+  `src/demo/`, `src/main.py`, `pyproject.toml`, `uv.lock`, `ts/package.json`,
+  `ts/package-lock.json`, `.github/workflows/`, `tools/git-hooks/`, `.mcp.json`, or
+  `.claude/settings*.json`. A diff that reads a credential from the environment, opens a socket or
+  spawns a process outside those paths also triggers it. When the coordinator is unsure, it runs the
+  review.
+- **Who runs it.** The coordinator runs Claude Code's built-in `/security-review` command against
+  the branch at the reviewed commit, in the scratch clone it made for the gating reviewer. The
+  building session never runs it for its own phase.
+- **The record.** The coordinator records the result as a verdict record beside the others, with
+  `reviewer.type: security-review` and `gating: true`. Its findings are fixed or explicitly accepted
+  like the gating reviewer's. The schema's `definition_sha256` names an agent definition file, and
+  the built-in command has none. Until the schema says what a built-in reviewer records there, the
+  coordinator records the sha256 of the output of `claude --version` it ran under, and says so in
+  the record's `notes` (idea `000589`).
+
 **Leaving shadow.** The judge's verdicts decide nothing while it runs in shadow. It leaves shadow
 when the owner decides so on a comparison table built from the verdict records, after at least ten
 reviewed phases, and that decision is recorded in `GOV-003` (owner ruling at G3, 2026-09-24).
@@ -233,8 +256,9 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
 1. The session sends `READY` with the paths of the verdict records the Session Manager handed it,
    committed unchanged on the branch, and every finding either fixed or explicitly accepted. The
    records come from the review in *Build reviews*: the runner, then the gating reviewer and, during
-   shadow, the shadow judge `review-judge`, on the same brief. It also sends the tail of its
-   post-rebase runs of the four gate checks:
+   shadow, the shadow judge `review-judge`, on the same brief. For a phase that triggers the
+   security review, `READY` also names its `/security-review` verdict record. It also sends the
+   tail of its post-rebase runs of the four gate checks:
    `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/ tools/` and
    `uv run mypy src/`. `dev`'s baseline is 0 ruff findings and 0 mypy errors, so each check must report
    zero findings; matching the previous count is not enough.

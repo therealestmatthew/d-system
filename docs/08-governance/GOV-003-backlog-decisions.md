@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-10-04'
+updated: '2026-10-05'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -899,3 +899,59 @@ Applied by `phase-grd-03` (`PLAN-045`, `REQ-028` R07-R10) in
 
 **Why recorded here:** `PLAN-045` D7 still states the earlier base. A session reading the plan alone
 would wait for a Session Manager run that never produces a base report.
+
+## The build-review judge has no shell, and a fixed runner executes its commands — 2026-09-23
+
+Owner ruling O-5 of 2026-09-23, as the Session Manager's board records it: "O-5 judge without Bash +
+fixed command runner" (answering O-5 (a) in the Scout's orchestration architecture report).
+**Standing.**
+
+The build-review judge is an agent with no shell: `review-judge` declares `tools: Read, Grep, Glob`.
+The commands a review needs are run by code with no judgement: `tools/run_review_checks.py`
+([OPS-029](OPS-029-run-review-checks.md)) runs the phase's `verification` list and the gate checks
+at the reviewed commit and writes the evidence the judge reads. A judge that needs a command the
+runner did not run says so in its verdict and does not run it (`PLAN-047` D1, `REQ-030` R01-R02;
+built by `phase-asr-01` and `phase-asr-02`).
+
+**Why recorded here:** keeping `Bash` and relying on the prompt was the state idea `000241` records
+failing. A later change that gives the judge a shell reverses this ruling and needs the owner.
+
+## The coordinator dispatches every build review, never the builder — 2026-09-23
+
+Owner ruling O-6 of 2026-09-23, as the Session Manager's board records it: "O-6 coordinator
+dispatches assurance (out of P3:164)" (answering O-6 (a) in the Scout's orchestration architecture
+report). **Standing.**
+
+Every build review is dispatched and briefed by the coordinator, today the Session Manager, never by
+the session that built the phase. The brief holds the phase's `scope`, `acceptance` and
+`verification`, the commit range and its diff, the runner's manifest and, for the gating reviewer, a
+coordinator-made checkout, and nothing the builder wrote. A building session sends `REVIEW-REQUEST`
+and waits for `VERDICT` (`PLAN-047` D3, `REQ-030` R03-R04; written into
+[GOV-017](GOV-017-multi-session-coordination-protocol.md) "Build reviews", `/session-close` step 3,
+`PROMPT-036` and `PROMPT-037` by `phase-asr-04`). The same coordinator runs the diff-time
+`/security-review` on qualifying phases (owner ruling at G3 on `PLAN-047` OQ3, 2026-09-24; applied
+by `phase-asr-05`).
+
+**Why recorded here:** before this ruling the builder dispatched its own reviewer, and so chose what
+went into the reviewer's brief. A rule in `GOV-014` alone could be read as binding only the
+idea-realization pipeline, which has not yet run, so the ruling is recorded here and in `GOV-017`.
+
+## Build-review verdicts are recorded now, and new reviewer types start in shadow — 2026-09-23
+
+Owner ruling Q7 of 2026-09-23, as the Session Manager's board records it: "Q7 record verdicts now,
+new reviewer types start in shadow" (answering Q7 in Builder A's owner-design mapping, section 8).
+**Standing.**
+
+Every build-review verdict, gating and shadow, is recorded as a schema-valid verdict record under
+`docs/08-governance/reviews/verdicts/` (`schemas/review-verdict.schema.json`), committed unchanged
+on the phase branch and checked by sha256 at the merge gate (`PLAN-047` D4, `REQ-030` R05, R10). A
+new reviewer type starts in shadow, recorded with `gating: false`, beside the gating reviewer on the
+same brief, and decides nothing. `review-judge` is the first such type. It leaves shadow when the
+owner decides so on a comparison table built from the verdict records after at least ten reviewed
+phases, and that decision is recorded in this document (`PLAN-047` D5, OQ2, ruled at G3 on
+2026-09-24). A sampled re-review is recorded with `gating: false`
+([OPS-030](OPS-030-draw-rereview-sample.md)).
+
+**Why recorded here:** the calibration data the owner asked for exists only if every verdict is kept
+from the first review on. A reviewer type that gated from its first review would decide merges with
+no record of how often it agrees with the reviewers it replaces.
