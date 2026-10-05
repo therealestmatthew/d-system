@@ -469,7 +469,7 @@ CI regenerates it and fails on any difference.
 | PLAN-003.04 | doc-html-04-frontend-components | deprecated | 0 | 0 | 0 | — |
 | PLAN-003.05 | doc-html-05-sample-data | deprecated | 0 | 0 | 0 | — |
 | PLAN-003.06 | doc-html-06-verification | deprecated | 0 | 0 | 0 | — |
-| PLAN-004 | doc-reliability-follow-up | approved | 7 | 0 | 4 | agent-architect, agent-builder-b, agent-rel11 |
+| PLAN-004 | doc-reliability-follow-up | approved | 6 | 1 | 4 | agent-architect, agent-batch-runner, agent-builder-b, agent-rel11 |
 | PLAN-005 | doc-document-codes | complete | 0 | 0 | 6 | — |
 | PLAN-006 | doc-confidentiality-sweep | complete | 0 | 0 | 6 | agent-architect, agent-clay, agent-fern |
 | PLAN-007 | doc-capture-system | complete | 0 | 0 | 1 | agent-architect |

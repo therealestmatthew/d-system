@@ -197,7 +197,8 @@ items:
   - sys-contracts
   - sys-projection
   owner: repository-owner
-  status: queued
+  agent: agent-batch-runner
+  status: active
   priority: 1
   session_budget: 1
   depends_on:
@@ -217,6 +218,7 @@ items:
   deliverables:
   - src/db/source_validation.py
   - test/test_source_validation.py
+  - test/test_rebuild.py
   next_action: 'PARKED overnight 2026-10-05: branch agent/phase-rel-03 at 8c4f349 is READY
     (review: should-fix fixed; SM gate green, 1545 passed). Owner decision: accept test/test_rebuild.py
     (sys-delivery, outside declared systems; a 7-line commitment fixture), widen the declaration,
