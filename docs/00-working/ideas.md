@@ -25278,3 +25278,13 @@ tools/check_test_baseline.py reports OK when a test that passed in the base fail
 Context: R10 makes R07's output part of a READY. GOV-017's merge gate separately runs the full pytest suite, so a failing branch test is not invisible at the gate, but the baseline tool's "OK" line can read as a pass for a red run, which is what happened during phase-grd-04. The tool and R07 were built by phase-grd-03 under PLAN-045.
 
 </details>
+
+---
+
+## 000588 · Align the demo-adversary and demo-validator-code charters with the scratch-clone review brief
+
+**Created 2026-10-05T03:11:30-04:00 · Status: `open`**
+
+The demo-adversary and demo-validator-code agent definitions (.claude/agents/) still say they run against "the worktree path stated in your dispatch prompt"; since phase-asr-04 the GOV-017 brief gives the gating reviewer a coordinator-made scratch clone at the reviewed commit, not a worktree, and bars reading the session record and git log there. Align the charters.
+
+(From Session 3 - Standby Builder, 2026-10-05, overnight run; recorded as given by Ideation.)
