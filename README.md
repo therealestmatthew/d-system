@@ -146,7 +146,7 @@ is paired with an `OPS-*` document; the [catalog](docs/08-governance/catalog.md)
 ```bash
 uv run pytest                                      # Run all tests
 uv run pytest test/path/to/test_file.py::test_name # Run specific test
-uv run ruff check src/ test/                       # Linting
+uv run ruff check src/ test/ tools/                # Linting
 uv run mypy src/                                   # Type-checking
 cd ts && npm run build                             # Frontend build
 ```

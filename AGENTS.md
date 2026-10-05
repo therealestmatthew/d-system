@@ -87,7 +87,7 @@ uv run pytest
 uv run pytest test/path/to/test_file.py::test_name
 
 # Lint / type-check
-uv run ruff check src/ test/
+uv run ruff check src/ test/ tools/
 uv run mypy src/
 
 # Governance — run before finishing any documentation change

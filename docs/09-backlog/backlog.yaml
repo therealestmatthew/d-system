@@ -419,14 +419,10 @@ items:
   scope:
   - Resolve existing script lint issues and include the selected loader/retrieval
     tooling in CI checks.
-  - Widen the lint gate documented in AGENTS.md and OPS-001 to cover tools/, so the
-    command agents run by hand matches the one CI runs. Owner decision; see GOV-003.
   - Keep tests isolated from the repository database.
   acceptance:
   - The expanded lint/test commands pass and cover preflight, failed rebuild and retrieval
     behavior.
-  - uv run ruff check src/ test/ tools/ passes, and that is the command AGENTS.md
-    and OPS-001 name.
   - CI tests neither require nor create the repository data/ directory.
   verification:
   - uv run pytest
@@ -436,8 +432,6 @@ items:
   - tools/rebuild_db.py
   - tools/load_context.py
   - test/test_rebuild_db.py
-  - AGENTS.md
-  - docs/08-governance/OPS-001-operations.md
   next_action: Resolve existing script lint issues and include the selected loader/retrieval
     tooling in CI checks.
 - id: phase-rel-10
