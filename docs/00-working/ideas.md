@@ -25192,3 +25192,23 @@ No phase owns this. The nearest is phase-sch-04 (Write the per-layer testing sta
 The idea-realization plugin's writer (plugins/idea-realization/scripts/idea.py change_status) checks only that promoted_to is non-empty, the same gap 000577 fixed in tools/append_idea.py; it should resolve each promoted_to value to a governed document code.
 
 (From Session 3 - Standby Builder, 2026-10-05, overnight run; recorded as given by Ideation. Overlaps 000577, which raised the same gap in tools/append_idea.py.)
+
+---
+
+## 000585 · Update sys-demo-overview's status and paths in the systems registry
+
+**Created 2026-10-05T00:43:27-04:00 · Status: `open`**
+
+sys-demo-overview in docs/08-governance/systems.yaml is still "planned" with only PLAN-021 as its path, though phase-demo-03/04 shipped tools/overview_metrics.py, overview_inventory.py and generate_overview.py; update its status and paths.
+
+(From Session 5 - Batch Runner, 2026-10-05, found while doing 000571; recorded as given by Ideation. Same kind of registry drift as 000571, which concerns sys-html.)
+
+---
+
+## 000586 · Correct sys-html's depends_on in the systems registry to what the engine-page generator uses
+
+**Created 2026-10-05T00:43:27-04:00 · Status: `open`**
+
+sys-html's depends_on (sys-api, sys-ui, sys-contracts) reflects retired PLAN-003; the shipped engine-page generator actually imports the idea log fold(), sys-backlog readiness and governance front-matter parsing. Review and correct it.
+
+(From Session 5 - Batch Runner, 2026-10-05, left out of the 000571 fix to keep its diff narrow; recorded as given by Ideation.)
