@@ -45,8 +45,14 @@
                             the table view's <table>. Carries no wrapper of its own; this
                             template supplies the ".lr-prose" typography scope
     {{FOOTER}}           - pre-rendered HTML, e.g. what generated this page and from what
+    {{INLINE_SCRIPT}}    - pre-rendered HTML: on the three table views, a complete <script>
+                            element holding templates/scripts/lit-report-table.js (sorting,
+                            filtering, matrix column visibility; phase-lrr-03, owner ruling
+                            2026-09-30); an empty string on every deliverable page, which
+                            therefore carries no script tag at all
 
-  Self-contained (R08): no external stylesheet link, no script tag, no remote asset. Light
+  Self-contained (R08): no external stylesheet link, no remote script, no remote asset. The
+  only script is the table views' inline one above; it fetches nothing. Light
   and dark legibility (R09) come entirely from lit-report.css's :root custom properties and
   its prefers-color-scheme override; this template makes no colour decisions itself. Wide
   {{CONTENT}} (a 1,200-row table, a 1,305-line deliverable) never grows the page body past
@@ -100,5 +106,6 @@
     {{FOOTER}}
   </footer>
 </div>
+{{INLINE_SCRIPT}}
 </body>
 </html>

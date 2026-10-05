@@ -369,33 +369,92 @@ def test_index_counts_match_the_extractors_counts_exactly(
         assert f"<strong>{table['column_count']}</strong> columns" in index
 
 
-def test_csv_placeholder_counts_match_the_extracted_table(
-    data: dict[str, Any], pages: dict[str, str]
-) -> None:
+def _csv_pages(data: dict[str, Any]) -> list[tuple[str, dict[str, Any], str]]:
+    """(href, table, table key) for each CSV deliverable."""
+    key_by_filename = {t["filename"]: k for k, t in data["tables"].items()}
+    out = []
     for entry in data["deliverables"]:
-        if entry["format"] != "csv":
-            continue
-        href = f"{Path(entry['filename']).stem}.html"
-        rendered = pages[href]
-        table = next(
-            t for t in data["tables"].values() if t["filename"] == entry["filename"]
-        )
-        assert f"<strong>{table['row_count']:,}</strong>" in rendered
-        assert f"<strong>{table['column_count']}</strong>" in rendered
-        for column in table["columns"]:
-            assert html.escape(column) in rendered
-
-
-def test_csv_pages_carry_the_phase_lrr_03_handoff_marker_and_md_pages_do_not(
-    data: dict[str, Any], pages: dict[str, str]
-) -> None:
-    marker = "phase-lrr-03"
-    for entry in data["deliverables"]:
-        href = f"{Path(entry['filename']).stem}.html"
         if entry["format"] == "csv":
-            assert marker in pages[href]
-        else:
-            assert marker not in pages[href]
+            key = key_by_filename[entry["filename"]]
+            out.append((f"{Path(entry['filename']).stem}.html", data["tables"][key], key))
+    return out
+
+
+def _tbody_rows(rendered: str) -> list[str]:
+    body = re.search(r"<tbody>(.*?)</tbody>", rendered, re.S)
+    assert body, "no <tbody> in table page"
+    return re.findall(r"<tr>(.*?)</tr>", body.group(1), re.S)
+
+
+def _cell_texts(row_html: str) -> list[str]:
+    """A rendered row's cells as the browser's textContent: tags dropped, entities decoded."""
+    cells = re.findall(r"<td>(.*?)</td>", row_html, re.S)
+    return [html.unescape(re.sub(r"<[^>]+>", "", cell)) for cell in cells]
+
+
+def test_table_pages_render_every_row_and_column_of_the_extracted_table(
+    data: dict[str, Any], pages: dict[str, str]
+) -> None:
+    """R03: rendered row counts equal the CSVs' (1200, 1154, 67) and every column has a
+    sortable header -- read from the extractor's table, never recounted."""
+    expected = {"ledger": 1200, "inventory": 1154, "matrix": 67}
+    for href, table, key in _csv_pages(data):
+        rendered = pages[href]
+        rows = _tbody_rows(rendered)
+        assert len(rows) == table["row_count"] == expected[key]
+        headers = re.findall(r'<th scope="col" aria-sort="none" data-lr-col="\d+">(.*?)</th>',
+                             rendered)
+        assert [html.unescape(re.sub(r"<[^>]+>", "", h)) for h in headers] == table["columns"]
+        assert all('class="lr-table__sort"' in h for h in headers)
+        assert f'data-lr-table="{key}"' in rendered
+        assert f'data-lr-row-count="{table["row_count"]}"' in rendered
+        assert f"of {table['row_count']:,} rows" in rendered
+
+
+def test_table_cells_carry_the_csv_values_exactly_in_csv_order(
+    data: dict[str, Any], pages: dict[str, str]
+) -> None:
+    """Every cell's text, as a browser reads it, is the CSV value: the <wbr> break hints add
+    no text, so sorting and filtering see exactly what the CSV holds."""
+    for href, table, _key in _csv_pages(data):
+        rendered_rows = [_cell_texts(row) for row in _tbody_rows(pages[href])]
+        assert rendered_rows == table["rows"]
+
+
+def test_only_the_matrix_has_column_controls_with_the_documented_defaults(
+    data: dict[str, Any], pages: dict[str, str]
+) -> None:
+    """R03: the matrix's column visibility starts at MATRIX_DEFAULT_COLUMNS, one checkbox per
+    column; the ledger and inventory have no column controls."""
+    defaults = lit_report_render.MATRIX_DEFAULT_COLUMNS
+    for href, table, key in _csv_pages(data):
+        boxes = re.findall(r'<input type="checkbox" data-lr-col="(\d+)"( checked)?>', pages[href])
+        if key != "matrix":
+            assert boxes == []
+            continue
+        assert [int(index) for index, _ in boxes] == list(range(table["column_count"]))
+        checked = [table["columns"][int(index)] for index, mark in boxes if mark]
+        assert set(checked) == set(defaults) and len(checked) == len(defaults) == 9
+        assert f">{len(defaults)}</span> of {table['column_count']} shown" in pages[href]
+
+
+def test_a_default_column_missing_from_the_matrix_raises() -> None:
+    with pytest.raises(ValueError, match="not_a_column"):
+        lit_report_render._render_column_controls(["a", "b"], ("a", "not_a_column"))
+
+
+def test_no_placeholder_body_remains_on_any_page(pages: dict[str, str]) -> None:
+    """phase-lrr-02's handoff placeholder is gone; its marker named this phase."""
+    for href, rendered in pages.items():
+        assert "becomes a browsable table in a later phase" not in rendered, href
+        assert "lr-csv-columns" not in rendered, href
+
+
+def test_breakable_adds_break_hints_without_corrupting_entities() -> None:
+    assert lit_report_render._breakable("H1;H2") == "H1;<wbr>H2"
+    assert lit_report_render._breakable("x_y") == "x_<wbr>y"
+    assert lit_report_render._breakable("a<b") == "a&lt;b"
+    assert lit_report_render._breakable("a&b;c") == "a&amp;b;<wbr>c"
 
 
 # --- The 2026-09-22 editorial-note ruling on 05 -----------------------------------------------
@@ -464,8 +523,48 @@ def test_novel_appears_nowhere_outside_an_unavailability_statement(pages: dict[s
 def test_no_off_origin_network_dependency_in_any_page(pages: dict[str, str]) -> None:
     for href, rendered in pages.items():
         assert "<link" not in rendered, f"{href}: external stylesheet link present"
-        assert "<script" not in rendered, f"{href}: script tag present"
+        assert "<script src" not in rendered, f"{href}: external script present"
         assert re.search(r'src="https?://', rendered) is None, f"{href}: off-origin src"
+
+
+def test_only_the_three_table_pages_carry_a_script_and_it_is_inline(
+    data: dict[str, Any], pages: dict[str, str]
+) -> None:
+    """Owner ruling 2026-09-30: the table script is inlined on the table views and the
+    {{INLINE_SCRIPT}} token is empty everywhere else, so deliverable pages and the entry page
+    carry no script tag at all."""
+    table_pages = {href for href, _table, _key in _csv_pages(data)}
+    script = lit_report_render.load_template("lit-report-table.js")
+    for href, rendered in pages.items():
+        if href in table_pages:
+            assert rendered.count("<script") == 1, href
+            assert f"<script>\n{script}</script>" in rendered, href
+        else:
+            assert "<script" not in rendered, href
+
+
+def test_the_table_script_makes_no_network_call_and_cannot_close_its_element() -> None:
+    script = lit_report_render.load_template("lit-report-table.js")
+    for forbidden in ("fetch(", "XMLHttpRequest", "import(", "http://", "https://", "</script"):
+        assert forbidden not in script
+    assert "performance.now()" in script, "R10 timing span (owner ruling 2026-09-30)"
+
+
+def test_load_template_strips_the_scripts_leading_comment() -> None:
+    raw = (lit_report_render.TEMPLATES_SCRIPTS / "lit-report-table.js").read_text("utf-8")
+    assert raw.lstrip().startswith("/*")
+    loaded = lit_report_render.load_template("lit-report-table.js")
+    assert loaded.startswith("(function ()")
+    assert "{{" not in loaded
+
+
+def test_load_template_refuses_a_script_that_would_close_its_element(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    (tmp_path / "bad.js").write_text('var s = "</script>";\n', encoding="utf-8")
+    monkeypatch.setattr(lit_report_render, "TEMPLATES_SCRIPTS", tmp_path)
+    with pytest.raises(ValueError, match="</script"):
+        lit_report_render.load_template("bad.js")
 
 
 # --- R09: design-system conformance (this phase's slice) ---------------------------------------

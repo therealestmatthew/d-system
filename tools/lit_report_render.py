@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
-"""Render the literature-review campaign report's pages — `REQ-027` `phase-lrr-02`.
+"""Render the literature-review campaign report's pages — `REQ-027` `phase-lrr-02`, `phase-lrr-03`.
 
 This module renders. It writes nothing to `_public/` and assembles no CLI — `phase-lrr-04` owns
 both. It consumes `tools/lit_report_extract.extract()`'s output (see that module's docstring for
 the shape) and returns a mapping of relative output path to complete HTML document; writing that
-mapping to disk is `phase-lrr-04`'s job, and replacing the three CSV pages' placeholder bodies
-with interactive tables is `phase-lrr-03`'s.
+mapping to disk is `phase-lrr-04`'s job.
 
 Fifteen entries come out of `render_report()`: `index.html` plus one page per deliverable
-(fourteen — eleven Markdown, three CSV). The three CSV pages carry a placeholder body in this
-phase — their column list and row count, both read from the extractor's `tables` — rather than a
-sortable, filterable table; `_csv_placeholder()` below is where `phase-lrr-03` replaces the body.
+(fourteen — eleven Markdown, three CSV). Each CSV page is a browsable table view (`REQ-027` R03,
+`phase-lrr-03`): `_render_table()` writes every row into the page as HTML from the extractor's
+`tables` entry, so the table's data travels inline in its own page and nothing is fetched
+(`PLAN-043`'s inlining decision). `templates/scripts/lit-report-table.js` is inlined into those
+three pages only, through the page shell's `{{INLINE_SCRIPT}}`, and adds sorting, free-text
+filtering and, on the matrix, column visibility. Deliverable pages and the entry page carry no
+script (owner ruling, 2026-09-30).
 
 Determinism (`REQ-027` R05). `render_report()` is a pure function of its `data` argument and the
 on-disk template family under `templates/html/` and `templates/styles/` — no wall clock, no
@@ -64,6 +67,7 @@ from markdown_it import MarkdownIt
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATES_HTML = ROOT / "templates" / "html"
 TEMPLATES_STYLES = ROOT / "templates" / "styles"
+TEMPLATES_SCRIPTS = ROOT / "templates" / "scripts"
 
 SITE_TITLE = "D-System Literature-Review Campaign Report"
 
@@ -91,6 +95,38 @@ _CSS_COMMENT = re.compile(r"/\*.*?\*/", re.DOTALL)
 
 _TOKEN_RE = re.compile(r"\{\{([A-Z0-9_]+)\}\}")
 
+#: The leading `/* ... */` header comment of a script under templates/scripts/, stripped when the
+#: script is inlined, for the same page-weight and literal-string reasons as `_CSS_COMMENT`. Only
+#: the leading block goes: a regex cannot tell a comment from a `/*` inside a JavaScript string,
+#: so the script body is left exactly as written.
+_LEADING_JS_COMMENT = re.compile(r"^\s*/\*.*?\*/\s*", re.DOTALL)
+
+#: A zero-width split point after each underscore and semicolon; see `_breakable()`.
+_BREAK_AFTER = re.compile(r"(?<=[_;])")
+
+#: The table view the page's script drives. The key is the extractor's `tables` key.
+TABLE_SCRIPT = "lit-report-table.js"
+
+#: The matrix columns visible when its page opens (`REQ-027` R03: a default subset that fits a
+#: 1280px viewport without the page scrolling sideways). These are the matrix's nine short
+#: columns — identity, classification, scores and flags. The other 34 hold paragraphs of prose
+#: and start hidden; each has its own checkbox. A name missing from the matrix's header raises
+#: rather than silently showing fewer columns.
+MATRIX_DEFAULT_COLUMNS = (
+    "source_id",
+    "source_type",
+    "research_domain",
+    "hypotheses_challenged",
+    "component_overlap_score",
+    "architecture_overlap_score",
+    "critical_collision",
+    "interpretation_confidence",
+    "access_limitation",
+)
+
+#: Tables that get column-visibility controls, with the columns each shows by default.
+COLUMN_VISIBILITY_DEFAULTS: dict[str, tuple[str, ...]] = {"matrix": MATRIX_DEFAULT_COLUMNS}
+
 #: CommonMark plus tables and strikethrough, verified against all eleven Markdown deliverables.
 #:
 #: `html=False` is the one departure from the bare "commonmark" preset, and it is deliberate.
@@ -111,8 +147,17 @@ def load_template(name: str) -> str:
     stripped (it is inlined as a substitution value, never filled itself, so its rules are what
     matters -- not its prose). Anything else is read from `templates/html/` with its leading
     `<!-- token contract -->` doc comment stripped, so that comment's own literal `{{TOKEN}}`
-    mentions cannot be corrupted by `fill()`.
+    mentions cannot be corrupted by `fill()`. `name` ending in `.js` is read from
+    `templates/scripts/` with its leading `/* ... */` comment stripped; it raises `ValueError` if
+    the script contains `</script`, which would close the inline `<script>` element early.
     """
+    if name.endswith(".js"):
+        script = _LEADING_JS_COMMENT.sub(
+            "", (TEMPLATES_SCRIPTS / name).read_text(encoding="utf-8"), count=1
+        )
+        if "</script" in script.lower():
+            raise ValueError(f"load_template(): {name} contains '</script' and cannot be inlined")
+        return script
     if name.endswith(".css"):
         raw = (TEMPLATES_STYLES / name).read_text(encoding="utf-8")
         return _CSS_COMMENT.sub("", raw)
@@ -253,23 +298,69 @@ def _editorial_note_05(measured_collision_sections: int) -> str:
     )
 
 
-def _csv_placeholder(table: dict[str, Any]) -> str:
-    """The three CSV deliverables' placeholder body for this phase.
-
-    `phase-lrr-03` replaces this CONTENT with the interactive, sortable, free-text-filterable
-    table `REQ-027` R03 requires (and, for the matrix, column visibility). Until then this states
-    the table's column list and row count, both read from the extractor's own `tables` entry —
-    nothing here is computed from the CSV directly.
-    """
-    columns = "".join(f"<li><code>{html.escape(c)}</code></li>" for c in table["columns"])
+def _render_column_controls(columns: list[str], defaults: tuple[str, ...]) -> str:
+    """The matrix's column-visibility checkboxes, collapsed by default, `defaults` ticked."""
+    missing = [name for name in defaults if name not in columns]
+    if missing:
+        raise ValueError(f"default column(s) not in the table: {', '.join(missing)}")
+    boxes = "".join(
+        '<label class="lr-table-view__column">'
+        f'<input type="checkbox" data-lr-col="{index}"{" checked" if name in defaults else ""}>'
+        f"<code>{html.escape(name)}</code></label>"
+        for index, name in enumerate(columns)
+    )
     return (
-        "<!-- phase-lrr-03: replace this placeholder body with the interactive, sortable, "
-        "free-text-filterable table (REQ-027 R03). The matrix view additionally needs "
-        "column-visibility toggles. -->\n"
-        "<p>This CSV deliverable becomes a browsable table in a later phase "
-        f"(<code>phase-lrr-03</code>). For now: <strong>{table['row_count']:,}</strong> rows "
-        f"&times; <strong>{table['column_count']}</strong> columns.</p>"
-        f'<ul class="lr-csv-columns">{columns}</ul>'
+        '<details class="lr-table-view__columns">'
+        "<summary>Columns: "
+        f'<span class="lr-table-view__columns-count">{len(defaults)}</span> of {len(columns)} '
+        "shown</summary>"
+        f'<div class="lr-table-view__column-list">{boxes}</div>'
+        "</details>"
+    )
+
+
+def _breakable(text: str) -> str:
+    """`text`, escaped, with a `<wbr>` after each underscore and semicolon.
+
+    Headers such as `architecture_overlap_score` and cells such as `H2;H7;H9` or
+    `preprint_version` have no space to wrap at, so each would hold its column at the width of
+    the whole string. `<wbr>` adds a break opportunity and no text, so a cell's `textContent`,
+    which the script sorts and filters on, is exactly the CSV value.
+    """
+    # Split the raw text and escape each piece: inserting after escaping would also break the
+    # semicolon that ends an entity such as &lt;.
+    return "<wbr>".join(html.escape(piece) for piece in _BREAK_AFTER.split(text))
+
+
+def _render_table(key: str, table: dict[str, Any]) -> str:
+    """One CSV deliverable as a browsable table view (`REQ-027` R03).
+
+    Every row of the extractor's `tables[key]` is written as an escaped `<tr>`, in the CSV's
+    order, so the page carries its own data and the row count is the extractor's by
+    construction. The figures shown are `row_count` and `columns`, never a recount.
+    """
+    columns: list[str] = table["columns"]
+    header_cells = "".join(
+        f'<th scope="col" aria-sort="none" data-lr-col="{index}">'
+        f'<button type="button" class="lr-table__sort">{_breakable(name)}</button></th>'
+        for index, name in enumerate(columns)
+    )
+    body_rows = "\n".join(
+        "<tr>" + "".join(f"<td>{_breakable(cell)}</td>" for cell in row) + "</tr>"
+        for row in table["rows"]
+    )
+    defaults = COLUMN_VISIBILITY_DEFAULTS.get(key)
+    controls = _render_column_controls(columns, defaults) if defaults is not None else ""
+    return fill(
+        load_template("lit-report-table.html"),
+        {
+            "TABLE_KEY": html.escape(key),
+            "ROW_COUNT": str(table["row_count"]),
+            "ROW_COUNT_TEXT": f"{table['row_count']:,}",
+            "COLUMN_CONTROLS": controls,
+            "HEADER_CELLS": header_cells,
+            "BODY_ROWS": body_rows,
+        },
     )
 
 
@@ -362,30 +453,35 @@ def render_report(data: dict[str, Any]) -> dict[str, str]:
     """The full fifteen-page mapping: `index.html` plus one page per deliverable.
 
     A pure function of `data` (from `tools.lit_report_extract.extract()`) and the on-disk
-    `templates/html/lit-report-*.html` + `templates/styles/lit-report.css` family. No figure here
+    `templates/html/lit-report-*.html` + `templates/styles/lit-report.css` +
+    `templates/scripts/lit-report-table.js` family. No figure here
     is computed from the corpus; every count comes from `data["counts"]` or from the
     `deliverables`/`tables` entries the extractor already measured.
     """
     page_template = load_template("lit-report-page.html")
     index_template = load_template("lit-report-index.html")
     css = load_template("lit-report.css")
+    table_script = f"<script>\n{load_template(TABLE_SCRIPT)}</script>"
 
     deliverables: list[dict[str, Any]] = data["deliverables"]
     tables: dict[str, dict[str, Any]] = data["tables"]
     counts: dict[str, Any] = data["counts"]
-    table_by_filename = {table["filename"]: table for table in tables.values()}
+    table_key_by_filename = {table["filename"]: key for key, table in tables.items()}
 
     pages: dict[str, str] = {}
     for entry in deliverables:
         href = _output_path(entry["filename"])
 
         editorial_notes = ""
+        script = ""
         if entry["format"] == "md":
             content = render_markdown(entry["markdown"])
             if entry["filename"] == "05_critical_collisions.md":
                 editorial_notes = _editorial_note_05(counts["collision_sections"])
         else:
-            content = _csv_placeholder(table_by_filename[entry["filename"]])
+            key = table_key_by_filename[entry["filename"]]
+            content = _render_table(key, tables[key])
+            script = table_script
 
         pages[href] = fill(
             page_template,
@@ -400,6 +496,7 @@ def render_report(data: dict[str, Any]) -> dict[str, str]:
                 "EDITORIAL_NOTES": editorial_notes,
                 "CONTENT": content,
                 "FOOTER": _render_footer(entry["filename"]),
+                "INLINE_SCRIPT": script,
             },
         )
 

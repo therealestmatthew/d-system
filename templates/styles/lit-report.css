@@ -402,6 +402,127 @@ h1.lr__site-title {
   background: var(--lr-table-row-alt);
 }
 
+/* ---- table views (lit-report-table.html, phase-lrr-03): the three CSVs, browsable ---- */
+
+/* The view's own scroll box carries any width the visible columns need, so the page body never
+   scrolls sideways (R03); the table inside it is a real table again rather than the block-level
+   scroller .lr-prose table makes a Markdown table. */
+.lr-table-view__scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.lr-prose .lr-table {
+  display: table;
+  overflow: visible;
+  margin: 0;
+}
+
+/* Cells hold up to a few thousand characters of prose. A reading width between 5rem and 28rem
+   keeps a row from becoming one very wide line or one very tall column; break-word, unlike
+   anywhere, breaks only a word longer than the column, so the table cannot squeeze every
+   column to a single character to fit its box. */
+.lr-prose .lr-table th,
+.lr-prose .lr-table td {
+  padding: 0.35rem 0.45rem;
+}
+
+.lr-table td {
+  min-width: 5rem;
+  max-width: 28rem;
+  overflow-wrap: break-word;
+}
+
+.lr-prose .lr-table thead th {
+  white-space: normal;
+  min-width: 4rem;
+}
+
+.lr-table [hidden] {
+  display: none;
+}
+
+.lr-table__sort {
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.lr-table__sort:focus-visible {
+  outline: 2px solid var(--lr-link);
+  outline-offset: 2px;
+}
+
+.lr-table th[aria-sort="ascending"] .lr-table__sort::after {
+  content: " \25B2";
+}
+
+.lr-table th[aria-sort="descending"] .lr-table__sort::after {
+  content: " \25BC";
+}
+
+.lr-table-view__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  margin: 0 0 0.75rem;
+}
+
+.lr-table-view__filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lr-table-view__filter-input {
+  font: inherit;
+  font-weight: 400;
+  width: 22rem;
+  max-width: 100%;
+  padding: 0.3rem 0.5rem;
+  color: var(--lr-fg);
+  background: var(--lr-bg);
+  border: 1px solid var(--lr-border);
+  border-radius: 6px;
+}
+
+.lr-table-view__status {
+  margin: 0;
+  color: var(--lr-fg-muted);
+}
+
+.lr-table-view__columns {
+  margin: 0 0 0.75rem;
+}
+
+.lr-table-view__columns summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.lr-table-view__column-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.25rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.lr-table-view__column {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 /* ---- framing block (lit-report-index.html): the epistemic posture, prominent ---- */
 
 /* The provenance line inside the framing block. REQ-027 R06 keeps the third duplicate-rate
@@ -513,6 +634,12 @@ h1.lr__site-title {
 
   .lr__nav {
     flex: 1 1 auto;
+    width: 100%;
+  }
+
+  /* Stacked, align-items: flex-start would size main to its content, and a table view's
+     content is the whole table; full width keeps the table scrolling inside its own box. */
+  .lr__main {
     width: 100%;
   }
 }

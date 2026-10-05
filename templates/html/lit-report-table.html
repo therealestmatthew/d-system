@@ -1,0 +1,49 @@
+<!--
+  Literature-review campaign report — one browsable table view (PLAN-043, REQ-027 R03, R10,
+  phase-lrr-03). Filled by tools/lit_report_render.py into {{CONTENT}} of lit-report-page.html
+  on the three CSV pages (ledger, inventory, matrix). Every row is rendered here as HTML, so the
+  table's data travels inline in its own page (PLAN-043's inlining decision) and nothing is
+  fetched. templates/scripts/lit-report-table.js, inlined through the page's {{INLINE_SCRIPT}},
+  adds sorting, filtering and column visibility on top; without script the full table still
+  reads.
+
+  Token contract:
+    {{TABLE_KEY}}        - plain text, the extractor's key for this table: "ledger",
+                            "inventory" or "matrix". Carried as data-lr-table so the script
+                            and a browser check can address the table without guessing
+    {{ROW_COUNT}}        - plain text, the extractor's row_count, unformatted (e.g. "1200").
+                            The script reads it back as the "of N rows" total
+    {{ROW_COUNT_TEXT}}   - plain text, the same figure formatted for reading (e.g. "1,200")
+    {{COLUMN_CONTROLS}}  - pre-rendered HTML: a <fieldset> of one checkbox per column for the
+                            matrix (R03 column visibility), or an empty string for the other
+                            two tables
+    {{HEADER_CELLS}}     - pre-rendered HTML, one <th> per column, each holding a sort
+                            <button>
+    {{BODY_ROWS}}        - pre-rendered HTML, one <tr> per CSV row, cells escaped
+
+  The figures are the extractor's (REQ-027 R05). The script counts visible rows at run time
+  only to report the result of a filter the reader typed, never to restate a corpus figure.
+-->
+<div class="lr-table-view" data-lr-table="{{TABLE_KEY}}" data-lr-row-count="{{ROW_COUNT}}">
+  <div class="lr-table-view__controls">
+    <label class="lr-table-view__filter">
+      <span>Filter rows</span>
+      <input type="search" class="lr-table-view__filter-input" autocomplete="off"
+             spellcheck="false" placeholder="Type to filter any column">
+    </label>
+    <p class="lr-table-view__status" role="status" aria-live="polite">
+      Showing <span class="lr-table-view__shown">{{ROW_COUNT_TEXT}}</span> of {{ROW_COUNT_TEXT}} rows
+    </p>
+  </div>
+  {{COLUMN_CONTROLS}}
+  <div class="lr-table-view__scroll">
+    <table class="lr-table">
+      <thead>
+        <tr>{{HEADER_CELLS}}</tr>
+      </thead>
+      <tbody>
+        {{BODY_ROWS}}
+      </tbody>
+    </table>
+  </div>
+</div>
