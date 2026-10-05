@@ -1,0 +1,42 @@
+{
+  "verdict_id": "2026-10-05-phase-asr-04-demo-adversary",
+  "date": "2026-10-05",
+  "phase": "phase-asr-04",
+  "reviewed_commit": "7fa9a3e3f11d33ea2f0ee7fe6380cc4bf2809c80",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "GOV-017 never says where the Session Manager physically writes a verdict record before the builder has it.",
+      "evidence": "docs/08-governance/GOV-017-multi-session-coordination-protocol.md:192-199 (\"The review\" steps 3-4); tools/run_review_checks.py:220-236 removes the runner worktree in finally; PLAN-047 D4 says records are committed on the phase branch, not dev.",
+      "consequence": "An executing Session Manager following this text literally has nowhere to put the file: the runner worktree is gone, and writing into the primary checkout on dev needs a TURN? and would put an unmerged phase's record on dev.",
+      "minimal_fix": "Name the staging location explicitly (e.g. _working/session-manager/verdicts-pending/<verdict_id>.json), handed to the builder to copy into its own worktree at the stated path before committing."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "The merge-gate verdict-sha check names a checkout that has already been deleted, with no disambiguation.",
+      "evidence": "GOV-017.md:243-255, merge gate step 2: the runner's worktree is removed afterwards, then 'In a checkout of the branch tip, it runs sha256sum -c _working/session-manager/verdicts.sha256' without naming which checkout.",
+      "consequence": "The checkout is either already removed, the builder's own worktree (unstated), or a new SM worktree, which would reintroduce the separate detached-worktree step the phase's scope said to eliminate.",
+      "minimal_fix": "One sentence naming which checkout, ordered relative to the runner's worktree lifecycle."
+    },
+    {
+      "id": "F03",
+      "severity": "major",
+      "title": "PROMPT-036's Validator template does not carry the coordinator brief the intro paragraph says it does, and the scope required both templates to.",
+      "evidence": "docs/02-prompts/PROMPT-036-build-coordinator.md:306-312 (intro: both templates 'briefed under GOV-017's brief rule') vs :325-328 (Validator 'Give it' list lacks the runner manifest path that :333 adds for the Adversary); GOV-017.md:188-189 lists demo-validator-code as a gating option with no PROMPT-036 dispatch instruction.",
+      "condition": "Change PROMPT-036 step 6 and its validator and adversary templates to name dedicated reviewer types and the coordinator brief, not the general-purpose charter.",
+      "minimal_fix": "Either drop Validator from the intro's brief-rule claim and say it is a step-4 pre-review check distinct from the GOV-017 build review, or add the manifest-path instruction to the Validator paragraph and show where PROMPT-036 dispatches it as the step-6 gating reviewer."
+    }
+  ],
+  "raw_reply_sha256": "9fc9da14c718918e9f11ecac5ca893dd1ce0fd7a19c07c901dab479f12296cbf",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager by hand (phase-asr-04 acceptance: this phase's GOV-017 text is not yet on dev). Brief: scope, acceptance and verification from dev's backlog.yaml, the range a635c45..7fa9a3e, the runner manifest (run from a scratch clone at 7fa9a3e; all 8 entries exit 0). The diff (29.6 KB) was given as a file path, not pasted inline. No builder-written input. Raw reply kept at _working/session-manager/verdict-evidence/phase-asr-04/; it is the reply text as received by the coordinator, with the harness's indentation removed."
+}

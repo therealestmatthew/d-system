@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-05-phase-asr-04-review-judge",
+  "date": "2026-10-05",
+  "phase": "phase-asr-04",
+  "reviewed_commit": "7fa9a3e3f11d33ea2f0ee7fe6380cc4bf2809c80",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [],
+  "raw_reply_sha256": "34b86f2b967f4b7dcb40366da3e5ff5cbc95aff3c95f72fe36b5a86fb0231c63",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager by hand (phase-asr-04 acceptance: this phase's GOV-017 text is not yet on dev). Brief: scope, acceptance and verification from dev's backlog.yaml, the range a635c45..7fa9a3e, the runner manifest (run from a scratch clone at 7fa9a3e; all 8 entries exit 0). The diff (29.6 KB) was given as a file path, not pasted inline. No builder-written input. Raw reply kept at _working/session-manager/verdict-evidence/phase-asr-04/; it is the reply text as received by the coordinator, with the harness's indentation removed. Acceptance items 3 and 6 judged 'cannot judge' (post-review steps); items 1, 2, 4 and 5 met."
+}
