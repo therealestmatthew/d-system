@@ -42,14 +42,26 @@ as Session 1 - Builder A, following the plan at
 
 ## Review
 
-Coordinator-dispatched review of `6163861`. Unclaimed, so there are no verdict records; the Session
-Manager keeps the raw replies under
-`_working/session-manager/verdict-evidence/fix-session-start-step2/`.
+Coordinator-dispatched review in two rounds. Unclaimed, so there are no verdict records; the
+Session Manager keeps the raw replies under
+`_working/session-manager/verdict-evidence/fix-session-start-step2/`. The commit ids are the
+reviewed tips, before the rebase onto dev `72e405b`.
+
+Round 1, on `6163861`:
 
 - demo-adversary (gating): pass-with-findings. Shadow review-judge: pass-with-findings.
 - Finding (minor, gating; shadow flagged the same): step 2's added sentence "Record which exception
   you relied on in the session record." was a standing rule found in none of the `000591` ruling,
-  `GOV-003`, `GOV-017` or `PROMPT-036`/`PROMPT-037`. Fixed by removing it, per the owner's ruling.
+  `GOV-003`, `GOV-017` or `PROMPT-036`/`PROMPT-037`. Fixed in `a58f713` by removing it, per the
+  owner's ruling.
+
+Round 2, on `a58f713`:
+
+- demo-adversary (gating): pass, no findings. It ran governance (OK, 45/452/37/347), pytest (1638
+  passed), ruff and mypy (clean) in its own clone and found the catalog regeneration exact. It
+  reported that it read this session record while locating its catalog row, against its brief; its
+  verdict rests on the diff and command evidence.
+- Shadow review-judge: pass, no findings.
 
 ## Verification
 
