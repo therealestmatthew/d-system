@@ -24302,3 +24302,13 @@ Raised by Session 1 - Builder A.
 `cd ts && npm test` (vitest, added for idea 000569 on branch agent/fix-react-error-boundary) is not in .github/workflows/ci.yaml or in the Session Manager's merge gate, so a broken stage test would not stop a merge. Run the frontend unit tests in both.
 
 Raised by Session 1 - Builder A.
+
+---
+
+## 000583 · Tests that read the live idea log should use a fixed fixture log or the schema's full status enum
+
+**Created 2026-10-04T23:03:19-04:00 · Status: `open`**
+
+Tests that read the live idea log (_data/ideas.jsonl) break the first time the data reaches a new status (2026-10-03: 000554 -> delivered crashed a workbench test on a status-table KeyError, fixed in e66b42d); such tests should use a fixed fixture log or the schema's full status enum, so an ungated idea turn cannot turn dev red.
+
+(From the owner, 2026-10-04, relayed verbatim by the Session Manager during the overnight run.)
