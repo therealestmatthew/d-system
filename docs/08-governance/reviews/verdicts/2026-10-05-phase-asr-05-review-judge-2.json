@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-05-phase-asr-05-review-judge-2",
+  "date": "2026-10-05",
+  "phase": "phase-asr-05",
+  "reviewed_commit": "8967335f33836f9ede79fcb3112e3c8183564649",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "The delta shows an idea-triage annotation and open->triaged move for idea 000589 in _data/ideas.jsonl and docs/00-working/ideas.md, outside the phase's scope.",
+      "evidence": "Delta e45c1cf..8967335 hunks on _data/ideas.jsonl and docs/00-working/ideas.md.",
+      "consequence": "Scope note only. The gating reviewer established these came from dev via the rebase (e45c1cf is not an ancestor of 8967335); the branch's own diff from 91bfdf4 touches only the declared files."
+    }
+  ],
+  "raw_reply_sha256": "28a482ec60b331ffc0d57a8251fab4aa90f46d2ef8131ea0d8a6369c1d23ade0",
+  "outcomes": [],
+  "notes": "Round 2. Dispatched and briefed by the Session Manager under GOV-017 'Build reviews'. Brief: scope/acceptance/verification from dev, range 91bfdf4..8967335 and delta since e45c1cf (files; no session record), runner manifest (coordinator scratch clone at 8967335; 7 entries exit 0), the clone for the gating reviewer only, the round-1 gating record. The delta file was cut against the pre-rebase round-1 commit e45c1cf and so also showed dev's idea commits (coordinator's diff choice, not a branch change). Raw reply at _working/session-manager/verdict-evidence/phase-asr-05/, indentation removed. Round-1 F01 and F02 resolved per the judge."
+}

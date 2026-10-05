@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-05-phase-asr-05-demo-adversary-2",
+  "date": "2026-10-05",
+  "phase": "phase-asr-05",
+  "reviewed_commit": "8967335f33836f9ede79fcb3112e3c8183564649",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [],
+  "raw_reply_sha256": "8108271f0f006d452ac33a8459de76dd125da69d0f74cc6569557dde475ba9c8",
+  "outcomes": [],
+  "notes": "Round 2. Dispatched and briefed by the Session Manager under GOV-017 'Build reviews'. Brief: scope/acceptance/verification from dev, range 91bfdf4..8967335 and delta since e45c1cf (files; no session record), runner manifest (coordinator scratch clone at 8967335; 7 entries exit 0), the clone for the gating reviewer only, the round-1 gating record. The delta file was cut against the pre-rebase round-1 commit e45c1cf and so also showed dev's idea commits (coordinator's diff choice, not a branch change). Raw reply at _working/session-manager/verdict-evidence/phase-asr-05/, indentation removed. Round-1 F01 and F02 resolved per this reviewer; F03 (stopgap) unchanged, no fix needed."
+}
