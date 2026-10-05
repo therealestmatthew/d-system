@@ -92,8 +92,10 @@ running this command.
 sends the coordinator — under `GOV-017` the Session Manager — `REVIEW-REQUEST <branch> <tip>`,
 naming the branch and the commit from step 2, and nothing else, then waits for `VERDICT`. The
 coordinator runs the review runner, dispatches the reviewers with its own brief, and returns the
-verdict records. Commit those records unchanged on the branch. Do not proceed to step 6 before
-`VERDICT` arrives, and do not treat a pending review as passed.
+verdict records, staged under `_working/session-manager/verdicts-pending/<phase-id>/` in the
+primary checkout. Copy each unchanged into the worktree at
+`docs/08-governance/reviews/verdicts/<verdict_id>.json` and commit it on the branch. Do not proceed
+to step 6 before `VERDICT` arrives, and do not treat a pending review as passed.
 
 **A session that did not build the phase may dispatch.** When the owner runs this command in their
 own session, or a coordinator runs it for a phase its creators built, it dispatches directly under

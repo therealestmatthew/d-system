@@ -189,16 +189,22 @@ reads the builder's account judges the account instead of the work (owner ruling
    `demo-validator-code`, never a `general-purpose` agent — and, during shadow, the **shadow
    judge**, `review-judge`. Both get the same brief. Before the first dispatch of a run, check that
    `review-judge` is among the available agent types;
-3. writes one verdict record per reviewer under `docs/08-governance/reviews/verdicts/`, named
-   `<verdict_id>.json` and valid against `schemas/review-verdict.schema.json` (`REQ-030` R05,
-   `PLAN-047` D4). It copies each finding without changing it, keeps the reviewer's raw reply as an
-   evidence file under `_working/session-manager/review-replies/`, and puts that reply's sha256 in
-   the record. The gating reviewer's record carries `gating: true`; the judge's carries
-   `gating: false`. The directory is created by the first record written;
+3. writes one verdict record per reviewer, named `<verdict_id>.json` and valid against
+   `schemas/review-verdict.schema.json` (`REQ-030` R05, `PLAN-047` D4), into the staging directory
+   `_working/session-manager/verdicts-pending/<phase-id>/` in the primary checkout. That path is
+   gitignored, so writing there needs no turn (*Departures*, item 2); the runner's worktree is
+   already gone, and a record written onto `dev` would put an unmerged phase's record there. It
+   copies each finding without changing it, keeps the reviewer's raw reply as an evidence file under
+   `_working/session-manager/review-replies/`, and puts that reply's sha256 in the record. The
+   gating reviewer's record carries `gating: true`; the judge's carries `gating: false`;
 4. records each verdict record's sha256 in `_working/session-manager/verdicts.sha256`, one
-   `sha256sum` line per file, and sends `VERDICT` with the record paths and their sha256.
+   `sha256sum` line per file, giving the path the record will have on the branch,
+   `docs/08-governance/reviews/verdicts/<verdict_id>.json`. It sends `VERDICT` with the staged paths
+   and their sha256.
 
-The building session commits the records unchanged on its branch. It fixes or explicitly accepts
+The building session copies each staged record unchanged into its worktree at
+`docs/08-governance/reviews/verdicts/<verdict_id>.json` and commits it on its branch; the directory
+is created by the first record copied. It fixes or explicitly accepts
 each finding; a `reject` verdict means a fix and a new `REVIEW-REQUEST`, which produces new records
 beside the old ones. Every build review is recorded this way, gating and shadow alike (`REQ-030`
 R05, R06), from `phase-asr-04` on. A sampled re-review (`PLAN-047` D6,
@@ -248,11 +254,13 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
    the Session Manager re-runs the four gate checks in a detached temporary worktree
    (`git worktree add --detach ../d-system-worktrees/verify-<slug> <branch>`, removed afterwards).
 
-   In the same step it checks the verdict records. In a checkout of the branch tip, it runs
-   `sha256sum -c _working/session-manager/verdicts.sha256` over the lines for this phase's records.
-   Every line must report `OK`. A line reporting `FAILED`, or a handed record missing from the
-   branch, refuses the branch. The Session Manager names the file and reports the difference to the
-   owner as a finding (`REQ-030` R10, `PLAN-047` D4).
+   In the same step it checks the verdict records against the commit itself, so no checkout is
+   needed after the runner removes its worktree. For each of this phase's lines in
+   `_working/session-manager/verdicts.sha256`, it runs `git show <tip>:<path> | sha256sum` in the
+   primary checkout, which reads the branch's committed blob without switching anything. Each must
+   print the recorded sha256. A different sha256, or a recorded path missing at the tip, refuses the
+   branch. The Session Manager names the file and reports the difference to the owner as a finding
+   (`REQ-030` R10, `PLAN-047` D4).
 3. The Session Manager brings the merge to the owner with the session's results, its own runner
    manifest, the gating reviewer's verdict and the shadow judge's verdict, the verdict-record check,
    and `git diff --stat dev..<branch>`. Only the gating verdict decides.

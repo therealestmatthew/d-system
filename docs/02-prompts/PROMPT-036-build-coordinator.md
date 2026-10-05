@@ -310,7 +310,9 @@ against the deliverables below; do only what is missing; report what already exi
 **Sonnet** unless the owner said otherwise at kickoff, and carries absolute paths only. The
 **Creator** and **Blocker resolver** templates name the `general-purpose` charter. The **Validator**
 and **Adversary** templates do not: each is dispatched as a dedicated reviewer type, whose own
-definition is its charter, and briefed under `GOV-017`'s brief rule ("Build reviews").
+definition is its charter, and neither gets anything the creator wrote. They do different jobs. The
+Validator is step 4's check inside the creator's fix cycles, before any build review. The Adversary
+is step 6's gating build reviewer, briefed under `GOV-017`'s brief rule ("Build reviews").
 
 **Creator.** Give it: the phase id and title; the absolute path of `backlog.yaml` and the phase's
 `- id:` anchor; absolute paths of the documents its `plan` and `sources` name; its `scope`,
