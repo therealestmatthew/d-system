@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-05-phase-asr-05-review-judge",
+  "date": "2026-10-05",
+  "phase": "phase-asr-05",
+  "reviewed_commit": "e45c1cf1d5328fd08d732d5bef3ce915fa8d4bf5",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [],
+  "raw_reply_sha256": "7a4d5183c2e02e4ed9e32d778e3a4ca1872241e8f3173ace66f0f9dfcda8c72a",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews' (merged in phase-asr-04; the new flow formally applies from the next run's starters, P4). Brief: scope, acceptance and verification from dev's backlog.yaml, the range dd18c92..e45c1cf (diff as a file path, no session record in it), the runner manifest (coordinator scratch clone at e45c1cf; 7 entries exit 0), and that clone as the gating reviewer's checkout only. /security-review not run: the trigger is this phase's own unmerged text and the diff touches only GOV docs. Raw reply kept at _working/session-manager/verdict-evidence/phase-asr-05/, as received with the harness's indentation removed. The judge got no checkout (no shell); it read context files in the clone. All four acceptance conditions met per the judge."
+}

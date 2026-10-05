@@ -1,0 +1,41 @@
+{
+  "verdict_id": "2026-10-05-phase-asr-05-demo-adversary",
+  "date": "2026-10-05",
+  "phase": "phase-asr-05",
+  "reviewed_commit": "e45c1cf1d5328fd08d732d5bef3ce915fa8d4bf5",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "GOV-017's merge gate step 3 still names only the gating reviewer's and shadow judge's verdicts and says 'Only the gating verdict decides', while this phase records the security review as a second verdict with gating: true.",
+      "evidence": "GOV-017-multi-session-coordination-protocol.md:242-244 (security review recorded with reviewer.type security-review, gating: true) vs :298-300 (merge gate step 3, unmodified by this diff).",
+      "consequence": "For the first phase that trips the trigger, the merge-gate procedure read literally drops the security verdict from the owner's approval package, defeating REQ-030 R08.",
+      "minimal_fix": "Edit GOV-017:298-300 to list the security-review verdict when triggered and replace 'Only the gating verdict decides' with wording for two independently gating verdicts."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "The security-review trigger's first condition is worded at plan granularity ('the phase's plan names a threat surface'), diverging from REQ-030 R08's phase-level wording.",
+      "evidence": "GOV-017-multi-session-coordination-protocol.md:229-231 vs REQ-030-reviewer-contract.md:68 and GOV-010 P12 ('a plan names each threat surface its phases touch').",
+      "consequence": "Ambiguous between 'this phase is mapped to a surface' and 'any phase of a plan that names a surface anywhere'; the diff-path condition is the objective backstop.",
+      "minimal_fix": "Reword to 'the phase's plan maps this phase to a threat surface under GOV-010 P12'."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Recording /security-review's definition_sha256 as the sha256 of `claude --version` output is a flagged stopgap pointing at idea 000589; schema-valid and not a defect.",
+      "evidence": "GOV-017-multi-session-coordination-protocol.md:243-245; _data/ideas.jsonl idea 000589.",
+      "consequence": "None; no fix needed (intentional, tracked stopgap)."
+    }
+  ],
+  "raw_reply_sha256": "6c8001c20ca27fffb61a337932af4f85adf81a389752cb2336fd5fc48fbcb8b8",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews' (merged in phase-asr-04; the new flow formally applies from the next run's starters, P4). Brief: scope, acceptance and verification from dev's backlog.yaml, the range dd18c92..e45c1cf (diff as a file path, no session record in it), the runner manifest (coordinator scratch clone at e45c1cf; 7 entries exit 0), and that clone as the gating reviewer's checkout only. /security-review not run: the trigger is this phase's own unmerged text and the diff touches only GOV docs. Raw reply kept at _working/session-manager/verdict-evidence/phase-asr-05/, as received with the harness's indentation removed."
+}
