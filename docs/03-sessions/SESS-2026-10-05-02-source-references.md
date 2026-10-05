@@ -119,8 +119,18 @@ awaiting the owner's merge approval via the Session Manager, then completion on 
 
 ## Unresolved
 
-- `test/test_rebuild.py` belongs to `sys-delivery`, outside the phase's declared systems
-  (containment report above). See Decisions.
+None. The `test/test_rebuild.py` question is settled by the owner's ruling below.
+
+## Owner ruling, 2026-10-05
+
+The phase was parked overnight because its fixture fix in `test/test_rebuild.py` sits in
+`sys-delivery`, outside its declared systems. On the morning of 2026-10-05 the Session Manager
+relayed the owner's approval, and the owner confirmed it directly in this session. Asked "Is that
+your ruling?" about merging `phase-rel-03` with the fixture, the owner answered:
+
+> "Yes, accept and merge"
+
+`test/test_rebuild.py` was added to the phase's deliverables in the re-claim commit on `dev`.
 
 ## Review
 
