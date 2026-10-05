@@ -118,21 +118,38 @@ browser-verified; awaiting the owner's merge approval through the Session Manage
 
 ## Unresolved
 
-- Whether "parallel to `{{INLINE_STYLES}}`" in the owner's ruling meant the token's mechanism or
-  its markup. See Decisions.
-- `tools/check_test_baseline.py` exits 1 and blocks the merge until the owner signs off by name.
-  The base is `8979a09`, run in a temporary `git clone --shared`; the branch is at `6ccce8f`.
+None. Both open items are settled by the owner's sign-off below.
 
-  ```text
-  2 tests passed in the base and are missing or skipped in the branch:
-    missing  test.test_lit_report_render::test_csv_pages_carry_the_phase_lrr_03_handoff_marker_and_md_pages_do_not
-    missing  test.test_lit_report_render::test_csv_placeholder_counts_match_the_extracted_table
-  ```
+## Owner sign-off, 2026-10-05
 
-  Both were removed on purpose. They asserted `phase-lrr-02`'s placeholder body (its handoff
-  marker, column list and counts), and the phase's scope replaces that body. Their checks carry
-  over to `test_table_pages_render_every_row_and_column_of_the_extracted_table` (counts and
-  columns, now as a real table) and `test_no_placeholder_body_remains_on_any_page`.
+The phase was parked overnight for two decisions that only the owner can make. On the morning of
+2026-10-05 the Session Manager relayed the owner's rulings, and the owner confirmed them directly in
+this session. The question asked was: "For the literature-review tables (phase-lrr-03): do you sign
+off the two retired placeholder tests (test_csv_pages_carry_the_phase_lrr_03_handoff_marker_and_md_pages_do_not,
+test_csv_placeholder_counts_match_the_extracted_table) and accept {{INLINE_SCRIPT}} carrying the
+whole <script> element?" The owner answered:
+
+> "Yes to both"
+
+- `tools/check_test_baseline.py`'s nonzero result is signed off for exactly these two tests:
+  - `test.test_lit_report_render::test_csv_pages_carry_the_phase_lrr_03_handoff_marker_and_md_pages_do_not`
+  - `test.test_lit_report_render::test_csv_placeholder_counts_match_the_extracted_table`
+- `{{INLINE_SCRIPT}}` carrying the whole `<script>` element, empty on deliverable pages, is
+  accepted as the reading of the 2026-09-30 ruling. The overnight assumption becomes the owner's
+  decision.
+
+The overnight baseline result, kept as evidence. The base is `8979a09`; the branch was at
+`6ccce8f`.
+
+```text
+2 tests passed in the base and are missing or skipped in the branch:
+  missing  test.test_lit_report_render::test_csv_pages_carry_the_phase_lrr_03_handoff_marker_and_md_pages_do_not
+  missing  test.test_lit_report_render::test_csv_placeholder_counts_match_the_extracted_table
+```
+
+Both were removed on purpose. They asserted `phase-lrr-02`'s placeholder body, and their checks
+carry over to `test_table_pages_render_every_row_and_column_of_the_extracted_table` and
+`test_no_placeholder_body_remains_on_any_page`.
 
 ## Review
 
