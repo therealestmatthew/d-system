@@ -12919,8 +12919,23 @@ items:
   - templates/README.md
   - docs/08-governance/OPS-033-template-library.md
   - docs/08-governance/codes.yaml
-  next_action: Two families already exist and must keep rendering identically. Treat them as the regression
-    surface, not as examples to rewrite.
+  next_action: All acceptance met and adversarially reviewed; awaiting the owner's merge approval
+    via the Session Manager, then completion on dev.
+  session: doc-session-template-library
+  completion_evidence:
+  - templates/html/library.yaml
+  - tools/template_library.py
+  - test/test_template_library.py
+  - templates/README.md
+  - docs/08-governance/OPS-033-template-library.md
+  - docs/03-sessions/SESS-2026-10-05-06-template-library.md
+  result: 'templates/html/library.yaml declares every template''s family and population method
+    (slot-fill, ai-adaptation, or both with named ai_slots); tools/template_library.py rejects
+    drift between declarations and files and dispatches render() on the declared method (a page
+    for slot-fill, an adaptation brief otherwise, no model call). Adding a pattern-matched file or
+    a manifest family renders with no generator change. Every generate_overview.py fill and both
+    house-page fills replay byte-identically through the library. 34 library and tool-doc tests
+    pass; ruff, mypy, governance and the private-content check (31 identifiers) are clean.'
 - id: phase-des-04
   title: Build the HTML component library
   plan: doc-html-generation-design-system
