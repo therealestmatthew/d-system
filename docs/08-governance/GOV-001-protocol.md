@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-09-27'
+updated: '2026-10-05'
 systems: [sys-governance]
 depends_on: []
 review_after: '2026-12-05'
@@ -58,6 +58,43 @@ Start with the [architectural audit](../07-architecture/ARCH-002-system-audit.md
 | Brain memory types | — | Existing `brain/<plural-type>/` directories | Existing memory schema; no document lifecycle fields |
 
 New durable memories go in `brain/`. `docs/05-memories/README.md` is a navigation pointer; it is not a competing memory store. All plans, including `PLAN-001`, live under `docs/01-plans/`; root `plans/` no longer exists (see [PLAN-018](../01-plans/PLAN-018-plans-directory-consolidation.md) and [GOV-003](GOV-003-backlog-decisions.md)). Multi-file plans give each child its own ID, a sub-code under the parent's code, and `parent` pointing at the overview. Codes are assigned with `--next-code` and are never chosen by hand; [GOV-005](GOV-005-document-codes.md) states the rules and [ADR-006](../04-decisions/ADR-006-document-codes.md) the rationale. `depends_on` means a prerequisite, not merely a related topic.
+
+## When a requirement document is mandatory (REQ-015 R01–R03)
+
+A plan is **paired** when its `depends_on` list names at least one document whose `kind` is
+`requirement`. The question this section answers is when that pairing is mandatory rather than
+optional, in terms a second reader applies to the same plan and reaches the same answer —
+"the plan feels non-trivial" is not that term, because two readers do not agree on what feels
+non-trivial.
+
+**The rule:** a requirement document is mandatory for a plan once that plan is registered as more
+than one phase in `docs/09-backlog/backlog.yaml` — that is, more than one item whose `plan` field
+names it. A plan realized as zero or one backlog phase keeps its acceptance in its own body; one
+phase and one plan share a single unit of claim, review and acceptance, so a second document would
+only restate the first. A plan split across multiple phases hands each phase its own claim, its own
+session and its own review, and no single phase's acceptance section can own an acceptance
+definition that has to span phases it does not control — that is what the standalone requirement
+document is for.
+
+Applying the rule needs no judgment call: count the backlog items whose `plan` field equals the
+plan's document id. The count is either more than one or it is not.
+
+`src/governance/requirement_rule.py` implements the rule (`requirement_mandatory()`) and classifies
+the corpus against it (`unpaired_mandatory_plans()`). Run the classification with:
+
+```bash
+uv run python -m src.governance --classify-requirements
+```
+
+**Grandfathering.** The rule is enforced going forward, not retroactively. At the time this rule was
+written, classifying the existing corpus found plans that meet the mandatory condition and have no
+paired requirement document; enforcing the rule against them immediately would turn `dev` red on
+work written before the rule existed. Those plan ids are recorded as `GRANDFATHERED_PLAN_IDS` in
+`src/governance/requirement_rule.py` and are permanently exempt from the enforcement check below,
+identified by id rather than by a blanket exemption — the list is visible and finite, not forgotten.
+A plan whose id is not on that list — every plan created after this rule, and any existing plan that
+was already paired — is checked: if it meets the mandatory condition and is not paired, the
+governance check fails and names the plan.
 
 ## Front matter contract
 
@@ -145,6 +182,7 @@ The inventory is generated on demand from the registry and document headers. It 
 | IDs, owners, tag/project/memory/system/document references | Python validator | CI failure |
 | Dependency, parent and supersession cycles | Graph checks | CI failure |
 | Overlapping or unclaimed concurrent active phases | Backlog concurrency check | CI failure |
+| A new plan meeting the mandatory-requirement condition with no paired requirement | Requirement pairing check (`requirement_rule.py`); grandfathered plans exempt | CI failure |
 | Work that strays outside a phase's declared systems/deliverables | Owner's diff review | Human decision |
 | Missing component/evidence paths; protected or symlink paths | Read-only path checks | CI failure |
 | Overdue review date | Date check | Warning |
