@@ -120,6 +120,19 @@ browser-verified; awaiting the owner's merge approval through the Session Manage
 
 - Whether "parallel to `{{INLINE_STYLES}}`" in the owner's ruling meant the token's mechanism or
   its markup. See Decisions.
+- `tools/check_test_baseline.py` exits 1 and blocks the merge until the owner signs off by name.
+  The base is `8979a09`, run in a temporary `git clone --shared`; the branch is at `6ccce8f`.
+
+  ```text
+  2 tests passed in the base and are missing or skipped in the branch:
+    missing  test.test_lit_report_render::test_csv_pages_carry_the_phase_lrr_03_handoff_marker_and_md_pages_do_not
+    missing  test.test_lit_report_render::test_csv_placeholder_counts_match_the_extracted_table
+  ```
+
+  Both were removed on purpose. They asserted `phase-lrr-02`'s placeholder body (its handoff
+  marker, column list and counts), and the phase's scope replaces that body. Their checks carry
+  over to `test_table_pages_render_every_row_and_column_of_the_extracted_table` (counts and
+  columns, now as a real table) and `test_no_placeholder_body_remains_on_any_page`.
 
 ## Review
 
