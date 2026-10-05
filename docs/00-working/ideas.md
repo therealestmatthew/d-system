@@ -24871,7 +24871,7 @@ Raised by Session 1 - Builder A.
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-10-05T00:02:49-04:00): ADR-027 records this as a consequence of retiring PLAN-003: "sys-html in docs/08-governance/systems.yaml is still planned, with PLAN-003's overview as its path. Recorded as idea 000571." The audit's session record (SESS-2026-10-04-08) lists it under Unresolved.
 
@@ -24880,6 +24880,7 @@ Confirmed in systems.yaml: sys-html has status planned, paths docs/01-plans/PLAN
 No plan or phase delivers this registry update. Related registry ideas: 000341 (sys-capture's paths omit later capture files) is the same kind of stale-path defect on a different system, and 000444 asks for a review of every sys-* tag in systems.yaml, which would cover sys-html.
 
 PROPOSED LINK: 000571 --relates_to--> 000444 (000444's review of every sys-* tag would cover sys-html's status and paths)
+- **finding** by agent-idea-triage (2026-10-05T01:13:49-04:00): Delivered on dev, by Session 5 - Batch Runner during the overnight run of 2026-10-04/05 (as reported by that session and the Session Manager): commit 0284679 updated sys-html in docs/08-governance/systems.yaml after PLAN-003's retirement, and commit 97c6521 added the overview, atlas and lit-report outputs to its paths after review. The depends_on question that fix left alone is recorded separately as 000586. Status left at triaged; whether to move it further is the owner's call.
 
 </details>
 
@@ -25260,8 +25261,20 @@ PROPOSED LINK: 000586 --relates_to--> 000571 (the depends_on correction left out
 
 ## 000587 · check_test_baseline.py should fail when a base-passing test fails or errors in the branch
 
-**Created 2026-10-05T01:12:43-04:00 · Status: `open`**
+**Created 2026-10-05T01:12:43-04:00 · Status: `triaged`**
 
 tools/check_test_baseline.py reports OK when a test that passed in the base fails in the branch: it checks only missing and newly skipped tests (REQ-028 R07), so a branch run with 2 failures printed "Test baseline OK" during phase-grd-04. It should also fail on a base-passing test that fails or errors in the branch.
 
 (From Session 3 - Standby Builder, 2026-10-05, overnight run; recorded as given by Ideation. The check is part of the merge gate's READY evidence, built by phase-grd-03.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T01:13:49-04:00): Confirmed on dev: tools/check_test_baseline.py already classifies each test as passed, skipped or failed (a <failure> or <error> element counts as failed, lines 53-56), but it reports only tests that passed in the base and are missing or skipped in the branch (lines 65-73); its OK line reads "none is missing or skipped". That is exactly REQ-028 R07 as written: R07 names missing and newly skipped tests, and its listed verification cases include no base-pass/branch-fail pair. So the tool meets its requirement, and this idea is an extension of R07 rather than a defect against it.
+
+Context: R10 makes R07's output part of a READY. GOV-017's merge gate separately runs the full pytest suite, so a failing branch test is not invisible at the gate, but the baseline tool's "OK" line can read as a pass for a red run, which is what happened during phase-grd-04. The tool and R07 were built by phase-grd-03 under PLAN-045.
+
+</details>
