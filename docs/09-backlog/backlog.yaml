@@ -219,10 +219,22 @@ items:
   - src/db/source_validation.py
   - test/test_source_validation.py
   - test/test_rebuild.py
-  next_action: 'PARKED overnight 2026-10-05: branch agent/phase-rel-03 at 8c4f349 is READY
-    (review: should-fix fixed; SM gate green, 1545 passed). Owner decision: accept test/test_rebuild.py
-    (sys-delivery, outside declared systems; a 7-line commitment fixture), widen the declaration,
-    re-claim and merge.'
+  next_action: Owner accepted the test/test_rebuild.py fixture on 2026-10-05; re-claimed with it
+    in the deliverables. Awaiting the merge via the Session Manager, then completion on dev.
+  session: doc-session-source-references
+  completion_evidence:
+  - src/db/source_validation.py
+  - test/test_source_validation.py
+  - test/test_rebuild.py
+  - docs/03-sessions/SESS-2026-10-05-02-source-references.md
+  result: 'validate_identities() runs after the per-record schema checks. Tag, project,
+    person, commitment, interaction, decision and related-memory references must resolve,
+    and IDs must be unique within each kind. A duplicate names both files; an unknown
+    reference names the record, field and missing ID. A memory''s project may be the
+    repository scope d-system, and no entity may use it. A reference failure leaves an
+    existing database byte-identical. 32 new tests; 83 focused and 1545 in total pass
+    after rebase; ruff, mypy, governance, the test baseline and diff patterns are clean.
+    The owner''s real portfolio validates with 0 errors.'
 - id: phase-rel-04
   title: Make project stakeholders the membership authority
   plan: doc-reliability-follow-up
