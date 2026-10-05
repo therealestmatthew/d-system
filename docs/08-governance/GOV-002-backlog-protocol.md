@@ -171,7 +171,8 @@ A phase enters `next_up` only once it has been reviewed under `GOV-018`. The gov
 for each `next_up` phase with no review record under `docs/08-governance/reviews/` that lists it in
 `target.phases` or `target.later_added_phases`, has `status: dispositioned`, and has no finding
 whose last disposition is `escalated-g3` (`REQ-028` R12, `src/governance/review_gate.py`). The 19
-phases in `next_up` when the owner made the rule are exempt by name in that file; the list does not grow.
+phases in `next_up` when the owner made the rule are exempt by name in that file; the list does not
+grow.
 
 With `next_up` set, an agent needs no judgment to choose: the first ready phase in the rendered
 order is the one to take. Without it, several phases can share a priority and the tie falls to
