@@ -25300,3 +25300,13 @@ The demo-adversary and demo-validator-code agent definitions (.claude/agents/) s
 Wider than the two named agents: the line "Run every command against the worktree path stated in your dispatch prompt" appears in seven files under .claude/agents/ on dev: demo-adversary (48), demo-validator-code (50), demo-validator-check, demo-validator-web, demo-creator-py, demo-creator-web and demo-creator-docs. Only the gating reviewer's dispatch changes under phase-asr-04; creators and the other validators still run in worktrees. The files carry no generated-file header, so they are edited directly. review-judge.md already says its checkout may not be at the reviewed commit.
 
 </details>
+
+---
+
+## 000589 · The review-verdict schema needs a form for a built-in reviewer with no definition file
+
+**Created 2026-10-05T03:41:13-04:00 · Status: `open`**
+
+schemas/review-verdict.schema.json requires reviewer.definition_sha256 of an agent definition file (.claude/agents/<type>.md), but the built-in /security-review command the coordinator runs at READY (phase-asr-05) has no definition file; the schema needs a form for a built-in reviewer (e.g. the Claude Code version it ran under).
+
+(From Session 3 - Standby Builder, 2026-10-05, overnight run; recorded as given by Ideation.)
