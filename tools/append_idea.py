@@ -43,6 +43,10 @@ survive (`src.db.ideas` merges a chain of amendments rather than keeping only th
 Title and body are the only amendable fields, and neither can be cleared — every idea must
 have both.
 
+**`status` into `promoted` needs `--promoted-to`** — one or more governed document codes naming
+what the idea became. Each must be a code the governance registry holds, checked the same way as a
+`--doc` pointer; a doc id such as `doc-batch-orchestration-protocol` is refused.
+
 **`status` into `delivered`, `resolved` or `absorbed` needs at least one pointer** — `--doc`,
 `--phase` or `--commit`, each repeatable — naming where the delivery happened. Each must
 resolve: a document code the governance registry holds, a phase id in the backlog, or a commit
