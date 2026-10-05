@@ -151,12 +151,25 @@ reproduce the reviewer's exact case and pass.
   `docs/08-governance/` deliverable to GOV-018, GOV-002 and `reviews/` in the claim commit.
   `reviews/` was not written to: the records the acceptance needs were already on `dev`.
 
+- **OVERNIGHT ASSUMPTION: `test/test_backlog.py` is edited although it is not a declared
+  deliverable.** The new rule broke two of its tests. Fixing their fixtures stays inside the claimed
+  systems (`sys-backlog`, `sys-governance`). The alternative, exempting fixture phase ids in the
+  check, is what the phase forbids. The containment report names the file.
+
 ## Corrections
 
 - The first fixture build failed: the governance audit requires every phase's `plan` to name a plan
   document. The fixture now writes a plan that names its phases, so the plan-versus-registered
   check (`REQ-028` R09) stays quiet and each test isolates this rule.
 - A wrongly shaped record crashed the check (the review finding above); fixed before `READY`.
+- The first full suite run on the rebased branch had 2 failures, both in `test/test_backlog.py`:
+  `test_next_up_promotes_phases_ahead_of_priority` and `test_next_up_preserves_its_own_order`. Both
+  put made-up phases in `next_up` with no review record, which the new rule correctly refuses
+  (`next_up: phase-zzz-01 has no dispositioned review record ... (no record lists it)`). Each test
+  now writes a dispositioned fixture record for its phases, through a small `reviewed()` helper.
+  `tools/check_test_baseline.py` reported OK on that failing run, because it checks only for tests
+  that are missing or newly skipped, not for tests that newly fail. That gap went to Ideation as an
+  idea rather than being fixed here.
 
 ## Left undone
 

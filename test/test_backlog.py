@@ -76,6 +76,14 @@ def backlog_repo(tmp_path: Path) -> tuple[Path, dict[str, Any], dict[str, Any]]:
     return tmp_path, catalog, result
 
 
+def reviewed(root: Path, *phases: str) -> None:
+    """A dispositioned GOV-018 record listing `phases`, so they may sit in next_up (REQ-028 R12)."""
+    reviews = root / "docs/08-governance/reviews"
+    reviews.mkdir(parents=True, exist_ok=True)
+    record = {"target": {"phases": list(phases)}, "status": "dispositioned", "findings": []}
+    (reviews / "fixture.json").write_text(json.dumps(record))
+
+
 def check(fixture: tuple[Path, dict[str, Any], dict[str, Any]]) -> list[str]:
     root, catalog, result = fixture
     (root / "docs/09-backlog/backlog.yaml").write_text(json.dumps(catalog))
@@ -346,6 +354,7 @@ def test_next_up_promotes_phases_ahead_of_priority(
         phase(id="phase-zzz-01", priority=4),
     ]
     catalog["next_up"] = ["phase-zzz-01"]
+    reviewed(backlog_repo[0], "phase-zzz-01")
     assert check(backlog_repo) == []
     rendered = render_backlog(catalog, result["documents"])
     rows = [line for line in rendered.split("\n") if line.startswith("| phase-")]
@@ -360,6 +369,7 @@ def test_next_up_preserves_its_own_order(
     _, catalog, result = backlog_repo
     catalog["items"] = [phase(id=f"phase-aaa-0{n}") for n in (1, 2, 3)]
     catalog["next_up"] = ["phase-aaa-03", "phase-aaa-01"]
+    reviewed(backlog_repo[0], "phase-aaa-03", "phase-aaa-01")
     assert check(backlog_repo) == []
     rows = [
         line for line in render_backlog(catalog, result["documents"]).split("\n")
