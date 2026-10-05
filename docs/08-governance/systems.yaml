@@ -270,18 +270,28 @@ systems:
 - id: sys-html
   name: Dynamic HTML generation
   domain: application
-  status: planned
+  status: implemented
   owner: repository-owner
   paths:
-  - docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md
+  - docs/01-plans/PLAN-036-html-generation-design-system.md
   - templates/README.md
+  - templates/html
+  - templates/styles
+  - tools/generate_house_css.py
+  - tools/generate_engine_pages.py
+  - _public/engine
   depends_on:
   - sys-api
   - sys-ui
   - sys-contracts
-  description: Proposed YAML-to-JSON pages, API, React Router, typed blocks and styling (PLAN-003, under
-    audit by phase-des-01). Since the 2026-09-30 amendment to PLAN-036 it also covers the planned house-style
-    token family and the generated idea realization engine pages under _public/engine/ (REQ-036). Planned.
+  description: HTML generated from repository data and published as committed snapshots under
+    _public/, governed by PLAN-036. Built so far are the house-style token family
+    (templates/styles/house-tokens.json, generated into house.css by tools/generate_house_css.py,
+    phase-des-07), the house components and templates under templates/html/, and the idea
+    realization engine pages under _public/engine/ (tools/generate_engine_pages.py, phase-des-09 to
+    phase-des-12, REQ-036). PLAN-003's authored YAML-to-JSON page site was retired by ADR-027 and is
+    not part of this system. The template and component libraries (phase-des-03, phase-des-04) are
+    still queued.
 - id: sys-course
   name: Git course production
   domain: delivery
