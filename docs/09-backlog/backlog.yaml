@@ -7252,7 +7252,7 @@ items:
   - sys-html
   owner: repository-owner
   agent: agent-batch-runner
-  status: active
+  status: complete
   priority: 2
   session_budget: 1
   depends_on:
@@ -7295,8 +7295,8 @@ items:
   - tools/lit_report_render.py
   - test/test_lit_report_render.py
   - docs/08-governance/OPS-019-lit-report-render.md
-  next_action: Owner signed off the two retired tests and the INLINE_SCRIPT reading on 2026-10-05;
-    re-claimed. Awaiting the merge via the Session Manager, then completion on dev.
+  next_action: Complete. The three CSV pages are sortable, filterable tables (matrix column visibility);
+    merged onto dev with the owner's approval and sign-off of 2026-10-05.
   session: doc-session-lit-report-tables
   completion_evidence:
   - templates/html/lit-report-table.html
