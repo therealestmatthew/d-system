@@ -4,7 +4,6 @@ decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
 - phase-grd-04
-- phase-asr-05
 - phase-cap-08
 - phase-irs-11
 - phase-irs-14
@@ -15500,7 +15499,7 @@ items:
   systems:
   - sys-gov-docs
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-standby-3
   session: doc-session-threat-surfaces-security-review
   priority: 1
@@ -15529,8 +15528,29 @@ items:
   - docs/08-governance/GOV-010-plan-quality-standard.md
   - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
   - docs/08-governance/GOV-003-backlog-decisions.md
-  next_action: Built and reviewed on agent/phase-asr-05 (SESS-2026-10-05-07); waits for the
-    owner-approved merge and the completion edit on dev.
+  completion_evidence:
+  - docs/08-governance/GOV-010-plan-quality-standard.md
+  - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - docs/08-governance/GOV-003-backlog-decisions.md
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-asr-05-demo-adversary.json
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-asr-05-review-judge.json
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-asr-05-demo-adversary-2.json
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-asr-05-review-judge-2.json
+  - docs/03-sessions/SESS-2026-10-05-07-threat-surfaces-security-review.md
+  result: >-
+    GOV-010 gains P12: a plan names, per phase, the threat surfaces it touches (authentication, network
+    exposure, secrets, dependencies) and what protects each; silence, or a decision cited without the surface
+    it governs, fails the judgement; the non-conformant example is a plan whose phase edits
+    src/api/routes/demo_terminal.py without naming a network or authentication surface. GOV-017's "Build
+    reviews" gains the diff-time security review: a phase-level trigger (the plan maps the phase to a P12
+    surface, or the diff touches a listed path), the coordinator running the built-in /security-review in its
+    scratch clone, and a gating verdict record that READY names and merge-gate step 3 counts beside the gating
+    reviewer's (definition_sha256 stopgap, idea 000589). GOV-003 records owner rulings O-5, O-6 and Q7 of
+    2026-09-23 as standing, each dated and quoted. Reviewed by the Session Manager as coordinator under
+    GOV-017: demo-adversary gating rejected round 1 (F01 blocker, F02 major, both fixed; F03 minor accepted)
+    and passed round 2 with no findings; review-judge shadow passed both. Full suite 1555 passed. Merged onto
+    dev with the owner's approval relayed by the Session Manager.
+  next_action: Complete.
 - id: phase-plug-01
   title: Plugin skeleton, prerequisites skill, scaffold with install-state record, and doctor
   plan: doc-idea-realization-plugin
