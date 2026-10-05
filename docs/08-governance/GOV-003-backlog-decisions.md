@@ -959,7 +959,8 @@ no record of how often it agrees with the reviewers it replaces.
 ## In a pre-approved unattended run, the Session Manager's ASSIGN is the claim approval — 2026-10-05
 
 Owner ruling of 2026-10-05, given to the Session Manager in its morning session and confirmed by the
-owner in Builder A's session the same day, answering "When the owner is away, builders stalled on
+owner in Builder A's session the same day. The quotation is the Session Manager's relay of the
+owner's answer, not a transcript, and the owner approved it as relayed. It answers "When the owner is away, builders stalled on
 /session-start's claim-approval question. For future unattended runs, should the SM's ASSIGN count
 as that approval?": "Yes, only in runs you pre-approve — only when the owner has pre-approved the run
 (like O1); recorded as an owner ruling in GOV-003, and the starters say so. Daytime runs still ask

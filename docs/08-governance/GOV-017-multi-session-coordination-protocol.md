@@ -142,7 +142,8 @@ The Session Manager allocates the three slots. Builders do not pick from `--read
 wait for an assignment. Before assigning, the Session Manager checks that the phase's Conflicts
 column is empty against every active claim, and takes the earliest such phase in the rendered queue
 order (`next_up` first). **The owner approves each assignment** before it is sent. `/session-start`'s
-own claim-approval question still goes to the owner as written.
+own claim-approval question still goes to the owner as written, except in a run the owner has
+pre-approved, where the Session Manager's ASSIGN is that approval (GOV-003, 2026-10-05).
 
 The Conflicts column compares a phase only against phases already active, and only through their
 declared systems and deliverable paths (`collisions()` in `src/governance/backlog.py`). It therefore
