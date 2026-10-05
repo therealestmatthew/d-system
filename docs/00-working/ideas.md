@@ -25182,3 +25182,13 @@ These fix two code paths. Neither makes tests independent of the live log: sever
 No phase owns this. The nearest is phase-sch-04 (Write the per-layer testing standard, queued; PLAN-035, REQ-020 R09-R10), which states what "tested" means per layer and where coverage falls short; it does not name live-data dependencies.
 
 </details>
+
+---
+
+## 000584 · The idea-realization plugin's writer should resolve promoted_to to a governed document code
+
+**Created 2026-10-05T00:22:24-04:00 · Status: `open`**
+
+The idea-realization plugin's writer (plugins/idea-realization/scripts/idea.py change_status) checks only that promoted_to is non-empty, the same gap 000577 fixed in tools/append_idea.py; it should resolve each promoted_to value to a governed document code.
+
+(From Session 3 - Standby Builder, 2026-10-05, overnight run; recorded as given by Ideation. Overlaps 000577, which raised the same gap in tools/append_idea.py.)
