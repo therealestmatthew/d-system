@@ -279,11 +279,9 @@ systems:
   - templates/styles
   - tools/generate_house_css.py
   - tools/generate_engine_pages.py
-  - tools/generate_overview.py
   - tools/lit_report_extract.py
   - tools/lit_report_render.py
   - _public/engine
-  - _public/overview
   - _public/governance-atlas.html
   depends_on:
   - sys-api
@@ -293,8 +291,8 @@ systems:
     _public/, governed by PLAN-036. Built so far are the house-style token family
     (templates/styles/house-tokens.json, generated into house.css by tools/generate_house_css.py,
     phase-des-07); the governance atlas page (_public/governance-atlas.html, phase-des-02); the
-    overview page (tools/generate_overview.py into _public/overview/, phase-demo-04, shared with
-    sys-demo-overview); the idea realization engine pages (tools/generate_engine_pages.py into
+    overview page's templates (its generator and output belong to sys-demo-overview); the idea
+    realization engine pages (tools/generate_engine_pages.py into
     _public/engine/, phase-des-09 to phase-des-12, REQ-036); and the literature-review report
     extractor and renderer (tools/lit_report_extract.py and lit_report_render.py, phase-lrr-01 and
     phase-lrr-02, shared with sys-research). templates/html/ and templates/styles/ hold the atlas,
@@ -492,18 +490,26 @@ systems:
 - id: sys-demo-overview
   name: Deterministic overview generation
   domain: application
-  status: planned
+  status: implemented
   owner: repository-owner
   paths:
   - docs/01-plans/PLAN-021-live-demo.md
+  - tools/overview_metrics.py
+  - tools/overview_inventory.py
+  - tools/generate_overview.py
+  - .claude/skills/d-system-overview
+  - _public/overview
   depends_on:
   - sys-portfolio
   - sys-backlog
   - sys-html
   description: Deterministic scripts over the idea log (via fold()), the backlog and this registry
     that emit chart-ready JSON and consolidated inventories, plus the skill and templates that render
-    them into a generated overview page under _public/. Same inputs, same outputs; no model calls in
-    the data path. Planned; built by phase-demo-03 and phase-demo-04.
+    them into a generated overview page under _public/overview/. Same inputs, same outputs; no model
+    calls in the data path. Built by phase-demo-03 (tools/overview_metrics.py and
+    overview_inventory.py, OPS-011 and OPS-012) and phase-demo-04 (tools/generate_overview.py, the
+    d-system-overview skill and OPS-014). The page's templates under templates/html/ and
+    templates/styles/ belong to sys-html.
 - id: sys-demo-kit
   name: Consultant demo kit
   domain: delivery
