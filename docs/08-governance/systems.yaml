@@ -279,7 +279,12 @@ systems:
   - templates/styles
   - tools/generate_house_css.py
   - tools/generate_engine_pages.py
+  - tools/generate_overview.py
+  - tools/lit_report_extract.py
+  - tools/lit_report_render.py
   - _public/engine
+  - _public/overview
+  - _public/governance-atlas.html
   depends_on:
   - sys-api
   - sys-ui
@@ -287,11 +292,16 @@ systems:
   description: HTML generated from repository data and published as committed snapshots under
     _public/, governed by PLAN-036. Built so far are the house-style token family
     (templates/styles/house-tokens.json, generated into house.css by tools/generate_house_css.py,
-    phase-des-07), the house components and templates under templates/html/, and the idea
-    realization engine pages under _public/engine/ (tools/generate_engine_pages.py, phase-des-09 to
-    phase-des-12, REQ-036). PLAN-003's authored YAML-to-JSON page site was retired by ADR-027 and is
-    not part of this system. The template and component libraries (phase-des-03, phase-des-04) are
-    still queued.
+    phase-des-07); the governance atlas page (_public/governance-atlas.html, phase-des-02); the
+    overview page (tools/generate_overview.py into _public/overview/, phase-demo-04, shared with
+    sys-demo-overview); the idea realization engine pages (tools/generate_engine_pages.py into
+    _public/engine/, phase-des-09 to phase-des-12, REQ-036); and the literature-review report
+    extractor and renderer (tools/lit_report_extract.py and lit_report_render.py, phase-lrr-01 and
+    phase-lrr-02, shared with sys-research). templates/html/ and templates/styles/ hold the atlas,
+    overview, lit-report and house families. PLAN-003's authored YAML-to-JSON page site was retired by
+    ADR-027 and is not part of this system. Still queued are the template and component libraries and
+    the HTML Designer agent (phase-des-03, phase-des-04, phase-des-06) and the rest of the lit-report
+    family (phase-lrr-03, phase-lrr-04).
 - id: sys-course
   name: Git course production
   domain: delivery
