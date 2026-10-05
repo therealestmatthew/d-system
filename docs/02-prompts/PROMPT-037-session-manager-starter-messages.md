@@ -178,8 +178,9 @@ Do not pick work from --ready yourself. Wait for ASSIGN <phase-id> from me.
 
 On ASSIGN:
 1. Run /session-start for that phase. Its owner-approval question before the claim still goes to
-   the owner, as written. Skip its preflight pytest in the primary checkout (contract item 9); run
-   it in the worktree once created.
+   the owner, as written, except in a run the owner has pre-approved: there my ASSIGN is that
+   approval and you do not ask (GOV-003, 2026-10-05). Skip its preflight pytest in the primary
+   checkout (contract item 9); run it in the worktree once created.
 2. Make the claim commit (plus catalog regen) only inside a granted turn: TURN? claim <phase-id>.
 3. Build and verify in the worktree.
 4. Run /session-close up to and including its independent review: its step 3 has you send

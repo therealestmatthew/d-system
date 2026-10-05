@@ -955,3 +955,29 @@ phases, and that decision is recorded in this document (`PLAN-047` D5, OQ2, rule
 **Why recorded here:** the calibration data the owner asked for exists only if every verdict is kept
 from the first review on. A reviewer type that gated from its first review would decide merges with
 no record of how often it agrees with the reviewers it replaces.
+
+## In a pre-approved unattended run, the Session Manager's ASSIGN is the claim approval — 2026-10-05
+
+Owner ruling of 2026-10-05, given to the Session Manager in its morning session and confirmed by the
+owner in Builder A's session the same day, answering "When the owner is away, builders stalled on
+/session-start's claim-approval question. For future unattended runs, should the SM's ASSIGN count
+as that approval?": "Yes, only in runs you pre-approve — only when the owner has pre-approved the run
+(like O1); recorded as an owner ruling in GOV-003, and the starters say so. Daytime runs still ask
+the owner." **Standing.**
+
+In a run the owner has pre-approved, as the overnight run of 2026-10-04/05 was under the Session
+Manager's note O1, an `ASSIGN` from the Session Manager is the owner's approval for
+`/session-start`'s question before the claim commit, and the builder does not ask it. In every other
+run the question goes to the owner as written.
+[PROMPT-037](../02-prompts/PROMPT-037-session-manager-starter-messages.md)'s Builder role, step 1,
+says so; the Standby Builder role works "exactly as a Builder" and inherits it.
+
+The incident: in the overnight run of 2026-10-04/05, Builders A and B both put `/session-start`'s
+claim question to the owner, who was away, and waited on it all night. Builder A was assigned
+`phase-lrr-03` and asked at about 23:15. The Session Manager granted the claim turn, revoked it when
+the session stayed blocked, and at 00:40 reassigned the phase to the Batch Runner, which built it.
+The owner's answer reached Builder A after the withdrawal and was not acted on.
+
+**Why recorded here:** `PROMPT-037`'s Builder role said the question "still goes to the owner, as
+written", and `/session-start` step 2 says an unanswered question is not a yes. A builder reading
+either alone would block an unattended run on a question nobody can answer.
