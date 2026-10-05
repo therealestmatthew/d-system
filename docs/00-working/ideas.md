@@ -25330,10 +25330,24 @@ The built-in reviewer is ruled: PLAN-047 (reviewer contract) line 135 says the s
 
 ## 000590 · Backlog status-regression end-to-end tests should not depend on live backlog order
 
-**Created 2026-10-05T08:37:45-04:00 · Status: `open`**
+**Created 2026-10-05T08:37:45-04:00 · Status: `triaged`**
 
 test/test_backlog_status_regression.py's two end-to-end tests pick the first non-complete backlog phase as their target and silently assume GOV-003 does not name it. They broke on dev at 850cae1, when phase-rel-04 became the first non-complete phase (GOV-003 names it). Choose a target not mentioned in GOV-003, or build a fixture, instead of relying on live backlog order.
 
 (From Session 5 - Batch Runner, 2026-10-05, received after the overnight HOLD; recorded as given by Ideation.)
 
 The owner ruled on the morning of 2026-10-05, as relayed by the Session Manager, that the Batch Runner fixes it, on branch agent/fix-status-regression-tests. It is the same family as 000583: tests that read live repository data break when the data moves.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T08:38:41-04:00): Confirmed on dev: the two tests are test_main_reports_a_status_regression_through_the_real_entry_point (line 354) and test_dev_relative_warning_goes_to_stderr_and_keeps_catalog_stdout_clean (line 407) in test/test_backlog_status_regression.py. Each picks its target with next(item for item in live_catalog["items"] if item["status"] != "complete") (lines 372 and 417), so the target moves whenever the live backlog changes. The other end-to-end tests in that file already build a temporary git repository with their own backlog.yaml and GOV-003.md and monkeypatch the paths, which is the fixture route the idea names. GOV-003 does name phase-rel-04, and 850cae1 is the phase-rel-03 completion merge that made phase-rel-04 the first phase not complete.
+
+Same family as 000583 (tests reading the live idea log break when the data reaches a new status). Per the owner's ruling recorded in the body, the fix is the Batch Runner's, on agent/fix-status-regression-tests, which exists but is not yet on dev.
+
+PROPOSED LINK: 000590 --relates_to--> 000583 (both are tests that read live repository data and break when that data moves)
+
+</details>
