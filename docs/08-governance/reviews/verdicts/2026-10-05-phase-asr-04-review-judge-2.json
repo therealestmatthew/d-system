@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-05-phase-asr-04-review-judge-2",
+  "date": "2026-10-05",
+  "phase": "phase-asr-04",
+  "reviewed_commit": "820821e0a1f86730212db7b6a2dd1e02546c74c6",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "The phase's own scope bullet 4 reads as requiring both PROMPT-036 templates to carry the coordinator brief, which is looser than what was built (Validator reclassified as a step-4 pre-review check).",
+      "evidence": "docs/09-backlog/backlog.yaml:15408-15409 (scope bullet 4, not edited by this phase) vs PROMPT-036-build-coordinator.md:306-340.",
+      "consequence": "Not a defect in the diff; the tension is in the backlog phase's own text. The reviewer would not ask the builder to fix it at this stage."
+    }
+  ],
+  "raw_reply_sha256": "17f771707e8a3cc124a550b15e0ea9070355cee447c7982aee604e3b0fec1c09",
+  "outcomes": [],
+  "notes": "Round 2. Dispatched and briefed by the Session Manager by hand. Brief: scope, acceptance and verification from dev's backlog.yaml, the range 8979a09..820821e (diff given as a file path, 37 KB), the runner manifest (run from a scratch clone at 820821e; all 8 entries exit 0), the path of that scratch clone as a read-only checkout, the round-1 gating record (reviewer-written), and the coordinator's fact that the round-1 records match the ledger. No builder-written input. Raw reply kept at _working/session-manager/verdict-evidence/phase-asr-04/, as received with the harness's indentation removed. The judge marked acceptance 3 met from the procedure text's determinism, not from an observed failing run. Round-1 findings F01-F03: resolved per this reviewer."
+}

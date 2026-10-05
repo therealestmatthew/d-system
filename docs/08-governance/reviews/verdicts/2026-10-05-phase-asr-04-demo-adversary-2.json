@@ -1,0 +1,26 @@
+{
+  "verdict_id": "2026-10-05-phase-asr-04-demo-adversary-2",
+  "date": "2026-10-05",
+  "phase": "phase-asr-04",
+  "reviewed_commit": "820821e0a1f86730212db7b6a2dd1e02546c74c6",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F04",
+      "severity": "blocker",
+      "title": "GOV-017's brief and session-close.md's mirror omit a checkout of the branch, which both gating reviewer types require, while PROMPT-036's templates add 'the worktree path' and call it the GOV-017 brief.",
+      "evidence": "GOV-017-multi-session-coordination-protocol.md:168-176 and :190 (three-bullet brief, 'Both get the same brief'); .claude/commands/session-close.md:111-120 (same list); .claude/agents/demo-adversary.md (run commands against the worktree path in the dispatch prompt); .claude/agents/demo-validator-code.md ('plus the worktree's absolute path'); PROMPT-036-build-coordinator.md:327-331, :333-339, :336.",
+      "consequence": "A Session Manager following GOV-017 literally gives the gating reviewer no file tree to Grep/Glob and no worktree to run Bash in, contradicting its charter; this review itself only ran because the coordinator added a checkout the text does not authorise.",
+      "minimal_fix": "Add a fourth brief bullet in GOV-017 and session-close.md: a checkout of the branch at the reviewed commit, for the gating reviewer (which has Bash); state that the shadow judge (no shell) does not need or get it."
+    }
+  ],
+  "raw_reply_sha256": "7c69869d5cece499492f3adda350fe73183463579b3329009487cb98eb8a0c61",
+  "outcomes": [],
+  "notes": "Round 2. Dispatched and briefed by the Session Manager by hand. Brief: scope, acceptance and verification from dev's backlog.yaml, the range 8979a09..820821e (diff given as a file path, 37 KB), the runner manifest (run from a scratch clone at 820821e; all 8 entries exit 0), the path of that scratch clone as a read-only checkout, the round-1 gating record (reviewer-written), and the coordinator's fact that the round-1 records match the ledger. No builder-written input. Raw reply kept at _working/session-manager/verdict-evidence/phase-asr-04/, as received with the harness's indentation removed. Round-1 findings F01, F02, F03: resolved per this reviewer."
+}
