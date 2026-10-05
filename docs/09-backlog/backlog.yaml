@@ -15091,7 +15091,8 @@ items:
   - sys-governance
   - sys-backlog
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-standby-3
   priority: 1
   session_budget: 1
   depends_on:
@@ -15122,13 +15123,12 @@ items:
   - src/governance/review_gate.py
   - src/governance/__main__.py
   - test/test_review_gate.py
+  - test/test_backlog.py
   - docs/08-governance/GOV-018-three-altitude-review-procedure.md
   - docs/08-governance/GOV-002-backlog-protocol.md
   - docs/08-governance/reviews/
-  next_action: 'PARKED overnight 2026-10-05: branch agent/phase-grd-04 at a691dac is READY (review PASS WITH
-    FINDINGS, major fixed; SM gate green, 1553 passed). Owner decision: accept test/test_backlog.py (sys-delivery,
-    outside declared systems; two next_up ordering tests now write a dispositioned fixture record), widen the
-    declaration, re-claim and merge.'
+  next_action: Re-claimed 2026-10-05 on the owner's ruling accepting the test/test_backlog.py fixture edit;
+    branch agent/phase-grd-04 is rebased, re-gated and sent READY for merge.
 - id: phase-dam-01
   title: Amend ARCH-006, GOV-014, GOV-018, REQ-022 and the session commands to the 2026-09-23 rulings
   plan: doc-design-document-amendments
