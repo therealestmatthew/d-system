@@ -31,6 +31,7 @@ import sys
 import time
 from collections.abc import Callable
 from pathlib import Path
+from types import ModuleType
 
 import pytest
 from fastapi import FastAPI
@@ -427,13 +428,13 @@ def test_seventh_concurrent_session_is_refused_while_six_are_open(
 class _AcceptProbe:
     """A stand-in websocket whose `accept()` records the reserved slots, then stops the route."""
 
-    def __init__(self, module: object, shell: str | None = None) -> None:
+    def __init__(self, module: ModuleType, shell: str | None = None) -> None:
         self.module = module
         self.query_params: dict[str, str] = {} if shell is None else {"shell": shell}
         self.reserved_at_accept: int | None = None
 
     async def accept(self) -> None:
-        self.reserved_at_accept = len(self.module.RESERVED)  # type: ignore[attr-defined]
+        self.reserved_at_accept = len(self.module.RESERVED)
         raise RuntimeError("stop after accept")
 
 
