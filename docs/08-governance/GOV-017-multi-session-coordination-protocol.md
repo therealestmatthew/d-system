@@ -226,10 +226,10 @@ review before `READY` (owner ruling at G3 on `PLAN-047` OQ3, 2026-09-24: "the co
 built-in /security-review on qualifying phases, recorded as a verdict"; `REQ-030` R08). It is the
 diff-time half of ruling Q9, whose plan-time half is `GOV-010` P12.
 
-- **Trigger.** The coordinator runs it when either is true. First, the phase's plan names a threat
-  surface under `GOV-010` P12 (authentication, network exposure, secrets, dependencies). Second,
-  `git diff --name-only <range>` lists a path that touches one: anything under `src/api/` or
-  `src/demo/`, `src/main.py`, `pyproject.toml`, `uv.lock`, `ts/package.json`,
+- **Trigger.** The coordinator runs it when either is true. First, the phase's plan maps this
+  phase to a threat surface under `GOV-010` P12 (authentication, network exposure, secrets,
+  dependencies). Second, `git diff --name-only <range>` lists a path that touches one: anything
+  under `src/api/` or `src/demo/`, `src/main.py`, `pyproject.toml`, `uv.lock`, `ts/package.json`,
   `ts/package-lock.json`, `.github/workflows/`, `tools/git-hooks/`, `.mcp.json`, or
   `.claude/settings*.json`. A diff that reads a credential from the environment, opens a socket or
   spawns a process outside those paths also triggers it. When the coordinator is unsure, it runs the
@@ -247,7 +247,7 @@ diff-time half of ruling Q9, whose plan-time half is `GOV-010` P12.
 **Leaving shadow.** The judge's verdicts decide nothing while it runs in shadow. It leaves shadow
 when the owner decides so on a comparison table built from the verdict records, after at least ten
 reviewed phases, and that decision is recorded in `GOV-003` (owner ruling at G3, 2026-09-24).
-Until then every build review runs both reviewers, and only the gating verdict decides.
+Until then every build review runs both reviewers, and only gating verdicts decide.
 
 ## The merge gate
 
@@ -296,8 +296,11 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
    branch. The Session Manager names the file and reports the difference to the owner as a finding
    (`REQ-030` R10, `PLAN-047` D4).
 3. The Session Manager brings the merge to the owner with the session's results, its own runner
-   manifest, the gating reviewer's verdict and the shadow judge's verdict, the verdict-record check,
-   and `git diff --stat dev..<branch>`. Only the gating verdict decides.
+   manifest, the gating reviewer's verdict, the `/security-review` verdict when the phase triggered
+   it, the shadow judge's verdict, the verdict-record check, and `git diff --stat dev..<branch>`.
+   Only the gating verdicts decide: the gating reviewer's and, when it ran, the security review's.
+   Each must pass, with its findings fixed or explicitly accepted. The shadow judge's verdict
+   decides nothing.
 4. On the owner's yes, it sends `GRANTED merge` and gives the session the lock. If `dev` has moved
    since step 2, the session rebases and re-runs the four gate checks while holding the lock, and
    reports the new tip; the Session Manager re-runs step 2 on that tip before the session

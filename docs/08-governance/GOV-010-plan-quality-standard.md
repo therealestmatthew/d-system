@@ -268,10 +268,10 @@ assumed.
   Session Briefing, reads the outputs of the signals built in phases 1 and 2, but that dependency is
   shown only in the separate Composition Map, not where the work is ordered.
 
-### P12. The plan names the threat surfaces its phases touch
+### P12. The plan names the threat surfaces each phase touches
 
-A plan names each threat surface its phases touch, and for each one says what protects it or points
-to the decision that does. The four surfaces are:
+For each phase it registers, a plan names the threat surfaces that phase touches, and for each one
+says what protects it or points to the decision that does. The four surfaces are:
 
 - **Authentication:** who may call, open or use what the phase builds.
 - **Network exposure:** anything that listens, binds a host or port, or accepts a connection,
@@ -280,14 +280,15 @@ to the decision that does. The four surfaces are:
 - **Dependencies:** a new or changed third-party package or version (`pyproject.toml`, `uv.lock`,
   `ts/package.json`, `ts/package-lock.json`).
 
-A plan whose phases touch none of them says so in one line. This is the plan-time half of the
+A plan whose phases touch none of them says so in one line; a phase that touches none needs no
+entry of its own. This is the plan-time half of the
 owner's 2026-09-23 ruling Q9; its diff-time half is the security review in `GOV-017`'s merge gate
 (`REQ-030` R08).
 
-**How a reviewer judges it.** Read each phase's `deliverables` and the code they name, and list the
-surfaces they touch. A route under `src/api/`, a process or terminal the code spawns, a bind host, a
-credential read from the environment, and a change to a dependency file each count. The plan must
-name every surface on that list. If the plan says nothing about threat surfaces, the judgement
+**How a reviewer judges it.** For each phase, read its `deliverables` and the code they name, and
+list the surfaces they touch. A route under `src/api/`, a process or terminal the code spawns, a
+bind host, a credential read from the environment, and a change to a dependency file each count.
+The plan must name every surface on that list against the phase that touches it. If the plan says nothing about threat surfaces, the judgement
 fails; it does not mean none is touched. If the plan names a decision without saying which surface
 that decision governs, the judgement also fails, because the reader cannot tell what is exposed.
 
