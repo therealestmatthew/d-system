@@ -89,6 +89,18 @@ def test_promotion_must_name_what_the_idea_became(log: Path) -> None:
     assert json.loads(_lines(log)[-1])["promoted_to"] == "PLAN-016"
 
 
+def test_promotion_refuses_a_target_that_is_not_a_governed_code(log: Path) -> None:
+    append_idea.add("First", "Body", log)
+
+    for promoted_to in (["doc-batch-orchestration-protocol"], ["PLAN-016", "PLAN-99999"], "nope"):
+        with pytest.raises(append_idea.IdeaError, match="not a governed document code"):
+            append_idea.change_status("000001", "promoted", promoted_to=promoted_to, log=log)
+    assert len(_lines(log)) == 1
+
+    append_idea.change_status("000001", "promoted", promoted_to=["PLAN-016", "REQ-004"], log=log)
+    assert json.loads(_lines(log)[-1])["promoted_to"] == ["PLAN-016", "REQ-004"]
+
+
 def test_a_second_discard_after_a_revisit_is_permanent(log: Path) -> None:
     append_idea.add("First", "Body", log)
     append_idea.change_status("000001", "discarded", log=log)

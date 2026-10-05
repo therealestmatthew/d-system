@@ -191,6 +191,15 @@ def resolve_pointers(pointers: list[dict[str, str]], root: Path = ROOT) -> None:
             raise IdeaError(f"pointer commit {value!r} is not a commit in this repository")
 
 
+def resolve_promoted_to(promoted_to: list[str] | str, root: Path = ROOT) -> None:
+    """Refuse a promotion that names something other than a governed document code, checked the
+    same way a doc pointer is, so a promoted idea always says which document it became."""
+    codes = document_codes(root)
+    for value in [promoted_to] if isinstance(promoted_to, str) else promoted_to:
+        if value not in codes:
+            raise IdeaError(f"promoted_to {value!r} is not a governed document code")
+
+
 def build_created(idea: str, title: str, body: str, at: str, eid: str) -> dict[str, Any]:
     return {"idea": idea, "event": "created", "at": at, "eid": eid, "title": title, "body": body}
 
@@ -322,6 +331,8 @@ def change_status(
         )
     if target == "promoted" and not promoted_to:
         raise IdeaError("--promoted-to is required when promoting: name what the idea became")
+    if promoted_to:
+        resolve_promoted_to(promoted_to, root)
     if target in CLOSING_STATES:
         if not closes_with:
             raise IdeaError(

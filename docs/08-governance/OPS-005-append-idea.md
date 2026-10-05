@@ -7,7 +7,7 @@ kind: operation
 status: active
 owner: repository-owner
 created: '2026-09-08'
-updated: '2026-09-08'
+updated: '2026-10-04'
 systems: [sys-portfolio]
 depends_on: [doc-governance-operations]
 ---
@@ -100,6 +100,10 @@ branches' appended lines. Amending the same idea twice appends two corrections t
 survive (`src.db.ideas` merges a chain of amendments rather than keeping only the latest).
 Title and body are the only amendable fields, and neither can be cleared — every idea must
 have both.
+
+**`status` into `promoted` needs `--promoted-to`** — one or more governed document codes naming
+what the idea became. Each must be a code the governance registry holds, checked the same way as a
+`--doc` pointer; a doc id such as `doc-batch-orchestration-protocol` is refused.
 
 **`status` into `delivered`, `resolved` or `absorbed` needs at least one pointer** — `--doc`,
 `--phase` or `--commit`, each repeatable — naming where the delivery happened. Each must
