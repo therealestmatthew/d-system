@@ -25351,3 +25351,13 @@ Same family as 000583 (tests reading the live idea log break when the data reach
 PROPOSED LINK: 000590 --relates_to--> 000583 (both are tests that read live repository data and break when that data moves)
 
 </details>
+
+---
+
+## 000591 · /session-start step 2 should not stall on claim approval in a run the owner has pre-approved
+
+**Created 2026-10-05T13:53:13-04:00 · Status: `open`**
+
+.claude/commands/session-start.md step 2 ("Stop here until the answer comes back") still reads unconditionally, so in a run the owner has pre-approved a builder can still stall on the claim-approval question, although GOV-003 (2026-10-05 entry), GOV-017 Claim slots and PROMPT-037 builder step 1 now say the Session Manager's ASSIGN is that approval in such runs (on agent/fix-unattended-assign-rule, merging today).
+
+(From the owner, 2026-10-05, relayed by the Session Manager; flagged by Session 1 - Builder A. Recorded as given by Ideation. The owner asked that it be recorded and triaged, and that Builder A then plan a solution.)
