@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-23'
-updated: '2026-10-04'
+updated: '2026-10-05'
 systems: [sys-realization]
 depends_on: [doc-idea-realization-system, doc-idea-realization-system-requirements, doc-realization-role-contracts, doc-plan-quality-standard]
 ---
@@ -204,6 +204,12 @@ is appended to the finding's `dispositions` list. The last entry is the current 
 When every finding carries at least one disposition, set `status: dispositioned`. The schema then
 rejects any finding without one. A `dispositioned` record goes to phase-fit (stage 6) with the
 plan, and its `escalated-g3` findings go to the owner at G3.
+
+A dispositioned record is also what lets a phase into `next_up`. The governance check refuses a
+`next_up` phase unless a record lists it at either altitude, is `dispositioned`, and has no finding
+whose last disposition is `escalated-g3`; the owner's G3 ruling, appended after the planner's
+`escalated-g3`, is what clears such a finding (`REQ-028` R12, `GOV-002`'s "Inserting work at the
+front").
 
 This procedure does not define a second review of the revised plan. `ARCH-006` provides two
 revision cycles, after which unresolved blockers go to G3.

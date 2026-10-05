@@ -33,6 +33,7 @@ from src.governance.codes import inspect_codes, inspect_register, next_code, ren
 from src.governance.idea_priority import inspect_idea_priority
 from src.governance.plan_phases import inspect_plan_phases
 from src.governance.regression import audit as audit_status_regression
+from src.governance.review_gate import REVIEWS_DIR, inspect_review_gate
 from src.governance.staleness import catalog_errors, ideas_md_errors
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -395,7 +396,8 @@ def audit_backlog(
             today or date.today(),
             ideas,
         )
-        return errors + audit_plan_phases(root, result, catalog)[0], catalog
+        errors += audit_plan_phases(root, result, catalog)[0]
+        return errors + audit_review_gate(root, catalog)[0], catalog
     except (OSError, ValueError, KeyError, IdeaError, yaml.YAMLError) as exc:
         return [f"backlog inputs: {exc}"], {}
 
@@ -412,6 +414,20 @@ def audit_plan_phases(
         )
     except (OSError, ValueError, KeyError) as exc:
         return [f"plan phases inputs: {exc}"], {}
+
+
+def audit_review_gate(root: Path, catalog: dict[str, Any]) -> tuple[list[str], dict[str, int]]:
+    """Each next_up phase needs a dispositioned review record (REQ-028 R12); see review_gate."""
+    try:
+        records: dict[str, Any] = {}
+        directory = public_path(root, REVIEWS_DIR)
+        if directory.is_dir():
+            for path in sorted(directory.glob("*.json")):
+                location = path.relative_to(root).as_posix()
+                records[location] = json.loads(path.read_text(encoding="utf-8"))
+        return inspect_review_gate(catalog.get("next_up", []), records)
+    except (OSError, ValueError) as exc:
+        return [f"review gate inputs: {exc}"], {}
 
 
 def idea_ids(root: Path) -> set[str]:
