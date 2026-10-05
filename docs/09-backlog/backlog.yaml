@@ -199,8 +199,7 @@ items:
   - sys-contracts
   - sys-projection
   owner: repository-owner
-  agent: agent-batch-runner
-  status: active
+  status: queued
   priority: 1
   session_budget: 1
   depends_on:
@@ -220,8 +219,10 @@ items:
   deliverables:
   - src/db/source_validation.py
   - test/test_source_validation.py
-  next_action: Check tag, project, person, commitment and related-memory references,
-    plus duplicate source and task IDs.
+  next_action: 'PARKED overnight 2026-10-05: branch agent/phase-rel-03 at 8c4f349 is READY
+    (review: should-fix fixed; SM gate green, 1545 passed). Owner decision: accept test/test_rebuild.py
+    (sys-delivery, outside declared systems; a 7-line commitment fixture), widen the declaration,
+    re-claim and merge.'
 - id: phase-rel-04
   title: Make project stakeholders the membership authority
   plan: doc-reliability-follow-up
