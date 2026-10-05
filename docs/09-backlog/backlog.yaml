@@ -15502,6 +15502,7 @@ items:
   owner: repository-owner
   status: active
   agent: agent-standby-3
+  session: doc-session-threat-surfaces-security-review
   priority: 1
   session_budget: 1
   depends_on:
@@ -15528,8 +15529,8 @@ items:
   - docs/08-governance/GOV-010-plan-quality-standard.md
   - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
   - docs/08-governance/GOV-003-backlog-decisions.md
-  next_action: Waits for phase-asr-04. The reviewer is ruled - the built-in /security-review run by the
-    coordinator.
+  next_action: Built and reviewed on agent/phase-asr-05 (SESS-2026-10-05-07); waits for the
+    owner-approved merge and the completion edit on dev.
 - id: phase-plug-01
   title: Plugin skeleton, prerequisites skill, scaffold with install-state record, and doctor
   plan: doc-idea-realization-plugin
