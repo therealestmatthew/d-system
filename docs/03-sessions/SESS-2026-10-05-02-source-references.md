@@ -112,8 +112,9 @@ The owner's real records were also validated, with
 
 ## Backlog
 
-`status: active`, `agent: agent-batch-runner`. `next_action`: All acceptance met and reviewed;
-awaiting the owner's merge approval via the Session Manager, then completion on dev.
+`status: active`, `agent: agent-batch-runner`, re-claimed on 2026-10-05 with `test/test_rebuild.py`
+added to the deliverables. `next_action`: owner accepted the fixture; awaiting the merge through the
+Session Manager, then completion on `dev`.
 `completion_evidence`: `src/db/source_validation.py`, `test/test_source_validation.py`,
 `test/test_rebuild.py`, this record.
 
