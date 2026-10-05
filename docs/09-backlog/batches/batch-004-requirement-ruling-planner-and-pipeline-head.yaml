@@ -3,10 +3,10 @@
 schema_version: 1
 id: batch-004
 title: The mandatory-requirement ruling, the idea planner agent, and the first three pipeline phases
-status: queued
+status: in_progress
 sequence: 4
 created: '2026-09-22'
-updated: '2026-09-27'
+updated: '2026-10-05'
 coordinator: PROMPT-036
 provenance: 'PROMPT-036''s original batch 4, unchanged in membership, carried over on 2026-09-22 and
   re-checked the same day: every phase still queued and unclaimed, no edge pointing later in the global
