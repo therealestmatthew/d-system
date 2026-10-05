@@ -83,9 +83,10 @@ import os
 import subprocess
 import sys
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -214,7 +215,9 @@ def _self_install(log: Path | None, state_file: Path) -> dict[str, Any]:
     (OPS-016 documents this behavior).
     """
     ideas = fold(load_events(log)) if log is not None else fold(load_events())
-    open_ids = sorted((idea_id for idea_id, entry in ideas.items() if entry["status"] == "open"), key=int)
+    open_ids = sorted(
+        (idea_id for idea_id, entry in ideas.items() if entry["status"] == "open"), key=int
+    )
     state = install(log, state_file)
     if open_ids:
         print(

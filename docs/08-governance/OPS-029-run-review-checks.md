@@ -7,7 +7,7 @@ kind: operation
 status: active
 owner: repository-owner
 created: '2026-10-01'
-updated: '2026-10-01'
+updated: '2026-10-04'
 systems: [sys-gov-docs]
 depends_on: [doc-reviewer-contract-requirements, doc-reviewer-contract, doc-multi-session-coordination-protocol]
 ---
@@ -40,7 +40,7 @@ It never runs anything in the checkout it is started from, only in its own tempo
 3. It runs `uv sync --extra dev` there, listed as a `setup` entry.
 4. It runs each `verification` entry that is a command, in backlog order.
 5. It runs each of the four `GOV-017` gate checks that the list does not already contain:
-   `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/` and
+   `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/ tools/` and
    `uv run mypy src/`. A gate check the list also names runs once, with kind `verification+gate`.
 6. It removes the worktree, whether the run passed, failed or was interrupted.
 

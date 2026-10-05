@@ -63,7 +63,7 @@ WORKTREES = "d-system-worktrees"  # a sibling of the primary checkout, as AGENTS
 GATE_CHECKS = (
     "uv run python -m src.governance",
     "uv run pytest",
-    "uv run ruff check src/ test/",
+    "uv run ruff check src/ test/ tools/",
     "uv run mypy src/",
 )
 SETUP = ("uv sync --extra dev",)

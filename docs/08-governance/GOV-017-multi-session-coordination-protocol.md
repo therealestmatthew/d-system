@@ -161,7 +161,7 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
 
 1. The session sends `READY` with the phase's own review verdict — every finding either fixed or
    explicitly accepted — and the tail of its post-rebase runs of the four gate checks:
-   `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/` and
+   `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/ tools/` and
    `uv run mypy src/`. `dev`'s baseline is 0 ruff findings and 0 mypy errors, so each check must report
    zero findings; matching the previous count is not enough.
 

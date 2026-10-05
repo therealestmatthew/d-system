@@ -91,7 +91,7 @@ Roster
    Exception: reports under _working/session-manager/ (gitignored) need no turn.
 4. MERGE: send READY <branch> with (a) the phase's review verdict, every finding fixed or
    explicitly accepted, and (b) the tail of the post-rebase `uv run python -m src.governance`,
-   `uv run pytest`, `uv run ruff check src/ test/` and `uv run mypy src/` runs (dev's
+   `uv run pytest`, `uv run ruff check src/ test/ tools/` and `uv run mypy src/` runs (dev's
    baseline is 0 ruff findings, 0 mypy errors; the gate is clean), and (c) the output of
    `uv run python tools/check_test_baseline.py <base.xml> <branch.xml>` (you produce both
    reports: base from `pytest --junitxml` on dev's tip in a temporary git clone --shared,

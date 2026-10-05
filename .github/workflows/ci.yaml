@@ -25,7 +25,7 @@ jobs:
           uv run python -m src.governance --catalog > /dev/null
           git diff --exit-code docs/08-governance/catalog.md
       - run: uv run python -m src.governance
-      - run: uv run ruff check src/ test/
+      - run: uv run ruff check src/ test/ tools/
       - run: uv run mypy src/
       - run: uv run pytest
 

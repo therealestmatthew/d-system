@@ -127,7 +127,10 @@ def check(repo: Path, integration_branch: str) -> tuple[bool, str]:
     stash_entries = find_stash_entries(primary)
 
     if not dirty_paths and not stash_entries:
-        return False, f"Primary checkout is clean. Integration into '{integration_branch}' is not refused."
+        return (
+            False,
+            f"Primary checkout is clean. Integration into '{integration_branch}' is not refused.",
+        )
 
     lines = [f"Refused: integration into '{integration_branch}' cannot proceed."]
 
