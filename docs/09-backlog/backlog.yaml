@@ -15383,7 +15383,8 @@ items:
   - sys-governance
   - sys-gov-docs
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-standby-3
   priority: 1
   session_budget: 1
   depends_on:
@@ -15434,7 +15435,8 @@ items:
   - .claude/commands/session-close.md
   - docs/02-prompts/PROMPT-036-build-coordinator.md
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
-  - docs/08-governance/
+  - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - docs/08-governance/reviews/verdicts/
   next_action: Waits for asr-01..03, phase-grd-03 and phase-dam-01. Read their merged GOV-017,
     PROMPT-037, session-close.md and GOV-014 (Validator inputs) text before editing.
 - id: phase-asr-05
