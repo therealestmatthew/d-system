@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-05-phase-asr-04-demo-adversary-3",
+  "date": "2026-10-05",
+  "phase": "phase-asr-04",
+  "reviewed_commit": "3b591a858f7245e3b56d599208cefe200717023c",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "The bar on reading the builder's session record and git log inside the gating reviewer's scratch clone is a prompt instruction, not a technical control.",
+      "evidence": "GOV-017-multi-session-coordination-protocol.md:168-183 (the checkout bullet and the sentence naming the tension); the scratch clone contains docs/03-sessions/* and full git log.",
+      "consequence": "A gating reviewer with Bash/Grep could defeat the instruction; disclosed in the governed text and of the same trust-based kind as other controls in the protocol, so not blocking."
+    }
+  ],
+  "raw_reply_sha256": "b135717ec4faa6d7cecf953580a0d4557dc5e40086c1c47d5dbb0aefe6cad1be",
+  "outcomes": [],
+  "notes": "Round 3. Dispatched and briefed by the Session Manager by hand. Brief: scope, acceptance and verification from dev's backlog.yaml, the range 8979a09..3b591a8 and the delta since 820821e (diffs given as file paths), the runner manifest (run from a coordinator-made scratch clone at 3b591a8; all 8 entries exit 0), that scratch clone as the gating reviewer's read-only checkout, the prior reviewer-written records, and the coordinator's fact that all four committed records match the ledger. No builder-written input. Raw reply kept at _working/session-manager/verdict-evidence/phase-asr-04/, as received with the harness's indentation removed. Round-2 F04: resolved per this reviewer. The reviewer self-reported running `git log --oneline 820821e..3b591a8` in the checkout and seeing two commit subject lines, contrary to its brief; it states it used none of that content as evidence."
+}

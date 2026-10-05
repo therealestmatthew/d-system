@@ -1,0 +1,33 @@
+{
+  "verdict_id": "2026-10-05-phase-asr-04-review-judge-3",
+  "date": "2026-10-05",
+  "phase": "phase-asr-04",
+  "reviewed_commit": "3b591a858f7245e3b56d599208cefe200717023c",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "demo-adversary.md and demo-validator-code.md still say 'Run every command against the worktree path stated in your dispatch prompt', while GOV-017, session-close.md and PROMPT-036 now hand the gating reviewer a scratch clone.",
+      "evidence": ".claude/agents/demo-adversary.md:48, .claude/agents/demo-validator-code.md:50 vs GOV-017's new fourth brief bullet.",
+      "consequence": "Functionally harmless; vocabulary diverges between the coordination docs and the agent charters.",
+      "minimal_fix": "One clause in each agent file acknowledging the path may be a scratch clone rather than the builder's worktree."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Acceptance 3's demonstration is not evidenced in the judge's inputs: no runner entry or evidence file performs the match / edited-copy mismatch / refusal sequence.",
+      "evidence": "Runner manifest 3b591a858f72 (no such entry); GOV-017 merge gate step 2 specifies the mechanism only.",
+      "consequence": "Acceptance 3 judged 'cannot judge' by the judge; the demonstration exists only in the builder's session record, which the judge may not read."
+    }
+  ],
+  "raw_reply_sha256": "0a7a3397d840e468b3a875194b284b14758d2fa2c5579c1f784e5c1c60ccc0c2",
+  "outcomes": [],
+  "notes": "Round 3. Dispatched and briefed by the Session Manager by hand. Brief: scope, acceptance and verification from dev's backlog.yaml, the range 8979a09..3b591a8 and the delta since 820821e (diffs given as file paths), the runner manifest (run from a coordinator-made scratch clone at 3b591a8; all 8 entries exit 0), that scratch clone as the gating reviewer's read-only checkout, the prior reviewer-written records, and the coordinator's fact that all four committed records match the ledger. No builder-written input. Raw reply kept at _working/session-manager/verdict-evidence/phase-asr-04/, as received with the harness's indentation removed. The judge got no checkout (shadow; no shell). Acceptance 1, 2, 4, 5, 6 met; 3 cannot judge. Round-2 F04 resolved per this reviewer."
+}
