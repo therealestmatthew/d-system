@@ -7240,7 +7240,8 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  status: queued
+  agent: agent-batch-runner
+  status: active
   priority: 2
   session_budget: 1
   depends_on:
