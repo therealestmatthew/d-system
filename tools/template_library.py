@@ -208,6 +208,12 @@ class Library:
         ai_slots = template.ai_slots if template.population == "both" else template.slots
         deterministic = {k: v for k, v in values.items() if k not in ai_slots}
         if template.population == "both":
+            # A value for an agent's slot would be neither filled nor clearly passed on; refuse it
+            # rather than let it look filled.
+            claimed = sorted(set(values) & set(ai_slots))
+            _require(
+                not claimed, f"{name}: slot(s) {', '.join(claimed)} are the agent's (ai_slots)"
+            )
             missing = sorted(set(template.slots) - set(ai_slots) - set(deterministic))
             _require(not missing, f"{name}: unfilled deterministic slot(s): {', '.join(missing)}")
         return AdaptationBrief(

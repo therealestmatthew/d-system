@@ -51,7 +51,7 @@ the template itself), and the generators that render the family today.
 |---|---|
 | `slot-fill` | The page or fragment, every slot filled. A slot missing from the data, or a key the template does not have, is an error |
 | `ai-adaptation` | An adaptation brief (JSON) for an agent: the template, its slots and the data. Nothing is filled and no model is called |
-| `both` | A brief with every deterministic slot already filled in `partial`; only the slots in `ai_slots` are left for the agent. A missing deterministic slot is an error |
+| `both` | A brief with every deterministic slot already filled in `partial`; only the slots in `ai_slots` are left for the agent. A missing deterministic slot, or a value supplied for an `ai_slots` slot, is an error |
 
 Reference catalogues (`reference: true`, such as `house-components.html` and
 `atlas-components.html`) are declared and refused by `render`.

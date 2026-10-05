@@ -154,6 +154,14 @@ def test_both_refuses_a_missing_deterministic_slot() -> None:
         lib.load().render("atlas-page.html", {"PAGE_TITLE": "A", "BRAND": "D"})
 
 
+def test_both_refuses_a_value_for_an_agent_slot() -> None:
+    with pytest.raises(lib.LibraryError, match="SECTIONS are the agent's"):
+        lib.load().render(
+            "atlas-page.html",
+            {"PAGE_TITLE": "A", "BRAND": "D", "BRAND_SUB": "s", "SECTIONS": "<p>x</p>"},
+        )
+
+
 def test_a_reference_catalogue_is_not_rendered() -> None:
     with pytest.raises(lib.LibraryError, match="reference"):
         lib.load().render("house-components.html", {})
