@@ -15393,6 +15393,7 @@ items:
   owner: repository-owner
   status: active
   agent: agent-standby-3
+  session: doc-session-coordinator-dispatched-review
   priority: 1
   session_budget: 1
   depends_on:
@@ -15445,8 +15446,8 @@ items:
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
   - docs/08-governance/reviews/verdicts/
-  next_action: Waits for asr-01..03, phase-grd-03 and phase-dam-01. Read their merged GOV-017,
-    PROMPT-037, session-close.md and GOV-014 (Validator inputs) text before editing.
+  next_action: Built and reviewed on agent/phase-asr-04 (SESS-2026-10-05-04); waits for the
+    owner-approved merge and the completion edit on dev.
 - id: phase-asr-05
   title: 'Second docs phase: threat surfaces in plans, the READY security review, and GOV-003 entries for
     O-5, O-6 and Q7'
