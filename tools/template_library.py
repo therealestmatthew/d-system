@@ -79,7 +79,7 @@ class Template:
     reference: bool
     page: bool
     slots: tuple[str, ...]
-    generator: str | None
+    generators: tuple[str, ...]
     inline_styles: InlineStyles | None
     path: Path = field(compare=False)
 
@@ -237,11 +237,10 @@ def load(root: Path = ROOT) -> Library:
         fid = family.get("id")
         _require(isinstance(fid, str) and fid not in family_ids, f"bad or duplicate family {fid!r}")
         family_ids.add(fid)
-        generator = family.get("generator")
-        _require(
-            generator is None or (root / generator).is_file(),
-            f"{fid}: generator {generator} does not exist",
-        )
+        generators = family.get("generators")
+        _require(isinstance(generators, list), f"{fid}: generators must be a list")
+        for generator in generators:
+            _require((root / generator).is_file(), f"{fid}: generator {generator} does not exist")
         styles = family.get("inline_styles")
         if styles is not None:
             for name in styles.get("files") or []:
@@ -295,7 +294,7 @@ def load(root: Path = ROOT) -> Library:
             reference=bool(entry.get("reference", False)),
             page=body.lstrip().lower().startswith("<!doctype html"),
             slots=slots,
-            generator=family.get("generator"),
+            generators=tuple(family["generators"]),
             inline_styles=(
                 InlineStyles(
                     tuple(styles.get("files") or ()),
@@ -319,7 +318,7 @@ def _describe(template: Template) -> dict[str, Any]:
         "reference": template.reference,
         "page": template.page,
         "slots": list(template.slots),
-        "generator": template.generator,
+        "generators": list(template.generators),
     }
 
 
@@ -328,11 +327,11 @@ def main(argv: list[str] | None = None) -> int:
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("list", help="every declared template, one JSON object per line")
     show = commands.add_parser("show", help="one template's declaration and slots, as JSON")
-    show.add_argument("template")
+    show.add_argument("template", help="template file name under templates/html/")
     render = commands.add_parser(
         "render", help="render a template from a JSON object of slot values"
     )
-    render.add_argument("template")
+    render.add_argument("template", help="template file name under templates/html/")
     render.add_argument("--data", type=Path, required=True, help="JSON object: slot -> text")
     render.add_argument("--out", type=Path, required=True, help="page, or brief (JSON) for AI")
     args = parser.parse_args(argv)

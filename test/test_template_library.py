@@ -44,6 +44,7 @@ def tree(tmp_path: Path) -> Path:
     for generator in (
         "generate_overview.py",
         "generate_engine_pages.py",
+        "generate_house_css.py",
         "lit_report_render.py",
     ):
         shutil.copy(ROOT / "tools" / generator, tmp_path / "tools" / generator)
@@ -210,7 +211,7 @@ def test_a_new_family_is_a_manifest_entry_and_renders_through_the_cli(
     data["families"].append(
         {
             "id": "note",
-            "generator": None,
+            "generators": [],
             "inline_styles": {"files": ["templates/styles/note.css"], "separator": ""},
             "templates": [{"file": "note-page.html", "population": "slot-fill"}],
         }
@@ -310,6 +311,26 @@ def test_house_page_replays_byte_identically_through_the_library(
     assert isinstance(result, lib.Rendered) and result.html == out
 
 
+def test_house_specimen_replays_byte_identically_through_the_library(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """generate_house_css.py --specimen is the house page's second generator."""
+    house = _load("generate_house_css")
+    original = house.fill
+    calls: list[tuple[dict[str, str], str]] = []
+
+    def recording(template: str, values: dict[str, str]) -> str:
+        out: str = original(template, values)
+        calls.append((dict(values), out))
+        return out
+
+    monkeypatch.setattr(house, "fill", recording)
+    house.render_specimen(house.load_tokens(), variant="swiss", theme="dark")
+    (values, out), = calls
+    result = lib.load().render("house-page.html", values)
+    assert isinstance(result, lib.Rendered) and result.html == out
+
+
 def test_adding_templates_leaves_existing_renders_byte_identical(tree: Path) -> None:
     """R05's second half, on a tree that gains a template and a family."""
     atlas_values = {"PAGE_TITLE": "A", "BRAND": "D", "BRAND_SUB": "s"}
@@ -325,7 +346,7 @@ def test_adding_templates_leaves_existing_renders_byte_identical(tree: Path) -> 
     (tree / "templates/html/overview-callout.html").write_text("<p>{{NOTE}}</p>\n", "utf-8")
     data = manifest(tree)
     (tree / "templates/html/note-page.html").write_text("<p>{{T}}</p>\n", encoding="utf-8")
-    data["families"].append({"id": "note", "generator": None, "templates": [
+    data["families"].append({"id": "note", "generators": [], "templates": [
         {"file": "note-page.html", "population": "slot-fill"}]})
     write_manifest(tree, data)
     templates = generate_overview.Templates(
@@ -362,11 +383,12 @@ def test_an_undeclared_template_is_rejected(tree: Path) -> None:
         (lambda d: family(d, "overview")["templates"].append(
             {"pattern": "overview-b*.html", "population": "slot-fill"}),
          "declared twice at the same level"),
-        (lambda d: family(d, "atlas").update(generator="tools/missing.py"), "does not exist"),
+        (lambda d: family(d, "atlas").update(generators=["tools/missing.py"]), "does not exist"),
+        (lambda d: family(d, "atlas").update(generators=None), "generators must be a list"),
         (lambda d: d.update(schema_version=2), "schema_version"),
     ],
     ids=["empty-pattern", "bad-method", "ai-slots-on-slot-fill", "unknown-ai-slot",
-         "double-declared", "missing-generator", "schema-version"],
+         "double-declared", "missing-generator", "generators-not-a-list", "schema-version"],
 )
 def test_an_inconsistent_manifest_is_rejected(tree: Path, change: Any, message: str) -> None:
     data = manifest(tree)

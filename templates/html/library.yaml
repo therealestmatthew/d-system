@@ -9,7 +9,7 @@
 #
 # Fields:
 #   families[].id           - the family's name, as templates/README.md uses it
-#   families[].generator    - the tool that renders the family today, or null when pages are
+#   families[].generators   - the tools that render the family today; empty when pages are
 #                             written by an agent or by hand. Informational: generators keep
 #                             their own template loading, so their output cannot change here
 #   families[].inline_styles
@@ -37,7 +37,7 @@ schema_version: 1
 
 families:
   - id: overview
-    generator: tools/generate_overview.py
+    generators: [tools/generate_overview.py]
     inline_styles:
       files: [templates/styles/overview.css]
       separator: ""
@@ -47,7 +47,7 @@ families:
         population: slot-fill
 
   - id: house
-    generator: tools/generate_engine_pages.py
+    generators: [tools/generate_engine_pages.py, tools/generate_house_css.py]
     inline_styles:
       files: [templates/styles/house.css, templates/styles/house-components.css]
       separator: "\n"
@@ -60,7 +60,7 @@ families:
         reference: true
 
   - id: atlas
-    generator: null
+    generators: []
     inline_styles:
       files: [templates/styles/atlas.css]
       separator: ""
@@ -77,7 +77,7 @@ families:
         reference: true
 
   - id: lit-report
-    generator: tools/lit_report_render.py
+    generators: [tools/lit_report_render.py]
     inline_styles:
       files: [templates/styles/lit-report.css]
       separator: ""
