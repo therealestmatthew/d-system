@@ -12886,7 +12886,8 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  status: queued
+  agent: agent-batch-runner
+  status: active
   priority: 3
   session_budget: 1
   depends_on:
@@ -12913,9 +12914,10 @@ items:
   - uv run pytest
   - uv run python -m src.governance
   deliverables:
-  - templates/html/
-  - templates/styles/
-  - tools/
+  - templates/html/library.yaml
+  - tools/template_library.py
+  - test/test_template_library.py
+  - templates/README.md
   next_action: Two families already exist and must keep rendering identically. Treat them as the regression
     surface, not as examples to rewrite.
 - id: phase-des-04

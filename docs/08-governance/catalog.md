@@ -503,7 +503,7 @@ CI regenerates it and fails on any difference.
 | PLAN-033 | doc-retrieval-knowledge-infrastructure | active | 10 | 0 | 1 | agent-night |
 | PLAN-034 | doc-blocked-downstream-projections | active | 2 | 0 | 1 | agent-night |
 | PLAN-035 | doc-schema-consistency-testing | active | 4 | 0 | 2 | agent-night, agent-standby-3 |
-| PLAN-036 | doc-html-generation-design-system | active | 3 | 0 | 9 | agent-builder-a, agent-coord, agent-night, agent-standby-3 |
+| PLAN-036 | doc-html-generation-design-system | active | 2 | 1 | 9 | agent-batch-runner, agent-builder-a, agent-coord, agent-night, agent-standby-3 |
 | PLAN-037 | doc-standalone-explorations-housekeeping | active | 7 | 0 | 1 | agent-night |
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 0 | 0 | 1 | agent-coord |
 | PLAN-039 | doc-idea-realization-system-plan | draft | 9 | 0 | 5 | agent-build, agent-builder-a, agent-codex-boundary-study, agent-coord |
