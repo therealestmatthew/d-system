@@ -25373,3 +25373,13 @@ PROPOSED LINK: 000590 --relates_to--> 000583 (both are tests that read live repo
 The rule it must match is on branch agent/fix-unattended-assign-rule, not yet on dev: a GOV-003 entry (owner ruling of 2026-10-05, Standing) says that in a run the owner has pre-approved, the Session Manager's ASSIGN is the owner's approval for /session-start's claim question, and that in every other run the question goes to the owner as written. The branch changes GOV-003, GOV-017 and PROMPT-037 and leaves session-start.md untouched. The entry's own "Why recorded here" names step 2 as one of the two texts that blocked the overnight run of 2026-10-04/05 (Builders A and B waited all night; phase-lrr-03 was reassigned to the Batch Runner at 00:40). Step 2 should change only after that branch merges, so that it cites a rule already on dev.
 
 </details>
+
+---
+
+## 000592 · Start the Owner Terminal outside the project so the project deny rules do not apply to it
+
+**Created 2026-10-05T15:30:03-04:00 · Status: `open`**
+
+The deny rules in the project's .claude/settings.json (AGENTS.md, CLAUDE.md, .agents/, .codex/, _private/, _data/ideas.jsonl) apply to every session started inside /code/d-system, including the Owner Terminal. As a result the Owner Terminal could not make the owner-approved AGENTS.md edit (C17 failed) or write under .codex/. This contradicts GOV-017's statement that the Owner Terminal exists to write paths agents are denied.
+
+Owner ruling (2026-10-05, relayed by the Session Manager): start the Owner Terminal from a directory outside the project, in manual mode, using absolute paths and git -C. Update GOV-017's "The Owner Terminal" section and its start command, and PROMPT-037's Owner Terminal starter, to say so — after a test write from an outside-started session confirms the deny rules no longer apply. Triage after capture.
