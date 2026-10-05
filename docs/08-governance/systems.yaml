@@ -339,8 +339,9 @@ systems:
   - test
   depends_on: []
   description: Existing Python lint/type/test and frontend build jobs; governance gate added by this
-    change. `tools/` scripts are not yet covered by the documented `ruff check src/ test/` gate
-    (tracked by `phase-rel-09`), and there is no deploy or release job.
+    change. CI and the merge gate run `ruff check src/ test/ tools/` (idea 000570); AGENTS.md still
+    documents `ruff check src/ test/` (tracked by `phase-rel-09`), and there is no deploy or
+    release job.
 - id: sys-governance
   name: Repository governance
   domain: governance
