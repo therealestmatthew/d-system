@@ -116,6 +116,9 @@ the same brief rule:
    - the commit range from step 2 and the output of `git diff <range>` (the judge has no shell, so
      it needs the diff text);
    - the path to the runner's `manifest.json`;
+   - for the gating reviewer only, the path of a scratch clone of the branch at the reviewed commit,
+     made by the dispatching session and removed afterwards, never the building session's worktree.
+     Tell it not to read the phase's session record or `git log`. The judge gets no checkout;
    - its job, stated plainly: decide independently, from the diff and the runner's evidence, whether
      each acceptance condition holds. "No discrepancies found" is a valid finding when it is the
      honest result.

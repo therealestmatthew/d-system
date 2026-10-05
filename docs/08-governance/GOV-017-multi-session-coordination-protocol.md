@@ -173,7 +173,16 @@ Batch Runner under this protocol, it sends `REVIEW-REQUEST` like a Builder.
   the diff text itself goes in the brief;
 - the path to the runner's `manifest.json` under `_working/review-checks/<phase-id>/<commit12>/`.
   Each entry's `file` is relative to the root of the checkout that ran the runner, and every
-  evidence file sits beside the manifest.
+  evidence file sits beside the manifest;
+- for the gating reviewer only, the path of a checkout of the branch at the reviewed commit, so it
+  can run commands. The coordinator makes it, as a scratch clone (`git clone --shared` of the
+  primary checkout, then a checkout of that commit), and removes it after the review. It is never
+  the builder's worktree, which may hold uncommitted state. The shadow judge has no shell and
+  gets no checkout.
+
+A checkout of the branch contains the builder's session record and its commit history. The brief
+tells the gating reviewer not to read either: not the phase's record under `docs/03-sessions/`, and
+not `git log` or commit messages.
 
 The brief may not contain anything the builder wrote: not the session record, not commit messages or
 `git log` output, not the text of `REVIEW-REQUEST` or `READY` beyond the branch and its tip, not a
@@ -187,7 +196,8 @@ reads the builder's account judges the account instead of the work (owner ruling
    four gate checks at the tip in a detached worktree and writes the manifest;
 2. dispatches the **gating reviewer** — a dedicated reviewer type, `demo-adversary` or
    `demo-validator-code`, never a `general-purpose` agent — and, during shadow, the **shadow
-   judge**, `review-judge`. Both get the same brief. Before the first dispatch of a run, check that
+   judge**, `review-judge`. Both get the same brief, except that only the gating reviewer gets the
+   checkout. Before the first dispatch of a run, check that
    `review-judge` is among the available agent types;
 3. writes one verdict record per reviewer, named `<verdict_id>.json` and valid against
    `schemas/review-verdict.schema.json` (`REQ-030` R05, `PLAN-047` D4), into the staging directory

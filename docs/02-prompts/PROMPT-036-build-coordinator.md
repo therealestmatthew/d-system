@@ -333,7 +333,9 @@ verdict and its evidence file path. It changes nothing.
 **Adversary.** Dispatch `subagent_type: demo-adversary`, not `general-purpose`; it is the gating
 reviewer in step 6. Give it the `GOV-017` brief: the phase id, its `scope`, `acceptance` and
 `verification` verbatim, the commit range and its `git diff` output, the path to the runner's
-`manifest.json`, and the worktree path. Nothing the creator wrote goes in. Add the
+`manifest.json`, and the path of a scratch clone of the branch at the reviewed commit that you make
+and remove afterwards, not the phase worktree. Nothing the creator wrote goes in; tell it not to
+read the phase's session record or `git log`. Add the
 instruction to assume the work is broken and hunt for where it fails when executed or merged —
 acceptance satisfied in appearance only, deliverables overreaching the declaration, tests that
 assert nothing, a green command that does not exercise the claim it stands for. Read-and-run only;
