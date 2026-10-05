@@ -7295,11 +7295,25 @@ items:
   - tools/lit_report_render.py
   - test/test_lit_report_render.py
   - docs/08-governance/OPS-019-lit-report-render.md
-  next_action: 'PARKED overnight 2026-10-05: branch agent/phase-lrr-03 at bc9f7d2 is READY (review:
-    no blocking/should-fix; browser checks PASS via headless Chrome; SM gate green, 1521 passed). Owner
-    decisions: sign off check_test_baseline''s 2 retired tests (test_csv_pages_carry_the_phase_lrr_03_handoff_marker_and_md_pages_do_not,
-    test_csv_placeholder_counts_match_the_extracted_table); confirm INLINE_SCRIPT carries the whole
-    <script> element. Then re-claim and merge.'
+  next_action: Owner signed off the two retired tests and the INLINE_SCRIPT reading on 2026-10-05;
+    re-claimed. Awaiting the merge via the Session Manager, then completion on dev.
+  session: doc-session-lit-report-tables
+  completion_evidence:
+  - templates/html/lit-report-table.html
+  - templates/html/lit-report-page.html
+  - templates/scripts/lit-report-table.js
+  - templates/styles/lit-report.css
+  - tools/lit_report_render.py
+  - test/test_lit_report_render.py
+  - docs/08-governance/OPS-019-lit-report-render.md
+  - docs/03-sessions/SESS-2026-10-05-05-lit-report-tables.md
+  result: 'The ledger, inventory and matrix render as tables carrying their own rows (1200, 1154
+    and 67), with one inline script on those three pages only. Headless Chrome (validator agent,
+    no Playwright MCP available): sorting ascending then descending changed order with counts
+    unchanged on all three; filter terms matched exactly the CSV-computed counts (10, 11, 5);
+    a matrix column toggle hid 67 of 67 cells with no page-body scroll at 1280px; the ledger
+    filter handler took 0.50ms (35.10ms to the next frame) on an i7-1185G7, Chrome 153. 1521
+    tests pass; ruff, mypy, governance and the private-content check (31 identifiers) are clean.'
 
 - id: phase-lrr-04
   title: Cross-links, epistemic framing, generator assembly and the drift test

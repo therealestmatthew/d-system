@@ -454,6 +454,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-10-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-05-02-source-references.md |
 | SESS-2026-10-05-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-05-03-next-up-review-gate.md |
 | SESS-2026-10-05-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-05-04-coordinator-dispatched-review.md |
+| SESS-2026-10-05-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-05-05-lit-report-tables.md |
 | SESS-2026-10-05-06 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-05-06-template-library.md |
 | SESS-2026-10-05-07 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-05-07-threat-surfaces-security-review.md |
 | SESS-2026-10-05-08 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-05-08-build-in-public-answer.md |
