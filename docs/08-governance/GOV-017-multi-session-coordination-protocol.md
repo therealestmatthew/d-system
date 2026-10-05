@@ -215,8 +215,10 @@ Until then every build review runs both reviewers, and only the gating verdict d
 A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. Approval is relayed:
 
 1. The session sends `READY` with the paths of the verdict records the Session Manager handed it,
-   committed unchanged on the branch, and every finding either fixed or explicitly accepted. It also
-   sends the tail of its post-rebase runs of the four gate checks:
+   committed unchanged on the branch, and every finding either fixed or explicitly accepted. The
+   records come from the review in *Build reviews*: the runner, then the gating reviewer and, during
+   shadow, the shadow judge `review-judge`, on the same brief. It also sends the tail of its
+   post-rebase runs of the four gate checks:
    `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/ tools/` and
    `uv run mypy src/`. `dev`'s baseline is 0 ruff findings and 0 mypy errors, so each check must report
    zero findings; matching the previous count is not enough.
@@ -252,8 +254,8 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
    branch, refuses the branch. The Session Manager names the file and reports the difference to the
    owner as a finding (`REQ-030` R10, `PLAN-047` D4).
 3. The Session Manager brings the merge to the owner with the session's results, its own runner
-   manifest, the gating verdict and the shadow judge's verdict, the verdict-record check, and
-   `git diff --stat dev..<branch>`.
+   manifest, the gating reviewer's verdict and the shadow judge's verdict, the verdict-record check,
+   and `git diff --stat dev..<branch>`. Only the gating verdict decides.
 4. On the owner's yes, it sends `GRANTED merge` and gives the session the lock. If `dev` has moved
    since step 2, the session rebases and re-runs the four gate checks while holding the lock, and
    reports the new tip; the Session Manager re-runs step 2 on that tip before the session
