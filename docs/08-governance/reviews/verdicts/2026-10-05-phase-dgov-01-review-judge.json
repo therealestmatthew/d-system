@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-05-phase-dgov-01-review-judge",
+  "date": "2026-10-05",
+  "phase": "phase-dgov-01",
+  "reviewed_commit": "dee784f73add1ea7875a905be1745087268743b4",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "The phase's own newly-added verification line `uv run python -m src.governance --classify-requirements` was not run by the runner, and no test exercises the CLI flag itself — tests call render_classification() directly, bypassing argparse dispatch.",
+      "evidence": "docs/09-backlog/backlog.yaml, src/governance/__main__.py; the --classify-requirements wiring (mutual-exclusion group membership, its exclusion from `plain`) is confirmed only by reading the diff, not by execution.",
+      "consequence": "Cannot fully judge this specific verification entry; diff inspection shows it is correctly added to the `output` mutually-exclusive group and to the `plain`-exclusion tuple, and the `elif args.classify_requirements:` branch is wired, so the risk looks low."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Scope text says grandfathering \"14-plus plans\"; the implemented list (GRANDFATHERED_PLAN_IDS) has 12.",
+      "evidence": "src/governance/requirement_rule.py:157-172.",
+      "consequence": "Explainable: the new multi-phase-only rule is narrower than the old \"any plan without a requirement\" metric the scope's estimate came from. Not a defect, worth a reader's awareness."
+    }
+  ],
+  "raw_reply_sha256": "9111dc83d917069887b258bc9ae71cb9e7db1a0a69e47be4acb8feaf7e55a3f7",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews'. Brief: scope, acceptance and verification from dev 72e405b's backlog.yaml, plus the owner-approved third verification line the branch adds (--classify-requirements; not run by the runner, which reads dev's list), the owner's two binding rulings on R02/R03 from batch-004's opening questions, the range 72e405b..dee784f (diff as a file path, docs/03-sessions excluded), and the runner manifest; no checkout (shadow judge) _working/review-checks/phase-dgov-01/dee784f73add/ (5 entries, exit 0). /security-review not run: the diff touches only src/governance/, GOV-001, test/ and backlog.yaml. Raw reply kept at _working/session-manager/review-replies/phase-dgov-01-dee784f-review-judge.md. The judge also noted, not as a finding, that backlog.yaml is outside the declared deliverables but the addition is owner-approved."
+}

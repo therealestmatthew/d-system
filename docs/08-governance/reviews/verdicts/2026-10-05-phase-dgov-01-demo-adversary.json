@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-05-phase-dgov-01-demo-adversary",
+  "date": "2026-10-05",
+  "phase": "phase-dgov-01",
+  "reviewed_commit": "dee784f73add1ea7875a905be1745087268743b4",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Scope/implementation count mismatch: the scope says grandfathering covers \"14-plus plans\"; the implemented rule and --classify-requirements find exactly 12.",
+      "evidence": "docs/09-backlog/backlog.yaml (phase-dgov-01 scope, 3rd bullet); src/governance/requirement_rule.py:157-172, confirmed by running the CLI.",
+      "consequence": "Acceptance only requires \"a number,\" which it has, so this doesn't fail R02, but the scope's own estimate doesn't match what the delivered rule measures — worth the owner noting in case \"14-plus\" was anchored to a different metric than \"backlog items whose plan field names this doc.\""
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "Rule is trivially gameable by splitting work across plan documents instead of phases: the mandatory condition triggers only when one plan id is named by more than one backlog item.",
+      "evidence": "src/governance/requirement_rule.py:185-187, mirrored in GOV-001-protocol.md:26-33.",
+      "consequence": "A plan written as two single-phase plan documents instead of one two-phase plan never crosses the threshold and is never required to pair with a requirement, even though it produces the exact multi-phase, multi-session acceptance-spanning situation R01-R03 exist to catch. The written rule and the code share this gap, so a second reader applying GOV-001's prose would reach the same (wrong) permissive answer for a deliberately split plan. Not fatal to this phase's literal acceptance text, but it is a real loophole in both the rule and its enforcement."
+    }
+  ],
+  "raw_reply_sha256": "dd28cee7e8847c55d568dcb68dcf397a555a910aea7e695634d6d1e2c01d1cea",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews'. Brief: scope, acceptance and verification from dev 72e405b's backlog.yaml, plus the owner-approved third verification line the branch adds (--classify-requirements; not run by the runner, which reads dev's list), the owner's two binding rulings on R02/R03 from batch-004's opening questions, the range 72e405b..dee784f (diff as a file path, docs/03-sessions excluded), and the runner manifest _working/review-checks/phase-dgov-01/dee784f73add/ (5 entries, exit 0). /security-review not run: the diff touches only src/governance/, GOV-001, test/ and backlog.yaml. Raw reply kept at _working/session-manager/review-replies/phase-dgov-01-dee784f-demo-adversary.md, as received with the harness's indentation removed. F02's severity: the reviewer wrote \"Minor/major (judgment call)\"; the schema allows one value, and the SM recorded the higher. The reviewer's points 3 and 4 were non-findings (checked and held) and are not recorded as findings."
+}
