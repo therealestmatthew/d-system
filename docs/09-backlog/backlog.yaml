@@ -7240,8 +7240,7 @@ items:
   systems:
   - sys-html
   owner: repository-owner
-  agent: agent-batch-runner
-  status: active
+  status: queued
   priority: 2
   session_budget: 1
   depends_on:
@@ -7284,8 +7283,11 @@ items:
   - tools/lit_report_render.py
   - test/test_lit_report_render.py
   - docs/08-governance/OPS-019-lit-report-render.md
-  next_action: Unblocked. phase-lrr-02 is complete, and _csv_placeholder() in tools/lit_report_render.py
-    is the seam this phase replaces.
+  next_action: 'PARKED overnight 2026-10-05: branch agent/phase-lrr-03 at bc9f7d2 is READY (review:
+    no blocking/should-fix; browser checks PASS via headless Chrome; SM gate green, 1521 passed). Owner
+    decisions: sign off check_test_baseline''s 2 retired tests (test_csv_pages_carry_the_phase_lrr_03_handoff_marker_and_md_pages_do_not,
+    test_csv_placeholder_counts_match_the_extracted_table); confirm INLINE_SCRIPT carries the whole
+    <script> element. Then re-claim and merge.'
 
 - id: phase-lrr-04
   title: Cross-links, epistemic framing, generator assembly and the drift test
