@@ -25283,8 +25283,20 @@ Context: R10 makes R07's output part of a READY. GOV-017's merge gate separately
 
 ## 000588 · Align the demo-adversary and demo-validator-code charters with the scratch-clone review brief
 
-**Created 2026-10-05T03:11:30-04:00 · Status: `open`**
+**Created 2026-10-05T03:11:30-04:00 · Status: `triaged`**
 
 The demo-adversary and demo-validator-code agent definitions (.claude/agents/) still say they run against "the worktree path stated in your dispatch prompt"; since phase-asr-04 the GOV-017 brief gives the gating reviewer a coordinator-made scratch clone at the reviewed commit, not a worktree, and bars reading the session record and git log there. Align the charters.
 
 (From Session 3 - Standby Builder, 2026-10-05, overnight run; recorded as given by Ideation.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T03:12:23-04:00): The brief this idea cites is not on dev yet. phase-asr-04 (coordinator-dispatched build review wired into session-close, PROMPT-036, GOV-017 and PROMPT-037) is active, and the scratch-clone wording is on its branch, agent/phase-asr-04: GOV-017 line 178 there says the coordinator makes the gating reviewer's checkout "as a scratch clone (git clone --shared ...)" (commit 07c805f, round-2 finding F04). On dev, GOV-017 still has no such text. The charters should match once that branch merges, not before.
+
+Wider than the two named agents: the line "Run every command against the worktree path stated in your dispatch prompt" appears in seven files under .claude/agents/ on dev: demo-adversary (48), demo-validator-code (50), demo-validator-check, demo-validator-web, demo-creator-py, demo-creator-web and demo-creator-docs. Only the gating reviewer's dispatch changes under phase-asr-04; creators and the other validators still run in worktrees. The files carry no generated-file header, so they are edited directly. review-judge.md already says its checkout may not be at the reviewed commit.
+
+</details>
