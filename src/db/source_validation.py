@@ -10,6 +10,11 @@ So the contract here is narrow and deliberate: read entity content (`data_root()
 against the schemas in `schemas/`, and return every problem found with the file and the
 field that caused it. Nothing in this module connects to DuckDB, creates `data/`, or
 stops at the first error — a caller fixing source files wants the whole list.
+
+Schemas see one record at a time, so two checks run across records afterwards
+(`validate_identities`): every reference to a tag, project, person, commitment or memory
+must name a record that exists, and no two records of one kind may share an ID. Both name
+every source record involved.
 """
 
 from __future__ import annotations
@@ -64,6 +69,27 @@ ENTITY_DIRECTORIES: dict[str, str] = {
 #: Files under brain/ that carry no memory front matter by design.
 BRAIN_EXCLUDED = {"index.md"}
 
+#: The memory `project` value for this repository itself. It is a repository scope, not a
+#: portfolio project, so no `_data/projects/` record backs it (ADR-001) and none should.
+REPOSITORY_MEMORY_SCOPE = "d-system"
+
+#: Record kind -> (field, kind it refers to). A field holds either one ID or a list of
+#: them; null and absent mean "no reference". `promised_to` and `owed_by` are left out on
+#: purpose: their schemas allow the name as written until an identity is confirmed
+#: (ADR-008), so an unknown value there is not an error.
+REFERENCES: dict[str, tuple[tuple[str, str], ...]] = {
+    "tag": (("related", "tag"),),
+    "project": (("tags", "tag"), ("stakeholders", "person")),
+    "person": (("projects", "project"),),
+    "commitment": (("project_id", "project"), ("tags", "tag")),
+    "task": (("commitment_id", "commitment"), ("project_id", "project"), ("tags", "tag")),
+    "interaction": (("project_id", "project"), ("participants", "person"), ("tags", "tag")),
+    "decision": (("project_id", "project"), ("decided_by", "person"), ("tags", "tag")),
+    "waiting-on": (("project_id", "project"), ("tags", "tag")),
+    "development-event": (("project_id", "project"), ("tags", "tag")),
+    "memory": (("project", "project"), ("tags", "tag"), ("related", "memory")),
+}
+
 
 @dataclass(frozen=True)
 class SourceError:
@@ -76,6 +102,15 @@ class SourceError:
     def __str__(self) -> str:
         location = f"{self.path}: {self.field}" if self.field else self.path
         return f"{location}: {self.message}"
+
+
+@dataclass(frozen=True)
+class SourceRecord:
+    """One record that passed its schema, kept for the cross-record checks."""
+
+    kind: str
+    path: str
+    document: dict[str, Any]
 
 
 def _registry(schemas: Path) -> Registry[Any]:
@@ -141,10 +176,14 @@ def _relative(path: Path, root: Path) -> str:
         return str(path)
 
 
-def validate_entities(root: Path, validators: _Validators) -> list[SourceError]:
+def validate_entities(
+    root: Path, validators: _Validators, records: list[SourceRecord] | None = None
+) -> list[SourceError]:
     """Every JSON file under the entity content root, against the schema its directory
     implies. `tags.json` is shared taxonomy (ADR-009) and always read from the tracked
     `_data/`, independent of `data_root()`.
+
+    Each record that passes its schema is appended to `records`, when given.
     """
     errors: list[SourceError] = []
     data = data_root(root)
@@ -161,9 +200,11 @@ def validate_entities(root: Path, validators: _Validators) -> list[SourceError]:
                 errors.append(SourceError(name, "", "expected a list of tags"))
             else:
                 for index, tag in enumerate(tags):
-                    errors.extend(
-                        _validate(validators, "tag", tag, f"{name}[{index}]")
-                    )
+                    location = f"{name}[{index}]"
+                    tag_errors = _validate(validators, "tag", tag, location)
+                    errors.extend(tag_errors)
+                    if not tag_errors and records is not None:
+                        records.append(SourceRecord("tag", location, tag))
 
     for directory, schema in ENTITY_DIRECTORIES.items():
         source = data / directory
@@ -176,7 +217,10 @@ def validate_entities(root: Path, validators: _Validators) -> list[SourceError]:
             except json.JSONDecodeError as exc:
                 errors.append(SourceError(name, "", f"invalid JSON: {exc}"))
                 continue
-            errors.extend(_validate(validators, schema, document, name))
+            document_errors = _validate(validators, schema, document, name)
+            errors.extend(document_errors)
+            if not document_errors and records is not None:
+                records.append(SourceRecord(schema, name, document))
     return errors
 
 
@@ -215,8 +259,13 @@ def _normalize_yaml_dates(value: Any) -> Any:
     return value
 
 
-def validate_memories(root: Path, validators: _Validators) -> list[SourceError]:
-    """Every brain entry's front matter, against `schemas/memory.schema.json`."""
+def validate_memories(
+    root: Path, validators: _Validators, records: list[SourceRecord] | None = None
+) -> list[SourceError]:
+    """Every brain entry's front matter, against `schemas/memory.schema.json`.
+
+    Each entry that passes is appended to `records`, when given.
+    """
     errors: list[SourceError] = []
     brain = root / "brain"
     if not brain.is_dir():
@@ -241,9 +290,11 @@ def validate_memories(root: Path, validators: _Validators) -> list[SourceError]:
         if not isinstance(meta, dict):
             errors.append(SourceError(name, "", "front matter is not a mapping"))
             continue
-        errors.extend(
-            _validate(validators, "memory", _normalize_yaml_dates(meta), name)
-        )
+        meta = _normalize_yaml_dates(meta)
+        meta_errors = _validate(validators, "memory", meta, name)
+        errors.extend(meta_errors)
+        if not meta_errors and records is not None:
+            records.append(SourceRecord("memory", name, meta))
     return errors
 
 
@@ -289,6 +340,62 @@ def validate_ideas(root: Path, validators: _Validators) -> list[SourceError]:
     return errors
 
 
+def _referenced_ids(value: Any) -> list[tuple[str, str]]:
+    """(suffix, id) pairs for one reference field: `[i]` per list item, `` for a scalar."""
+    if isinstance(value, str):
+        return [("", value)]
+    if isinstance(value, list):
+        return [(f"[{i}]", item) for i, item in enumerate(value) if isinstance(item, str)]
+    return []
+
+
+def validate_identities(records: Iterable[SourceRecord]) -> list[SourceError]:
+    """Cross-record checks no single-record schema can make.
+
+    A duplicate ID within one kind is reported on every record after the first, naming
+    the first — two task files claiming `t-1` under different commitments both appear.
+    An unknown reference is reported on the record holding it, naming the field and the
+    missing ID. A memory's `project` may also be `REPOSITORY_MEMORY_SCOPE`.
+
+    Only records that passed their schema arrive here, so a malformed file is reported
+    once, by its schema, and not again as a cascade of broken references.
+    """
+    records = list(records)
+    errors: list[SourceError] = []
+    known: dict[str, dict[str, str]] = {}
+    for record in records:
+        identifier = record.document.get("id")
+        if not isinstance(identifier, str):
+            continue
+        first = known.setdefault(record.kind, {}).setdefault(identifier, record.path)
+        if first != record.path:
+            errors.append(
+                SourceError(
+                    record.path,
+                    "id",
+                    f"duplicate {record.kind} ID '{identifier}', also defined in {first}",
+                )
+            )
+
+    for record in records:
+        for field, target in REFERENCES.get(record.kind, ()):
+            for suffix, identifier in _referenced_ids(record.document.get(field)):
+                if identifier in known.get(target, {}):
+                    continue
+                if (
+                    record.kind == "memory"
+                    and field == "project"
+                    and identifier == REPOSITORY_MEMORY_SCOPE
+                ):
+                    continue
+                errors.append(
+                    SourceError(
+                        record.path, f"{field}{suffix}", f"unknown {target} '{identifier}'"
+                    )
+                )
+    return errors
+
+
 def validate_sources(root: Path | None = None) -> list[SourceError]:
     """Validate every source file. Returns an empty list when the tree is loadable.
 
@@ -297,10 +404,12 @@ def validate_sources(root: Path | None = None) -> list[SourceError]:
     """
     root = ROOT if root is None else root
     validators = _Validators(root / "schemas")
+    records: list[SourceRecord] = []
     return (
-        validate_entities(root, validators)
-        + validate_memories(root, validators)
+        validate_entities(root, validators, records)
+        + validate_memories(root, validators, records)
         + validate_ideas(root, validators)
+        + validate_identities(records)
     )
 
 

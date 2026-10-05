@@ -138,6 +138,14 @@ def test_task_loads_with_any_combination_of_parents(
     tree: Path, parents: dict[str, str]
 ) -> None:
     write(tree, "projects", "proj1", VALID_PROJECT)
+    # The preflight rejects a task naming a commitment that does not exist (phase-rel-03).
+    write(
+        tree,
+        "commitments",
+        "c-1",
+        {"id": "c-1", "description": "Parent", "status": "open", "priority": "medium",
+         "created": "2026-09-01"},
+    )
     write(tree, "tasks", "t-1", {"id": "t-1", **TASK_BASE, **parents})
 
     rebuild_db.rebuild(tree)
