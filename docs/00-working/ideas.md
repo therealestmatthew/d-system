@@ -25305,8 +25305,20 @@ Wider than the two named agents: the line "Run every command against the worktre
 
 ## 000589 · The review-verdict schema needs a form for a built-in reviewer with no definition file
 
-**Created 2026-10-05T03:41:13-04:00 · Status: `open`**
+**Created 2026-10-05T03:41:13-04:00 · Status: `triaged`**
 
 schemas/review-verdict.schema.json requires reviewer.definition_sha256 of an agent definition file (.claude/agents/<type>.md), but the built-in /security-review command the coordinator runs at READY (phase-asr-05) has no definition file; the schema needs a form for a built-in reviewer (e.g. the Claude Code version it ran under).
 
 (From Session 3 - Standby Builder, 2026-10-05, overnight run; recorded as given by Ideation.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T03:46:35-04:00): Confirmed on dev: schemas/review-verdict.schema.json makes reviewer an object with required type and definition_sha256 and additionalProperties false; definition_sha256 is described as the sha256 of ".claude/agents/<type>.md". reviewer_type is a free kebab-case pattern, so "security-review" would pass as a type, but there is no file to hash and no other field is allowed. The schema already requires a separate top-level model field.
+
+The built-in reviewer is ruled: PLAN-047 (reviewer contract) line 135 says the security review "is the built-in /security-review command", and phase-asr-05 (second docs phase: threat surfaces in plans, the READY security review, and GOV-003 entries), now active, scopes it as run by the coordinator and "recorded as a verdict". So phase-asr-05 is the first place a verdict for a reviewer with no definition file will be written; the schema change belongs with it or before it.
+
+</details>
