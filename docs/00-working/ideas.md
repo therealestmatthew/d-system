@@ -23481,7 +23481,7 @@ Unresolved: option (a) vs (b), and whether ~26 s per commit is acceptable.
 
 ## 000525 · Idea Realization Engine: the whole system
 
-**Created 2026-10-01T16:24:59-04:00 · Status: `open`**
+**Created 2026-10-01T16:24:59-04:00 · Status: `triaged`**
 
 The single core idea every other card links to. IRE names the whole system that carries ideas to delivered work across projects; d-system is its baseline.
 
@@ -23491,10 +23491,15 @@ Overlaps as printed: 000436 (generalisable systems), 000314 (portable framework)
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-10-01T16:25:16-04:00): Owner decision, 2026-10-01 (verbatim in _working/session-manager/vision-ire-2026-10-01-raw.md, Addendum): The four parts of the Idea Realization Engine are Engine, Bridge, Brain and Library. Engine: agents, skills, multi-session orchestration and GitHub multi-repo control; every agent starts here. Bridge: the interface between the other three, the MCP server including the contracts and rules of knowledge interchange. Brain: the active knowledge store; knowledge routinely enters, exits, evolves and is pruned; tiers are treated differently (memories vs governance and protocols); global vs project scope decides which Brain aspects are available to all projects or only particular ones. Library: long-term storage and the component registry; checked out when needed; anything added is officially published and (relatively) permanent.
 - **finding** by agent-ideation (2026-10-02T16:28:58-04:00): Session Manager, step 1 rulings by the owner, 2026-10-01/02, as given: "S2: IRE planning, the d-system release export (000550) and the engine-pages run proceed in parallel. S1: IRE is planned from d-system's sessions and executed in the new repositories. Q1: IRE's planning documents live in a private planning repository. Q2: at the end it is imported into the Brain and archived. Q3: 'all plans under a single repo' (raw line 38) means the Brain, not the code repository. Q4: five planning levels with all four D16 changes. Q5: spikes allowed with an owner-approved brief; no idea-log spike. Q6: a level gate is recorded as a tag in the planning repository plus a pointer finding on 000525. Q7: the charter covers the several-user case, licence, non-goals, first-release scope and d-system's role. Q8: 000525-000549 skip the partition sweep. Q9: D16's dependency corrections with the five synthesis amendments. Q10: no interim idea-log repository. Q11: the merge-path wording in d-system is corrected separately. Source: artifact https://claude.ai/artifact/6NXq2BYHWm26EZZD1t3vZi (v4)."
+- **finding** by agent-idea-triage (2026-10-05T00:02:24-04:00): 000525 is the anchor card of the Idea Realization Engine; each of the other 24 IRE cards (000526-000549) carries a relates_to link to it. Its own links are to 000436 (systems that can be generalised to other repositories) and 000314 (portable framework). Its annotations record the owner's four-part definition (Engine, Bridge, Brain, Library) and the step-1 rulings.
+
+Related governed material describes d-system's own pipeline. ARCH-006 (draft) specifies nine stages and five owner gates (G1-G5) on LangGraph and the Claude Agent SDK; its closing section says that as of 2026-09-15 stages 1-3 exist in manual or batch form and everything else is planned work. PLAN-039 (draft) composes the existing programmes PLAN-029, PLAN-031, PLAN-032 and PLAN-025 into that pipeline, with PLAN-039.01 (draft) as the orchestrator design. REQ-022 holds the observable requirements, including automation rate, cycle time and rework rate (R24). GOV-014 holds the role contracts (triage, partition, planner, adversary, phase-fit, mapper, test author, developer, validator, realization).
+
+These documents cover a single-repository pipeline. None of them covers the Engine/Bridge/Brain/Library split, a Brain shared across projects, or execution in new repositories. Under the step-1 rulings that planning is done from d-system's sessions (S1) with the planning documents in a private planning repository (Q1). Ungoverned investigation drafts for D1, D2, D3 and D16 are in _working/session-manager/ire/.
 
 </details>
 
@@ -23531,11 +23536,27 @@ Overlaps as printed: 000436 (generalisable systems), 000314 (portable framework)
 
 ## 000526 · Generalize d-system into new repositories beside it
 
-**Created 2026-10-01T16:25:00-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:00-04:00 · Status: `triaged`**
 
 Stand up the generalized system in parallel repositories that use d-system as the reference; change nothing here.
 
 Overlaps as printed: 000436, 000281 (starter kit), 000115 (duplication audit)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:24-04:00): 000526 asks to stand up the generalised system in new repositories that use d-system as the reference, changing nothing in d-system. Its links: 000525 (IRE anchor), 000436 (systems that can be generalised to other repositories), 000281 (portable starter kit), 000115 (duplication audit).
+
+The step-1 rulings on 000525 bear on it directly: "S1: IRE is planned from d-system's sessions and executed in the new repositories." and "Q10: no interim idea-log repository."
+
+Related governed material: PLAN-040 (portable framework document templates) and PLAN-041 (portable framework content extraction), both draft and created 2026-09-19, with requirements REQ-024 and REQ-025. They produce the templates and extracted patterns a new repository would need to adopt d-system's workflow; both name 000281's starter kit as the downstream packaging. PLAN-048 built the idea-realization plugin (plugins/idea-realization/), a packaged subset of the pipeline intended for installation in other repositories. ARCH-012 (draft) recommends keeping d-system as one repository now and treats extraction (option B) as a conditional future path; it concerns d-system's own boundaries, not new IRE repositories.
+
+No governed document yet plans the new repositories themselves.
+
+</details>
 
 **Links**
 
@@ -23548,11 +23569,25 @@ Overlaps as printed: 000436, 000281 (starter kit), 000115 (duplication audit)
 
 ## 000527 · Ideas leave git: a store that does not conflict on clone and pull
 
-**Created 2026-10-01T16:25:01-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:01-04:00 · Status: `triaged`**
 
 Tracking the idea log in git conflicts as soon as others clone and pull; move ideas to a store with its own versioning.
 
 Overlaps as printed: 000162 (append-only knowledge log) · Decision D2
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:25-04:00): 000527 asks for ideas to move out of git into a store with its own versioning, because a git-tracked idea log conflicts once others clone and pull.
+
+Nothing in d-system's governed documents moves the idea log out of git. The nearest governed work addresses a different problem: concurrent writers on one machine. ADR-025 and REQ-035 R01-R02 (delivered by PLAN-052) make the plugin's idea writer hold an exclusive filelock lock across read, validate and append, with the lock file in the git common directory so all worktrees share it. REQ-035 R03 keeps the log in git and adds a warning when ideas are written anywhere other than the integration branch in the primary checkout. Neither addresses conflicts between clones on different machines, which is this idea's concern. PLAN-016 defines the current append-only event log tracked in git.
+
+The step-1 rulings on 000525 include "Q10: no interim idea-log repository." The ungoverned D2 (Brain storage) and D3 (idea-log integrity) investigations in _working/session-manager/ire/ analyse where the log goes once it leaves the product repository; D3 states that moving it into each user's Brain removes the clone-and-pull conflict under every D3 option.
+
+</details>
 
 **Links**
 
@@ -23564,11 +23599,25 @@ Overlaps as printed: 000162 (append-only knowledge log) · Decision D2
 
 ## 000528 · Prove the idea log is intact without git
 
-**Created 2026-10-01T16:25:01-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:01-04:00 · Status: `triaged`**
 
 A way to version ideas and show the log has not been altered, once git history no longer does that job.
 
 Overlaps as printed: 000162, 000480 (repair path for a malformed tail) · Decision D3
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:26-04:00): 000528 asks for a way to version ideas and show the idea log has not been altered once git history no longer does that job. It depends on 000527 (ideas leave git). Its links: 000525 (IRE anchor), 000162 (append-only event log for knowledge state), 000480 (repair path for a malformed tail in the plugin's idea log).
+
+PLAN-016 defines the current idea log as an append-only event log in which nothing is edited; today git history is the only record that a committed line has not changed. PLAN-052's lock (ADR-025, REQ-035 R01-R02) serialises concurrent writers on one machine; it does not prove integrity.
+
+No governed document specifies an integrity mechanism for a log outside git. The ungoverned D3 investigation (_working/session-manager/ire/D3-idea-log-integrity.md, 2026-10-01) analyses this question directly: it defines intact as no event altered, deleted or reordered and each writer known, compares options including a hash-chained log with signed checkpoints and signed per-writer chains, covers 000480's malformed-tail case, and makes its recommendation conditional on an open owner question (Q0: whether two machines or users must write to the same Brain without coordination).
+
+</details>
 
 **Links**
 
@@ -23580,11 +23629,25 @@ Overlaps as printed: 000162, 000480 (repair path for a malformed tail) · Decisi
 
 ## 000529 · Start from nothing
 
-**Created 2026-10-01T16:25:02-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:02-04:00 · Status: `triaged`**
 
 A new user installs the system and begins with no ideas and an empty brain, with the governance and protocols shipped as defaults.
 
 Overlaps as printed: 000281, 000458 (scaffold skill), 000459 (prerequisites) · D12
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:26-04:00): 000529 asks that a new user install the system and start with no ideas and an empty Brain, with governance and protocols shipped as defaults. Its links: 000525 (IRE anchor), 000281 (portable starter kit), 000458 (scaffold skill), 000459 (prerequisites skill).
+
+The nearest delivered work is the idea-realization plugin (PLAN-048, plugins/idea-realization/). REQ-031 R04 specifies a prerequisites skill; R05 a scaffold skill that creates the directories and seed files each feature needs, including an empty idea log; R06 limits the scaffold's writes, with .gitignore changed only on separate consent. PLAN-048.01 (delivered by phase-plug-01) covers R01, R03-R07 and R21; the manifest's defaults include ideas_path ideas/ideas.jsonl and backlog_path backlog/backlog.yaml. The plugin also ships governance documents rewritten as absolutes (000460, PLAN-048.07 and PLAN-048.09).
+
+This covers starting from an empty idea log in one repository. It does not cover an empty Brain shared across projects, which no governed document yet specifies. The ungoverned D3 investigation in _working/session-manager/ire/ lists a genesis event and first-run key creation under D12.
+
+</details>
 
 **Links**
 
@@ -23598,11 +23661,29 @@ Overlaps as printed: 000281, 000458 (scaffold skill), 000459 (prerequisites) · 
 
 ## 000530 · Prompts, plans and protocols made project-independent
 
-**Created 2026-10-01T16:25:03-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:03-04:00 · Status: `triaged`**
 
 Abstract the prompts, plans and protocols so they work for any project, not only for building d-system.
 
 Overlaps as printed: 000460 (governance as absolutes), 000501 (reusable plans), 000274
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:27-04:00): 000530 asks to abstract d-system's prompts, plans and protocols so they work for any project. Its links: 000525 (IRE anchor), 000460 (governance documents shipped in the plugin as absolutes), 000501 (archive non-reusable plans, consolidate into reusable prompts), 000274 (agent-driven extraction of reusable generalities).
+
+Related governed work:
+PLAN-020 (draft): one canonical source per portable workflow, with generated host adapters for Claude Code and Codex.
+PLAN-040 and PLAN-041 (draft, portable-framework batch 000269-000281): reusable document templates and schemas, and extraction of patterns from d-system's key documents.
+PLAN-025 (draft): the reusable partition pack PROMPT-034 (active), a prompt with nothing specific to one partition run.
+PLAN-048 (approved, phases complete): the idea-realization plugin, which packages the pipeline and its governance documents, rewritten as absolutes, for installation in other repositories.
+
+These cover parts of the ask. No governed document inventories d-system's prompts, plans and protocols as a whole to separate project-independent material from d-system-specific material.
+
+</details>
 
 **Links**
 
@@ -23615,11 +23696,27 @@ Overlaps as printed: 000460 (governance as absolutes), 000501 (reusable plans), 
 
 ## 000531 · Is a plugin enough? Move it to its own repository
 
-**Created 2026-10-01T16:25:04-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:04-04:00 · Status: `triaged`**
 
 The owner questions whether a plugin can carry the system; ruling: the plugin moves to its own repository, its future decided in the investigation.
 
 Overlaps as printed: 000455, 000456, 000462 · D13
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:27-04:00): 000531 records the owner questioning whether a plugin can carry the system, and its ruling that the plugin moves to its own repository, its future decided in the investigation. Its links: 000525 (IRE anchor), 000455 (shareable capture and triage plugin), 000456 (extend the plugin to the whole pipeline), 000462 (whether d-system consumes its own plugin).
+
+The plugin is PLAN-048's deliverable at plugins/idea-realization/ (102 tracked files); phase-plug-01 to phase-plug-09 are complete. An external audit's remediation is REQ-035 and PLAN-052: phase-plfx-01 and phase-plfx-02 are complete, phase-plfx-03 to phase-plfx-06 are queued.
+
+ARCH-012 (draft, system boundary study) recommends option A, one repository with explicit contracts, and treats option B (extraction) as a conditional future path with five preconditions. The study's validation report (docs/00-working/boundary-study/validation-report.md) rated F01 a blocker: ARCH-012's claim that no concern is ready for extraction is contradicted by the built plugin. phase-bnd-10 (deferred) would assess three candidates, the plugin among them, against those five preconditions and stop for the owner.
+
+ARCH-012's recommendation and the ruling recorded in this idea point in different directions for the plugin; no governed document yet reconciles them.
+
+</details>
 
 **Links**
 
@@ -23632,11 +23729,25 @@ Overlaps as printed: 000455, 000456, 000462 · D13
 
 ## 000532 · A custom MCP server between the engine and the Brain
 
-**Created 2026-10-01T16:25:04-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:04-04:00 · Status: `triaged`**
 
 The engine reads and writes ideas, prompts, plans and everything else only through a purpose-built MCP server.
 
 Overlaps as printed: 000020 (Librarian), 000159, 000160, 000250 (remote MCP) · D4
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:28-04:00): 000532 asks that the engine read and write ideas, prompts, plans and everything else only through a purpose-built MCP server. Its links: 000525 (IRE anchor), 000020 (MCP-mediated coordination with a Librarian), 000159 (direct file reads versus MCP tools, and enforceability), 000160 (read-only direct access, every write through a chokepoint), 000250 (mediate orchestrator state and dev writes through a remote MCP server).
+
+The owner's four-part definition on 000525 names this component: the Bridge is "the interface between the other three, the MCP server including the contracts and rules of knowledge interchange".
+
+No governed document designs it. PLAN-039.01 (orchestrator design) puts the MCP future for ledger and write mediation out of scope and assigns it to 000250. PLAN-032 (R16) guards against 000020's MCP server arriving by drift. The ungoverned D2 investigation (_working/session-manager/ire/D2-brain-storage.md) places the Brain's store behind the Bridge and requires that the storage choice not show through the Bridge's contract.
+
+</details>
 
 **Links**
 
@@ -23650,11 +23761,25 @@ Overlaps as printed: 000020 (Librarian), 000159, 000160, 000250 (remote MCP) · 
 
 ## 000533 · The Brain holds everything
 
-**Created 2026-10-01T16:25:05-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:05-04:00 · Status: `triaged`**
 
 Ideas, prompts, plans, phases, backlog, governance, protocols and knowledge all live in the Brain, not in a project repository.
 
 Overlaps as printed: 000166 (migration to MCP-held knowledge), 000043
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:28-04:00): 000533 asks that ideas, prompts, plans, phases, backlog, governance, protocols and knowledge all live in the Brain rather than in a project repository. Its links: 000525 (IRE anchor), 000166 (one-time migration to MCP-held knowledge with a governance regression pass), 000043 (documentation front matter and a documentation database).
+
+The step-1 rulings on 000525 include "Q3: 'all plans under a single repo' (raw line 38) means the Brain, not the code repository." They also place IRE's own planning documents in a private planning repository (Q1), imported into the Brain and archived at the end (Q2).
+
+Today's d-system stores the opposite way: ADR-001 (accepted) keeps governance and document metadata as files in the repository and gives governance metadata no DuckDB table; plans, backlog and the idea log are tracked files. PLAN-033 (active) covers retrieval and knowledge infrastructure over the existing corpus. No governed document plans moving these records out of the repository. The ungoverned D2 investigation (_working/session-manager/ire/D2-brain-storage.md) analyses how the Brain would store them, per tier and scope.
+
+</details>
 
 **Links**
 
@@ -23666,11 +23791,25 @@ Overlaps as printed: 000166 (migration to MCP-held knowledge), 000043
 
 ## 000534 · Knowledge in levels: general above project-specific
 
-**Created 2026-10-01T16:25:06-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:06-04:00 · Status: `triaged`**
 
 The Brain is hierarchical, with generalized knowledge and per-project knowledge, and a way to promote what proves general.
 
 Overlaps as printed: 000002, 000044, 000045, 000454 · D10
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:29-04:00): 000534 asks for a hierarchical Brain: generalised knowledge above per-project knowledge, with a way to promote what proves general. Its links: 000525 (IRE anchor), 000002 (prioritised retrieval order), 000044 and 000045 (graph and vector database tooling), 000454 (epistemic classification gaps). These cover retrieval, storage and classification rather than levels or promotion.
+
+The owner's four-part definition on 000525 states that in the Brain "global vs project scope decides which Brain aspects are available to all projects or only particular ones".
+
+Related governed work: PLAN-001 (approved) gives memories a scope of global, project or session, and lists memory promotion from session to global as an open question. PLAN-029 (active) defines classification axes (ontological, epistemic, lifecycle, temporal). PLAN-033 (active) covers retrieval, memory lifecycle and provenance. None designs general-versus-project levels or a promotion flow. The ungoverned D2 investigation in _working/session-manager/ire/ gives every stream a global or project:<id> scope.
+
+</details>
 
 **Links**
 
@@ -23684,11 +23823,27 @@ Overlaps as printed: 000002, 000044, 000045, 000454 · D10
 
 ## 000535 · Register projects in the Brain
 
-**Created 2026-10-01T16:25:07-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:07-04:00 · Status: `triaged`**
 
 Any project can register, and each registered project can write to the Brain.
 
 Overlaps as printed: 000086 (repo tracker), 000438 (tracking multiple repositories), 000437
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:29-04:00): 000535 asks that any project can register in the Brain and each registered project can write to it. Its links: 000525 (IRE anchor), 000086 (repo tracker and multi-repo memory agent), 000438 (how to track multiple repositories), 000437 (links and relationships between repositories).
+
+The owner's four-part definition on 000525 states that "global vs project scope decides which Brain aspects are available to all projects or only particular ones".
+
+In governed documents, PLAN-037 plans 000086 as a tracked list of the owner's repositories followed by a cross-repo awareness agent; that is tracking, not registration with write access. PLAN-039 and ARCH-006 cover a single repository's pipeline and define no project registry.
+
+The ungoverned D2 investigation (_working/session-manager/ire/D2-brain-storage.md) treats registration as a constraint: "Any project type can be registered (core schema plus typed extensions)", requiring typed project records with versioned extension schemas (D5), and gives the project registry its own stream type with each stream scoped global or project:<id>. How a registered project is authorised to write is not settled there or elsewhere.
+
+</details>
 
 **Links**
 
@@ -23701,11 +23856,25 @@ Overlaps as printed: 000086 (repo tracker), 000438 (tracking multiple repositori
 
 ## 000536 · A core project schema with typed extensions
 
-**Created 2026-10-01T16:25:08-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:08-04:00 · Status: `triaged`**
 
 One core project record; a GitHub project type adds local and remote repositories and forks; other types add their own attributes. Schema extension investigated as a topic of its own.
 
 Overlaps as printed: 000265 (generalized counterparties) · D5
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:30-04:00): 000536 asks for one core project record with typed extensions: a GitHub project type adds local and remote repositories and forks, other types add their own attributes, and schema extension is investigated as a topic of its own. Its links: 000525 (IRE anchor) and 000265 (generalised person and company counterparties).
+
+d-system's current schema (schemas/project.schema.json) has a single type field with a fixed enum (project, activity, goal, system, certification) and one optional repository field, a local path or remote URL. There is no extension mechanism and no fork or local/remote distinction.
+
+No governed plan, ADR or phase covers project schema extension. ADR-008 adds record types (interaction, decision, waiting_on), not project subtypes. ARCH-010 reconciles project parties, which is where 000265 is cited; that is the nearest schema-generalisation work. The ungoverned D2 investigation in _working/session-manager/ire/ lists "Any project type can be registered (core schema plus typed extensions)" as a Brain constraint, requiring versioned extension schemas (D5).
+
+</details>
 
 **Links**
 
@@ -23716,11 +23885,25 @@ Overlaps as printed: 000265 (generalized counterparties) · D5
 
 ## 000537 · Idea types: realization vs personal productivity
 
-**Created 2026-10-01T16:25:08-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:08-04:00 · Status: `triaged`**
 
 Ideas to investigate and build run the realization pipeline; personal-productivity items are handled separately. Define the boundary and how the personal productivity system fits.
 
 Overlaps as printed: 000504 (which ideas get which processes) · D6
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:31-04:00): 000537 asks to define the boundary between ideas that run the realization pipeline and personal-productivity items, and how the personal productivity system fits. Its links: 000525 (IRE anchor) and 000504 (which types of ideas are eligible for which escalations, protocols and processes).
+
+Related governed work: the system boundary study (PLAN-050, REQ-033, decision report ARCH-012, all draft) separates d-system into four concerns, including a personal-productivity core and an idea-realization core. ARCH-012 gives the personal-productivity core "Durable portfolio source records, memory records, capture and retrieval intent" and recommends option A, one repository with explicit contracts. phase-bnd-01 to phase-bnd-05 are complete; phase-bnd-06 to phase-bnd-14 are deferred.
+
+That study draws a boundary between systems and repositories, not between kinds of idea. No governed document classifies ideas as realization versus personal productivity or routes them to different processes; 000504 asks the related question of which ideas get which processes.
+
+</details>
 
 **Links**
 
@@ -23731,11 +23914,25 @@ Overlaps as printed: 000504 (which ideas get which processes) · D6
 
 ## 000538 · GitHub multi-repo control built into the engine
 
-**Created 2026-10-01T16:25:09-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:09-04:00 · Status: `triaged`**
 
 Branching, remotes, forks and merge protocols stored once and reused, so they are not rediscovered for each repository.
 
 Overlaps as printed: 000279 (issue and PR templates), 000438 · D9
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:31-04:00): 000538 asks that GitHub branching, remotes, forks and merge protocols be stored once in the IRE Engine and reused, rather than rediscovered for each repository. It is already linked to 000525 (the IRE anchor), 000279 (GitHub issue and PR templates) and 000438 (how multiple repositories are tracked and managed).
+
+Related material in d-system covers one repository only. PLAN-026 (concurrency, git safety and enforcement) decides d-system's own branch topology: only dev-to-main is gated and agent branches integrate onto dev directly; phase-conc-05 (branch protection on main, with a settings record) is queued. PLAN-040 and REQ-024 (portable framework document templates) include GitHub issue and PR templates for a new repository (000279, phase-fwt-05, queued). AGENTS.md holds d-system's branching and push rules as prose.
+
+No plan, requirement or phase stores branching, remote, fork or merge protocols as a reusable set applied across several repositories; that is the part of 000538 with no current home.
+
+</details>
 
 **Links**
 
@@ -23747,11 +23944,27 @@ Overlaps as printed: 000279 (issue and PR templates), 000438 · D9
 
 ## 000539 · Start every agent in the engine, never in the target repository
 
-**Created 2026-10-01T16:25:09-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:09-04:00 · Status: `triaged`**
 
 Agents launch in the engine and orient on a project through a skill that reads its record in the Brain.
 
 Overlaps as printed: 000440 (orchestrate other repositories without installing) · D8
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:32-04:00): 000539 states that every agent starts in the IRE Engine and orients on a project through a skill that reads the project's record in the Brain. It is already linked to 000525 (the IRE anchor) and 000440 (use this repository to orchestrate other repositories without installing features in them).
+
+The principle matches the owner decision on the four IRE parts recorded as a finding on 000525 on 2026-10-01, which describes the Engine as "agents, skills, multi-session orchestration and GitHub multi-repo control; every agent starts here." That is a separate finding from the owner's step-1 rulings (S1, S2, Q1-Q11) on 000525.
+
+Related d-system documents cover pieces of the mechanism for one repository: PLAN-020 (portable agent workflows from one canonical source) on how skills and workflows are made portable; PLAN-031 (agent engineering and delegation) on agent dispatch; PLAN-039 and PLAN-039.01 (idea realization system and its orchestrator design). None specifies agents launching outside the target repository and orienting through a Brain record.
+
+Related IRE cards: 000532 (a custom MCP server between the engine and the Brain), 000533 (the Brain holds everything), 000535 (register projects in the Brain, the record such a skill would read) and 000540 (multi-session orchestration ships with the engine).
+
+</details>
 
 **Links**
 
@@ -23762,11 +23975,25 @@ Overlaps as printed: 000440 (orchestrate other repositories without installing) 
 
 ## 000540 · The multi-session orchestration ships with the engine
 
-**Created 2026-10-01T16:25:10-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:10-04:00 · Status: `triaged`**
 
 The Session Manager, builder, scout, ideation and Owner Terminal roles, and their agents and skills, become part of the engine.
 
 Overlaps as printed: 000496 (autonomy configuration in the plugin), 000515 (session launcher)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:32-04:00): 000540 asks that the multi-session orchestration roles (Session Manager, builder, scout, ideation, Owner Terminal) and their agents and skills become part of the IRE Engine. It is already linked to 000525, 000496 (port the session autonomy configuration to the plugin's multi-session.md and session-manager-messages.md) and 000515 (a script that reopens every planning session after a restart).
+
+GOV-017 (multi-session coordination protocol) defines these roles in d-system: Session Manager, Ideation, Prompt Planner, Batch Runner, Builders, Standby Builder, Scout and the optional Owner Terminal, with the primary-checkout lock and the message contract. PROMPT-037 holds the Session Manager kickoff and starter messages.
+
+A partial port already exists in the idea-realization plugin. REQ-031 (status draft) R20 ships "the multi-session coordination protocol and its starter messages" in the plugin, and plugins/idea-realization/docs/ contains multi-session.md and session-manager-messages.md; REQ-031 also states that R15 does not port the multi-session lock relay. That plugin is d-system's packaging of the pipeline, not the IRE Engine; no plan or phase yet places these roles, agents and skills in the Engine.
+
+</details>
 
 **Links**
 
@@ -23778,11 +24005,27 @@ Overlaps as printed: 000496 (autonomy configuration in the plugin), 000515 (sess
 
 ## 000541 · Multi-project document codes
 
-**Created 2026-10-01T16:25:11-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:11-04:00 · Status: `triaged`**
 
 Document governance extended to many projects, for example a project code prefix, with every project's plans in one store and discoverable across projects.
 
 Overlaps as printed: 000382 (overloaded terms) · D7
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:33-04:00): 000541 asks that document governance extend to many projects, for example through a project code prefix, with every project's plans in one store and discoverable across projects. It is already linked to 000525 (the IRE anchor) and 000382 (naming review for overloaded terms).
+
+Current document codes are single-project: PLAN-005 (deterministic document codes and a documentation management view) and GOV-005 (document code assignment protocol) define one code space for d-system. ARCH-006 (idea realization system) describes the pipeline for d-system. None defines per-project prefixes, cross-project allocation or cross-project discovery.
+
+The owner's step-1 rulings on 000525 bear on where the store lives: "Q1: IRE's planning documents live in a private planning repository." "Q2: at the end it is imported into the Brain and archived." "Q3: 'all plans under a single repo' (raw line 38) means the Brain, not the code repository."
+
+Related IRE cards: 000530 (prompts, plans and protocols made project-independent), 000535 (register projects in the Brain), 000536 (a core project schema with typed extensions) and 000547 (Brain tiers and scopes).
+
+</details>
 
 **Links**
 
@@ -23793,11 +24036,25 @@ Overlaps as printed: 000382 (overloaded terms) · D7
 
 ## 000542 · The Library: shared, published, tagged, checked out when needed
 
-**Created 2026-10-01T16:25:11-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:11-04:00 · Status: `triaged`**
 
 Tried and tested components live in the shared Library, relatively permanent once published, found by tags and categories; possibly its own repository.
 
 Overlaps as printed: 000084, 000367 (ideas linked to templates), 000420 · D11
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:34-04:00): 000542 describes the Library: tried and tested components, relatively permanent once published, found by tags and categories, checked out when needed, possibly its own repository. It is already linked to 000525, 000084 (HTML component library), 000367 (ideas linked to templates) and 000420 (extracting pages into reusable templates).
+
+The closest d-system work is PLAN-036 (HTML generation and design system), limited to HTML assets in this repository. Its phases phase-des-03 (make the template layer a growing library with declared population methods), phase-des-04 (build the HTML component library, from 000084) and phase-des-06 (build the HTML Designer agent, which would populate the asset layers by scanning shipped pages) are all queued. REQ-021 R06 (machine-readable population method per template), R07 (components compose a page without bespoke markup) and R10 (palette role sets) are their requirements. Existing template families live in templates/html/ and templates/styles/ (atlas, house, overview, lit-report).
+
+No plan or requirement defines a cross-project Library of published components in general (beyond HTML), a publish step that makes an item relatively permanent, tag-and-category discovery, check-out, or a separate Library repository.
+
+</details>
 
 **Links**
 
@@ -23810,11 +24067,27 @@ Overlaps as printed: 000084, 000367 (ideas linked to templates), 000420 · D11
 
 ## 000543 · A Brain that can scale to a hosted database
 
-**Created 2026-10-01T16:25:12-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:12-04:00 · Status: `triaged`**
 
 Start local, with a path to cloud servers and databases when more users or machines share one brain.
 
 Overlaps as printed: 000250 · D2
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:34-04:00): 000543 asks that the Brain start local with a path to hosted servers and databases when more users or machines share one Brain. It is already linked to 000525 (the IRE anchor) and 000250 (mediate orchestrator state and dev writes through a remote MCP server).
+
+PLAN-039.01 (orchestrator design) records that the remote MCP future for the ledger and write mediation is idea 000250 and out of scope for that plan. ADR-001 (file-based governance) names a revisit condition: "Reconsider ... catalog storage when measured repository checks or cross-repository discovery exceed a simple local scan. Scale based on observed friction, not project-count guesses." No plan, requirement or ADR covers moving the Brain to hosted storage.
+
+The owner's step-1 rulings on 000525 include "Q3: 'all plans under a single repo' (raw line 38) means the Brain, not the code repository." and "Q7: the charter covers the several-user case, licence, non-goals, first-release scope and d-system's role." The several-user case in Q7 is where a hosted Brain would first be needed.
+
+Related IRE cards: 000533 (the Brain holds everything), 000547 (Brain tiers and scopes), 000532 (a custom MCP server between the engine and the Brain) and 000548 (the Bridge is a contract, not just a server).
+
+</details>
 
 **Links**
 
@@ -23825,11 +24098,25 @@ Overlaps as printed: 000250 · D2
 
 ## 000544 · Names that drive adoption, fixed once chosen
 
-**Created 2026-10-01T16:25:12-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:12-04:00 · Status: `triaged`**
 
 Decided: Engine, Bridge, Brain, Library, published with the ire- prefix.
 
 Overlaps as printed: 000016 (public presence), 000382 · D15
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:35-04:00): 000544 records a decided naming: the four IRE parts are Engine, Bridge, Brain and Library, published with the ire- prefix. It is already linked to 000525 (the IRE anchor), 000016 (public presence) and 000382 (naming review for overloaded terms).
+
+The same four names appear in the owner decision on the four IRE parts recorded as a finding on 000525 on 2026-10-01. The owner's step-1 ruling S2 on 000525 is that "IRE planning, the d-system release export (000550) and the engine-pages run proceed in parallel."
+
+No plan, requirement or backlog phase in d-system records these repository names or the ire- prefix; PLAN-039 and REQ-022 (idea realization system plan and requirements) cover the pipeline and do not use them. 000382's naming review is the open d-system item that touches overloaded terms such as these.
+
+</details>
 
 **Links**
 
@@ -23841,11 +24128,25 @@ Overlaps as printed: 000016 (public presence), 000382 · D15
 
 ## 000545 · Plan the planning: levels before detail
 
-**Created 2026-10-01T16:25:13-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:13-04:00 · Status: `triaged`**
 
 Decide the planning levels first (big picture, then finer), each closed by an owner decision, before planning any one part in detail.
 
 Overlaps as printed: GOV-021 (planning protocol), 000505 (plan anatomy) · D16
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:35-04:00): 000545 asks that the planning levels be decided first, big picture before detail, each closed by an owner decision, before any one part is planned in detail. It is linked to 000525 (the IRE anchor) and 000505 (plan anatomy); its body also names GOV-021 as an overlap, which is not a link.
+
+The owner's step-1 rulings on 000525 settle part of this for IRE: "Q4: five planning levels with all four D16 changes." "Q6: a level gate is recorded as a tag in the planning repository plus a pointer finding on 000525." "Q9: D16's dependency corrections with the five synthesis amendments."
+
+Related d-system documents: GOV-021 (planning protocol) lists 19 ordered steps from capture to the learning loop for one plan; ARCH-006 (idea realization system) describes nine stages and five gate decision categories; PLAN-039 (idea realization system master plan) registers 17 phases. None defines a hierarchy of planning levels above a single plan, each closed by an owner gate.
+
+</details>
 
 **Links**
 
@@ -23856,11 +24157,25 @@ Overlaps as printed: GOV-021 (planning protocol), 000505 (plan anatomy) · D16
 
 ## 000546 · Publishing from the Brain to the Library
 
-**Created 2026-10-01T16:25:13-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:13-04:00 · Status: `triaged`**
 
 Always intentional, when reuse value is identified (rule of three, or sooner by foresight); hand-curated with AI that recommends but never directs.
 
 Overlaps as printed: 000274 (extracting reusable generalities), 000501 · D18
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:36-04:00): 000546 sets the rule for publishing from the Brain to the Library: always intentional, when reuse value is identified (rule of three, or sooner by foresight), hand-curated, with AI that recommends but never directs. It is already linked to 000525, 000274 (agent-driven extraction of reusable generalities from key documents) and 000501 (archive old plan files and consolidate their ideas into configurable reusable prompts).
+
+000274 is promoted into PLAN-041 (portable framework content extraction from repository history) with REQ-025. PLAN-041 defines three independent analysis passes (patterns from 000274, session decisions from 000275, form critique from 000276) writing under docs/00-working/framework/06-analysis/; phase-fwa-01 to phase-fwa-03 are queued. That work extracts candidate content from d-system; it does not define a publish decision. 000501 is triaged and unplanned.
+
+No plan, requirement or phase defines the curation step, its criteria, the approval record, or the hand-off from the Brain to a Library.
+
+</details>
 
 **Links**
 
@@ -23872,11 +24187,25 @@ Overlaps as printed: 000274 (extracting reusable generalities), 000501 · D18
 
 ## 000547 · Brain tiers and scopes
 
-**Created 2026-10-01T16:25:14-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:14-04:00 · Status: `triaged`**
 
 Memories, append-only records and governance are treated differently; global knowledge is available to all projects, project knowledge to one.
 
 Overlaps as printed: 000162, 000454, 000166 · D10
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:36-04:00): 000547 asks that the Brain treat memories, append-only records and governance differently, and that global knowledge be available to all projects and project knowledge to one. It is already linked to 000525, 000162 (append-only event log for knowledge state), 000454 (epistemic classification gaps) and 000166 (one-time migration to MCP-held knowledge).
+
+PLAN-001 (agent memory system design plan) gives each memory a scope field of global, project or session, and lists memory promotion from session to global as an open question. That covers the scope half for memories in brain/ only. PLAN-033 (retrieval and knowledge infrastructure) and the phase-ret-01 to phase-ret-10 phases cover search and retrieval; phase-mem-01 to phase-mem-19 cover the memory system. ADR-024 puts idea classification (record kind, and four axes for knowledge records) on the idea schema.
+
+No document defines tiers that treat memories, append-only records and governance differently, or project scope across several projects in one Brain.
+
+</details>
 
 **Links**
 
@@ -23889,11 +24218,27 @@ Overlaps as printed: 000162, 000454, 000166 · D10
 
 ## 000548 · The Bridge is a contract, not just a server
 
-**Created 2026-10-01T16:25:15-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:15-04:00 · Status: `triaged`**
 
 The Bridge holds the contracts and rules of knowledge interchange between Engine, Brain and Library; the MCP server implements them.
 
 Overlaps as printed: 000159, 000160 · D17
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:37-04:00): 000548 says the Bridge holds the contracts and rules of knowledge interchange between Engine, Brain and Library, and the MCP server implements them. It is already linked to 000525, 000159 (whether agents read files directly or only call MCP tools, and how that is enforced) and 000160 (read-only direct access, every write through a mediating chokepoint).
+
+Related IRE cards: 000532 (a custom MCP server between the engine and the Brain), 000533 (the Brain holds everything), 000547 (Brain tiers and scopes), and 000542 and 000546 (the Library and publishing from the Brain to it).
+
+In d-system, ARCH-006 (idea realization system) has an authority model and hand-off contracts between pipeline stages; neither it nor REQ-022 names a Bridge or interchange rules between separate knowledge stores. PLAN-032 (autonomous agent operations) carries the owner's ruling on 000020 (MCP-mediated multi-agent coordination with a Librarian context service), which is not built.
+
+D17 in the idea body refers to the item "The Bridge contract" in the Session Manager's IRE vision working page (_working/session-manager/vision-ire-2026-10-01-v3.html), which lists contract format and versioning, who may read or write which tier and scope, how rule changes are approved, and local versus hosted. It is not the D17 search domain in PLAN-023.02.
+
+</details>
 
 **Links**
 
@@ -23905,7 +24250,7 @@ Overlaps as printed: 000159, 000160 · D17
 
 ## 000549 · An interim repository for the idea log
 
-**Created 2026-10-01T16:25:16-04:00 · Status: `open`**
+**Created 2026-10-01T16:25:16-04:00 · Status: `triaged`**
 
 Track the idea log in its own repository for version control until the Brain's storage is settled; immutable events and the fold make append-only merges safe.
 
@@ -23915,9 +24260,14 @@ Overlaps as printed: 000162, 000480 · D19
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-10-02T16:28:58-04:00): Session Manager, 2026-10-02, as given: "Owner ruled 2026-10-02: no interim idea-log repository. d-system's git already versions and pushes the log; it is imported into the Brain later. merge=union was shown not to work (two branches allocate the same next id; the fold refuses the second 'created')."
+- **finding** by agent-idea-triage (2026-10-05T00:02:37-04:00): 000549 proposed tracking the idea log in its own repository until the Brain's storage is settled, relying on immutable events and the fold for safe append-only merges. It is linked to 000525, 000162 (append-only event log for knowledge state) and 000480 (a repair path for a malformed tail in the plugin's idea log).
+
+The owner's step-1 rulings on 000525 include "Q10: no interim idea-log repository."
+
+The Session Manager's annotation on this idea (2026-10-02) records the reasons as given: d-system's git already versions and pushes the log, it is imported into the Brain later, and merge=union was shown not to work because two branches allocate the same next id and the fold refuses the second 'created'.
 
 </details>
 
@@ -23932,7 +24282,7 @@ Overlaps as printed: 000162, 000480 · D19
 
 ## 000550 · A clean production branch without ideas: dev keeps dev data, main gets releases
 
-**Created 2026-10-01T17:11:28-04:00 · Status: `open`**
+**Created 2026-10-01T17:11:28-04:00 · Status: `triaged`**
 
 Owner's words, 2026-10-01 (relayed by the Session Manager): "Can we create a separate branch that we maintain in sync with dev except it has no ideas... maybe that should be the main branch. When we merge dev into main can we cherry pick everything not idealogy? Can we generate a reusable bash or other workflow type script that allows us to consistently apply the sync with dev by cherrypicking not idea files? Then when we approve pr merge it fires and merges without ideas? Or we create a staging third branch: main, dev, stage. Then the workflow becomes dev->stage, delete ideas from stage and commit, squash merge stage->main... propose a formal release structure where we keep dev with dev data and maintain clean production branches."
 
@@ -23942,9 +24292,16 @@ Related, as named with the ask: 000066 (gate main behind a PR from dev), 000527 
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-10-01T17:11:29-04:00): Owner follow-up, 2026-10-01 (relayed by the Session Manager), owner's words: "We create the deterministic methods / scripts to surgically remove specific items (or bundles of items). Ability to drop all sessions, prompts, plans + phases, backlog & next up, batches (of phases queued for execution), and so on. Then we just toggle the argument (config file) for each we want to remove. We start with ideas then layer on the others." Owner rulings on it: goal = clean product; main restarts as a fresh orphan at the first release; plan it now in d-system.
+- **finding** by agent-idea-triage (2026-10-05T00:02:38-04:00): 000550 asks for a release structure in which dev keeps development data such as ideas and main receives clean releases, with a reusable script that removes idea files when syncing. The owner's follow-up annotation widens this to deterministic, config-toggled removal of item bundles (ideas first, then sessions, prompts, plans and phases, backlog and next_up, batches), and records rulings: the goal is a clean product, main restarts as a fresh orphan at the first release, and it is planned now in d-system. It is already linked to 000066 (protect main and require PRs from dev), 000527 (ideas leave git), 000529 (start from nothing) and 000549 (interim idea-log repository).
+
+The owner's step-1 ruling S2 on 000525: "IRE planning, the d-system release export (000550) and the engine-pages run proceed in parallel."
+
+PLAN-026 (concurrency, git safety and enforcement) section 3, "Only dev-to-main is gated; agent/* keeps integrating directly", sets the existing branch gate, and its decision 3 amends ADR-003 (worktree-isolated concurrent agents). phase-conc-05 (branch protection on main) and phase-conc-06 (multi-agent protocol for the pull-request gate) are queued. Neither covers removing content from main or an orphan restart.
+
+No plan, requirement or phase has the release export or the removal scripts as its deliverable. Adjacent ideas: 000059 (git tooling and practices), 000091 (AGENTS.md push rule) and 000377 (governance docs still name main as the integration branch).
 
 </details>
 
@@ -23959,27 +24316,60 @@ Related, as named with the ask: 000066 (gate main behind a PR from dev), 000527 
 
 ## 000551 · New agents: Concept Explorer, Concept Manager, Context Explorer, Context Manager
 
-**Created 2026-10-01T17:19:44-04:00 · Status: `open`**
+**Created 2026-10-01T17:19:44-04:00 · Status: `triaged`**
 
 Owner's words, 2026-10-01 (relayed by the Session Manager), verbatim: "Idea (new agent(s)): - Concept Explorer - Concept Manager - Context Explorer - Context Manager. Concept Eplorers take very specific small information and seek out related concepts in the repo It then structures the related concepts into groups and defines what that grouping structure is. The get batch dispatched in groups of 2-3 to explore different groups them Context Manager assimilated and presents structured findings and new insights on data and knowledge relationships."
 
 No links recorded with the ask; overlaps are left for triage.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:38-04:00): The idea proposes four specialized agent types for exploring and managing concepts and contexts in the repository: Concept Explorer, Concept Manager, Context Explorer, and Context Manager. These agents would extract, structure, and organize related concepts from the codebase.
+
+The closest related ideas are 000020 (MCP-mediated multi-agent coordination), 000081 (Agent engineering context pipelines), 000002/000004 (agentic knowledge retrieval and semantic search), and 000509 (HelpDesk Agent for answering repository questions). All address knowledge exploration and agent coordination, but none proposes these specific agent types.
+
+The work relates to PLAN-031 (Agent engineering and delegation), which governs how agents are designed and coordinated, and PLAN-033 (Retrieval and knowledge infrastructure), which covers how the system finds and organizes knowledge. Neither plan names these four agents, and they do not currently exist in the backlog. The idea represents a new proposal for specialized agents within the broader agent-engineering and knowledge-retrieval initiatives already planned.
+
+PROPOSED LINK: 000551 --relates_to--> 000020 (both propose multi-agent coordination systems)
+PROPOSED LINK: 000551 --relates_to--> 000081 (both address structuring and selecting relevant context for agents)
+
+</details>
+
 ---
 
 ## 000552 · Build our own graph processing engine (is Python the right language?)
 
-**Created 2026-10-01T17:19:44-04:00 · Status: `open`**
+**Created 2026-10-01T17:19:44-04:00 · Status: `triaged`**
 
 Owner's words, 2026-10-01 (relayed by the Session Manager), verbatim: "Idea - build our own graph processing engine (is python the right choice? I think C or other lower level language would be superior for performance."
 
 No links recorded with the ask; overlaps are left for triage.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:39-04:00): Idea 000552 asks to build a custom graph processing engine and raises an open question about language choice: Python versus C or another lower-level language for performance.
+
+Related ideas: 000005 (Graph databases and GitNexus) and 000044 (Explore graph database tooling for a documentation and knowledge database) both look at existing graph database tools rather than building an engine. 000122 (Evaluate alternative languages and platforms for a non-web rebuild of the application) weighs Rust, Go and C# with performance among its criteria; it touches the same language question at application scope.
+
+Related documents: PLAN-033 (Retrieval and knowledge infrastructure) has phase-ret-06 (survey structured, graph and vector retrieval for the documentation corpus) and phase-ret-08 (evaluate a code-graph tool), both queued, and both evaluate existing tools. PLAN-028 (Workbench architecture quality) has performance phases (phase-arch-14, phase-arch-16) that do not concern graph processing. PLAN-017 (Unified idea and plan lifecycle architecture), in its "What ships and what waits" table, lists "Additional edge types/graph engine/dashboard" as "No current implementation. Revisit only when an actual relationship/query cannot be represented or Markdown prevents a documented decision"; that row concerns the idea-link graph.
+
+No plan, requirement, ADR or backlog phase covers building a graph processing engine or choosing its language.
+
+</details>
+
 ---
 
 ## 000553 · Investigate test_cli_check_exits_two_on_sigterm as a timing-sensitive flake under full-suite load
 
-**Created 2026-10-02T01:47:36-04:00 · Status: `open`**
+**Created 2026-10-02T01:47:36-04:00 · Status: `triaged`**
 
 Session 3 - Standby Builder, 2026-10-02, as given: "test/test_broker.py::test_cli_check_exits_two_on_sigterm failed in a full pytest run (1 failed, 1302 passed, 13 min) but passes alone in 0.78s; investigate it as a timing-sensitive flake under suite load."
 
@@ -23989,9 +24379,18 @@ Unresolved: the failure message and the commit it ran on were not given with the
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-10-02T01:47:38-04:00): Session Manager observation, 2026-10-02, as given: "SM gate on dev 440190c in a scratch clone: test/test_daemon.py::test_manual_tick_exits_while_daemon_holds_the_lock and ::test_stale_lock_recovers_after_forced_kill failed in the full suite (2 failed, 1289 passed); run alone with test_broker.py, 47 passed in 32.5 s. Load average was 21 (parallel scratch-clone pytest runs from an SM workflow). No src/, tools/ or test/ change since the last fully green gate at 52d0c41."
+- **finding** by agent-idea-triage (2026-10-05T00:02:40-04:00): The test test_cli_check_exits_two_on_sigterm (test/test_broker.py:356) spawns `python -m src.broker check` as a subprocess, sleeps a fixed 300 ms (time.sleep(0.3)), then sends SIGTERM and waits up to 5 s. This answers the body's open point: the test does depend on a fixed delay before the signal. Its docstring says the child installs its SIGTERM handler before blocking on stdin and that the test "is not expected to be flaky in practice", but also that "a sufficiently starved CI runner could in principle still deliver the signal before the handler is installed."
+
+The two tests in the Session Manager annotation, test/test_daemon.py::test_manual_tick_exits_while_daemon_holds_the_lock and ::test_stale_lock_recovers_after_forced_kill, also spawn real daemon subprocesses; they poll until the daemon holds the lock, run a tick subprocess with a 10 s timeout, and stop the daemon with SIGTERM or SIGKILL. They have no fixed sleep, but they share the dependence on subprocess scheduling under load.
+
+Related documents: PLAN-039.01 section 2 describes the daemon's SIGTERM stop ("finishes the current tick and releases the lock"). REQ-028 R07 defines a test-baseline check (built in phase-grd-03) that flags tests missing or newly skipped against a base run; it does not address intermittent failures.
+
+Related ideas on test reliability: 000099 and 000129 (demo-terminal PTY test failures), 000399 (an automatic full test run after every write to dev), 000057 (testing strategy). None covers subprocess or signal timing.
+
+Unresolved: the failure message and commit for the broker failure, and the exit code observed.
 
 </details>
 
@@ -24009,25 +24408,79 @@ What it would touch: OPS-028 and the generator docstring it is generated from (t
 
 ## 000555 · HtmlViewerRegion's page-exists check is fooled by Vite's SPA fallback
 
-**Created 2026-10-03T09:14:20-04:00 · Status: `open`**
+**Created 2026-10-03T09:14:20-04:00 · Status: `triaged`**
 
 HtmlViewerRegion's page-exists HEAD check (/workbench-file/<file>, HtmlViewerRegion.tsx:268) gets 200 from Vite's SPA fallback when D_SYSTEM_DEMO_TERMINAL is unset, so the viewer reports `ready` and would iframe the app shell instead of showing `missing`. Found in phase-wbf-10's review. — Session 1 - Builder A
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:40-04:00): Idea 000555 records a pre-existing defect found in phase-wbf-10's review (SESS-2026-10-03-01, review finding 1): HtmlViewerRegion's HEAD request to /workbench-file/<file> (ts/src/stage/HtmlViewerRegion.tsx:268) gets 200 from Vite's SPA fallback when D_SYSTEM_DEMO_TERMINAL is unset, so the page state becomes ready instead of missing. The session record says the finding is unchanged from dev and was sent to Ideation; phase-wbf-10's next_action names 000555 as the follow-up.
+
+Cause: ts/vite.config.ts:472 registers the serveRepositoryFiles plugin only when D_SYSTEM_DEMO_TERMINAL is 1 (the gate cites ADR-015 rule 1), so with the flag unset no /workbench-file route exists and the dev server's fallback answers. phase-wbf-10 (PLAN-027, complete) silenced the flag-off 404 probes through a shared terminal-enabled check in ts/src/stage/useTerminalEnabled.ts and listed HtmlViewerRegion.tsx as a deliverable, but left this check unchanged.
+
+Related ideas: 000100 (silence the flag-off 404 probes from the workbench frontend) is the flag-off problem phase-wbf-10 addressed; its 404s came from absent backend routes, while 000555 is a 200 from the frontend fallback. 000109 and 000119 concern the same /workbench-file route (new-tab open and markdown rendering).
+
+No requirement or decision states what the page-exists check should report when the route is absent.
+
+PROPOSED LINK: 000555 --relates_to--> 000100 (both are flag-off workbench probe behaviour; phase-wbf-10 addressed 000100 and surfaced 000555)
+
+</details>
 
 ---
 
 ## 000556 · Workbench Idea Explorer status filter omits delivered, resolved, absorbed and set_aside
 
-**Created 2026-10-03T12:43:53-04:00 · Status: `open`**
+**Created 2026-10-03T12:43:53-04:00 · Status: `triaged`**
 
 Workbench Idea Explorer status filter (ts/src/stage/IdeaExplorerRegion.tsx:23 STATUSES) lists only open/triaged/reviewing/promoted/discarded; it can't filter on delivered/resolved/absorbed/set_aside, including delivered idea 000554. — Session 2 - Builder B
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:41-04:00): Idea 000556 asks for the Idea Explorer status filter to cover delivered, resolved, absorbed and set_aside. Commit 2e34704 ("List every schema idea status in the Idea Explorer filter"), on dev, does this: STATUSES in ts/src/stage/IdeaExplorerRegion.tsx now lists all nine values of the status enum in schemas/idea.schema.json, in order, and test_idea_explorer_status_filter_covers_every_schema_status in test/test_workbench_api.py compares the array to the enum so a new schema status fails the test by name.
+
+The work was owner-directed and unclaimed, with no backlog phase. Its session record is docs/03-sessions/SESS-2026-10-04-04-idea-explorer-status-filter.md; its Review section records a demo-adversary verdict of PASS with no blocker, major or minor findings.
+
+000554, named in the body, is only an example of a delivered idea the filter could not show. No plan, requirement, ADR or backlog phase covers this filter.
+
+</details>
 
 ---
 
 ## 000557 · Decisionator agent: captures decisions across all sessions
 
-**Created 2026-10-03T13:23:56-04:00 · Status: `open`**
+**Created 2026-10-03T13:23:56-04:00 · Status: `triaged`**
 
 decisionator - fully and solely responsible for capturing and logging decisions across all sessions. Needs to be paired with deterministic observability and provenance to support optimal capture design.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:41-04:00): Idea 000557 (Decisionator agent) is already linked relates_to 000559 (telemetry, observability, provenance placeholder), matching its body's "Needs to be paired with deterministic observability and provenance."
+
+Related governed work:
+
+PLAN-001 (Agent memory system) defines Chronicle, which reads session transcripts and other unstructured artifacts, including "decision threads", and extracts candidate memories for Vault Scribe. Its phases (phase-mem-01, -02, -03) are queued; none names decision capture as its own extraction type.
+
+PLAN-051 (Session autonomy configuration) has a decision log for decisions a session takes under a delegated autonomy setting (D11), a narrower scope than all sessions. GOV-003 (Accepted choices for phased backlog delivery) records the owner's governance rulings. tools/append_decision.py writes _data/gate-decisions.jsonl, the orchestrator's gate-decision inbox; it records gate decisions for runs, not decisions across sessions.
+
+Observability and provenance: 000054 (Observability and telemetry) and 000032 (Evidence-backed provenance graph) cover the infrastructure the body names. phase-expl-01 (PLAN-037) scopes observability and telemetry; phase-ret-10 (PLAN-033) records provenance. Both are queued.
+
+000558 (Questioneer agent) links to this idea as its possible pair.
+
+No plan, requirement or phase names an agent responsible for capturing decisions across all sessions.
+
+</details>
 
 **Links**
 
@@ -24038,9 +24491,25 @@ decisionator - fully and solely responsible for capturing and logging decisions 
 
 ## 000558 · Questioneer agent: designs questions, writes them to structured files, logs the answers
 
-**Created 2026-10-03T13:23:56-04:00 · Status: `open`**
+**Created 2026-10-03T13:23:56-04:00 · Status: `triaged`**
 
 questioneer - responsible for question design (all questions written to structured file(s) before presenting them the answers logged - to be paired with decisioneer maybe.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:42-04:00): Idea 000558 (Questioneer agent) is already linked relates_to 000557 (Decisionator agent), which its body names as a possible pair.
+
+No plan, requirement, ADR or backlog phase covers an agent that designs questions, writes them to structured files before presenting them, and logs the answers.
+
+Nearby material: phase-bnd-04 (complete) has an acceptance rule that every owner question in the boundary report identifies the decider, decision point, recommended answer and consequence, a question-design rule for one report. tools/append_decision.py writes _data/gate-decisions.jsonl, the orchestrator's gate-decision inbox; it logs answers to orchestrator gates, not questions put to the owner in sessions. tools/append_idea.py is the writer for the idea log. PLAN-020 (portable agent workflows) covers workflow packaging, not question design.
+
+No document records questions and their answers as structured files.
+
+</details>
 
 **Links**
 
@@ -24050,11 +24519,30 @@ questioneer - responsible for question design (all questions written to structur
 
 ## 000559 · Investigate telemetry, observability, provenance, logging, tracking, monitoring (placeholder)
 
-**Created 2026-10-03T13:23:56-04:00 · Status: `open`**
+**Created 2026-10-03T13:23:56-04:00 · Status: `triaged`**
 
 Investigate the following: telemetry, observability, provenance, logging, tracking, monitoring, etc.
 
 Placeholder: the owner will share more later.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:42-04:00): Idea 000559 is a placeholder for investigating telemetry, observability, provenance, logging, tracking and monitoring; the owner will add more later.
+
+Related ideas: 000054 (Observability and telemetry) is the closest match: structured logging, metrics and tracing across the FastAPI backend, agent runs and background tooling. 000447 (Investigate observability, logging, provenance and tracking of agents in more detail) covers the same list for agents. 000032 (Evidence-backed provenance graph for memories, reports and recommendations) covers provenance. 000557, 000562 and 000563 already link to 000559.
+
+Governed documents: PLAN-037 (Standalone explorations and housekeeping) has group G57 "Observability and telemetry", sourced from 000054, with one scoping phase, phase-expl-01 (Scope observability and telemetry, with its boundaries against P4 and P5), queued. PLAN-037 notes that a sys-observability system exists in docs/08-governance/systems.yaml. phase-ret-10 (PLAN-033, queued) records provenance behind memories, reports and recommendations.
+
+No ADR or requirement covers this scope.
+
+PROPOSED LINK: 000559 --relates_to--> 000054 (both investigate observability and telemetry; 000054 is the source of PLAN-037's G57 and phase-expl-01)
+PROPOSED LINK: 000559 --relates_to--> 000447 (both investigate observability, logging, provenance and tracking; 000447 is limited to agents)
+
+</details>
 
 **Links**
 
@@ -24066,7 +24554,7 @@ Placeholder: the owner will share more later.
 
 ## 000560 · Idea capture: question apparent typos or mistakes before recording, since ideas are immutable
 
-**Created 2026-10-03T13:31:24-04:00 · Status: `open`**
+**Created 2026-10-03T13:31:24-04:00 · Status: `triaged`**
 
 Update your ideation agent logic to specifically account for this scenario, where if there is a typo or something that seems unintentional, a mistake, something that is blatantly wrong or unreasonable, you should raise a question about it before immediately capturing the raw idea, since ideas are immutable.
 
@@ -24074,13 +24562,50 @@ However, if I confirm that what I meant is what I meant, then you accept it. Don
 
 Origin: 000557 (decisionator agent) was recorded with "loving" where "logging" was meant; the agent asked about it only after capture and had to amend it.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:43-04:00): Idea 000560 asks that idea capture question an apparent typo or mistake before recording, since idea events cannot be edited, and accept the wording once the owner confirms it. Origin: 000557 was recorded with "loving" where "logging" was meant, and the question came only after capture.
+
+Related ideas: 000048 (an idea scribe agent that appends ideas outside the main session) is where capture logic would live if capture moves to an agent. 000561 (better dictation tool) addresses the source of the errors. 000557 is the origin case.
+
+Related documents: ADR-010's section "Ideas are recorded as given, not filtered at entry" says an entry is never declined, merged or reworded because it overlaps something; it does not address dictation errors. .claude/commands/idea.md does not mention questioning wording before capture. PLAN-029 (idea graph lifecycle, active) groups 000048 under G02 "Idea-system agents"; its phase-idg-06 (Move /idea capture into a subagent) is queued.
+
+Outside the repository, the agent's auto-memory has a note from 2026-10-03 recording this incident: fix obvious dictation slips before recording, ask before recording when the meaning is unclear, and accept confirmed wording. It is not a governed document.
+
+No plan, phase or requirement prescribes pre-capture questioning.
+
+PROPOSED LINK: 000560 --relates_to--> 000048 (the scribe agent would carry capture logic, including pre-capture questioning)
+PROPOSED LINK: 000560 --relates_to--> 000561 (000561 addresses the dictation errors that cause the mistakes 000560 wants questioned)
+
+</details>
+
 ---
 
 ## 000561 · Investigate a better dictation (voice-to-text) tool
 
-**Created 2026-10-03T13:31:24-04:00 · Status: `open`**
+**Created 2026-10-03T13:31:24-04:00 · Status: `triaged`**
 
 I need to investigate a better tool for dictation (voice to text), because the built-in one does not properly capture what I'm saying, despite me intentionally pronouncing and speaking everything as clearly as possible. We should consider Wispr Flow, but not limit to that consideration. We need to explore options, so mark that as an idea as well.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:44-04:00): Investigated related ideas, plans, requirements, ADRs and backlog phases for dictation/voice-to-text tool investigation.
+
+Related ideas: Idea 000563 (Two-way voice system: I dictate, and an agent speaks back to me) depends on good dictation capabilities. The owner notes that current text-to-speech on Claude Code mobile is "wonky sometimes", but that is output-side; this idea 000561 addresses input-side (voice-to-text quality). Improving dictation accuracy would make 000563 more viable.
+
+Searched docs/01-plans/, docs/06-requirements/, docs/04-decisions/, and docs/09-backlog/backlog.yaml for related plans, phases or requirements touching dictation, voice-to-text, tool investigation, or Wispr Flow: no results. No existing governed work covers this tool investigation.
+
+This is a standalone exploration of personal-productivity tooling, not yet connected to any plan, requirement, or backlog phase.
+
+</details>
 
 **Links**
 
@@ -24090,11 +24615,33 @@ I need to investigate a better tool for dictation (voice to text), because the b
 
 ## 000562 · Investigate the Claude devs' plugin that scans sessions for important information to surface to the user
 
-**Created 2026-10-03T13:33:38-04:00 · Status: `open`**
+**Created 2026-10-03T13:33:38-04:00 · Status: `triaged`**
 
 Claude devs on X just announced a plugin that scans sessions for important information to bring to my awareness, or generally the awareness of the user running it.
 
 This connects to the observability topics (000559).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:44-04:00): Idea 000562 asks to investigate a plugin, announced by Claude developers on X, that scans sessions for important information to bring to the user's attention. It is already linked relates_to 000559 (observability placeholder).
+
+Related ideas:
+- 000009 (Independent transcript analysis with adversarial session review) is the closest internal overlap: an agent reads the session transcript directly and writes its own account, compared adversarially with the working agent's record. Both extract information from session content.
+- 000054 (Observability and telemetry) covers backend and agent-run instrumentation rather than session content.
+- 000003 (A skill for mid-session notes updates) concerns recording information during a session.
+- 000060 (Memory and context management) concerns curating information over time.
+
+Governed documents: PLAN-001's Chronicle reads session transcripts and extracts candidate memories (phases queued). phase-expl-01 (PLAN-037, queued) scopes observability. PLAN-042 (Session-type taxonomy investigation) studies session types. None covers an external plugin for scanning sessions.
+
+Unresolved: the plugin's name and source were not given.
+
+PROPOSED LINK: 000562 --relates_to--> 000009 (both extract important information from session content)
+
+</details>
 
 **Links**
 
@@ -24104,9 +24651,23 @@ This connects to the observability topics (000559).
 
 ## 000563 · Two-way voice system: I dictate, and an agent speaks back to me (not high priority)
 
-**Created 2026-10-03T13:33:38-04:00 · Status: `open`**
+**Created 2026-10-03T13:33:38-04:00 · Status: `triaged`**
 
 I want a system where I can dictate and I have an agent who will dictate back to me. The default text to voice on Claude Code mobile is a little bit wonky sometimes, so we may need to get creative. What I have currently works and it gets the job done, so this is not super high priority. But it would be a very nice to have.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:45-04:00): Idea 000563 asks for a two-way voice system: the owner dictates and an agent speaks back. The body notes that Claude Code mobile's default text-to-voice is sometimes unreliable, that the current setup works, and that this is not high priority.
+
+It is already linked relates_to 000561 (investigate a better dictation tool), which covers the dictation half, and relates_to 000559 (observability placeholder), whose body names no voice or audio topic.
+
+Searched docs/01-plans/, docs/06-requirements/, docs/04-decisions/, docs/08-governance/ and docs/09-backlog/backlog.yaml for dictation, voice-to-text, text-to-speech and speech: no related plan, requirement, ADR or phase. PLAN-051 (Session autonomy configuration) has a mobile flag for sessions run from a mobile device, but does not cover voice input or output.
+
+</details>
 
 **Links**
 
@@ -24117,198 +24678,507 @@ I want a system where I can dictate and I have an agent who will dictate back to
 
 ## 000564 · Governance check for _tmpagent/claims.jsonl
 
-**Created 2026-10-04T01:34:07-04:00 · Status: `open`**
+**Created 2026-10-04T01:34:07-04:00 · Status: `triaged`**
 
 A governance check for _tmpagent/claims.jsonl: required fields, event order, and the open-claim fold. Nothing reads the file today; lines 13-14 use "agent" instead of the required "by" and went unnoticed.
 
 Raised by Session 2 - Builder B.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:45-04:00): Idea 000564 asks for a governance check on _tmpagent/claims.jsonl: required fields, event order and the open-claim fold. _tmpagent/AGENTS.md (lines 11-14) states "This contract is enforced by convention, not by a check. No test reads claims.jsonl and no validator fails on it." Lines 13-14 of claims.jsonl carry "agent" rather than "by", as the body says.
+
+phase-dgov-07 (Register _tmpagent in the systems maturity registry, complete) added sys-tmpagent to docs/08-governance/systems.yaml under REQ-015 R14, which is the ask of 000023 (still triaged). Its session record, SESS-2026-10-04-01, says a mechanical check of the ledger is idea 000564, not that phase.
+
+Related ideas: 000023 (no systems.yaml entry for the claim protocol), whose registry entry now exists; 000154 (a check for unreleased _tmpagent claims), one specific rule over the same file; 000025 (no recovery procedure for an abandoned claim).
+
+No plan or requirement covers building a check for claims.jsonl.
+
+PROPOSED LINK: 000564 --relates_to--> 000023 (000023's registry entry was delivered by phase-dgov-07; this check is the follow-on named in that session)
+PROPOSED LINK: 000564 --relates_to--> 000154 (both are checks over claims.jsonl; 000154 covers unreleased claims, 000564 fields and order)
+
+</details>
+
 ---
 
 ## 000565 · Reject non-positive --limit in tools/load_context.py
 
-**Created 2026-10-04T07:29:28-04:00 · Status: `open`**
+**Created 2026-10-04T07:29:28-04:00 · Status: `triaged`**
 
 tools/load_context.py --limit -1 (any negative value) crashes with a raw duckdb BinderException traceback. Reject non-positive limits in argparse with a clear message. Pre-existing on dev; found in the phase-rel-08 review.
 
 Raised by Session 2 - Builder B.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:46-04:00): Idea 000565 asks that tools/load_context.py reject a non-positive --limit instead of crashing with a raw DuckDB BinderException.
+
+This was done after phase-rel-08, not within it: phase-rel-08's result records "the pre-existing negative --limit crash is idea 000565". Commit 8898b62 ("Reject a non-positive or non-integer --limit with a usage error (idea 000565)") added a positive_int argparse type that rejects values below 1 with exit code 2 and the message "must be at least 1, got {number}", and updated OPS-003. Review-fix commit bec6418 bounds --limit above at DuckDB's BIGINT maximum (2**63-1) and makes load() raise ValueError for an out-of-range limit. Both are on dev, as unclaimed work recorded in SESS-2026-10-04-07.
+
+No other idea overlaps. No plan, requirement or phase carries this fix.
+
+</details>
+
 ---
 
 ## 000566 · Amend step 9 worktree removal in AGENTS.md and /session-start
 
-**Created 2026-10-04T09:45:46-04:00 · Status: `open`**
+**Created 2026-10-04T09:45:46-04:00 · Status: `triaged`**
 
 AGENTS.md hand-off step 9 and /session-start step 9 still remove the worktree right after an approved merge. That contradicts the owner's 2026-09-23 Q8 ruling that every worktree removal needs owner approval, now recorded in GOV-003 by phase-dam-01. Both texts need amending; the AGENTS.md change needs the owner's per-change approval.
 
 Found by Session 3 - Standby Builder, which removed phase-sch-05's worktree on 2026-10-04 by following step 9 without asking.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:47-04:00): Idea 000566 names a contradiction: AGENTS.md hand-off step 9 (lines 302-310) and .claude/commands/session-start.md step 9 (lines 196-209) both run `git worktree remove` right after the approved merge, with no separate approval for the removal.
+
+GOV-003 (lines 814-822), entry "Every worktree removal needs the owner's approval — 2026-09-23", records the Q8 ruling as standing: "An agent asks the owner before running `git worktree remove`, including after an approved merge." It also says: "AGENTS.md hand-off step 9 and `/session-start` step 9 still list the removal as a step that follows the merge without its own approval. Until they are amended, this entry governs: the merge approval does not cover the removal."
+
+That entry was added by phase-dam-01 (commit a9ba320) under REQ-029 R08, which requires a GOV-003 entry for each problem-7 ruling. REQ-029 R10 limits AGENTS.md changes to lines 179-180 and 284-286; no requirement in REQ-029 amends either step 9. Both passages are unamended on dev.
+
+No overlapping ideas found. No plan or requirement covers this amendment.
+
+</details>
+
 ---
 
 ## 000567 · Re-point phase-syn-05 off the retired PLAN-003 page pipeline
 
-**Created 2026-10-04T09:45:47-04:00 · Status: `open`**
+**Created 2026-10-04T09:45:47-04:00 · Status: `triaged`**
 
 phase-syn-05 depends on phase-html-10 and needs PLAN-003's YAML-to-JSON page pipeline, which the owner retired on 2026-10-04 (phase-des-01 audit). It needs a new dependency, for example the engine-page generator, or a re-scope.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:47-04:00): The retirement decision for PLAN-003 (ADR-027) names this gap directly: "phase-syn-05 (queued) depends on phase-html-10 and needs the YAML-to-JSON page pipeline. Recorded as idea 000567." The audit's session record (SESS-2026-10-04-08) lists it under Unresolved and notes that phase-syn-05 reports waiting on a cancelled phase until this idea is acted on.
+
+The backlog confirms it: phase-syn-05 (Export the portfolio digest through generated HTML) is queued, depends_on [phase-syn-04, phase-html-10], and its scope still reads "Map a reviewed digest into supported page blocks and the existing YAML-to-JSON page build pipeline." phase-html-10 is cancelled, retired with PLAN-003 by ADR-027. The phase needs a new dependency (for example the engine page generator built by phase-des-09), a re-scope, or retirement; that choice is open.
+
+The same audit produced four sibling ideas: 000568 (phase-sch-06 stranded by the same retirement), 000569 (React error boundary), 000570 (CI ruff on tools/) and 000571 (sys-html registry entry). Only 000568 shares this idea's cause: a phase left depending on retired PLAN-003 work.
+
+PROPOSED LINK: 000567 --relates_to--> 000568 (both are phases stranded by PLAN-003's retirement under ADR-027; different phases, same cause)
+
+</details>
+
 ---
 
 ## 000568 · Re-gate deferred phase-sch-06 off the retired PLAN-003
 
-**Created 2026-10-04T09:46:23-04:00 · Status: `open`**
+**Created 2026-10-04T09:46:23-04:00 · Status: `triaged`**
 
 phase-sch-06 is deferred, and its resume_when waits for PLAN-003 to be built. That can no longer happen now that the owner retired PLAN-003 on 2026-10-04 (phase-des-01 audit). Re-gate it on the house/engine generators, or retire it.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:48-04:00): phase-sch-06 (Design HTML-generation fixtures) is deferred, and its resume_when reads: "PLAN-003's HTML generation system exists far enough that template and data shapes are fixed". PLAN-003 was retired on 2026-10-04 by ADR-027, so that condition can no longer be met.
+
+ADR-027 names this case: "phase-sch-06 (deferred) has a resume_when that waits for PLAN-003 to be built. Recorded as idea 000568." The owner ruled that the audit phase (phase-des-01, complete) reports such phases rather than editing them, so the phase entry is unchanged.
+
+The phase comes from PLAN-035 (Schema consistency and testing), group G34 (Testing strategy), which maps REQ-020 R11 (where HTML-generation fixtures live, whether they are generated from _data/ or hand-authored, and whether a fixture is a governed artifact or a test asset) to phase-sch-06. PLAN-035 gave 000001 its own deferred phase because the partition called 000001 "dormant until PLAN-003 builds".
+
+Possible new gates already exist in the backlog: the engine page generators (phase-des-09 and phase-des-12, complete) and the template library (phase-des-03, queued, scoped against the audit's findings). Re-gating or retiring the phase is the owner's choice.
+
+000567 has the same cause (phase-syn-05 left depending on retired PLAN-003 work); 000569, 000570 and 000571 are other follow-ups from the same audit and do not touch this phase's gate.
+
+</details>
+
 ---
 
 ## 000569 · Error boundary and accessible loading/error status for the React stage/workbench
 
-**Created 2026-10-04T09:46:23-04:00 · Status: `open`**
+**Created 2026-10-04T09:46:23-04:00 · Status: `triaged`**
 
 The shipped React stage/workbench has no error boundary and no accessible loading/error status; a render error blanks the app. PLAN-003 specified both (ErrorBoundary, retry, status), and ARCH-003 M4 asked for accessible status, but both requirements retire with PLAN-003.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:48-04:00): ADR-027 lists this gap among those that outlive PLAN-003: "the stage and workbench have no React error boundary and no accessible loading or error status (idea 000569)". ARCH-003 M4 is the earlier source of the accessible-status ask.
+
+Work on it has since merged to dev as unclaimed, owner-directed work with no backlog phase, recorded in SESS-2026-10-04-15 (commits c054cb8 to 51c55d5 on dev). That record reports: ErrorBoundary around the stage root in App.tsx and around each workbench panel through guardedPanel() in StagePage.tsx; role="status" on loading text and role="alert" on load errors across the layout loader and nine panel files; Retry that remounts the panel; and seven vitest/Testing Library tests. Its self-declared acceptance conditions are all marked Met, and a demo-adversary review returned PASS WITH FINDINGS.
+
+The record also lists what is left: the notes strip's loading and error states share an element with no live region, so they are not announced; Retry on a crashed terminal panel opens a new session; whether screen readers announce the File Browser's status inside role="tree" is unconfirmed; and nothing in CI or the merge gate runs npm test yet (idea 000582). The session record's status is active, and the idea's status was left for Ideation.
+
+PROPOSED LINK: 000569 --relates_to--> 000582 (000582 asks for the vitest suite added for this idea to run in CI and the merge gate)
+
+</details>
+
 ---
 
 ## 000570 · CI's ruff step should lint tools/
 
-**Created 2026-10-04T09:46:23-04:00 · Status: `open`**
+**Created 2026-10-04T09:46:23-04:00 · Status: `triaged`**
 
 CI's ruff step lints only src/ and test/, not tools/, where the page generators and most CLI tools live (.github/workflows/ci.yaml). Found in the phase-des-01 audit of PLAN-003.06.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:49-04:00): ADR-027 (the decision retiring PLAN-003) lists this among the gaps that outlive the plan: "CI's ruff step does not lint tools/ (idea 000570)". PLAN-003.06-verification.md disposition row 06-R3 retires the plan's `uv run ruff check src/ tools/` step and notes that CI's ruff step (.github/workflows/ci.yaml line 28) lints src/ test/ only, with linting tools/ left to this idea.
+
+Confirmed on dev: .github/workflows/ci.yaml line 28 is `uv run ruff check src/ test/`. GOV-017's merge gate uses the same `uv run ruff check src/ test/`, so tools/ is unlinted in both places. Whether tools/ currently passes ruff was not checked here.
+
+No plan or phase covers this. 000569 and 000571 are separate follow-ups from the same audit.
+
+</details>
+
 ---
 
 ## 000571 · Update sys-html in the systems registry after PLAN-003's retirement
 
-**Created 2026-10-04T09:46:24-04:00 · Status: `open`**
+**Created 2026-10-04T09:46:24-04:00 · Status: `triaged`**
 
 sys-html in docs/08-governance/systems.yaml is still "planned", its path is PLAN-003's overview, and it says "under audit by phase-des-01". PLAN-003 is retired (2026-10-04) and the house family plus the engine/overview generators have shipped, so its maturity and paths need review.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:49-04:00): ADR-027 records this as a consequence of retiring PLAN-003: "sys-html in docs/08-governance/systems.yaml is still planned, with PLAN-003's overview as its path. Recorded as idea 000571." The audit's session record (SESS-2026-10-04-08) lists it under Unresolved.
+
+Confirmed in systems.yaml: sys-html has status planned, paths docs/01-plans/PLAN-003-dynamic-html-generation/PLAN-003-overview.md and templates/README.md, and a description of the proposed YAML-to-JSON pages "under audit by phase-des-01". PLAN-036 (HTML generation and design system, active) declares systems: [sys-html], and the engine page generators (phase-des-09, phase-des-12) and the house family have shipped. sys-demo-overview lists sys-html in its depends_on, so changing sys-html's scope affects that entry too.
+
+No plan or phase delivers this registry update. Related registry ideas: 000341 (sys-capture's paths omit later capture files) is the same kind of stale-path defect on a different system, and 000444 asks for a review of every sys-* tag in systems.yaml, which would cover sys-html.
+
+PROPOSED LINK: 000571 --relates_to--> 000444 (000444's review of every sys-* tag would cover sys-html's status and paths)
+
+</details>
+
 ---
 
 ## 000572 · Amend PLAN-045 D7 to the owner's JUnit-base ruling
 
-**Created 2026-10-04T11:09:28-04:00 · Status: `open`**
+**Created 2026-10-04T11:09:28-04:00 · Status: `triaged`**
 
 Amend PLAN-045 D7 to the owner's 2026-10-04 JUnit-base ruling: the builder produces both JUnit reports before READY (the dev tip in a throwaway detached worktree, and the rebased branch). D7 still says the base is "the Session Manager's merge-gate re-run on dev". GOV-003 will record the ruling via phase-grd-03.
 
 Raised by Session 2 - Builder B.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:50-04:00): The ruling is recorded in GOV-003 under "READY carries the test baseline and diff patterns; the builder produces both JUnit reports — 2026-10-04", applied by phase-grd-03 (complete). The base report comes from `pytest --junitxml` on dev's tip in a temporary `git clone --shared`, deleted afterwards, and the branch report from the rebased branch. GOV-003 states this replaces PLAN-045 D7's "the base run is the Session Manager's own merge-gate re-run on dev", because that re-run tests the branch tip and comes after READY, and that "Idea 000572 tracks amending D7 to match."
+
+Note that the idea's body says "a throwaway detached worktree"; the ruling was later changed to a shared clone (commit da00e1e), so that deleting it needs no owner approval under the worktree-removal rule. The amendment should follow GOV-003's clone wording, not the idea body.
+
+GOV-017's merge gate already carries the new procedure and says it replaces D7's text. SESS-2026-10-04-12 records: "Amending PLAN-045 D7 is idea 000572."
+
+PLAN-045 D7 is still unamended on dev: line 181 ends "run is the Session Manager's own merge-gate re-run on `dev`." No other idea covers this.
+
+</details>
+
 ---
 
 ## 000573 · Close the adapter and websocket when demo terminal startup fails
 
-**Created 2026-10-04T12:13:30-04:00 · Status: `open`**
+**Created 2026-10-04T12:13:30-04:00 · Status: `triaged`**
 
 In src/api/routes/demo_terminal.py, if create_adapter() or adapter.start() raises after websocket.accept() and before the adapter joins SESSIONS, nothing closes the adapter or the websocket. PosixPtyAdapter.start() can also leak the master pty fd when Popen fails after pty.openpty(). Pre-existing on dev; found by the phase-wbf-09 adversarial review, outside that phase's scope.
 
 Raised by Session 3 - Standby Builder.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:50-04:00): This defect has since been fixed on dev as unclaimed, owner-directed work: commit 63b6690 "Close the adapter and websocket when demo terminal startup fails (idea 000573)", recorded in SESS-2026-10-04-11. If create_adapter() or adapter.start() raises after accept(), the route now logs the error, closes any adapter (which releases the pty master fd PosixPtyAdapter.start() opened before Popen) and closes the socket with code 4003 "The terminal session failed to start"; the existing finally releases the reserved slot. src/demo/posix.py was left unchanged. Three new tests in test/test_demo_terminal.py cover the cases, and a demo-adversary review found all four self-declared conditions hold.
+
+What the session record leaves open: the fd fix is proven for the POSIX adapter only (WindowsConPtyAdapter after a failed spawn() is untested), and the terminal panel (ts/src/stage/TerminalRegion.tsx) does not quote the 4003 reason, so a startup failure shows a closed terminal without explanation.
+
+The original route and adapter came from phase-demo-01; phase-wbf-09 fixed three other defects in the same file (000095 cap race, 000096 shell override, 000137 close reason) and found this one out of its scope.
+
+</details>
+
 ---
 
 ## 000574 · max_active drift between backlog.yaml and the documents that describe it
 
-**Created 2026-10-04T12:44:33-04:00 · Status: `open`**
+**Created 2026-10-04T12:44:33-04:00 · Status: `triaged`**
 
 backlog.yaml sets max_active: 4 and --ready reports "of 4 allowed", but GOV-002:90 says "this repository sets 3", as do ADR-006:70 and the comment at src/governance/__main__.py:41. Found while researching phase-des-02.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:51-04:00): Confirmed on dev: docs/09-backlog/backlog.yaml sets max_active: 4. GOV-002 line 90 says "this repository sets `3`"; the comment in src/governance/__main__.py at lines 41-42 says the bound is "generous by orders of magnitude against `max_active: 3`"; ADR-006 line 70 says "`max_active` is 3". ADR-006 is a decision record citing the value as evidence at the time it was written, so it may be a historical statement rather than live guidance; GOV-002 and the code comment describe the current setting and are stale.
+
+No plan or phase covers this. PLAN-030 (Document and backlog governance) addresses document staleness generally, and PLAN-038 (Backlog status-regression guard) checks phase status, but neither checks backlog.yaml values against what governance documents state.
+
+</details>
+
 ---
 
 ## 000575 · Align GOV-005's dated-code allocation wording with codes.py
 
-**Created 2026-10-04T12:44:33-04:00 · Status: `open`**
+**Created 2026-10-04T12:44:33-04:00 · Status: `triaged`**
 
 GOV-005:54 says dated codes take the "lowest unused sequence", but src/governance/codes.py:106 allocates max plus one, so gaps are never refilled. Align the wording with the code. Found while researching phase-des-02.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:51-04:00): Confirmed: GOV-005 lines 54-55 say "A dated code takes the lowest unused sequence for its date", and PLAN-005 line 69 says the dated series takes "the lowest unused two-digit sequence". src/governance/codes.py line 106 returns max(used, default=0) + 1 for the date, so gaps are never refilled. REQ-001 R4 says "the next unused sequence number within that date", which is ambiguous between the two readings.
+
+The plugin's absolutes trace (PLAN-048.10, conflict 6) recorded the same discrepancy for the idea-realization plugin and resolved it in favour of highest-plus-one: "GOV-005:54-55 says a dated code takes the 'lowest unused sequence'; the plugin takes the highest plus one (codes.py:117-118). Plugin carried (D10)." That ruling concerns the plugin; this repository's GOV-005 wording is unchanged.
+
+Related but distinct: 000298 (PLAN-005 still states the retired manual code-reservation workaround) and 000283 (session codes collide because the allocator derives them from documents on disk).
+
+</details>
+
 ---
 
 ## 000576 · GOV-011 confuses codes.yaml reservations with pre-merge reservations
 
-**Created 2026-10-04T12:44:34-04:00 · Status: `open`**
+**Created 2026-10-04T12:44:34-04:00 · Status: `triaged`**
 
 GOV-011:46-52 tells you to release a codes.yaml reserved: entry with --release-code, but that command only drops pre-merge reservations under the git common dir (GOV-005:98-111 says the two kinds are unrelated). It also says a stale reservation blocks reuse forever, confusing reserved with retired. Found while researching phase-des-02.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:52-04:00): Confirmed. GOV-011 step 4 (lines 46-52) says to delete an abandoned draft from docs/00-working/promoted/ and release its reservation with `uv run python -m src.governance --release-code <code>`. ADR-019 (lines 60-61) says the same. The reservation a promoted draft holds is a codes.yaml reserved: entry (ADR-019 lines 56-57 have that entry removed when the document lands).
+
+GOV-005's section "Two different things are called a reservation" (lines 98-111) separates register reservations (reserved: in codes.yaml, tracked, written by a person) from pre-merge reservations (untracked, under the git common dir, written by --next-code). --release-code calls release() in src/governance/reservations.py (line 172), which acts on the pre-merge kind only, so it does not remove a codes.yaml entry. A register reservation is removed by editing codes.yaml (GOV-005 lines 76-80).
+
+GOV-011's warning that a surviving reservation "blocks the code from ever being reused" describes a retired code; a reserved entry stops allocation and use only until it is removed.
+
+Both GOV-011 and ADR-019 carry the error. Related but distinct code-reservation ideas: 000298 (PLAN-005's retired reservation workaround), 000575 (dated-code wording) and 000486 (structured holders for pre-merge reservations).
+
+</details>
+
 ---
 
 ## 000577 · append_idea.py should resolve promoted_to to a governed code
 
-**Created 2026-10-04T12:44:34-04:00 · Status: `open`**
+**Created 2026-10-04T12:44:34-04:00 · Status: `triaged`**
 
 tools/append_idea.py checks only that promoted_to is non-empty (lines 323-324); it does not resolve it to a governed code the way it resolves closes_with. Idea 000317 holds a doc id (doc-batch-orchestration-protocol), not a code. Found while researching phase-des-02.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:53-04:00): Confirmed: tools/append_idea.py lines 323-324 only refuse an empty promoted_to. Pointers given for delivered, resolved and absorbed go through resolve_pointers() (lines 175-191), which refuses a doc pointer that is not a governed document code via document_codes(); nothing equivalent is applied to promoted_to. The schema (schemas/idea.schema.json) types promoted_to only as non-empty strings.
+
+The contract exists: PLAN-017.01's "Promotion bridge" says a new promotion writes governed document codes and to "Build one resolver from the governance document inventory", refusing missing, reserved-only, retired-only or wrong-kind targets "before append". phase-idea-08 (complete) has the scope line "Validate promoted_to as a non-empty array of governed document codes"; the writer enforces the non-empty array but not the code check.
+
+The idea's example holds: 000317 (Register backlog batching and orchestration as a governance protocol) is promoted with promoted_to ['doc-batch-orchestration-protocol'], a document id rather than a code.
+
+</details>
+
 ---
 
 ## 000578 · Stale track-prefix table in docs/09-backlog/README.md
 
-**Created 2026-10-04T12:44:34-04:00 · Status: `open`**
+**Created 2026-10-04T12:44:34-04:00 · Status: `triaged`**
 
 docs/09-backlog/README.md's track-prefix table is stale: phase-agnt, bnd, fwa, fwt, irs, kit and port exist in backlog.yaml but are missing, and it lists phase-scope-*, which has no phases. GOV-006 relies on that table to gloss track prefixes. Found while researching phase-des-02.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:53-04:00): Confirmed against backlog.yaml: the track table in docs/09-backlog/README.md has no row for phase-agnt-* (2 phases), phase-bnd-* (14), phase-fwa-* (3), phase-fwt-* (5), phase-irs-* (17), phase-kit-* (4) or phase-port-* (3), and it has a phase-scope-* row (line 21) although backlog.yaml has no phase-scope phase. GOV-006 points agents to that README for track-prefix glosses.
+
+Overlap: 000379 (The backlog README track table is missing 6 prefixes, triaged) already reports six of these: irs, port, fwt, fwa, kit and agnt. This idea adds phase-bnd-* and the stale phase-scope-* row.
+
+No plan or phase maintains the table. 000056 (Documentation governance) is the umbrella for keeping docs current.
+
+PROPOSED LINK: 000578 --relates_to--> 000379 (000379 reports six of the same missing prefixes; this idea adds bnd and the stale scope row)
+
+</details>
+
 ---
 
 ## 000579 · Empty "Start and end a session" section in GOV-002
 
-**Created 2026-10-04T12:44:34-04:00 · Status: `open`**
+**Created 2026-10-04T12:44:34-04:00 · Status: `triaged`**
 
 GOV-002 line 154 has an empty section, "## Start and end a session", with no body. Fill it with a pointer to /session-start and /session-close, or remove it. Found while researching phase-des-02.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:54-04:00): Confirmed: docs/08-governance/GOV-002 line 154 is "## Start and end a session", followed directly by "## Inserting work at the front", with no body. The plugin's absolutes trace (PLAN-048.10) recorded the same defect for its copy of the text: "GOV-002:144 | Empty heading "Start and end a session" | No content".
+
+The procedures the section would point to exist: .claude/commands/session-start.md and .claude/commands/session-close.md, which AGENTS.md and GOV-003 already reference.
+
+No plan or phase fills or removes the section. phase-grd-04 (queued) will edit GOV-002 to name its next_up rule, so the two edits could be made in one change if the owner wants that.
+
+</details>
+
 ---
 
 ## 000580 · Review the type: ignore at test/test_demo_terminal.py:436
 
-**Created 2026-10-04T14:27:49-04:00 · Status: `open`**
+**Created 2026-10-04T14:27:49-04:00 · Status: `triaged`**
 
 Review the `# type: ignore[attr-defined]` at test/test_demo_terminal.py:436, merged with phase-wbf-09. The new diff-pattern check (tools/check_diff_patterns.py, phase-grd-03) flags it on dev~20..dev. Fix the type, or record why the ignore is justified.
 
 Raised by Session 2 - Builder B.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:54-04:00): Confirmed: test/test_demo_terminal.py line 436 is `self.reserved_at_accept = len(self.module.RESERVED)  # type: ignore[attr-defined]`, in a test double whose module attribute is typed object. phase-grd-03 ran tools/check_diff_patterns.py (OPS-032; REQ-028 R08) on dev~20..dev and it reported this line; SESS-2026-10-04-12 records that this merged phase-wbf-09 code was sent to Ideation as 000580 rather than changed there.
+
+Under the rule GOV-003 records for phase-grd-03, a nonzero diff-pattern result blocks a merge unless the owner signs off naming the lines, recorded in the session record. That rule applies to branch diffs; this line is already on dev, so it will only be reported again if a later diff range includes it.
+
+000408 is the idea that proposed the diff check.
+
+PROPOSED LINK: 000580 --relates_to--> 000408 (the check 000408 proposed is what flagged this ignore)
+
+</details>
+
 ---
 
 ## 000581 · Guard for AGENTS.md hand-off step 5 before a merge is granted
 
-**Created 2026-10-04T14:35:16-04:00 · Status: `open`**
+**Created 2026-10-04T14:35:16-04:00 · Status: `triaged`**
 
 A guard for AGENTS.md hand-off step 5: before a merge is granted, check that the phase entry on the branch carries session, completion_evidence and result (with status still active), for example in the Session Manager's READY gate or in a governance mode. The step was skipped on phase-des-11, phase-des-01 and phase-des-02 on 2026-10-04 although the rule was written down. The owner chose a guard idea plus the brain procedure mem-proc-earlier-steps-are-not-absorbed-by-a-later-one.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:55-04:00): AGENTS.md's "Concurrent agents: complete and hand off" section, step 5, requires the phase entry to carry session:, completion_evidence: and result: before the rebase (step 6) and the request to integrate (step 8), without setting status: complete. The idea asks for a check of that before a merge is granted.
+
+The owner's chosen response has two parts; the brain procedure part is done: brain/procedures/earlier-steps-are-not-absorbed-by-a-later-one.md (commit 628c381), recorded in SESS-2026-10-04-13. The guard is not built.
+
+Possible homes: the Session Manager's READY gate in GOV-017, which since phase-grd-03 carries the test baseline and diff-pattern outputs, or a governance check mode. PLAN-045 (Deterministic guards) is the plan for such checks; none of its phases checks these phase fields.
+
+Related ideas: 000413 (check that dev's last CI run is green before granting) and 000473 (the merge gate checks only a branch's tip) are other proposed checks at the same merge-grant point.
+
+PROPOSED LINK: 000581 --relates_to--> 000413 (both add a check the Session Manager runs before granting)
+
+</details>
+
 ---
 
 ## 000582 · Run the frontend unit tests in CI and the merge gate
 
-**Created 2026-10-04T17:09:06-04:00 · Status: `open`**
+**Created 2026-10-04T17:09:06-04:00 · Status: `triaged`**
 
 `cd ts && npm test` (vitest, added for idea 000569 on branch agent/fix-react-error-boundary) is not in .github/workflows/ci.yaml or in the Session Manager's merge gate, so a broken stage test would not stop a merge. Run the frontend unit tests in both.
 
 Raised by Session 1 - Builder A.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:55-04:00): CI: REQ-020 R07 requires "CI runs a frontend test suite and fails the build on a failing test", assigned to phase-sch-03 (Add a lint and test gate for ts/ to CI, queued). Its scope wires npm run lint and npm test into the frontend job of .github/workflows/ci.yaml, which today runs only npm ci and npm run build (lines 45-46). Part of phase-sch-03's scope is now stale: it says to add a test runner and the first test file, and ts/package.json already has "test": "vitest run" and vitest ^5.0.3, added for 000569.
+
+Merge gate: not in phase-sch-03's scope. GOV-017's merge gate has the four gate checks (governance, pytest, ruff on src/ test/, mypy on src/) plus the test-baseline and diff-pattern outputs from phase-grd-03; none runs npm test.
+
+000026 (CI only compiles the frontend, no test runner or lint gate for ts/) is the original CI half of this ask.
+
+PROPOSED LINK: 000582 --relates_to--> 000026 (both ask for a frontend test gate; 000582 also asks for the merge gate)
+
+</details>
+
 ---
 
 ## 000583 · Tests that read the live idea log should use a fixed fixture log or the schema's full status enum
 
-**Created 2026-10-04T23:03:19-04:00 · Status: `open`**
+**Created 2026-10-04T23:03:19-04:00 · Status: `triaged`**
 
 Tests that read the live idea log (_data/ideas.jsonl) break the first time the data reaches a new status (2026-10-03: 000554 -> delivered crashed a workbench test on a status-table KeyError, fixed in e66b42d); such tests should use a fixed fixture log or the schema's full status enum, so an ungated idea turn cannot turn dev red.
 
 (From the owner, 2026-10-04, relayed verbatim by the Session Manager during the overnight run.)
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T00:02:56-04:00): The incident is as stated: commit e66b42d (2026-10-03) fixed the workbench queue view after 000554 became the first delivered idea and the queue-order test hit KeyError: 'delivered'. It added test_idea_queue_status_precedence_covers_every_schema_status (test/test_workbench_api.py:550), which checks the precedence map against the schema enum. test/test_overview_tools.py:343 has a similar check, test_funnel_statuses_match_the_schema_enum. The schema's status enum has nine values, including delivered, resolved, absorbed and set_aside.
+
+These fix two code paths. Neither makes tests independent of the live log: several test files read _data/ideas.jsonl, and no audit has checked which of them assume a fixed set of statuses.
+
+No phase owns this. The nearest is phase-sch-04 (Write the per-layer testing standard, queued; PLAN-035, REQ-020 R09-R10), which states what "tested" means per layer and where coverage falls short; it does not name live-data dependencies.
+
+</details>
