@@ -61,8 +61,7 @@ Stop here until the answer comes back. An unanswered question is not a yes.
   run's coordination contract names the owner's pre-approval of the run. Otherwise ask as above.
 
 In either case you still check `max_active` and the Conflicts column, and you still report
-anything that looked wrong during orientation. Record which exception you relied on in the
-session record.
+anything that looked wrong during orientation.
 
 ### Work with no backlog phase
 
