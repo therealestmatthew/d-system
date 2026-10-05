@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-05-phase-expl-02-review-judge",
+  "date": "2026-10-05",
+  "phase": "phase-expl-02",
+  "reviewed_commit": "ddfe78d650988aac7d3521d9c71848ae23a0cf52",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "docs/08-governance/catalog.md changes but is not among the phase's declared deliverables.",
+      "evidence": "Diff lines 131-148; backlog deliverables docs/00-working/, docs/04-decisions/.",
+      "consequence": "The forced catalog regeneration any new governed document requires; not scope creep, but strictly outside the named deliverables."
+    }
+  ],
+  "raw_reply_sha256": "5353a7295aa00c1fd998400d574310396be81e30e2263a16a38cab1a565544f6",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews'. Brief: scope/acceptance/verification from dev, range 8f15be7..ddfe78d (diff as a file; no session record), runner manifest (coordinator scratch clone at ddfe78d; 5 entries exit 0), the clone for the gating reviewer only, and the owner's preloaded ruling P2 quoted verbatim as a coordinator fact. Raw reply at _working/session-manager/verdict-evidence/phase-expl-02/, indentation removed."
+}

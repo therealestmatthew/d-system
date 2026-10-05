@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-05-phase-expl-02-demo-adversary",
+  "date": "2026-10-05",
+  "phase": "phase-expl-02",
+  "reviewed_commit": "ddfe78d650988aac7d3521d9c71848ae23a0cf52",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [],
+  "raw_reply_sha256": "ac4361ffcf2eb54df1b7d6d22f3c9b948397507d2f3d8098471621a4d19de5e5",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews'. Brief: scope/acceptance/verification from dev, range 8f15be7..ddfe78d (diff as a file; no session record), runner manifest (coordinator scratch clone at ddfe78d; 5 entries exit 0), the clone for the gating reviewer only, and the owner's preloaded ruling P2 quoted verbatim as a coordinator fact. Raw reply at _working/session-manager/verdict-evidence/phase-expl-02/, indentation removed. The reviewer read _working/session-manager/restart-2026-10-04.md in the primary checkout to verify the quote (coordinator-written, not builder-written)."
+}

@@ -13483,7 +13483,7 @@ items:
   deliverables:
   - docs/00-working/
   - docs/04-decisions/
-  next_action: Answer recorded in ADR-028; awaiting the coordinator's review verdict and the merge.
+  next_action: Answer recorded in ADR-028; coordinator review gating PASS; awaiting the merge.
   session: doc-session-build-in-public-answer
   completion_evidence:
   - docs/04-decisions/ADR-028-build-in-public-content-chain.md
