@@ -360,11 +360,15 @@ def _unrecorded_target(live_catalog: Any) -> dict[str, Any]:
     depend on backlog order: they broke when `phase-rel-04`, which `GOV-003` names, became first.
     """
     working = (ROOT / regression.DECISIONS_PATH).read_text(encoding="utf-8")
-    found: dict[str, Any] = next(
-        item
-        for item in live_catalog["items"]
-        if item["status"] != "complete" and not is_recorded("", working, item["id"])
+    found: dict[str, Any] | None = next(
+        (
+            item
+            for item in live_catalog["items"]
+            if item["status"] != "complete" and not is_recorded("", working, item["id"])
+        ),
+        None,
     )
+    assert found is not None, "no non-complete phase is left unnamed by GOV-003 to fake against"
     return found
 
 
