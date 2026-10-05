@@ -7,7 +7,7 @@ kind: operation
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-09-22'
+updated: '2026-10-05'
 systems: [sys-research, sys-html]
 depends_on: [doc-governance-operations, doc-literature-review-report-requirements]
 ---
@@ -17,9 +17,8 @@ depends_on: [doc-governance-operations, doc-literature-review-report-requirement
 ## Trigger
 
 Run when a later phase of [PLAN-043](../01-plans/PLAN-043-literature-review-report-page.md) needs
-`tools/lit_report_extract.py`'s output turned into HTML — the interactive-table build
-(`phase-lrr-03`) and the generator that writes pages to `_public/` (`phase-lrr-04`), which this
-module hands its fifteen-page mapping to.
+`tools/lit_report_extract.py`'s output turned into HTML — the generator that writes pages to
+`_public/` (`phase-lrr-04`), which this module hands its fifteen-page mapping to.
 
 This module is `OPS-017`'s sibling half of the render seam
 [REQ-027](../06-requirements/REQ-027-literature-review-report-page.md) R05 requires: the extractor
@@ -59,9 +58,9 @@ pages["index.html"][:15]
 `render_report(data)` returns a `dict[str, str]` — fifteen entries, `index.html` plus one page per
 deliverable — mapping a relative output path (e.g. `"05_critical_collisions.html"`) to a complete
 HTML document (full `<!DOCTYPE html>` through `</html>`, styles inlined, nothing to fetch). Nothing
-is written to disk; that mapping **is** the seam between phases. `phase-lrr-03` replaces the three
-CSV pages' bodies with interactive, sortable, filterable tables (see "The three CSV deliverables"
-below); `phase-lrr-04` takes the finished mapping and writes each value to its key under `_public/`.
+is written to disk; that mapping **is** the seam between phases. The three CSV pages are
+browsable tables (see "The three CSV deliverables" below); `phase-lrr-04` takes the mapping and
+writes each value to its key under `_public/`.
 
 ### The public API
 
@@ -71,24 +70,49 @@ below); `phase-lrr-04` takes the finished mapping and writes each value to its k
   (`evidence: >`-style YAML block scalars that must stay inside `<pre>`, not leak out as literal
   `- ` text) included.
 - **`load_template(name: str) -> str`** — a template's text, by filename alone. A name ending in
-  `.css` is read from `templates/styles/`; anything else, from `templates/html/`. See "Two
-  behaviours" below for what each strips before returning.
+  `.css` is read from `templates/styles/`, one ending in `.js` from `templates/scripts/`, and
+  anything else from `templates/html/`. See "Behaviours" below for what each strips before
+  returning.
 - **`fill(template: str, tokens: dict[str, str]) -> str`** — plain `{{TOKEN}}` string substitution,
   strict in both directions. See "fill()'s contract" below.
 - **`render_report(data: dict) -> dict[str, str]`** — the full fifteen-page mapping, described
   above. A pure function of `data` (from `tools.lit_report_extract.extract()`) and the on-disk
-  `templates/html/lit-report-*.html` plus `templates/styles/lit-report.css` family.
+  `templates/html/lit-report-*.html`, `templates/styles/lit-report.css` and
+  `templates/scripts/lit-report-table.js` family.
 
 ### The three CSV deliverables
 
-`03_source_inventory.csv`, `04_evidence_matrix.csv` and `00_search_ledger.csv` currently render as
-placeholder pages: each carries its column list (`<code>` per column, from `data["tables"]`) and
-its row/column count, not a browsable table. `phase-lrr-03` is the phase that replaces this body
-with the sortable, free-text-filterable table `REQ-027` R03 requires — for the matrix, with column
-visibility toggles as well. `_csv_placeholder()` in the module marks the exact spot with an inline
-comment naming that phase.
+`00_search_ledger.csv` (1,200 × 15), `03_source_inventory.csv` (1,154 × 13) and
+`04_evidence_matrix.csv` (67 × 43) each render as a table view (`REQ-027` R03, `phase-lrr-03`).
+`_render_table()` fills `templates/html/lit-report-table.html` with every row of the extractor's
+`data["tables"][key]`, escaped and in CSV order, so each page carries its own data and nothing is
+fetched (`PLAN-043`'s inlining decision; the ledger page is about 1.8MB). The shown figures are
+`row_count` and `columns`, not a recount.
 
-### Two behaviours a reader would otherwise trip on
+`templates/scripts/lit-report-table.js` is inlined into those three pages only, as a complete
+`<script>` element in the page shell's `{{INLINE_SCRIPT}}` token; the token is empty on every
+deliverable page and the entry page has no such token, so neither carries a script tag (owner
+ruling, 2026-09-30). The script:
+
+- sorts by any column from its header button, ascending then descending (`aria-sort` marks the
+  state). A column sorts numerically when every non-empty cell is a number, otherwise as text;
+  empty cells stay last and ties keep the CSV order;
+- filters by free text, case-insensitively, over every column including hidden ones. A term
+  cannot match across a cell boundary. The status line reports the rows left;
+- on the matrix, shows and hides columns from a checkbox per column. The nine columns in
+  `MATRIX_DEFAULT_COLUMNS` (`source_id`, `source_type`, `research_domain`,
+  `hypotheses_challenged`, the two overlap scores, `critical_collision`,
+  `interpretation_confidence`, `access_limitation`) start visible; the 34 prose columns start
+  hidden. A default name missing from the matrix raises `ValueError`;
+- measures each filter run with `performance.now()` around the handler and stores it on the view
+  as `data-lr-filter-ms`, with the time to the next frame as `data-lr-filter-frame-ms` (`REQ-027`
+  R10, owner ruling 2026-09-30).
+
+Without script the full table still reads. `_breakable()` adds a `<wbr>` after each underscore and
+semicolon in headers and cells, so values such as `H2;H7;H9` and `architecture_overlap_score` can
+wrap. It adds no text, so a cell's `textContent` is the CSV value.
+
+### Behaviours a reader would otherwise trip on
 
 Both are already in the code; verify them there rather than assuming from the names.
 
@@ -109,6 +133,12 @@ fifteen times over — and false positives, since the stylesheet's own header co
 strings like `<table>` and `lr-editorial-note` as documentation, which would otherwise make a
 naive scan of a rendered page look like it contains a table or an editorial note regardless of the
 page's actual content.
+
+**(c) The table script's leading `/* */` comment is stripped, and `</script` is refused.**
+`templates/scripts/lit-report-table.js` is inlined as a value the same way. Only its leading
+comment is stripped, because a regex cannot tell a later `/*` from one inside a JavaScript string.
+`load_template()` raises `ValueError` if the script contains `</script`, which would end the
+inline element early.
 
 ### `fill()`'s contract
 
@@ -182,7 +212,9 @@ was deliberately **not** widened to read session records; its corpus remains
 
 | Failure | Cause | Fix |
 |---|---|---|
-| `FileNotFoundError` from `load_template()` | `templates/html/lit-report-page.html`, `lit-report-index.html`, or `templates/styles/lit-report.css` is missing or renamed | Restore the template family; `render_report()` reads those three exact filenames |
+| `FileNotFoundError` from `load_template()` | `templates/html/lit-report-page.html`, `lit-report-index.html`, `lit-report-table.html`, `templates/styles/lit-report.css` or `templates/scripts/lit-report-table.js` is missing or renamed | Restore the template family; `render_report()` reads those five exact filenames |
+| `ValueError: load_template(): lit-report-table.js contains '</script' ...` | An edit to the script added the closing-tag text, for example inside a string | Split the string (`"<" + "/script>"`) or remove it; the script must not end its own element |
+| `ValueError: default column(s) not in the table: ...` | `MATRIX_DEFAULT_COLUMNS` names a column `04_evidence_matrix.csv` no longer has | Update `MATRIX_DEFAULT_COLUMNS` to the matrix's current header |
 | `ValueError: fill(): token(s) not present in template: ...` | A caller (or a future edit to `render_report()`) supplies a token key the template no longer declares | Align the template's `{{TOKEN}}` names with the keys `render_report()` builds, or vice versa |
 | `ValueError: fill(): unfilled token(s) remain: ...` | The template declares a `{{TOKEN}}` no value was supplied for | Add the missing key to the `tokens` dict passed to `fill()` |
 | `KeyError` on `data["deliverables"]`, `data["tables"]`, or `data["counts"]` | `data` did not come from `tools.lit_report_extract.extract()`, or came from a stale/hand-edited copy | Pass `extract()`'s live output; do not hand-construct or cache `data` across a corpus change |
@@ -192,18 +224,21 @@ was deliberately **not** widened to read session records; its corpus remains
 
 ### Reference: `tools/lit_report_render.py`
 
-Render the literature-review campaign report's pages — `REQ-027` `phase-lrr-02`.
+Render the literature-review campaign report's pages — `REQ-027` `phase-lrr-02`, `phase-lrr-03`.
 
 This module renders. It writes nothing to `_public/` and assembles no CLI — `phase-lrr-04` owns
 both. It consumes `tools/lit_report_extract.extract()`'s output (see that module's docstring for
 the shape) and returns a mapping of relative output path to complete HTML document; writing that
-mapping to disk is `phase-lrr-04`'s job, and replacing the three CSV pages' placeholder bodies
-with interactive tables is `phase-lrr-03`'s.
+mapping to disk is `phase-lrr-04`'s job.
 
 Fifteen entries come out of `render_report()`: `index.html` plus one page per deliverable
-(fourteen — eleven Markdown, three CSV). The three CSV pages carry a placeholder body in this
-phase — their column list and row count, both read from the extractor's `tables` — rather than a
-sortable, filterable table; `_csv_placeholder()` below is where `phase-lrr-03` replaces the body.
+(fourteen — eleven Markdown, three CSV). Each CSV page is a browsable table view (`REQ-027` R03,
+`phase-lrr-03`): `_render_table()` writes every row into the page as HTML from the extractor's
+`tables` entry, so the table's data travels inline in its own page and nothing is fetched
+(`PLAN-043`'s inlining decision). `templates/scripts/lit-report-table.js` is inlined into those
+three pages only, through the page shell's `{{INLINE_SCRIPT}}`, and adds sorting, free-text
+filtering and, on the matrix, column visibility. Deliverable pages and the entry page carry no
+script (owner ruling, 2026-09-30).
 
 Determinism (`REQ-027` R05). `render_report()` is a pure function of its `data` argument and the
 on-disk template family under `templates/html/` and `templates/styles/` — no wall clock, no
