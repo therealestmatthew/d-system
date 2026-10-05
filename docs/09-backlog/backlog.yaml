@@ -15057,7 +15057,8 @@ items:
   - sys-governance
   - sys-backlog
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-standby-3
   priority: 1
   session_budget: 1
   depends_on:
@@ -15088,7 +15089,9 @@ items:
   - src/governance/review_gate.py
   - src/governance/__main__.py
   - test/test_review_gate.py
-  - docs/08-governance/
+  - docs/08-governance/GOV-018-three-altitude-review-procedure.md
+  - docs/08-governance/GOV-002-backlog-protocol.md
+  - docs/08-governance/reviews/
   next_action: Waits for phase-grd-03. Before claiming, confirm the Standby Builder's GOV-018 reviews of
     phase-gov-01 and phase-dgov-06 are recorded (owner ruling on PLAN-045 OQ7).
 - id: phase-dam-01
