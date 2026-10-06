@@ -148,5 +148,21 @@ The Session Manager dispatched three rounds of build review:
   tests run the extracted command against paths that combine `"`, `$HOME`-style text, a backtick,
   an apostrophe and a space, and they assert that the exact file is read.
 
-Fix cycles used: five, all on the same safe-write command after cycle 1. Two is `PROMPT-036`'s
-cap; the owner granted cycles 3, 4 and 5.
+- **Round 5, at `d466d577`.** Gating pass, shadow pass. Records:
+  `docs/08-governance/reviews/verdicts/2026-10-06-phase-idg-12-demo-adversary-4.json` and
+  `docs/08-governance/reviews/verdicts/2026-10-06-phase-idg-12-review-judge-4.json`. The heredoc
+  fix held against 11 path hazards. Both reviewers raised a minor F01: a path containing a newline
+  plus a line reading exactly `EOF` ended the heredoc early, and the rest ran as shell commands. On
+  2026-10-06 the owner ruled, relayed by the Session Manager, to enforce the slug. Fix cycle 6
+  (`b84bf61e`) does three things. The planner's instructions limit the slug to `[a-z0-9-]+`. The
+  delimiter is a fixed, quoted token (`PLANNER_DRAFT_PATH_EOF_9f3b6a2d1e8c4caa`). Python refuses,
+  before opening anything, any path that does not `re.fullmatch`
+  `docs/00-working/promoted/[A-Z]+-[0-9]{3}(?:\.[0-9]{2})?-[a-z0-9-]+\.md`. The tests prove that a
+  newline-plus-`EOF` path is refused and that the remainder never runs. One limit remains and is
+  recorded rather than claimed fixed. A path that already breaks the slug rule and contains the
+  fixed delimiter on its own line still ends the heredoc in the shell, before Python runs. No path
+  the planner legitimately builds can contain that line, and
+  `test_delimiter_cannot_be_produced_by_any_legitimate_slug_or_code` covers that.
+
+Fix cycles used: six, all on the same safe-write command after cycle 1. Two is `PROMPT-036`'s
+cap; the owner granted cycles 3 to 6.
