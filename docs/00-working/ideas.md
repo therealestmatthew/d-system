@@ -25452,8 +25452,22 @@ PROPOSED LINK: 000594 --relates_to--> 000569 (000569 is error/loading status acr
 
 ## 000595 · Create a dedicated security-review agent type that takes a commit range and a checkout path
 
-**Created 2026-10-05T21:22:24-04:00 · Status: `open`**
+**Created 2026-10-05T21:22:24-04:00 · Status: `triaged`**
 
 GOV-017's diff-time security review currently depends on the built-in /security-review, which needs origin/HEAD and reviews only the session's own working directory, so it failed on phase-sch-03. A dedicated agent type taking a commit range and a checkout path removes that dependency. It would also give the verdict record a real definition_sha256 (relates to 000589).
 
 Owner's ask, 2026-10-05, relayed by the Session Manager.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T21:26:23-04:00): Not yet delivered; no plan or phase proposes the agent type. GOV-017's security-review paragraph (from line 225) has the coordinator run Claude Code's built-in /security-review on phases whose diff touches a threat surface, recorded as a verdict with reviewer.type security-review and gating true. No security-review agent type exists in .claude/agents/.
+
+The verdict schema (schemas/review-verdict.schema.json) requires reviewer.definition_sha256 as the sha256 of .claude/agents/<type>.md, which the built-in command does not have; that gap is idea 000589 (triaged). Per the scout, phase-asr-05 (PLAN-047, reviewer contract) recorded the built-in review with a stopgap hash of the `claude --version` output (not independently confirmed). A dedicated agent type would supply a real definition file and hash, and could take a commit range and checkout path instead of needing origin/HEAD and the session's own working directory.
+
+PROPOSED LINK: 000595 --relates_to--> 000589 (000595 would remove the built-in-reviewer case that 000589 asks the schema to accommodate)
+
+</details>
