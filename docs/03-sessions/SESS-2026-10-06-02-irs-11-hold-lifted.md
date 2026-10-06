@@ -45,14 +45,37 @@ until a cap is configured.
 
 Not changed, as the assignment directed:
 
-- `batch-007`'s table. Its prose states the hold, at lines 12–13, line 23 and lines 57–62
+- `batch-007`'s table, in the first commit. Its prose states the hold, at lines 12–13, line 23 and lines 57–62
   ("…phase-irs-11 returns to queued and this table opens normally."). That table's composition and
   prose are the owner's, so the Session Manager is taking those lines to the owner.
   `batch-003`'s notes, lines 14–18, also describe the hold, as history.
 - The Standby Builder's review of `phase-irs-11` (two fixes and three questions) goes to the owner
   separately and is not applied here.
 
-## Verification
+## Review
+
+The Session Manager's gate at `07396f3d` passed. As unclaimed work, the review produced no verdict
+records; the raw replies are kept under
+`_working/session-manager/verdict-evidence/fix-irs-11-hold/`.
+
+- The gating `demo-adversary` passed with two minor findings. Batch-007's notes and
+  `verified.method` still said `phase-irs-11` is on owner hold (minor 1), and batch-003's lines
+  14–18 said the same (minor 2).
+- The shadow `review-judge` passed, with no findings.
+
+**Owner ruling, 2026-10-06 (in the Session Manager's session):** fix that prose in this branch
+before merging. Edit only the sentences about the `phase-irs-11` hold, so they say the hold was
+lifted on 2026-10-06, with `batch-003`'s kept as history.
+
+What was done:
+
+- `batch-007`: the provenance sentence, the `verified.method` clause and the notes now say the hold
+  was lifted on 2026-10-06 (`GOV-003`).
+- `batch-003`: the provenance sentence keeps the hold as history and adds the lift.
+- Each table's `updated` date is now 2026-10-06.
+- No composition, stage, phase, status or exclusion changed.
+- Both tables validate against `schemas/batch.schema.json`.
+
 
 In the worktree, after the change:
 

@@ -6,11 +6,11 @@ title: Run budgets, hard caps and the kill switch, then the batch graph
 status: queued
 sequence: 5
 created: '2026-09-27'
-updated: '2026-09-27'
+updated: '2026-10-06'
 coordinator: PROMPT-036
 provenance: 'Split out of batch-003 on 2026-09-27 by owner ruling, before any run had opened against
-  batch-003. phase-irs-11 is on owner hold (its budgets come from measured baselines only), and it
-  blocked batch-003''s later stages. phase-irs-14 depends on it. Both phases keep their batch-003
+  batch-003. phase-irs-11 was then on owner hold (its budgets come from measured baselines only), and
+  it blocked batch-003''s later stages. The owner lifted that hold on 2026-10-06 (GOV-003). phase-irs-14 depends on it. Both phases keep their batch-003
   stage order (batch-003 Q1, 2026-09-23) and external dependencies. Sequence 5 is by owner ruling
   the same day: batch-005 lists phase-irs-11 and phase-irs-14 in external_depends_on, and batch-006
   lists phase-irs-14, so this table must run before both. batch-005 moved to sequence 6 and
@@ -20,7 +20,8 @@ verified:
   date: '2026-09-27'
   method: 'Script over docs/09-backlog/backlog.yaml at dev 21a4943, using collisions() from
     src/governance/backlog.py: both phases resolve and are unclaimed, phase-irs-14 is queued and
-    phase-irs-11 is blocked for the owner hold (set on this table''s branch); the one in-batch
+    phase-irs-11 is blocked for the owner hold (set on this table''s branch; lifted on 2026-10-06,
+    GOV-003, when phase-irs-11 returned to queued); the one in-batch
     depends_on edge (phase-irs-14 on phase-irs-11) points to an earlier stage; the other edges
     resolve to phase-irs-04 and phase-part-03, both complete and listed in external_depends_on.
     phase-irs-11 and phase-irs-14 also collide (share system sys-realization, share deliverable
@@ -54,9 +55,11 @@ stages:
     - phase-irs-11
     conflicts_with:
     - phase-irs-11
-notes: 'phase-irs-11 is on owner hold, recorded in backlog.yaml as status blocked with blocked_reason
-  and resume_when. A separate owner ruling requires its budgets to come from measured baselines only.
-  Because this table has sequence 5, PROMPT-036 selects it after batch-004, and its verification
-  (every phase queued) fails on phase-irs-11 while the hold stands, so the run stops for the owner.
-  That keeps batch-005 and batch-006 behind their dependencies. When the owner lifts the hold,
-  phase-irs-11 returns to queued and this table opens normally.'
+notes: 'phase-irs-11 was on owner hold from 2026-09-27, recorded in backlog.yaml as status blocked
+  with blocked_reason and resume_when, because a separate owner ruling requires its budgets to come
+  from measured baselines only. The owner lifted the hold on 2026-10-06 (GOV-003, "Build it, fail
+  closed"): phase-irs-11 builds the budget, cap and kill-switch mechanism with no cap values,
+  dispatches nothing until a cap is configured, and is queued again, so this table opens normally.
+  Cap values remain the owner''s, from measured baselines. Because this table has sequence 5,
+  PROMPT-036 selects it after batch-004, which keeps batch-005 and batch-006 behind their
+  dependencies.'

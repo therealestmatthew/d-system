@@ -6,7 +6,7 @@ title: Batch graph and run budgets, with the idea schema bundle and plan-quality
 status: complete
 sequence: 3
 created: '2026-09-22'
-updated: '2026-09-30'
+updated: '2026-10-06'
 coordinator: PROMPT-036
 provenance: 'PROMPT-036''s original batch 3, unchanged in membership, carried over on 2026-09-22 when
   the batch table was abstracted out of the prompt. Re-checked that day: every phase still queued
@@ -14,8 +14,9 @@ provenance: 'PROMPT-036''s original batch 3, unchanged in membership, carried ov
   then, not in the original. On 2026-09-23 the owner''s batch-003 Q1 answer moved phase-irs-11 to
   stage 1 and phase-irs-14 to stage 2, with phase-irs-14 gaining depends_on phase-irs-11; the
   composition was re-checked by script that day. On 2026-09-27 the owner recomposed the table, before
-  any run had opened against it: phase-irs-11 is on owner hold (its budgets come from measured
-  baselines only), and as the only unbuilt stage-1 phase it blocked every later stage. phase-irs-11
+  any run had opened against it: phase-irs-11 was then on owner hold (its budgets come from measured
+  baselines only; the owner lifted the hold on 2026-10-06, GOV-003), and as the only unbuilt stage-1
+  phase it blocked every later stage. phase-irs-11
   and phase-irs-14 (which depends on it) moved to batch-007 with their stage order and external
   dependencies. phase-idg-10 and phase-idg-01 were built and completed outside this batch, so they
   were removed; see notes. phase-idg-11 is the only phase left. The title is kept as the batch''s
