@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-05-phase-sch-03-review-judge",
+  "date": "2026-10-05",
+  "phase": "phase-sch-03",
+  "reviewed_commit": "11b58aca2033f15489263c90fbf2424285154efd",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "reject",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "OPS-029's generated tool reference was not regenerated: the diff's only hunk to the file touches the hand-written \"## What it runs\" list, while the generated block still says \"four\" and omits npm ci.",
+      "evidence": "docs/08-governance/OPS-029-run-review-checks.md: generated block (<!-- generated:tool-reference:start --> … :end -->, lines 103-147 in the current checkout) untouched by the diff, although tools/run_review_checks.py's module docstring (the generator's source) was updated (diff lines 181-191).",
+      "consequence": "The document contradicts itself: hand-written text says \"five\" gate checks while the generated reference still says \"four\" and omits npm ci."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "No evidence in the runner output that `npm run build`, `npm run lint` or `npm test` pass (or correctly fail) on this diff, because ts/ dependencies were never installed in this review run.",
+      "evidence": "ts/eslint.config.js, ts/package.json, verification entries 2-4: 02-verification.txt `sh: 1: tsc: not found`; 03-verification.txt eslint 6.4.0 (stray global) \"couldn't find a configuration file\"; 04-verification.txt `sh: 1: vitest: not found`; 01-setup.txt shows only `uv sync --extra dev`, no `npm ci`.",
+      "consequence": "This blocks judging the phase's central claims (clean lint baseline, CI gate behavior) from the evidence provided."
+    }
+  ],
+  "raw_reply_sha256": "cca3af205820f7b67ebf03aaf5e8cabe1819807fcf35a1883ced3b60f45d2b30",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews'. Brief: scope, acceptance and verification from dev 6016a9c's backlog.yaml, the range 6016a9c...11b58ac (diff as file paths, docs/03-sessions excluded; a second copy without ts/package-lock.json), and the runner manifest _working/review-checks/phase-sch-03/11b58aca2033/. The runner is dev's version, which has no `cd ts && npm ci` setup step, so its npm build/lint/test entries exited 127/2/127 for missing ts/node_modules (an environment gap this phase closes); the SM re-ran them at 11b58ac after npm ci: build exit 0, lint clean, vitest 7/7. The acceptance line on the session-record self-check was excluded from every reviewer's brief and checked by the SM (SESS-2026-10-05-11 lines 120-137). Raw reply kept at _working/session-manager/review-replies/phase-sch-03-11b58ac-review-judge.md. The judge started before the runner wrote manifest.json and read the evidence files directly; it had no checkout. SM observation, not a change to any finding: the gating reviewer ran `tools/generate_tool_docs.py --check` at 11b58ac (\"28 tool document(s) current\"), which contradicts the judge's F01; F02's missing npm evidence is the dev runner's missing npm ci step, and the SM's own npm run at 11b58ac passed."
+}

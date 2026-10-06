@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-05-phase-sch-03-demo-adversary-2",
+  "date": "2026-10-05",
+  "phase": "phase-sch-03",
+  "reviewed_commit": "11b58aca2033f15489263c90fbf2424285154efd",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [],
+  "raw_reply_sha256": "f20b284b078972b4d66ba01f6d227712302f4300e566ef07907da0941230c1dd",
+  "outcomes": [],
+  "notes": "SECURITY REVIEW (GOV-017 'The security review'), triggered by .github/workflows/ci.yaml, ts/package.json and ts/package-lock.json in the diff. The built-in /security-review could not run: it diffs against origin/HEAD, which this repository lacks, and reviews only the coordinator's own working directory (the primary checkout on dev), not the scratch clone. OWNER RULING 2026-10-05 (in the Session Manager's session): a second demo-adversary with a security-only brief stands in for it, recorded as a gating verdict; idea 000595 proposes a dedicated security-review agent type. Brief: the threat surfaces (CI workflow injection/permissions/actions; new npm dependencies, sources, integrity, lifecycle scripts, audit; the runner's new npm ci/npm test commands and trust boundary; ts/src HTML/URL/postMessage handling), the range 6016a9c...11b58ac and the scratch clone. Result: no security findings; one pre-existing high npm audit advisory (source-map-js, GHSA-68fv-2mgg-jv7q) already on dev, not introduced by this diff. Raw reply kept at _working/session-manager/review-replies/phase-sch-03-11b58ac-security-demo-adversary.md."
+}

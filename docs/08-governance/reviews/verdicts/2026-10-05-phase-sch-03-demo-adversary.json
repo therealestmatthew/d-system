@@ -1,0 +1,34 @@
+{
+  "verdict_id": "2026-10-05-phase-sch-03-demo-adversary",
+  "date": "2026-10-05",
+  "phase": "phase-sch-03",
+  "reviewed_commit": "11b58aca2033f15489263c90fbf2424285154efd",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "REQ-020 R06 (\"a lint violation fails CI and is named\") does not hold for the ruleset's own centerpiece addition: react-hooks/exhaustive-deps (and react-hooks/incompatible-library, react-hooks/unsupported-syntax) ship as severity \"warn\" in eslint-plugin-react-hooks's flat recommended config, and `npm run lint` has no `--max-warnings 0`.",
+      "evidence": "ts/eslint.config.js (whole config) + ts/package.json:7 (`\"lint\": \"eslint .\"`). Verified via `node -e \"require('eslint-plugin-react-hooks').configs.flat.recommended.rules\"` → `exhaustive-deps: \"warn\"`. Proof: removed the 5 pre-existing `eslint-disable-next-line react-hooks/exhaustive-deps` comments in Popover.tsx, TerminalRegion.tsx (x2), HtmlViewerRegion.tsx (x2); `npm run lint` reported \"5 problems (0 errors, 5 warnings)\" and exited 0. Change reverted; git status clean.",
+      "consequence": "A real exhaustive-deps violation would be named but would NOT fail CI, contradicting the acceptance line as written. The self-check used an error-severity rule (@typescript-eslint/no-unused-vars, exit 1), which doesn't cover the gap because the one new rule family this phase exists to enforce is warn-severity.",
+      "condition": "REQ-020 R06 holds: a lint violation fails CI and is named; a clean tree passes."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "Five pre-existing `eslint-disable-next-line react-hooks/exhaustive-deps` comments remain, line-suppressing exactly the rule the owner ruling forbids trimming; only one of six such pre-existing disables was removed/fixed in this branch.",
+      "evidence": "ts/src/stage/Popover.tsx:109, ts/src/stage/TerminalRegion.tsx:307 and :463, ts/src/stage/HtmlViewerRegion.tsx:242 and :260 (all pre-existing on dev). Scope: \"fix every violation the ruleset flags in the existing tree in this phase... Do not trim a rule so that today's tree passes\"; the new eslint.config.js repeats \"Do not disable or trim a rule to make the tree pass; fix the code instead.\"",
+      "consequence": "Since these are warn-level anyway this doesn't change CI's green/red outcome today, but it is a direct, checkable violation of the phase's own stated rule and undermines the \"29 found and fixed\" baseline claim — the found/fixed count did not include these.",
+      "condition": "Lint baseline (owner ruling, 2026-09-30): fix every violation the ruleset flags in the existing tree in this phase, recording how many were found and fixed. Do not trim a rule so that today's tree passes."
+    }
+  ],
+  "raw_reply_sha256": "198ab854d4316a6648065a0f503418e8746eccb5245b6e22fddc1b9f20f4ff01",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews'. Brief: scope, acceptance and verification from dev 6016a9c's backlog.yaml, the range 6016a9c...11b58ac (diff as file paths, docs/03-sessions excluded; a second copy without ts/package-lock.json), and the runner manifest _working/review-checks/phase-sch-03/11b58aca2033/. The runner is dev's version, which has no `cd ts && npm ci` setup step, so its npm build/lint/test entries exited 127/2/127 for missing ts/node_modules (an environment gap this phase closes); the SM re-ran them at 11b58ac after npm ci: build exit 0, lint clean, vitest 7/7. The acceptance line on the session-record self-check was excluded from every reviewer's brief and checked by the SM (SESS-2026-10-05-11 lines 120-137). Raw reply kept at _working/session-manager/review-replies/phase-sch-03-11b58ac-demo-adversary.md, as received with the harness's indentation removed. The reviewer wrote its verdict as \"pass-with-findings\" while rating F01 a blocker; the record keeps the verdict as written (pass) and the blocker as written. Its item 3 (checks that held) is not recorded as findings."
+}
