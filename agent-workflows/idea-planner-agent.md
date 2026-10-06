@@ -118,17 +118,21 @@ what triage actually recorded.
 A drafted plan or requirement is long Markdown containing backticks, `$(...)`-shaped text and
 fenced code blocks of its own — exactly the content a shell would mis-parse if inlined into a
 command, the same corruption the triage agent's writing step guards against (idea `000019`; see
-the `idea` workflow). **Never inline the draft's prose directly into a shell command.** Write the
-draft to its destination file with your file-write tool first. If a later command in the same
-dispatch needs the draft's bytes as an argument — the section check run from the command line
-rather than in-process, say — substitute them from the file with `$(cat <path>)`, which inserts
-them literally with no further shell parsing, the same adaptation the triage agent uses for its
-finding text:
+the `idea` workflow). **Never inline the draft's prose directly into a shell command, and never
+substitute the draft's bytes into a Python string literal via `$(cat <path>)` — a draft containing
+`"""` ends a triple-quoted literal early and breaks the script**, a risk the triage agent's own
+`$(cat <path>)` use does not carry, since there the substitution lands inside a quoted CLI
+argument, not inside Python source the shell re-parses as code. Write the draft to its destination
+file with your file-write tool first. If a later command in the same dispatch needs the draft's
+bytes — the section check run from the command line rather than in-process, say — pass the file's
+**path** as an argument and have Python read the file itself, so no draft content ever passes
+through shell substitution into source code:
 
 ```bash
 uv run python -c "
+import sys
 from src.governance.plan_quality import check_plan_conformance
-print(check_plan_conformance(\"\"\"$(cat docs/00-working/promoted/<reserved-code>-<slug>.md)\"\"\",
-    depends_on=[...], documents={...}))
-"
+text = open(sys.argv[1]).read()
+print(check_plan_conformance(text, depends_on=[...], documents={...}))
+" docs/00-working/promoted/<reserved-code>-<slug>.md
 ```
