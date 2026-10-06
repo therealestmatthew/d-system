@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -67,7 +68,7 @@ export default function Popover({
   const triggerRef = useRef<HTMLButtonElement>(null)
   const bubbleRef = useRef<HTMLDivElement>(null)
 
-  const reposition = () => {
+  const reposition = useCallback(() => {
     const trigger = triggerRef.current
     if (!trigger) return
     const rect = trigger.getBoundingClientRect()
@@ -102,7 +103,7 @@ export default function Popover({
       next.top = rect.bottom + VIEWPORT_MARGIN
     }
     setStyle(next)
-  }
+  }, [width])
 
   useEffect(() => {
     onOpenChange?.(open)
@@ -112,9 +113,9 @@ export default function Popover({
   // Force-close whenever the caller disables the trigger — a bubble left open while its trigger
   // goes disabled (e.g. mid-drop) would be reachable only via Escape/outside-click, not via the
   // now-disabled trigger button, and REQ-007 W03 wants deactivation to be immediate and total.
-  useEffect(() => {
-    if (disabled) setOpen(false)
-  }, [disabled])
+  // Adjusted during render rather than in an effect, so the bubble never commits open while
+  // disabled.
+  if (disabled && open) setOpen(false)
 
   useLayoutEffect(() => {
     if (!open) return
@@ -125,7 +126,7 @@ export default function Popover({
       window.removeEventListener('resize', reposition)
       window.removeEventListener('scroll', reposition, true)
     }
-  }, [open])
+  }, [open, reposition])
 
   useEffect(() => {
     if (!open) return

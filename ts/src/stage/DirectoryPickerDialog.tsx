@@ -51,11 +51,13 @@ export default function DirectoryPickerDialog({
 }) {
   const [currentPath, setCurrentPath] = useState(initialDirectory)
   const [entries, setEntries] = useState<DirectoryEntry[]>([])
-  const [loadState, setLoadState] = useState<LoadState>('loading')
+  // The settled result names the path it belongs to, so navigating reads as 'loading' until
+  // that path's listing settles, without resetting state inside the effect.
+  const [settled, setSettled] = useState<{ path: string; state: 'loaded' | 'error' } | null>(null)
+  const loadState: LoadState = settled?.path === currentPath ? settled.state : 'loading'
 
   useEffect(() => {
     let cancelled = false
-    setLoadState('loading')
     const params = new URLSearchParams({ path: currentPath })
     fetchWorkbench(`${LIST_URL}?${params.toString()}`)
       .then((response) => {
@@ -67,10 +69,10 @@ export default function DirectoryPickerDialog({
         setEntries(
           body.filter((entry) => entry.is_dir).sort((a, b) => a.name.localeCompare(b.name)),
         )
-        setLoadState('loaded')
+        setSettled({ path: currentPath, state: 'loaded' })
       })
       .catch(() => {
-        if (!cancelled) setLoadState('error')
+        if (!cancelled) setSettled({ path: currentPath, state: 'error' })
       })
     return () => {
       cancelled = true

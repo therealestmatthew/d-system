@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import Popover from '../stage/Popover'
 import { PANEL_REGISTRY, panelDisplayName } from './panelRegistry'
 import type { LayoutSlotDefinition } from './types'
@@ -54,8 +55,15 @@ export default function Slot({
   slot: LayoutSlotDefinition
   visiblePanelId: string | null
   onSelectPanel: (panelId: string) => void
-  registerBody: (element: HTMLDivElement | null) => void
+  registerBody: (slotId: string, element: HTMLDivElement | null) => void
 }) {
+  // Stable per slot id, so React never sees this body's ref change identity across renders (see
+  // StagePage's comment above `registerSlotBody`).
+  const slotId = slot.slot_id
+  const bodyRef = useCallback(
+    (element: HTMLDivElement | null) => registerBody(slotId, element),
+    [registerBody, slotId],
+  )
   const implementedAdmits = slot.admits.filter((id) => PANEL_REGISTRY[id]?.Component)
   const isEmpty = implementedAdmits.length === 0
   const isMulti = implementedAdmits.length > 1
@@ -111,7 +119,7 @@ export default function Slot({
               ? 'stage-region__body stage-workbench-slot__portal-body'
               : 'stage-workbench-slot__portal-body'
         }
-        ref={registerBody}
+        ref={bodyRef}
       >
         {/* Only ever React children *or* `StagePage.tsx`'s appended panel host, never both: the
             two placeholders below render exactly when no panel is visible here, which is exactly

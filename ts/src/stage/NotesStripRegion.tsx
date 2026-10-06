@@ -87,7 +87,14 @@ export default function NotesStripRegion() {
     () =>
       (schemaVersion !== null ? loadActiveNotesFile(schemaVersion) : null) ?? DEFAULT_NOTES_FILENAME,
   )
-  const [contentState, setContentState] = useState<ContentLoadState>('loading')
+  // The settled content state names the file it belongs to, so choosing a file reads as
+  // 'loading' until that file's fetch settles, without resetting state inside the effect.
+  const [settledContent, setSettledContent] = useState<{
+    file: string
+    state: Exclude<ContentLoadState, 'loading'>
+  } | null>(null)
+  const contentState: ContentLoadState =
+    settledContent?.file === activeFile ? settledContent.state : 'loading'
   const [points, setPoints] = useState<string[]>([])
   const [current, setCurrent] = useState(0)
   const [autoAdvance, setAutoAdvance] = useState(false)
@@ -104,7 +111,6 @@ export default function NotesStripRegion() {
   // still never hardcodes a file list — every name still comes from the listing route.
   useEffect(() => {
     let cancelled = false
-    setFileListState('loading')
     fetchWorkbench(NOTES_FILE_LIST_URL)
       .then((response) => {
         if (!response.ok) throw new Error(`status ${response.status}`)
@@ -143,7 +149,8 @@ export default function NotesStripRegion() {
   // `ts/public/` handling), refetched whenever the chosen file changes.
   useEffect(() => {
     const generation = ++contentFetchGeneration.current
-    setContentState('loading')
+    const setContentState = (state: Exclude<ContentLoadState, 'loading'>) =>
+      setSettledContent({ file: activeFile, state })
     fetch(`/${activeFile}`, { cache: 'no-store' })
       .then((response) => {
         if (generation !== contentFetchGeneration.current) return

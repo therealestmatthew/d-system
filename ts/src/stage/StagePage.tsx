@@ -1,22 +1,33 @@
-import { useLayoutEffect, useRef, useState, type ComponentType, type ReactElement } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import './StagePage.css'
 import Slot from '../workbench/Slot'
 import LayoutConfigDialog from '../workbench/LayoutConfigDialog'
 import { useWorkbenchLayouts } from '../workbench/useWorkbenchLayouts'
 import { ActiveSchemaVersionProvider } from '../workbench/schemaVersionContext'
-import { PANEL_REGISTRY, panelDisplayName } from '../workbench/panelRegistry'
-import ErrorBoundary from './ErrorBoundary'
+import { PANEL_REGISTRY } from '../workbench/panelRegistry'
+import { guardedPanel } from './guardedPanel'
 
-/** A workbench panel inside its own error boundary, named for the reader (idea 000569). StagePage
- * portals exactly this into each panel's host; it is exported so a test can render the same
- * element the stage does. */
-export function guardedPanel(panelId: string, Component: ComponentType): ReactElement {
-  return (
-    <ErrorBoundary label={panelDisplayName(panelId)}>
-      <Component />
-    </ErrorBoundary>
-  )
+type AttachedHosts = Record<string, HTMLDivElement>
+
+/** The external store behind `StagePage`'s `attachedHosts`: a snapshot that is replaced, never
+ * mutated, and a listener set `useSyncExternalStore` subscribes to. */
+function createAttachedHostsStore() {
+  let snapshot: AttachedHosts = {}
+  const listeners = new Set<() => void>()
+  return {
+    getSnapshot: (): AttachedHosts => snapshot,
+    subscribe: (listener: () => void) => {
+      listeners.add(listener)
+      return () => {
+        listeners.delete(listener)
+      }
+    },
+    publish: (next: AttachedHosts) => {
+      snapshot = next
+      listeners.forEach((listener) => listener())
+    },
+  }
 }
 
 /**
@@ -108,9 +119,10 @@ export default function StagePage() {
   // render: a self-sustaining loop the instant the four slots' body containers first mounted.
   //
   // The fix has two parts, both required:
-  //  1. One stable callback per slot id, held in a ref-backed map rather than recreated inline, so
-  //     the ref prop React sees for a given slot never changes identity across renders — no more
-  //     spurious detach/attach pairs from *this* cause.
+  //  1. One stable registration callback, taking the slot id as an argument, which `Slot.tsx`
+  //     binds to its own slot id with `useCallback`, so the ref prop React sees for a given slot
+  //     never changes identity across renders — no more spurious detach/attach pairs from *this*
+  //     cause.
   //  2. That stable callback ignores `null` (detach) calls entirely rather than writing them into
   //     state, so a slot's entry here only ever moves from one real element to another. `Slot.tsx`
   //     now returns one uniform root shape for all of its 0/1/>1 cases, so a slot body should
@@ -120,53 +132,53 @@ export default function StagePage() {
   //     panel: with a stable per-panel host (see the file doc), a slot body briefly going missing
   //     no longer removes any panel's portal from the tree — the portal's container is the panel's
   //     own host, not the slot's.
-  const slotBodyCallbacks = useRef<Record<string, (element: HTMLDivElement | null) => void>>({})
-
-  function getRegisterSlotBody(slotId: string): (element: HTMLDivElement | null) => void {
-    const existing = slotBodyCallbacks.current[slotId]
-    if (existing) return existing
-    const callback = (element: HTMLDivElement | null) => {
-      if (!element) return // transient detach during a structural remount — ignore, see above.
-      setSlotBodies((previous) =>
-        previous[slotId] === element ? previous : { ...previous, [slotId]: element },
-      )
-    }
-    slotBodyCallbacks.current[slotId] = callback
-    return callback
-  }
+  const registerSlotBody = useCallback((slotId: string, element: HTMLDivElement | null) => {
+    if (!element) return // transient detach during a structural remount — ignore, see above.
+    setSlotBodies((previous) =>
+      previous[slotId] === element ? previous : { ...previous, [slotId]: element },
+    )
+  }, [])
 
   // panel_id -> that panel's own host element (see the file doc): created once, never replaced,
   // moved between slot bodies by the layout effect below. A ref, not state — its identity is
   // exactly the thing that must never change across a render.
   const panelHosts = useRef<Map<string, HTMLDivElement>>(new Map())
-  // panel_id -> true once that panel's host is attached inside a slot body in the document. The
-  // gate that stops a panel mounting into a detached host; see the file doc.
-  const [attachedHosts, setAttachedHosts] = useState<Record<string, boolean>>({})
+  // panel_id -> that panel's host, once the host is attached inside a slot body in the document.
+  // The gate that stops a panel mounting into a detached host; see the file doc. It holds the host
+  // itself so the render below never reads `panelHosts` (a ref) to find it. Attachment is DOM
+  // state that the layout effect below changes outside React, so it lives in a small external
+  // store that effect publishes to, and React reads it through `useSyncExternalStore` — whose
+  // updates re-render synchronously, before paint, exactly as a layout effect's own state update
+  // would.
+  const [attachedHostsStore] = useState(createAttachedHostsStore)
+  const attachedHosts = useSyncExternalStore(attachedHostsStore.subscribe, attachedHostsStore.getSnapshot)
 
   // This render's visible panel per slot, resolved once by `useWorkbenchLayouts`'s single resolver
   // and reused by both consumers below (the `Slot` chrome and the panel portals) so the header and
   // the mounted panel can never disagree about what this slot is showing.
-  const visiblePanelBySlotId: Record<string, string | null> = {}
-  // panel_id -> the slot whose body its host belongs in this render. Only visible, implemented
-  // panels appear here; a slot showing nothing contributes no entry.
-  const hostSlotByPanelId: Record<string, string> = {}
-  if (activeLayout) {
-    for (const slot of activeLayout.slots) {
-      const panelId = getSlotPanel(activeLayout, slot)
-      visiblePanelBySlotId[slot.slot_id] = panelId
-      if (panelId && PANEL_REGISTRY[panelId]?.Component) hostSlotByPanelId[panelId] = slot.slot_id
+  const { visiblePanelBySlotId, hostSlotByPanelId } = useMemo(() => {
+    const visible: Record<string, string | null> = {}
+    // panel_id -> the slot whose body its host belongs in this render. Only visible, implemented
+    // panels appear here; a slot showing nothing contributes no entry.
+    const hostSlots: Record<string, string> = {}
+    if (activeLayout) {
+      for (const slot of activeLayout.slots) {
+        const panelId = getSlotPanel(activeLayout, slot)
+        visible[slot.slot_id] = panelId
+        if (panelId && PANEL_REGISTRY[panelId]?.Component) hostSlots[panelId] = slot.slot_id
+      }
     }
-  }
+    return { visiblePanelBySlotId: visible, hostSlotByPanelId: hostSlots }
+  }, [activeLayout, getSlotPanel])
 
   // Attaches each visible panel's host to its slot's body, moving it there if it is currently
   // somewhere else, and detaches the hosts of panels that are no longer visible anywhere. A
   // *layout* effect, so the DOM move happens before the browser paints — a reassignment never
-  // shows the panel in its old slot for a frame. Runs on every commit (no dependency array): its
-  // inputs are two plain objects rebuilt each render, and it only ever writes state when something
-  // genuinely changed, so it cannot loop.
+  // shows the panel in its old slot for a frame. It only ever publishes when something genuinely
+  // changed, so it cannot loop.
   useLayoutEffect(() => {
     let changed = false
-    const nextAttached = { ...attachedHosts }
+    const nextAttached = { ...attachedHostsStore.getSnapshot() }
 
     for (const [panelId, slotId] of Object.entries(hostSlotByPanelId)) {
       const body = slotBodies[slotId]
@@ -181,8 +193,8 @@ export default function StagePage() {
       }
       // The reassignment itself: a DOM move, invisible to React, so nothing unmounts.
       if (host.parentElement !== body) body.appendChild(host)
-      if (!nextAttached[panelId]) {
-        nextAttached[panelId] = true
+      if (nextAttached[panelId] !== host) {
+        nextAttached[panelId] = host
         changed = true
       }
     }
@@ -196,8 +208,8 @@ export default function StagePage() {
       changed = true
     }
 
-    if (changed) setAttachedHosts(nextAttached)
-  })
+    if (changed) attachedHostsStore.publish(nextAttached)
+  }, [attachedHostsStore, hostSlotByPanelId, slotBodies])
 
   // One portal per visible panel, into that panel's own host. `panelId` is both the React key and
   // the host's identity, and neither changes when the panel moves slots — that is what makes a
@@ -205,8 +217,7 @@ export default function StagePage() {
   // error boundary, so a panel that throws while rendering is replaced by an error and a Retry
   // button in its own slot, and the other panels keep running (idea 000569).
   const panelPortals = Object.keys(hostSlotByPanelId).flatMap((panelId) => {
-    if (!attachedHosts[panelId]) return []
-    const host = panelHosts.current.get(panelId)
+    const host = attachedHosts[panelId]
     const Component = PANEL_REGISTRY[panelId]?.Component
     if (!host || !Component) return []
     return [createPortal(guardedPanel(panelId, Component), host, panelId)]
@@ -269,7 +280,7 @@ export default function StagePage() {
                     onSelectPanel={(panelId) =>
                       setSlotPanel(activeLayout.layout_id, slot.slot_id, panelId)
                     }
-                    registerBody={getRegisterSlotBody(slot.slot_id)}
+                    registerBody={registerSlotBody}
                   />
                 </div>
               ))}

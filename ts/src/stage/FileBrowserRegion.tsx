@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type MouseEvent as ReactMouseEvent } from 'react'
 import DirectoryPickerDialog from './DirectoryPickerDialog'
 import FileTreeContextMenu from './FileTreeContextMenu'
-import { COMPATIBLE_EXTENSIONS } from './HtmlViewerRegion'
+import { COMPATIBLE_EXTENSIONS } from './compatibleExtensions'
 import { useTerminalBridge, useViewerBridge } from './panelBridge'
 import { fetchWorkbench } from './useTerminalEnabled'
 
@@ -265,8 +265,7 @@ export default function FileBrowserRegion() {
   const [entries, setEntries] = useState<DirectoryEntry[]>([])
   // The folder `entries` was actually fetched for. `contextFolder` changing is what triggers the
   // next fetch (the effect below), but React commits at least one render in between — new
-  // `contextFolder`, still-old `entries` — before that effect's `setLoadState('loading')` takes
-  // effect. `buildTree(contextFolder, entries)` during that one stale render mismatches directory
+  // `contextFolder`, still-old `entries` — before that fetch settles. `buildTree(contextFolder, entries)` during that one stale render mismatches directory
   // against file list: an old-folder entry whose path doesn't start with the new prefix falls
   // through `buildTree`'s unstripped-path branch and can compute a path that collides with a
   // genuine entry already inside the new folder (e.g. a stale top-level `README.md` under a new
@@ -276,7 +275,10 @@ export default function FileBrowserRegion() {
   // against `contextFolder` below lets the render treat that one stale commit as loading too,
   // instead of ever building a tree from a directory/file-list pair that don't match.
   const [entriesFolder, setEntriesFolder] = useState<string>('.')
-  const [loadState, setLoadState] = useState<LoadState>('loading')
+  // The settled result names the folder it belongs to, so browsing reads as 'loading' until that
+  // folder's fetch settles, without resetting state inside the effect.
+  const [settled, setSettled] = useState<{ folder: string; state: 'loaded' | 'error' } | null>(null)
+  const loadState: LoadState = settled?.folder === contextFolder ? settled.state : 'loading'
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set())
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null)
   const [actionStatus, setActionStatus] = useState<ActionStatus | null>(null)
@@ -289,7 +291,6 @@ export default function FileBrowserRegion() {
 
   useEffect(() => {
     let cancelled = false
-    setLoadState('loading')
     fetchWorkbench(buildSearchUrl(contextFolder))
       .then((response) => {
         if (!response.ok) throw new Error(`status ${response.status}`)
@@ -299,10 +300,10 @@ export default function FileBrowserRegion() {
         if (cancelled) return
         setEntries(body)
         setEntriesFolder(contextFolder)
-        setLoadState('loaded')
+        setSettled({ folder: contextFolder, state: 'loaded' })
       })
       .catch(() => {
-        if (!cancelled) setLoadState('error')
+        if (!cancelled) setSettled({ folder: contextFolder, state: 'error' })
       })
     return () => {
       cancelled = true
@@ -311,10 +312,15 @@ export default function FileBrowserRegion() {
 
   // A freshly browsed folder starts fully collapsed below its own immediate children — a
   // previous folder's expanded paths otherwise carry over as harmless-but-stale entries that
-  // never match anything in the new tree; clearing them is just tidiness.
-  useEffect(() => {
+  // never match anything in the new tree; clearing them is just tidiness. A stale menu anchored
+  // to an entry from the previous context folder would otherwise linger over the newly loaded
+  // tree, so it closes on the same change.
+  const browseFolder = (folder: string) => {
+    if (folder === contextFolder) return
+    setContextFolder(folder)
     setExpandedPaths(new Set())
-  }, [contextFolder])
+    setContextMenu(null)
+  }
 
   const availableExtensions = useMemo(() => {
     const extensions = new Set<string>()
@@ -365,14 +371,6 @@ export default function FileBrowserRegion() {
   const currentPresetId =
     PRESETS.find((preset) => preset.directory === contextFolder && preset.typeFilter === typeFilter)?.id ??
     'custom'
-
-  // A stale menu anchored to an entry from the previous context folder would otherwise linger
-  // over the newly loaded tree — close it (and any leftover status) the moment the browsed folder
-  // changes, the same "fresh browse resets transient state" rule the expansion-clearing effect
-  // above already applies.
-  useEffect(() => {
-    setContextMenu(null)
-  }, [contextFolder])
 
   function openContextMenu(event: ReactMouseEvent, node: FileTreeNode): void {
     event.preventDefault()
@@ -513,7 +511,7 @@ export default function FileBrowserRegion() {
             onChange={(event) => {
               const preset = PRESETS.find((candidate) => candidate.id === event.target.value)
               if (!preset) return
-              setContextFolder(preset.directory)
+              browseFolder(preset.directory)
               setTypeFilter(preset.typeFilter)
             }}
           >
@@ -524,7 +522,7 @@ export default function FileBrowserRegion() {
               </option>
             ))}
           </select>
-          <DirectoryPickerDialog initialDirectory={contextFolder} onSelectDirectory={setContextFolder} />
+          <DirectoryPickerDialog initialDirectory={contextFolder} onSelectDirectory={browseFolder} />
         </div>
       </header>
       <div className="stage-region__body stage-region__body--file-browser">

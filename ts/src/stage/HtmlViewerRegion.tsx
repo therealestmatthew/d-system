@@ -5,6 +5,7 @@ import { useActiveSchemaVersion } from '../workbench/schemaVersionContext'
 import { loadHtmlViewerTabs, saveHtmlViewerTabs } from '../workbench/storage'
 import { viewerBridge, type ViewerBridgeHandle } from './panelBridge'
 import { fetchWorkbench } from './useTerminalEnabled'
+import { COMPATIBLE_EXTENSIONS } from './compatibleExtensions'
 
 const OVERVIEW_LOCATION_URL = '/api/v1/demo/stage/overview-location'
 const SEARCH_URL = '/api/v1/workbench/search'
@@ -13,28 +14,6 @@ const SEARCH_URL = '/api/v1/workbench/search'
 // (`src/api/routes/workbench.py`, `phase-wb-01`) report paths only, never content (ADR-015), so
 // this is what actually fetches the bytes an iframe can render.
 const WORKBENCH_FILE_PREFIX = '/workbench-file/'
-// The compatible files: `.html`/`.htm`/`.svg`, which this panel renders directly; `.md`, which
-// `serveRepositoryFiles` (`ts/vite.config.ts`) now renders route-side to HTML before this panel
-// ever sees it (idea 000110, idea 000119's ruling) — the block idea 000118 put on `.md` here was
-// only ever "until rendering lands," and it lands in the same change that adds `.md` to this
-// list; and the six raster/vector image formats that same route already serves with correct image
-// MIME types (`CONTENT_TYPE_BY_EXTENSION`) — an image needs no render step in the iframe, so
-// widening this list to include them (idea 000232) was a one-line addition, no backend or
-// vite.config change. Exported so the File Browser's right-click context menu
-// (`FileBrowserRegion.tsx`, REQ-007 W09) can hide "Open in HTML Viewer" on an incompatible entry
-// using this same list rather than a second, hand-kept copy of it.
-export const COMPATIBLE_EXTENSIONS = [
-  '.html',
-  '.htm',
-  '.svg',
-  '.md',
-  '.png',
-  '.jpg',
-  '.jpeg',
-  '.gif',
-  '.webp',
-  '.ico',
-]
 
 // REQ-007 W08: "tabs exactly like the terminal's session tabs" — mirrors `TerminalRegion`'s own
 // `MAX_SESSIONS`/`FIRST_SESSION_ID` constants and cap, one tab bar per panel instance.
@@ -163,36 +142,45 @@ export default function HtmlViewerRegion() {
   // never observes in practice since `Slot.tsx` mounts panels only once `loadState === 'loaded'`.
   const schemaVersion = useActiveSchemaVersion()
   const [embedded, setEmbedded] = useState(true)
-  // Read once, on this component instance's first render only (guarded below) — `useRef`'s own
-  // initial-value argument is otherwise re-evaluated on every render, which would mean a
-  // localStorage read (and JSON parse) on every render just to be discarded after the first.
-  const initialStateRef = useRef<{ tabs: ViewerTab[]; activeTabId: number } | null>(null)
-  if (initialStateRef.current === null) {
-    initialStateRef.current = loadInitialTabs(schemaVersion)
-  }
-  const [tabs, setTabs] = useState<ViewerTab[]>(() => initialStateRef.current!.tabs)
-  const [activeTabId, setActiveTabId] = useState<number>(() => initialStateRef.current!.activeTabId)
-  const nextTabIdRef = useRef(Math.max(0, ...initialStateRef.current!.tabs.map((tab) => tab.id)) + 1)
-  const [searchText, setSearchTextState] = useState(
-    () => tabs.find((tab) => tab.id === activeTabId)?.searchText ?? '',
-  )
+  // Read once, on this component instance's first render only — a lazy `useState` initializer,
+  // so the localStorage read (and JSON parse) is not repeated on every render just to be
+  // discarded after the first.
+  const [initialState] = useState(() => loadInitialTabs(schemaVersion))
+  const [tabs, setTabs] = useState<ViewerTab[]>(initialState.tabs)
+  const [activeTabId, setActiveTabId] = useState<number>(initialState.activeTabId)
+  const nextTabIdRef = useRef(Math.max(0, ...initialState.tabs.map((tab) => tab.id)) + 1)
   const [files, setFiles] = useState<DirectoryEntry[]>([])
-  const [filesLoadState, setFilesLoadState] = useState<FilesLoadState>('loading')
-  const [pageState, setPageState] = useState<PageState>('idle')
+  // Each settled result names the request it belongs to, so a tab, directory, page or refresh
+  // change reads as 'loading'/'checking' until its own fetch settles, without resetting state
+  // inside the effects below.
+  const [settledFiles, setSettledFiles] = useState<{ key: string; state: 'loaded' | 'error' } | null>(null)
+  const [settledPage, setSettledPage] = useState<{
+    key: string
+    state: Exclude<PageState, 'idle' | 'checking'>
+  } | null>(null)
   const [refreshToken, setRefreshToken] = useState(0)
 
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? null
+  // The search input is a shared header control (one `<input>`), but the text it shows and writes
+  // is the active tab's own (REQ-007 W08), so switching tabs swaps the displayed text.
+  const searchText = activeTab?.searchText ?? ''
+  const filesKey = activeTab === null ? null : `${activeTab.id}|${activeTab.directory}`
+  const filesLoadState: FilesLoadState =
+    settledFiles !== null && settledFiles.key === filesKey ? settledFiles.state : 'loading'
+  const pageKey =
+    activeTab === null || !activeTab.selectedFile
+      ? null
+      : `${activeTab.id}|${activeTab.selectedFile}|${refreshToken}`
+  const pageState: PageState =
+    pageKey === null
+      ? 'idle'
+      : settledPage !== null && settledPage.key === pageKey
+        ? settledPage.state
+        : 'checking'
 
   function updateTab(id: number, patch: Partial<Omit<ViewerTab, 'id'>>) {
     setTabs((previous) => previous.map((tab) => (tab.id === id ? { ...tab, ...patch } : tab)))
   }
-
-  // Keep the search input's own state in sync with whichever tab is active — the input is a
-  // shared header control (one `<input>`), but the text it shows and writes is per-tab (REQ-007
-  // W08). Switching tabs swaps the displayed text; typing writes back to the active tab below.
-  useEffect(() => {
-    setSearchTextState(activeTab?.searchText ?? '')
-  }, [activeTabId])
 
   // Seed any tab that has no directory yet — a freshly created tab, never one restored from
   // storage with a real value already — from the generated overview page's own location, once
@@ -233,9 +221,8 @@ export default function HtmlViewerRegion() {
   // (REQ-007 W07). Text filtering happens client-side against this same fetched list, below — no
   // round trip per keystroke. Re-fetches whenever the active tab or its directory changes.
   useEffect(() => {
-    if (activeTab === null || activeTab.directory === null) return
+    if (activeTab === null || activeTab.directory === null || filesKey === null) return
     let cancelled = false
-    setFilesLoadState('loading')
     fetchWorkbench(buildSearchUrl(activeTab.directory))
       .then((response) => {
         if (!response.ok) throw new Error(`status ${response.status}`)
@@ -244,10 +231,10 @@ export default function HtmlViewerRegion() {
       .then((body) => {
         if (cancelled) return
         setFiles(body)
-        setFilesLoadState('loaded')
+        setSettledFiles({ key: filesKey, state: 'loaded' })
       })
       .catch(() => {
-        if (!cancelled) setFilesLoadState('error')
+        if (!cancelled) setSettledFiles({ key: filesKey, state: 'error' })
       })
     return () => {
       cancelled = true
@@ -259,18 +246,14 @@ export default function HtmlViewerRegion() {
   // point at a file that has since been removed, and `refreshToken` re-runs this same check for
   // the refresh control (REQ-007 W07: "a refresh button re-fetching the current page").
   useEffect(() => {
-    if (activeTab === null || !activeTab.selectedFile) {
-      setPageState('idle')
-      return
-    }
+    if (activeTab === null || !activeTab.selectedFile || pageKey === null) return
     let cancelled = false
-    setPageState('checking')
     fetch(`${WORKBENCH_FILE_PREFIX}${activeTab.selectedFile}`, { method: 'HEAD', cache: 'no-store' })
       .then((response) => {
-        if (!cancelled) setPageState(response.ok ? 'ready' : 'missing')
+        if (!cancelled) setSettledPage({ key: pageKey, state: response.ok ? 'ready' : 'missing' })
       })
       .catch(() => {
-        if (!cancelled) setPageState('error')
+        if (!cancelled) setSettledPage({ key: pageKey, state: 'error' })
       })
     return () => {
       cancelled = true
@@ -312,7 +295,6 @@ export default function HtmlViewerRegion() {
     }
     viewerBridge.register(handle)
     return () => viewerBridge.unregister(handle)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabs])
 
   const addTab = () => {
@@ -373,9 +355,7 @@ export default function HtmlViewerRegion() {
                   aria-label="Filter compatible files"
                   value={searchText}
                   onChange={(event) => {
-                    const value = event.target.value
-                    setSearchTextState(value)
-                    if (activeTab) updateTab(activeTab.id, { searchText: value })
+                    if (activeTab) updateTab(activeTab.id, { searchText: event.target.value })
                   }}
                 />
                 {filesLoadState === 'loading' ? (

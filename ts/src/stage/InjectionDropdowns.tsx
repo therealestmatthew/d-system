@@ -18,12 +18,18 @@ interface InjectionSources {
 
 const EMPTY_SOURCES: InjectionSources = { skills: [], agents: [], prompts: [] }
 
-// Same reasoning as CommandPanel's CONTROL_CHARACTER_PATTERN (see that file) applied here to
+// Same reasoning as CommandPanel's hasControlCharacter (see that file) applied here to
 // `injection` instead of `command`: an embedded \n/\r would execute everything before it the
 // moment the shell's line editor sees it, defeating "injects without executing" for this entry.
 // Rejecting the whole entry at load time is the first of two defense layers — TerminalRegion's
 // `sendCommand` (via TerminalSession's imperative handle) is the second.
-const CONTROL_CHARACTER_PATTERN = /[\x00-\x1f\x7f]/
+function hasControlCharacter(text: string): boolean {
+  for (let index = 0; index < text.length; index++) {
+    const code = text.charCodeAt(index)
+    if (code < 0x20 || code === 0x7f) return true
+  }
+  return false
+}
 
 function isInjectionSourceEntry(value: unknown): value is InjectionSourceEntry {
   return (
@@ -32,7 +38,7 @@ function isInjectionSourceEntry(value: unknown): value is InjectionSourceEntry {
     typeof (value as { id?: unknown }).id === 'string' &&
     typeof (value as { label?: unknown }).label === 'string' &&
     typeof (value as { injection?: unknown }).injection === 'string' &&
-    !CONTROL_CHARACTER_PATTERN.test((value as { injection: string }).injection)
+    !hasControlCharacter((value as { injection: string }).injection)
   )
 }
 
@@ -70,9 +76,9 @@ function useInjectionSources() {
   const [sources, setSources] = useState<InjectionSources>(EMPTY_SOURCES)
   const fetchGeneration = useRef(0)
 
-  const load = () => {
+  // Sets state only from the response callbacks, so the mount effect can call it directly.
+  const fetchSources = () => {
     const generation = ++fetchGeneration.current
-    setLoadState('loading')
     fetchWorkbench(INJECTION_SOURCES_URL, { cache: 'no-store' })
       .then((response) => {
         if (generation !== fetchGeneration.current) return
@@ -103,8 +109,14 @@ function useInjectionSources() {
       })
   }
 
+  const load = () => {
+    setLoadState('loading')
+    fetchSources()
+  }
+
+  // loadState starts as 'loading', so the first fetch needs no reset.
   useEffect(() => {
-    load()
+    fetchSources()
     return () => {
       fetchGeneration.current += 1
     }

@@ -20,7 +20,13 @@ interface CommandsFile {
 // R12's "injects without executing" for any entry authored (or corrupted) with one. Rejecting the
 // whole entry at load time is the first of the two defense layers — see TerminalRegion's
 // `sendCommand` for the second.
-const CONTROL_CHARACTER_PATTERN = /[\x00-\x1f\x7f]/
+function hasControlCharacter(text: string): boolean {
+  for (let index = 0; index < text.length; index++) {
+    const code = text.charCodeAt(index)
+    if (code < 0x20 || code === 0x7f) return true
+  }
+  return false
+}
 
 function isCommandEntry(value: unknown): value is CommandEntry {
   return (
@@ -28,7 +34,7 @@ function isCommandEntry(value: unknown): value is CommandEntry {
     value !== null &&
     typeof (value as { label?: unknown }).label === 'string' &&
     typeof (value as { command?: unknown }).command === 'string' &&
-    !CONTROL_CHARACTER_PATTERN.test((value as { command: string }).command) &&
+    !hasControlCharacter((value as { command: string }).command) &&
     typeof (value as { run?: unknown }).run === 'boolean'
   )
 }
@@ -80,9 +86,9 @@ export default function CommandPanel({
   const [entries, setEntries] = useState<CommandEntry[]>([])
   const fetchGeneration = useRef(0)
 
-  const loadEntries = () => {
+  // Sets state only from the response callbacks, so the mount effect can call it directly.
+  const fetchLoadEntries = () => {
     const generation = ++fetchGeneration.current
-    setLoadState('loading')
     fetch(DEMO_COMMANDS_URL, { cache: 'no-store' })
       .then((response) => {
         if (generation !== fetchGeneration.current) return
@@ -109,8 +115,14 @@ export default function CommandPanel({
       })
   }
 
+  const loadEntries = () => {
+    setLoadState('loading')
+    fetchLoadEntries()
+  }
+
+  // loadState starts as 'loading', so the first fetch needs no reset.
   useEffect(() => {
-    loadEntries()
+    fetchLoadEntries()
     return () => {
       fetchGeneration.current += 1
     }

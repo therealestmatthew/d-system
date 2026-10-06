@@ -98,16 +98,20 @@ export default function ExplorerRegion<T>({
 }: ExplorerRegionProps<T>) {
   const [view, setView] = useState<ExplorerView>('standard')
   const [rows, setRows] = useState<T[]>([])
-  const [loadState, setLoadState] = useState<LoadState>('loading')
+  // The settled result names the URL it belongs to, so a view or URL change reads as 'loading'
+  // until its own fetch settles, without resetting state inside the effect.
+  const [settled, setSettled] = useState<{ url: string; state: 'loaded' | 'error' } | null>(null)
   const [textFilter, setTextFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState(NO_STATUS_FILTER)
   const [sortColumn, setSortColumn] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
 
+  const url = view === 'queue' ? queueUrl : standardUrl
+  const loadState: LoadState = settled?.url === url ? settled.state : 'loading'
+
   useEffect(() => {
     let cancelled = false
-    setLoadState('loading')
-    fetch(view === 'queue' ? queueUrl : standardUrl)
+    fetch(url)
       .then((response) => {
         if (!response.ok) throw new Error(`status ${response.status}`)
         return response.json() as Promise<T[]>
@@ -115,22 +119,24 @@ export default function ExplorerRegion<T>({
       .then((body) => {
         if (cancelled) return
         setRows(body)
-        setLoadState('loaded')
+        setSettled({ url, state: 'loaded' })
       })
       .catch(() => {
-        if (!cancelled) setLoadState('error')
+        if (!cancelled) setSettled({ url, state: 'error' })
       })
     return () => {
       cancelled = true
     }
-  }, [view, standardUrl, queueUrl])
+  }, [url])
 
   // A fresh view load starts with no column sort applied, so the just-fetched order (the view's
   // own order) is what renders until the user asks for a column sort — never a stale sort column
   // silently reapplied to the new view's rows.
-  useEffect(() => {
+  const selectView = (next: ExplorerView) => {
+    if (next === view) return
+    setView(next)
     setSortColumn(null)
-  }, [view])
+  }
 
   const filteredRows = useMemo(() => {
     const needle = textFilter.trim().toLowerCase()
@@ -180,7 +186,7 @@ export default function ExplorerRegion<T>({
               type="button"
               className="stage-explorer__view-button"
               aria-pressed={view === 'standard'}
-              onClick={() => setView('standard')}
+              onClick={() => selectView('standard')}
             >
               {standardLabel}
             </button>
@@ -188,7 +194,7 @@ export default function ExplorerRegion<T>({
               type="button"
               className="stage-explorer__view-button"
               aria-pressed={view === 'queue'}
-              onClick={() => setView('queue')}
+              onClick={() => selectView('queue')}
             >
               {queueLabel}
             </button>

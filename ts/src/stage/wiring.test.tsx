@@ -27,7 +27,7 @@ describe('error boundary wiring', () => {
 
   it('each portaled panel is guarded and named by its display name', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
-    const { guardedPanel } = await import('./StagePage')
+    const { guardedPanel } = await import('./guardedPanel')
     function Broken(): never {
       throw new Error('panel failed')
     }

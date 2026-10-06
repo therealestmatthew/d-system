@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   isRawLayoutFile,
   type LayoutDefinition,
@@ -323,7 +323,9 @@ export function useWorkbenchLayouts() {
    *     unimplemented panel, or declares none at all (layout 1's explorer slot), has always shown;
    *  5. `null`, when no panel assigned here is implemented yet.
    */
-  const getSlotPanel = (layout: LayoutDefinition, slot: LayoutSlotDefinition): string | null => {
+  // Stable while the stored choices and the platform default are unchanged, so `StagePage` can
+  // memoize the per-render panel placement it resolves through this.
+  const getSlotPanel = useCallback((layout: LayoutDefinition, slot: LayoutSlotDefinition): string | null => {
     const implemented = (panelId: string | null | undefined): boolean =>
       !!panelId && slot.admits.includes(panelId) && !!PANEL_REGISTRY[panelId]?.Component
 
@@ -342,7 +344,7 @@ export function useWorkbenchLayouts() {
     }
     if (implemented(slot.default_panel)) return slot.default_panel
     return slot.admits.find((panelId) => PANEL_REGISTRY[panelId]?.Component) ?? null
-  }
+  }, [slotVisiblePanel, terminalPlatformDefaultPanelId])
 
   /** Changes which of a slot's currently-assigned panels is visible — never a reassignment (see
    * `setPanelSlot` for that). `Slot.tsx`'s header dropdown is its only caller (REQ-007 W16/W17:
