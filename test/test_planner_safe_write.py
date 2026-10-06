@@ -46,6 +46,14 @@ def test_documented_command_reads_path_not_string_literal() -> None:
     assert "open(sys.argv[1])" in command
 
 
+def test_documented_command_quotes_the_trailing_path_argument() -> None:
+    """Round-3 (minor): the trailing draft-path argument is double-quoted in the example, not
+    bare and not single-quoted - single quotes would break on a slug containing an apostrophe.
+    """
+    command = _extract_safe_write_command()
+    assert f'"{_PLACEHOLDER}"' in command
+
+
 def test_documented_command_handles_a_draft_containing_triple_quotes(tmp_path: Path) -> None:
     """Run the literal extracted command against a draft containing `\"\"\"` and confirm it
     does not raise a SyntaxError - the exact failure the round-2 review reproduced against the
@@ -75,5 +83,36 @@ def test_documented_command_handles_a_draft_containing_triple_quotes(tmp_path: P
     )
 
     assert "SyntaxError" not in result.stderr, result.stderr
+    assert result.returncode == 0, result.stderr
+    assert "conformant" in result.stdout.lower()
+
+
+def test_documented_command_handles_a_path_with_a_space_and_an_apostrophe(tmp_path: Path) -> None:
+    """Round-3 (minor): the trailing path argument must be quoted - a reserved code's slug can
+    carry a space and an apostrophe, and only double quotes survive both. This drops the draft
+    under a directory literally named "it's a dir" and confirms the extracted command still
+    succeeds.
+    """
+    odd_dir = tmp_path / "it's a dir"
+    odd_dir.mkdir()
+    draft = odd_dir / "fixture draft.md"
+    draft.write_text(
+        "# Fixture draft\n\n## Context and scope\n\nOrdinary content; the path is the hazard "
+        "here, not the draft's body.\n"
+        "## Decisions\n## Implementation phases\n## Acceptance and verification\n"
+        "## Out of scope\n## Open questions\n"
+    )
+
+    command = _extract_safe_write_command()
+    command = command.replace("depends_on=[...], documents={...}", "depends_on=[], documents={}")
+    command = command.replace(_PLACEHOLDER, str(draft))
+
+    result = subprocess.run(
+        ["bash", "-c", command],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+
     assert result.returncode == 0, result.stderr
     assert "conformant" in result.stdout.lower()

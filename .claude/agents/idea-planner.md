@@ -145,5 +145,9 @@ import sys
 from src.governance.plan_quality import check_plan_conformance
 text = open(sys.argv[1]).read()
 print(check_plan_conformance(text, depends_on=[...], documents={...}))
-" docs/00-working/promoted/<reserved-code>-<slug>.md
+" "docs/00-working/promoted/<reserved-code>-<slug>.md"
 ```
+
+Keep the double quotes around the trailing path argument when you fill in the real path — a
+reserved code's slug can carry a space or an apostrophe, and double quotes are the one quoting
+style that survives both; single quotes break on an apostrophe.
