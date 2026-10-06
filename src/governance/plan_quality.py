@@ -132,18 +132,20 @@ def depends_on_requirement(depends_on: list[str], documents: dict[str, dict[str,
 def check_plan_conformance(
     markdown: str,
     *,
-    depends_on: list[str] | None = None,
-    documents: dict[str, dict[str, object]] | None = None,
+    depends_on: list[str],
+    documents: dict[str, dict[str, object]],
 ) -> ConformanceResult:
     """GOV-010's plan-section check.
 
-    `depends_on`/`documents` supply the one condition the draft text cannot answer on its own:
-    whether a named dependency is a `requirement`-kind document, which satisfies Verification and
-    Requirement coverage together via the single `Requirement coverage` heading. Omit both when the
-    draft has no requirement pairing to check.
+    `depends_on`/`documents` are required, not optional, so a caller cannot forget them and
+    silently skip the one condition the draft text cannot answer on its own: whether a named
+    dependency is a `requirement`-kind document, which satisfies Verification and Requirement
+    coverage together via the single `Requirement coverage` heading. Pass `depends_on=[],
+    documents={}` explicitly when the draft has no requirement pairing to check — that is a
+    decision, not a default.
     """
     headings = present_headings(markdown)
-    paired = depends_on_requirement(depends_on or [], documents or {})
+    paired = depends_on_requirement(depends_on, documents)
 
     conformant, missing = _check_sections(headings, PLAN_SECTIONS)
 

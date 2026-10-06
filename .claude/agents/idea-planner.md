@@ -77,8 +77,14 @@ came from should move to `promoted`. Those are gates `G2`/`G3`, owner-reserved (
    stage exists for a phase that grows after drafting, not as a substitute for doing this step now.
 7. **Run the section check against your own draft before finishing**
    (`src/governance/plan_quality.py`'s `check_plan_conformance()` /
-   `check_requirement_conformance()`) and fix any missing section it names. A draft that fails its
-   own conformance check is not finished.
+   `check_requirement_conformance()`) and fix any missing section it names. `check_plan_conformance()`
+   takes `depends_on` and `documents` as required keyword arguments, not optional ones — pass the
+   plan draft's real `depends_on` list and a `documents` mapping that includes the paired
+   requirement's id with `{"kind": "requirement"}` whenever step 4 made one mandatory, and pass
+   `depends_on=[], documents={}` explicitly when it did not. Never call it without deciding this:
+   omitting the real pairing is how an unconformant draft (missing `Requirement coverage`) would
+   wrongly certify itself as conformant. A draft that fails its own conformance check is not
+   finished.
 8. **Land the draft at `docs/00-working/promoted/<reserved-code>-<slug>.md`**, per `ADR-019` step 3
    and `GOV-011`'s "Location" section — the filename carries the reserved code you were given from
    the start, so `GOV-011`'s later move into `docs/01-plans/` or `docs/06-requirements/` leaves the
@@ -119,3 +125,21 @@ the schema needs it, in the shape `docs/01-plans/` and `docs/06-requirements/` a
 `GOV-010`'s accepted headings, used verbatim, are what the section check matches against. Quote
 each cited finding or link by its idea id and annotation text rather than paraphrasing it away from
 what triage actually recorded.
+
+A drafted plan or requirement is long Markdown containing backticks, `$(...)`-shaped text and
+fenced code blocks of its own — exactly the content a shell would mis-parse if inlined into a
+command, the same corruption the triage agent's writing step guards against (idea `000019`; see
+the `idea` workflow). **Never inline the draft's prose directly into a shell command.** Write the
+draft to its destination file with your file-write tool first. If a later command in the same
+dispatch needs the draft's bytes as an argument — the section check run from the command line
+rather than in-process, say — substitute them from the file with `$(cat <path>)`, which inserts
+them literally with no further shell parsing, the same adaptation the triage agent uses for its
+finding text:
+
+```bash
+uv run python -c "
+from src.governance.plan_quality import check_plan_conformance
+print(check_plan_conformance(\"\"\"$(cat docs/00-working/promoted/<reserved-code>-<slug>.md)\"\"\",
+    depends_on=[...], documents={...}))
+"
+```

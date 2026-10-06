@@ -111,7 +111,10 @@ this document, once real dispatch data from `phase-irs-11`'s baselines gives a r
   (`phase-idg-10`).
 - **Outputs:** a requirement and plan document pair per track, conformant to the plan-quality
   standard, decomposed to minimum scope per `ARCH-006` stage 4's duty (Planning → Review). Drafts
-  land where `phase-idg-11` defines, not directly under `docs/01-plans/`.
+  land where `phase-idg-11` defines, not directly under `docs/01-plans/`. `phase-idg-12`'s build
+  drafts the requirement only where `GOV-001`'s mandatory-requirement rule requires one — a
+  deliberate temporary exception to "a pair per track" pending a separate owner-approved amendment
+  to this contract and `ARCH-006`.
 - **Never-do:** never allocate a document code; never mark an idea `promoted`; never decide plan
   approval — that is G3, owner-reserved; never leave a phase table undecomposed for a later stage
   to split, when the standard requires minimum-scope phases at draft time.

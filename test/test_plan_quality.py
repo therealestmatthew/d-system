@@ -8,6 +8,8 @@ _data/ideas.jsonl or idea 000072.
 
 from __future__ import annotations
 
+import pytest
+
 from src.governance.plan_quality import (
     check_plan_conformance,
     check_requirement_conformance,
@@ -54,13 +56,13 @@ Has context but nothing else GOV-010 requires.
 
 
 def test_conformant_fixture_plan_passes() -> None:
-    result = check_plan_conformance(CONFORMANT_PLAN)
+    result = check_plan_conformance(CONFORMANT_PLAN, depends_on=[], documents={})
     assert result.conformant
     assert result.missing == ()
 
 
 def test_non_conformant_fixture_plan_is_rejected_and_names_missing_sections() -> None:
-    result = check_plan_conformance(NON_CONFORMANT_PLAN)
+    result = check_plan_conformance(NON_CONFORMANT_PLAN, depends_on=[], documents={})
     assert not result.conformant
     # Design, Work, Verification, Boundaries and Open questions are all absent.
     assert any(m.startswith("Design") for m in result.missing)
@@ -75,7 +77,7 @@ def test_fenced_code_heading_does_not_count() -> None:
         "## Open questions\n\nNone outstanding.\n",
         "```\n## Open questions\n```\n",
     )
-    result = check_plan_conformance(draft)
+    result = check_plan_conformance(draft, depends_on=[], documents={})
     assert not result.conformant
     assert any(m.startswith("Open questions") for m in result.missing)
 
@@ -103,17 +105,47 @@ def test_requirement_coverage_missing_when_paired_but_absent() -> None:
     assert any(m.startswith("Requirement coverage") for m in result.missing)
 
 
+def test_paired_draft_without_requirement_coverage_is_rejected_and_names_the_section() -> None:
+    """F01: a caller that passes the draft's real pairing never certifies a false pass.
+
+    `CONFORMANT_PLAN` satisfies Verification with its `Acceptance and verification` heading and
+    carries no `Requirement coverage` heading at all. Once it is paired with a requirement
+    document, GOV-010 requires `Requirement coverage` specifically — the single heading that
+    stands in for both rows — and this draft does not have it, so it must fail and the missing
+    section must be named.
+    """
+    result = check_plan_conformance(
+        CONFORMANT_PLAN,
+        depends_on=["doc-fixture-requirement"],
+        documents={"doc-fixture-requirement": {"kind": "requirement"}},
+    )
+    assert not result.conformant
+    assert any("Requirement coverage" in m for m in result.missing)
+
+
+def test_depends_on_and_documents_are_required_not_optional() -> None:
+    """F01: the checker's own API cannot be called without deciding the pairing inputs.
+
+    Omitting `depends_on`/`documents` used to default to "unpaired", which let a caller silently
+    skip the one condition the draft text cannot answer on its own. They are now required
+    keyword arguments, so a caller must pass something - even `depends_on=[], documents={}` for
+    an unpaired draft - rather than falling into a silent, wrong default.
+    """
+    with pytest.raises(TypeError):
+        check_plan_conformance(CONFORMANT_PLAN)  # type: ignore[call-arg]
+
+
 def test_concurrency_section_required_once_two_phase_ids_appear() -> None:
     draft = CONFORMANT_PLAN.replace(
         "| phase-fix-01 | Do the thing |",
         "| phase-fix-01 | Do the thing |\n| phase-fix-02 | Do the other thing |",
     )
-    result = check_plan_conformance(draft)
+    result = check_plan_conformance(draft, depends_on=[], documents={})
     assert not result.conformant
     assert any(m.startswith("Concurrency") for m in result.missing)
 
     conformant_draft = draft + "\n## Execution order and real concurrency\n\nSequential.\n"
-    assert check_plan_conformance(conformant_draft).conformant
+    assert check_plan_conformance(conformant_draft, depends_on=[], documents={}).conformant
 
 
 CONFORMANT_REQUIREMENT = """\
