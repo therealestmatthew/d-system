@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-05-phase-sch-03-demo-adversary-4",
+  "date": "2026-10-05",
+  "phase": "phase-sch-03",
+  "reviewed_commit": "6ba82a70f32dfd74b2ca12d4ff5dd7d3f730f6be",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [],
+  "raw_reply_sha256": "20bfe8e61f04778d2fb3613ca050bf4a5a9764d8f396a381d33b9c88ca4a50a3",
+  "outcomes": [],
+  "notes": "SECURITY REVIEW, round 2 (GOV-017 'The security review'; the round-2 delta touches ts/package.json). Owner-ruled stand-in for the built-in /security-review, as in round 1 (2026-10-05-phase-sch-03-demo-adversary-2; idea 000595). Brief: the ts/ delta 11b58ac -> 6ba82a7 and the full range, read-only in the shared clone. Result: no security findings; lockfile, ci.yaml and eslint.config.js byte-identical to round 1; terminal websocket construction and the inject-without-executing guard unchanged. The reviewer self-reported and corrected a transcription misread of Popover.tsx's effect dependencies; no finding resulted. Raw reply kept at _working/session-manager/review-replies/phase-sch-03-6ba82a7-security-demo-adversary.md."
+}

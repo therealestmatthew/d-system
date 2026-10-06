@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-05-phase-sch-03-demo-adversary-3",
+  "date": "2026-10-05",
+  "phase": "phase-sch-03",
+  "reviewed_commit": "6ba82a70f32dfd74b2ca12d4ff5dd7d3f730f6be",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [],
+  "raw_reply_sha256": "f3f7036bc9702b5142fc6432a38add056323568316e7f084b510b19499ec5934",
+  "outcomes": [],
+  "notes": "Round 2, dispatched and briefed by the Session Manager under GOV-017 'Build reviews'. Brief: scope, acceptance and verification from dev 376654b's backlog.yaml, round 1's gating findings with the owner's rulings on them (F01: add --max-warnings 0; F02: fix all five disables), the range 376654b...6ba82a7 and the ts/ delta since round 1 as file paths (docs/03-sessions excluded), and the runner manifest _working/review-checks/phase-sch-03/6ba82a70f32d/ (result failed only because dev's runner has no `cd ts && npm ci` step: npm entries 127/2/127; every Python gate exit 0). SM's own run at 6ba82a7 after npm ci: build 0, lint (--max-warnings 0) 0, vitest 7 passed, no eslint-disable under ts/src. Raw reply kept at _working/session-manager/review-replies/phase-sch-03-6ba82a7-demo-adversary.md. Gating build review; the clone at 6ba82a7 was its checkout. It confirmed F01 closed by reintroducing a warning-only violation (lint exit 1, reverted) and F02 closed (no eslint-disable under ts/src, ruleset untrimmed), and checked the five effect fixes for behaviour preservation."
+}

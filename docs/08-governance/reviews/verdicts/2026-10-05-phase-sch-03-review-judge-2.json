@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-05-phase-sch-03-review-judge-2",
+  "date": "2026-10-05",
+  "phase": "phase-sch-03",
+  "reviewed_commit": "6ba82a70f32dfd74b2ca12d4ff5dd7d3f730f6be",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Neither R06 nor R07 has a command-level demonstration of an actual failing violation/test in the runner evidence.",
+      "evidence": "Manifest exit 2/127 entries are the disclosed environment gap (missing ts/node_modules because dev's own runner lacks the cd ts && npm ci setup step this phase adds), not a deliberately introduced violation.",
+      "consequence": "Both conditions are judged here from the diff, the config, and the Session Manager's own post-npm ci run rather than from a command this review ran itself."
+    }
+  ],
+  "raw_reply_sha256": "1392df5d8bfa56fe5878b9d78bcdf68d87410b7c27590a159c4d170fc4ffc336",
+  "outcomes": [],
+  "notes": "Round 2, dispatched and briefed by the Session Manager under GOV-017 'Build reviews'. Brief: scope, acceptance and verification from dev 376654b's backlog.yaml, round 1's gating findings with the owner's rulings on them (F01: add --max-warnings 0; F02: fix all five disables), the range 376654b...6ba82a7 and the ts/ delta since round 1 as file paths (docs/03-sessions excluded), and the runner manifest _working/review-checks/phase-sch-03/6ba82a70f32d/ (result failed only because dev's runner has no `cd ts && npm ci` step: npm entries 127/2/127; every Python gate exit 0). SM's own run at 6ba82a7 after npm ci: build 0, lint (--max-warnings 0) 0, vitest 7 passed, no eslint-disable under ts/src. Raw reply kept at _working/session-manager/review-replies/phase-sch-03-6ba82a7-review-judge-rerun.md. No checkout (shadow judge). The reviewer labelled its one point \"Minor/informational\"; recorded as minor. An earlier round-2 judge dispatch read the runner folder before the manifest existed and judged nothing (SM dispatch-timing slip); its reply is kept as evidence at _working/session-manager/review-replies/phase-sch-03-6ba82a7-review-judge.md and has no verdict record."
+}

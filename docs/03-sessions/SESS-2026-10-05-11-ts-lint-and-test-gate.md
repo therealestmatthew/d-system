@@ -118,6 +118,25 @@ the same setup. It opened a second terminal session, switched the explorer slot 
 and then Backlog Explorer, and picked a Skills entry. `/checkpoint` appeared at the shell prompt
 without running. Every run reported `exceptions: []`, `consoleErrors: []` and `failed: []`.
 
+## Review round 2
+
+The Session Manager ran the review on `6ba82a7`. The verdict records are committed unchanged beside
+round 1's:
+
+- `docs/08-governance/reviews/verdicts/2026-10-05-phase-sch-03-demo-adversary-3.json`, gating:
+  pass, no findings.
+- `docs/08-governance/reviews/verdicts/2026-10-05-phase-sch-03-demo-adversary-4.json`, gating
+  security review (stand-in): pass, no findings.
+- `docs/08-governance/reviews/verdicts/2026-10-05-phase-sch-03-review-judge-2.json`, shadow: pass,
+  with one minor finding, which decides nothing. It notes that the runner evidence has no
+  command-level demonstration of a failing violation. The self-checks above are that
+  demonstration. The runner cannot run them because they need a temporary edit to the tree.
+
+Round 1's F01 and F02 are closed on the owner's rulings. The runner at `6ba82a7` passed every Python
+gate. Its npm entries failed only because dev's runner does not yet have this branch's `npm ci`
+setup step. The Session Manager then ran `npm ci`, build, lint and test at `6ba82a7`: build 0,
+lint 0, vitest 7.
+
 ## Verification
 
 Run on the branch before its rebase onto dev `6016a9c` (tip `9f607c1`, base `176bd78`). The
