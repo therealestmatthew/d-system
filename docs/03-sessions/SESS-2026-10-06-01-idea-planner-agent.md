@@ -137,4 +137,16 @@ The Session Manager dispatched three rounds of build review:
   Idea `000596` (quote the draft-path argument in the idea planner's safe-write command) records
   this fix.
 
-Fix cycles used: four. Two is `PROMPT-036`'s cap, and the owner granted the third and fourth.
+- **Round 4, at `4be47bdb`.** Gating pass, shadow pass. Records:
+  `docs/08-governance/reviews/verdicts/2026-10-06-phase-idg-12-demo-adversary-3.json` and
+  `docs/08-governance/reviews/verdicts/2026-10-06-phase-idg-12-review-judge-3.json`. The space and
+  apostrophe case is fixed. Both reviewers raised a minor F01: double quotes do not survive a path
+  containing `"`, and they expand `$` and backticks, so a path can change silently and the wrong
+  file is read. On 2026-10-06 the owner ruled, relayed by the Session Manager, to fix it with a
+  quoted heredoc. Fix cycle 5 (`753787de`) passes the path on stdin through `<<'EOF'`, reads it
+  with `sys.stdin.read()`, and puts no path text on the command line or in Python source. The
+  tests run the extracted command against paths that combine `"`, `$HOME`-style text, a backtick,
+  an apostrophe and a space, and they assert that the exact file is read.
+
+Fix cycles used: five, all on the same safe-write command after cycle 1. Two is `PROMPT-036`'s
+cap; the owner granted cycles 3, 4 and 5.
