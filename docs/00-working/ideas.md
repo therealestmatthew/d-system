@@ -25503,3 +25503,23 @@ Confirmed on branch agent/phase-idg-12 (the files are not on dev yet): the plan-
 Secondary, not part of this ask: nothing enforces kebab-case promoted-plan filenames; that would be separate hardening. No related ideas found beyond 000046 (idea planner agent, the parent concept); no proposed link or promotion.
 
 </details>
+
+---
+
+## 000597 · Record who created each idea on its created event
+
+**Created 2026-10-06T07:53:00-04:00 · Status: `open`**
+
+Record who created each idea — the owner or a named agent/session — as a field on the `created` event written by append_idea.py, so agent-generated ideas can be counted and filtered. Today only annotations and classifications carry an author.
+
+Sent by Session 1 - Builder A, for the owner.
+
+---
+
+## 000598 · An owner review session over every triaged idea, to pick out the meaningful ones and set aside or discard the rest
+
+**Created 2026-10-06T07:53:04-04:00 · Status: `open`**
+
+An owner review session over every triaged idea (565 on 2026-10-06; 417 named in no backlog phase) to pick out which ones are meaningful and which to set aside or discard.
+
+Sent by Session 1 - Builder A, for the owner.
