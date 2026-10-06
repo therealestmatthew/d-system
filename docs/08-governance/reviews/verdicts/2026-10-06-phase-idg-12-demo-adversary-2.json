@@ -1,0 +1,26 @@
+{
+  "verdict_id": "2026-10-06-phase-idg-12-demo-adversary-2",
+  "date": "2026-10-06",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "7eca001fc8ed2d3ed2cf1ecbbc904e0d54497246",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "The path argument is not quoted in the documented safe-write command, so a draft path containing a space or an apostrophe breaks the command.",
+      "evidence": ".claude/agents/idea-planner.md:146 (`... \" docs/00-working/promoted/<reserved-code>-<slug>.md`, no quotes around the trailing path). Reproduced with `PLAN-042-my plan's file.md` via bash -c: `bash: -c: line 6: unexpected EOF while looking for matching '''` (rc=2).",
+      "consequence": "Low-risk in practice — ADR-019 and every existing code-prefixed filename use kebab-case slugs with no spaces or quote characters, though nothing in src/governance/ or tools/ enforces that charset — so it is a latent gap, not an active one.",
+      "minimal_fix": "Quote the trailing path argument."
+    }
+  ],
+  "raw_reply_sha256": "093c82f382e00f2939eddefccdcd2e2294b66b96cda0222f726dcd7ef7989c45",
+  "outcomes": [],
+  "notes": "Round 3, a short re-review of one fix under the owner's 2026-10-06 ruling allowing one extra fix cycle for round 2's reopened safe-write finding only. Dispatched and briefed by the Session Manager after the runner finished. Brief: the finding, the owner's ruling and the asked-for fix, the fix delta f493a34 -> 7eca001 as a file path (docs/03-sessions excluded), and the runner manifest _working/review-checks/phase-idg-12/7eca001fc8ed/ (8 entries, passed). Raw reply kept at _working/session-manager/review-replies/phase-idg-12-7eca001-demo-adversary.md, as received with the harness's indentation removed. The reopened finding was confirmed fixed (drafts with \"\"\", backticks, $(...), ${...}, quotes, backslashes, unicode and a 2 MB file all ran; reverting to the old shape made both new tests fail). The reviewer states the minor finding is separate from the one the fix cycle was scoped to and not blocking."
+}
