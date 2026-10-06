@@ -25479,3 +25479,13 @@ PROPOSED LINK: 000595 --relates_to--> 000589 (000595 would remove the built-in-r
 **Links**
 
 - relates_to → `000589`
+
+---
+
+## 000596 · Quote the trailing draft-path argument in the idea planner agent's safe-write command
+
+**Created 2026-10-06T05:29:01-04:00 · Status: `open`**
+
+In .claude/agents/idea-planner.md (generated from agent-workflows/idea-planner-agent.md), the safe-write command's trailing draft-path argument is unquoted, so a path containing a space or apostrophe breaks it. Latent today: promoted-plan filenames are kebab-case, but nothing enforces that.
+
+Source: owner-accepted review finding, phase-idg-12 round 3, 2026-10-06. Relayed by the Session Manager.
