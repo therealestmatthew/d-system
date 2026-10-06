@@ -21221,6 +21221,7 @@ The owner's words, as relayed: "Ideation agent was very confusing in it's wordin
 
 - relates_to → `000417`
 - relates_to → `000418`
+- relates_to ← `000598`
 
 ---
 
@@ -25553,3 +25554,17 @@ Related: 000395 (idea clusters above a threshold go through partition-ideas befo
 PROPOSED LINK: 000598 --relates_to--> 000453 (000598 needs the set-aside and discard dispositions that 000453 names)
 
 </details>
+
+**Links**
+
+- relates_to → `000453`
+
+---
+
+## 000599 · Consider Postgres or another server database in place of the private-root file layout for tags and records
+
+**Created 2026-10-06T08:25:59-04:00 · Status: `open`**
+
+Consider Postgres or another server database for scalability and the future state, in place of the private-root file layout for tags and records.
+
+Owner, 2026-10-06, while ruling that project tags on ideas live under the private data root for now. Sent by Session 1 - Builder A, for the owner.
