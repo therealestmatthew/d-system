@@ -182,5 +182,20 @@ The Session Manager dispatched three rounds of build review:
   created), the 11 earlier hazards, `PLAN`, `REQ` and child-code paths, and a refused non-`PLAN`/`REQ`
   series.
 
-Fix cycles used: seven, all on the same safe-write command after cycle 1. Two is `PROMPT-036`'s
-cap; the owner granted cycles 3 to 7.
+- **Round 7, at `41dbfbb8`.** Gating pass, shadow pass. Records:
+  `docs/08-governance/reviews/verdicts/2026-10-06-phase-idg-12-demo-adversary-6.json` and
+  `docs/08-governance/reviews/verdicts/2026-10-06-phase-idg-12-review-judge-6.json`. The round-6
+  blocker is closed. Gating F01 (major): the single fixed path file was shared, so two concurrent
+  dispatches in one worktree could overwrite each other's path. F02 (minor): Write is scoped in
+  prose only, not at tool level; it is left as is, as for every other agent with Write. Shadow
+  minor: `depends_on` and `documents` are still filled in by hand, which is now stated in the
+  prose. On 2026-10-06 the owner ruled, relayed by the Session Manager, to use per-code path
+  files. Fix cycle 8 (`dd709923`) writes each draft's path to
+  `_working/idea-planner/<reserved-code>.path`. A fixed command globs those files and fullmatches
+  each file name against the code pattern and each file's content against the ADR-019 pattern,
+  whose code must equal the file name's code. It refuses mismatches without opening them and
+  prints one result line per draft, and the planner reads only its own line. The run exits
+  nonzero if any path file is refused.
+
+Fix cycles used: eight, all on the same safe-write command after cycle 1. Two is `PROMPT-036`'s
+cap; the owner granted cycles 3 to 8.
