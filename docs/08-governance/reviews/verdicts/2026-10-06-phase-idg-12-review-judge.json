@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-06-phase-idg-12-review-judge",
+  "date": "2026-10-06",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "9dcbae8ab1dd5564f5cb18dcea8e84b4775b6b10",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [],
+  "raw_reply_sha256": "9ae78e51c5937dafc661489e9b6aad56cbd9c3eb6d32514dae1c132de73df8e0",
+  "outcomes": [],
+  "notes": "Round 2, dispatched and briefed by the Session Manager under GOV-017 'Build reviews', after the runner finished. Brief: the phase's scope, acceptance and deliverables from dev eeab5ee's backlog.yaml, round 1's gating findings with the owner's rulings (fix F01, add the F02 line, fix F03), the full range eeab5ee...9dcbae8 and the fix delta ab24c03..9dcbae8 as file paths (docs/03-sessions and review records excluded), and the runner manifest _working/review-checks/phase-idg-12/9dcbae8ab1dd/ (8 entries, passed). Raw reply kept at _working/session-manager/review-replies/phase-idg-12-9dcbae8-review-judge.md. No checkout (shadow judge). It judged round 1's F03 closed from the diff; the gating reviewer, running the instruction in a checkout, reproduced a failure — a disagreement worth the shadow comparison table."
+}

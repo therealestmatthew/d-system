@@ -1,0 +1,27 @@
+{
+  "verdict_id": "2026-10-06-phase-idg-12-demo-adversary",
+  "date": "2026-10-06",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "9dcbae8ab1dd5564f5cb18dcea8e84b4775b6b10",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "Round 1's F03 is reopened: the added safe-write instruction claims to use the triage agent's adaptation but inlines $(cat file) into a Python triple-quoted string literal inside python -c source code, so file content containing its own \"\"\" sequence breaks out of the string and causes a SyntaxError.",
+      "evidence": ".claude/agents/idea-planner.md:119-141 and agent-workflows/idea-planner-agent.md; contrast agent-workflows/idea-triage-agent.md:106-112, which substitutes $(cat file) into a quoted CLI argument (--text \"$(cat ...)\"). Reproduced with a draft.md containing a fenced code block with \"\"\"A triple-quoted docstring...\"\"\": `uv run python -c \"... check_plan_conformance(\\\"\\\"\\\"$(cat draft.md)\\\"\\\"\\\", depends_on=[], documents={}) ...\"` → SyntaxError: invalid syntax.",
+      "consequence": "The patch adopts the $(cat) syntax but not the safety property, and introduces a new failure mode narrower than the one it closes.",
+      "condition": "Round-1 owner ruling: fix (adopt idea-triage's write-to-file-then-$(cat) rule).",
+      "minimal_fix": "Pass the file path to a small Python script/stdin (python -c \"... = open(sys.argv[1]).read() ...\" path) or read via stdin; never interpolate file bytes into Python source text."
+    }
+  ],
+  "raw_reply_sha256": "0072011aefe2f9addaf15c62ad0d223cf1ff7aa732953f65015cb5b9b40fc7ac",
+  "outcomes": [],
+  "notes": "Round 2, dispatched and briefed by the Session Manager under GOV-017 'Build reviews', after the runner finished. Brief: the phase's scope, acceptance and deliverables from dev eeab5ee's backlog.yaml, round 1's gating findings with the owner's rulings (fix F01, add the F02 line, fix F03), the full range eeab5ee...9dcbae8 and the fix delta ab24c03..9dcbae8 as file paths (docs/03-sessions and review records excluded), and the runner manifest _working/review-checks/phase-idg-12/9dcbae8ab1dd/ (8 entries, passed). Raw reply kept at _working/session-manager/review-replies/phase-idg-12-9dcbae8-demo-adversary.md, as received with the harness's indentation removed. The reviewer verified round 1's F01 and F02 closed (not recorded as findings) and reopened F03 as MAJOR, recorded here as this record's F01. Fix cycles: this was the phase's second and last under PROMPT-036's cap, so the finding goes to the owner."
+}
