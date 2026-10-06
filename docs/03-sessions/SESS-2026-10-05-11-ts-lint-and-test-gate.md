@@ -29,7 +29,8 @@ Worked in `/code/d-system-worktrees/phase-sch-03` on `agent/phase-sch-03`.
 - `ts/eslint.config.js`: the ruleset Vite's React + TypeScript template ships (`@eslint/js`
   recommended, `typescript-eslint` recommended, `eslint-plugin-react-hooks` recommended,
   `eslint-plugin-react-refresh` vite), unchanged. `ts/package.json`: `"lint"` runs `eslint .`, the
-  old `"lint": "tsc --noEmit"` is now `"typecheck"`, and `"test"` stays `vitest run`. The eslint
+  old `"lint": "tsc --noEmit"` is now `"typecheck"`, and `"test"` stays `vitest run`. After review
+  round 1, `"lint"` is `eslint . --max-warnings 0`, so a warning fails it too. The eslint
   devDependencies are added to `package.json` and `package-lock.json`.
 - `.github/workflows/ci.yaml`: the frontend job runs `npm run lint` and `npm test` after
   `npm run build`. Either failure fails the job.
@@ -49,8 +50,10 @@ Worked in `/code/d-system-worktrees/phase-sch-03` on `agent/phase-sch-03`.
 ## Lint baseline: 29 found, 29 fixed
 
 The first `npx eslint .` on the unchanged tree reported **29 problems (25 errors, 4 warnings)**. All
-29 are fixed. No rule was disabled, trimmed or suppressed, and the one existing suppression that no
-longer suppressed anything was removed.
+29 are fixed. Five older `eslint-disable-next-line react-hooks/exhaustive-deps` lines hid five more
+findings that the first count missed (review round 1, F02). Those five are fixed too, so the tree
+had **34 findings, and 34 are fixed**. No rule is disabled or trimmed, and no `eslint-disable`
+remains under `ts/src/`.
 
 | Rule | Count | Files | Fix |
 |---|---|---|---|
@@ -60,10 +63,60 @@ longer suppressed anything was removed.
 | `react-refresh/only-export-components` | 2 | HtmlViewerRegion, StagePage | `COMPATIBLE_EXTENSIONS` moves to `stage/compatibleExtensions.ts`, and `guardedPanel` to `stage/guardedPanel.tsx`. The importers and `wiring.test.tsx` follow. |
 | `react-hooks/exhaustive-deps` (warning) | 3 | HtmlViewerRegion, Popover, StagePage | HtmlViewer's search text is derived from the active tab, so the sync effect is gone. Popover's `reposition` is a `useCallback` on `[width]` and is listed as a dependency. StagePage's layout effect has a dependency list, `hostSlotByPanelId` is memoized, and `useWorkbenchLayouts`' `getSlotPanel` is a `useCallback`. |
 | unused `eslint-disable` (warning) | 1 | HtmlViewerRegion | Removed. |
+| `react-hooks/exhaustive-deps`, hidden by a disable (round 1) | 5 | HtmlViewerRegion (2), Popover, TerminalRegion (2) | HtmlViewer's files and page effects depend on the request keys and the active directory and selected file. Popover reads `onOpenChange` through a latest-value ref, so its effect still fires only when `open` changes. TerminalSession captures its shell once in state and lists it as a dependency, so the mount effect still runs once. `sendToActiveSession` is a `useCallback` on the active session id, and the bridge effect lists it. |
 
 **Owner ruling, 2026-10-05 (in this session, through AskUserQuestion):** for the last finding, the
 stage page's panel-host layout effect, which moves DOM nodes and must re-render once a host is
 attached, the owner chose "External store (Recommended)" over a one-line `eslint-disable`.
+
+## Review round 1
+
+The Session Manager ran the review on `11b58ac`. The verdict records are committed unchanged in
+`7f3e4cd`:
+
+- `docs/08-governance/reviews/verdicts/2026-10-05-phase-sch-03-demo-adversary.json`, gating: pass
+  as the reviewer wrote it, with a blocker.
+- `docs/08-governance/reviews/verdicts/2026-10-05-phase-sch-03-demo-adversary-2.json`, gating
+  security review (the owner-approved stand-in for `/security-review`): pass, no findings.
+- `docs/08-governance/reviews/verdicts/2026-10-05-phase-sch-03-review-judge.json`, shadow: reject.
+  The shadow verdict decides nothing.
+
+Gating findings:
+
+- **F01 (blocker), fixed in `efd72c0`.** REQ-020 R06 failed for the react-hooks rules that the flat
+  recommended config sets to warn, because `npm run lint` did not fail on warnings. **Owner ruling,
+  2026-10-05, in this session:** use `--max-warnings 0` rather than raising those rules to error in
+  the config.
+- **F02 (major), fixed in `efd72c0`.** Five older `exhaustive-deps` disables remained and were not
+  counted in the baseline. **Owner ruling, 2026-10-05, in this session:** fix all five rather than
+  accept them.
+
+Shadow findings, which decide nothing: F01, that OPS-029 was not regenerated, is contradicted by
+`tools/generate_tool_docs.py --check` ("28 tool document(s) current"). F02, that there is no npm
+evidence, is because dev's runner does not yet have this branch's `npm ci` setup step. The Session
+Manager ran `npm ci`, build, lint and test at `11b58ac`: build exit 0, lint clean, vitest 7/7.
+
+After the fixes:
+
+```
+> eslint . --max-warnings 0
+lint exit 0
+      Tests  7 passed (7)
+```
+
+A warning-only violation now fails lint: a `useEffect` that leaves out a prop it reads.
+
+```
+  6:6  warning  React Hook useEffect has a missing dependency: 'value'. ...  react-hooks/exhaustive-deps
+✖ 1 problem (0 errors, 1 warning)
+ESLint found too many warnings (maximum: 0).
+lint exit 1
+```
+
+The file was deleted afterwards, and lint then exited 0. The headless-Chrome check ran again with
+the same setup. It opened a second terminal session, switched the explorer slot to Idea Explorer
+and then Backlog Explorer, and picked a Skills entry. `/checkpoint` appeared at the shell prompt
+without running. Every run reported `exceptions: []`, `consoleErrors: []` and `failed: []`.
 
 ## Verification
 
@@ -159,8 +212,8 @@ The servers and browser were stopped afterwards, and no process was left in the 
 
 ## Acceptance
 
-- REQ-020 R06: a lint violation fails `npm run lint` and names the rule and location (self-check
-  above), and CI runs `npm run lint` as its own step. The clean tree passes.
+- REQ-020 R06: a lint violation, an error or a warning, fails `npm run lint` and names the rule and
+  location (the self-checks above), and CI runs `npm run lint` as its own step. The clean tree passes.
 - REQ-020 R07: a deliberately failing test fails `npm test` (self-check above), and CI runs it as
   its own step.
 - The build step is unchanged and passes.
