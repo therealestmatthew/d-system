@@ -266,6 +266,17 @@ def test_the_default_worktree_parent_is_beside_the_primary_checkout(tmp_path: Pa
     assert rrc.default_worktree_parent(linked) == expected  # not nested under the linked checkout
 
 
+def test_the_merge_gate_runs_the_frontend_tests_after_installing_their_dependencies() -> None:
+    """Idea 000582: the gate runs ts/'s unit tests, and the setup installs what they need first."""
+    entries = rrc.plan([], rrc.GATE_CHECKS, rrc.SETUP)
+    commands = [entry.command for entry in entries]
+
+    assert "cd ts && npm test" in rrc.GATE_CHECKS
+    assert commands.index("cd ts && npm ci") < commands.index("cd ts && npm test")
+    frontend = entries[commands.index("cd ts && npm test")]
+    assert (frontend.kind, frontend.note) == ("gate", None)  # a command, so it runs
+
+
 @pytest.mark.parametrize("entry, expected", [
     ("uv run pytest", True),
     ("cd ts && npm run build", True),

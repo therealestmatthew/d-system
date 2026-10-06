@@ -194,7 +194,7 @@ reads the builder's account judges the account instead of the work (owner ruling
 
 1. runs `uv run python tools/run_review_checks.py <phase-id> <tip>`
    ([OPS-029](OPS-029-run-review-checks.md)), which runs the phase's `verification` list and the
-   four gate checks at the tip in a detached worktree and writes the manifest;
+   five gate checks at the tip in a detached worktree and writes the manifest;
 2. dispatches the **gating reviewer** — a dedicated reviewer type, `demo-adversary` or
    `demo-validator-code`, never a `general-purpose` agent — and, during shadow, the **shadow
    judge**, `review-judge`. Both get the same brief, except that only the gating reviewer gets the
@@ -259,9 +259,9 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
    records come from the review in *Build reviews*: the runner, then the gating reviewer and, during
    shadow, the shadow judge `review-judge`, on the same brief. For a phase that triggers the
    security review, `READY` also names its `/security-review` verdict record. It also sends the
-   tail of its post-rebase runs of the four gate checks:
-   `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/ tools/` and
-   `uv run mypy src/`. `dev`'s baseline is 0 ruff findings and 0 mypy errors, so each check must report
+   tail of its post-rebase runs of the five gate checks:
+   `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/ tools/`,
+   `uv run mypy src/` and `cd ts && npm test`. `dev`'s baseline is 0 ruff findings and 0 mypy errors, so each check must report
    zero findings; matching the previous count is not enough.
 
    `READY` also carries the output of two branch checks run after the rebase (`REQ-028` R07, R08,
@@ -283,10 +283,10 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
    the phase's declared paths (`phase-dgov-06`, `REQ-015` R12-R13). That report never blocks.
 2. The Session Manager re-runs the checks on the branch tip with the review runner,
    `uv run python tools/run_review_checks.py <phase-id> <tip>`. Its manifest is this step's re-run:
-   it runs the phase's `verification` list and the four gate checks in a detached worktree it
+   it runs the phase's `verification` list and the five gate checks in a detached worktree it
    removes afterwards, so it touches neither the primary checkout nor the session's worktree
    (`PLAN-047` D2). A branch with no phase has nothing for the runner to read, so for unclaimed work
-   the Session Manager re-runs the four gate checks in a detached temporary worktree
+   the Session Manager re-runs the five gate checks in a detached temporary worktree
    (`git worktree add --detach ../d-system-worktrees/verify-<slug> <branch>`, removed afterwards).
 
    In the same step it checks the verdict records against the commit itself, so no checkout is
@@ -303,7 +303,7 @@ A branch reaches `dev` only with the owner's approval, as `AGENTS.md` requires. 
    Each must pass, with its findings fixed or explicitly accepted. The shadow judge's verdict
    decides nothing.
 4. On the owner's yes, it sends `GRANTED merge` and gives the session the lock. If `dev` has moved
-   since step 2, the session rebases and re-runs the four gate checks while holding the lock, and
+   since step 2, the session rebases and re-runs the five gate checks while holding the lock, and
    reports the new tip; the Session Manager re-runs step 2 on that tip before the session
    fast-forwards. Nothing else can land on `dev` while the session holds the lock.
 5. Before the fast-forward, the session runs
@@ -325,6 +325,10 @@ approval, as a standing rule for every session.
 **Owner ruling, 2026-09-23:** the gate checks include `ruff` and `mypy` alongside `governance` and
 `pytest` (steps 1, 2 and 4), and the dirty-integration check runs before every fast-forward
 (step 5). Both are recorded in `GOV-003`.
+
+**Owner approval, 2026-10-05 (relayed by the Session Manager):** the gate checks also include the
+frontend unit tests, `cd ts && npm test` (steps 1, 2 and 4; idea `000582`, `phase-sch-03`). The
+review runner installs them with `cd ts && npm ci` before it runs them.
 
 **Owner ruling, 2026-10-04:** the session produces both JUnit reports for the test baseline (step
 1): the base on `dev`'s tip in a temporary shared clone and the branch after the rebase. It

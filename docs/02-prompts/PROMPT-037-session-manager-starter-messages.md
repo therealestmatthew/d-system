@@ -105,8 +105,8 @@ Roster
    VERDICT with the verdict records and their sha256; commit them unchanged on your branch.
    Then send READY <branch> with (a) the verdict record paths, every finding fixed or
    explicitly accepted, and (b) the tail of the post-rebase `uv run python -m src.governance`,
-   `uv run pytest`, `uv run ruff check src/ test/ tools/` and `uv run mypy src/` runs (dev's
-   baseline is 0 ruff findings, 0 mypy errors; the gate is clean), and (c) the output of
+   `uv run pytest`, `uv run ruff check src/ test/ tools/`, `uv run mypy src/` and
+   `cd ts && npm test` runs (dev's baseline is 0 ruff findings, 0 mypy errors; the gate is clean), and (c) the output of
    `uv run python tools/check_test_baseline.py <base.xml> <branch.xml>` (you produce both
    reports: base from `pytest --junitxml` on dev's tip in a temporary git clone --shared,
    deleted after, branch from the rebased branch; OPS-031) and of
@@ -118,7 +118,7 @@ Roster
    merge; I relay, and a GRANTED merge from me is the owner's approval. At the gate I re-run
    your phase with tools/run_review_checks.py and check each verdict record's sha256 against
    the value I recorded; a changed or missing record refuses the branch. Merge only after
-   GRANTED merge. Inside that turn: (i) if dev moved, rebase, re-run all four, report the new
+   GRANTED merge. Inside that turn: (i) if dev moved, rebase, re-run all five, report the new
    tip and wait for my go; (ii) in every case, run
    `uv run python tools/git-hooks/refuse_dirty_integration.py` in the primary checkout and
    continue only if it exits 0 (AGENTS.md step 9); (iii) ff-merge, make the completion edit on
@@ -161,7 +161,7 @@ Changes to how PROMPT-036 runs:
 - The batch table's status commit (open or close) goes through TURN? batch <batch-id>.
 - Its step 6 adversarial review goes through REVIEW-REQUEST to me (contract item 4): I dispatch
   the reviewers and send VERDICT. Do not dispatch the adversary template yourself.
-- Its post-rebase run and merge follow contract item 4: all four gate checks, and the
+- Its post-rebase run and merge follow contract item 4: all five gate checks, and the
   dirty-integration check before the ff-merge.
 
 In your ACK include: your agent id, the phase you hold, its worktree, and the step you are on.

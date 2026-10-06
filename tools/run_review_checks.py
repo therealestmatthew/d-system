@@ -8,10 +8,11 @@ else:
 
 It reads the phase's `verification` list from `dev`'s `docs/09-backlog/backlog.yaml` (never from
 the commit under review, so a branch cannot weaken its own list), creates a detached temporary
-worktree at the commit, installs the environment there with `uv sync --extra dev`, and runs:
+worktree at the commit, installs the environment there with `uv sync --extra dev` and, for the
+frontend tests, `npm ci` in `ts/`, and runs:
 
 - each `verification` entry that is a command, in the order the backlog lists it;
-- then each of the four GOV-017 gate checks that the list does not already contain.
+- then each of the five GOV-017 gate checks that the list does not already contain.
 
 An entry is a command when its first word, after any `NAME=value` assignments, is `cd` or a
 program found on PATH. Any other entry is prose and is listed as not run. Commands run through
@@ -65,8 +66,9 @@ GATE_CHECKS = (
     "uv run pytest",
     "uv run ruff check src/ test/ tools/",
     "uv run mypy src/",
+    "cd ts && npm test",
 )
-SETUP = ("uv sync --extra dev",)
+SETUP = ("uv sync --extra dev", "cd ts && npm ci")
 TIMEOUT_SECONDS = 30 * 60
 TIMEOUT_EXIT = 124
 

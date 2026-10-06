@@ -37,11 +37,11 @@ It never runs anything in the checkout it is started from, only in its own tempo
    the commit under review. A branch that edits its own `verification` list cannot weaken the run.
    The manifest records which `dev` commit the list came from.
 2. It creates a detached worktree at the commit, under `../d-system-worktrees/review-<phase-id>-…`.
-3. It runs `uv sync --extra dev` there, listed as a `setup` entry.
+3. It runs `uv sync --extra dev` and `cd ts && npm ci` there, each listed as a `setup` entry.
 4. It runs each `verification` entry that is a command, in backlog order.
-5. It runs each of the four `GOV-017` gate checks that the list does not already contain:
-   `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/ tools/` and
-   `uv run mypy src/`. A gate check the list also names runs once, with kind `verification+gate`.
+5. It runs each of the five `GOV-017` gate checks that the list does not already contain:
+   `uv run python -m src.governance`, `uv run pytest`, `uv run ruff check src/ test/ tools/`,
+   `uv run mypy src/` and `cd ts && npm test`. A gate check the list also names runs once, with kind `verification+gate`.
 6. It removes the worktree, whether the run passed, failed or was interrupted.
 
 **An entry is a command** when its first word, after any `NAME=value` assignments, is `cd` or a
@@ -113,10 +113,11 @@ else:
 
 It reads the phase's `verification` list from `dev`'s `docs/09-backlog/backlog.yaml` (never from
 the commit under review, so a branch cannot weaken its own list), creates a detached temporary
-worktree at the commit, installs the environment there with `uv sync --extra dev`, and runs:
+worktree at the commit, installs the environment there with `uv sync --extra dev` and, for the
+frontend tests, `npm ci` in `ts/`, and runs:
 
 - each `verification` entry that is a command, in the order the backlog lists it;
-- then each of the four GOV-017 gate checks that the list does not already contain.
+- then each of the five GOV-017 gate checks that the list does not already contain.
 
 An entry is a command when its first word, after any `NAME=value` assignments, is `cd` or a
 program found on PATH. Any other entry is prose and is listed as not run. Commands run through
