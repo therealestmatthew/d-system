@@ -1,0 +1,40 @@
+{
+  "verdict_id": "2026-10-05-phase-idg-12-demo-adversary",
+  "date": "2026-10-05",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "7028efd451f64c604382c0748bef33b37eee9e58",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "Step 7 tells the agent to call check_plan_conformance()/check_requirement_conformance() but never says to pass depends_on/documents, the two kwargs that make the GOV-010 \"Requirement coverage\" condition fire.",
+      "evidence": ".claude/agents/idea-planner.md:84-87 (source agent-workflows/idea-planner-agent.md:68-71). Repro: check_plan_conformance(draft_missing_Requirement_coverage_heading) called with no kwargs → conformant=True, missing=() even though the draft is paired and GOV-010 requires that heading unconditionally when paired.",
+      "consequence": "An agent instance following the instructions literally (no-arg call) will self-certify a non-conformant paired draft as conformant — the exact failure REQ-014 R20 exists to catch, defeated at the one call site that actually exercises it in production use."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "GOV-014's Planner \"Outputs\" line is left unconditional (correctly, per scope), but GOV-014 states it is the authority and the agent definition is updated to match it, and nothing in GOV-014 flags the planner's conditional pairing as a sanctioned, temporary exception.",
+      "evidence": "docs/08-governance/GOV-014-realization-role-contracts.md:110-111 (\"Outputs: a requirement and plan document pair per track\") and :26-27 (\"this document is the authority and the agent definition is updated to match it, not the reverse\").",
+      "consequence": "A future reader/adversary applying GOV-014's own stated authority literally would be justified in \"fixing\" idea-planner.md back to unconditional pairing, reverting this phase's owner-approved behavior.",
+      "minimal_fix": "One line in GOV-014's Planner section noting the pairing exception is deliberate pending the owner's separate GOV-014/ARCH-006 amendment."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "idea-planner.md has tools Read, Grep, Bash (no Write/Edit), and \"How you write the draft\" gives no mechanism for safely producing a long Markdown file (tables, code fences, backticks) via Bash.",
+      "evidence": "Contrast idea-triage.md:103-123, which for a one-line finding explicitly mandates write-to-file-then-$(cat ...) to avoid shell-interpolation corruption.",
+      "consequence": "The planner's output is far larger and more injection-prone and has no equivalent safeguard."
+    }
+  ],
+  "raw_reply_sha256": "788914006d8313a2af0f216bfa8e886f1a78c51415064a22c58b58611f929fa7",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews', after the runner finished. Brief: scope, acceptance and verification from dev eeab5ee's backlog.yaml (the owner-approved claim-time edits), the owner's batch-004 round-2 rulings, the range eeab5ee...7028efd (diff as a file path, docs/03-sessions excluded), and the runner manifest _working/review-checks/phase-idg-12/7028efd451f6/ (8 entries, passed, including the npm ci setup and npm test gate). The recorded R19 live run is in the session record and was excluded from the brief; reviewers judged the agent definition, and the SM checks the run. agent-workflows/ is outside the declared deliverables; the owner's ruling for it is in batch-004's decisions (2026-10-05). /security-review not triggered. Raw reply kept at _working/session-manager/review-replies/phase-idg-12-7028efd-demo-adversary.md, as received with the harness's indentation removed. Gating build review; the scratch clone at 7028efd was its checkout. Its \"Holds\" paragraph (checks that held) is not recorded as findings."
+}

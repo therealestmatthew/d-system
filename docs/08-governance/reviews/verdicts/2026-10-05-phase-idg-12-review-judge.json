@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-05-phase-idg-12-review-judge",
+  "date": "2026-10-05",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "7028efd451f64c604382c0748bef33b37eee9e58",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "The backlog's own phase text says \"Build the REQ-022 R20 conformance check\" in scope while acceptance says \"REQ-014 R20\".",
+      "evidence": "Pre-existing wording in docs/09-backlog/backlog.yaml:10882 and :10888, not introduced by this diff.",
+      "consequence": "Not attributable to the build."
+    }
+  ],
+  "raw_reply_sha256": "b21f3cfc1b88e25aac9a0398b5c6c9fdc6c1989509b4993c8e79331961149078",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager under GOV-017 'Build reviews', after the runner finished. Brief: scope, acceptance and verification from dev eeab5ee's backlog.yaml (the owner-approved claim-time edits), the owner's batch-004 round-2 rulings, the range eeab5ee...7028efd (diff as a file path, docs/03-sessions excluded), and the runner manifest _working/review-checks/phase-idg-12/7028efd451f6/ (8 entries, passed, including the npm ci setup and npm test gate). The recorded R19 live run is in the session record and was excluded from the brief; reviewers judged the agent definition, and the SM checks the run. agent-workflows/ is outside the declared deliverables; the owner's ruling for it is in batch-004's decisions (2026-10-05). /security-review not triggered. Raw reply kept at _working/session-manager/review-replies/phase-idg-12-7028efd-review-judge.md. No checkout (shadow judge)."
+}
