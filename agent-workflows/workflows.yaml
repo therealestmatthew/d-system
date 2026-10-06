@@ -213,6 +213,33 @@ workflows:
       unsupported_limits:
       - Claude's 30-turn maxTurns cap has no Codex equivalent; Codex enforces no per-agent turn
         or token budget, so this role runs unbounded unless the host session itself is capped.
+- id: idea-planner-agent
+  name: idea-planner
+  description: >-
+    Drafts a governed plan - and, only when phase-dgov-01's rule says one is mandatory, the paired
+    requirement - from one accepted partition track: its member ideas, its new-plan-vs-amendment
+    ruling, and triage's prior findings and links. Never allocates a document code, never marks an
+    idea promoted. Invoked once per accepted track.
+  authority: agent-invocable
+  source: agent-workflows/idea-planner-agent.md
+  requires:
+  - read_files
+  - search_files
+  - run_commands
+  targets:
+  - host: claude
+    kind: agent
+    path: .claude/agents/idea-planner.md
+    capabilities:
+      read_files: Read
+      search_files: Grep
+      run_commands: Bash
+    unsupported: []
+    render:
+      tools: "Read, Grep, Bash"
+      model: haiku
+      effort: medium
+      max_turns: 30
 - id: partition-ideas
   name: partition-ideas
   description: >-
