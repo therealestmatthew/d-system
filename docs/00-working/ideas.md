@@ -25447,3 +25447,13 @@ Governing documents: REQ-007 W09 (workbench File Browser); PLAN-027 (workbench f
 PROPOSED LINK: 000594 --relates_to--> 000569 (000569 is error/loading status across the stage panels; 000594 is one concrete render-order defect in that area)
 
 </details>
+
+---
+
+## 000595 · Create a dedicated security-review agent type that takes a commit range and a checkout path
+
+**Created 2026-10-05T21:22:24-04:00 · Status: `open`**
+
+GOV-017's diff-time security review currently depends on the built-in /security-review, which needs origin/HEAD and reviews only the session's own working directory, so it failed on phase-sch-03. A dedicated agent type taking a commit range and a checkout path removes that dependency. It would also give the verdict record a real definition_sha256 (relates to 000589).
+
+Owner's ask, 2026-10-05, relayed by the Session Manager.
