@@ -1,15 +1,21 @@
-"""F03 (reopened): the planner's safe-write rule must survive a draft containing `\"\"\"`.
+"""The planner's safe-write rule must survive both hazardous draft content and a hazardous path.
 
 The documented command shape in `agent-workflows/idea-planner-agent.md` (and its generated
-`.claude/agents/idea-planner.md`) must pass the draft's file path to Python and have Python read
-the file itself, never substitute the draft's bytes into a Python string literal via `$(cat
-<path>)` — a draft containing `\"\"\"` would end a triple-quoted literal early and raise a
-SyntaxError under that shape, which is exactly what the round-2 review reproduced against the
-pre-fix command.
+`.claude/agents/idea-planner.md`) must never let the draft's path or bytes pass through shell
+parsing or appear as Python source text:
 
-This test extracts the exact command from the generated agent file (not a hand-written
-equivalent) and runs it, via the shell, against a real temporary draft containing `\"\"\"`, so a
-regression back to string-literal interpolation fails this test the same way it failed review.
+- round 2: substituting the draft's bytes into a Python string literal via `$(cat <path>)` broke
+  on a draft containing `\"\"\"` (ends a triple-quoted literal early).
+- round 3: an unquoted, then double-quoted, trailing path argument broke on a path containing a
+  space, an apostrophe, a double quote, a `$`-prefixed token or a backtick - double quotes still
+  let the shell expand `$...`/backticks inside them, and break outright on an embedded `"`.
+- round 4 (current): the fix passes the path on stdin through a heredoc with a quoted delimiter
+  (`<<'EOF'`), which expands nothing, and has Python read it from `sys.stdin` - no path text and
+  no draft bytes ever appear on the command line or inside the Python source.
+
+Every test here extracts the exact command from the generated agent file (not a hand-written
+equivalent) and runs it via the shell, so a regression back to any earlier shape fails the same
+way it failed review.
 """
 
 from __future__ import annotations
@@ -24,6 +30,20 @@ AGENT_FILE = ROOT / ".claude" / "agents" / "idea-planner.md"
 _FENCE_RE = re.compile(r"```bash\n(.*?)\n```", re.DOTALL)
 _PLACEHOLDER = "docs/00-working/promoted/<reserved-code>-<slug>.md"
 
+_SECTIONS = (
+    "## Context and scope\n\nFixture body.\n",
+    "## Decisions\n",
+    "## Implementation phases\n",
+    "## Acceptance and verification\n",
+    "## Out of scope\n",
+    "## Open questions\n",
+)
+
+
+def _draft(omit: str | None = None) -> str:
+    """A fixture draft, optionally missing one named GOV-010 section heading."""
+    return "# Fixture draft\n\n" + "".join(s for s in _SECTIONS if omit is None or omit not in s)
+
 
 def _extract_safe_write_command() -> str:
     """The last `bash` fenced block in the generated agent file — the safe-write example."""
@@ -31,88 +51,72 @@ def _extract_safe_write_command() -> str:
     blocks = _FENCE_RE.findall(text)
     assert blocks, "no fenced bash block found in the generated planner agent file"
     command = blocks[-1]
-    assert "sys.argv[1]" in command, (
-        "expected the safe-write example (reads sys.argv[1]); found something else - "
+    assert "sys.stdin" in command, (
+        "expected the safe-write example (reads the path from sys.stdin); found something else - "
         f"got:\n{command}"
     )
     assert _PLACEHOLDER in command, "expected the draft-path placeholder in the example command"
     return command
 
 
-def test_documented_command_reads_path_not_string_literal() -> None:
-    """The example never substitutes `$(cat ...)` into Python source, only passes a path."""
+def _run_for_path(path: Path) -> subprocess.CompletedProcess[str]:
+    """Fill in `path` on the heredoc's own line and substitute the real pairing inputs, then run."""
+    command = _extract_safe_write_command()
+    command = command.replace("depends_on=[...], documents={...}", "depends_on=[], documents={}")
+    command = command.replace(_PLACEHOLDER, str(path))
+    return subprocess.run(["bash", "-c", command], cwd=ROOT, capture_output=True, text=True)
+
+
+def test_documented_command_reads_the_path_from_stdin_not_the_command_line_or_source() -> None:
+    """Round 4: no path text and no `$(cat ...)` byte-substitution anywhere in the example."""
     command = _extract_safe_write_command()
     assert "$(cat" not in command
-    assert "open(sys.argv[1])" in command
-
-
-def test_documented_command_quotes_the_trailing_path_argument() -> None:
-    """Round-3 (minor): the trailing draft-path argument is double-quoted in the example, not
-    bare and not single-quoted - single quotes would break on a slug containing an apostrophe.
-    """
-    command = _extract_safe_write_command()
-    assert f'"{_PLACEHOLDER}"' in command
+    assert "sys.argv" not in command
+    assert "sys.stdin.read()" in command
+    # The path appears exactly once: on its own line inside the quoted heredoc, nowhere else.
+    assert command.count(_PLACEHOLDER) == 1
+    assert "<<'EOF'" in command, "the heredoc delimiter must be quoted so nothing is expanded"
 
 
 def test_documented_command_handles_a_draft_containing_triple_quotes(tmp_path: Path) -> None:
-    """Run the literal extracted command against a draft containing `\"\"\"` and confirm it
-    does not raise a SyntaxError - the exact failure the round-2 review reproduced against the
-    pre-fix `$(cat <path>)`-into-a-triple-quoted-literal shape.
-    """
+    """Round 2's regression case: a draft containing `\"\"\"` must not raise a SyntaxError."""
     draft = tmp_path / "fixture-draft.md"
-    draft.write_text(
-        '# Fixture draft\n\n## Context and scope\n\nContains a literal """ sequence '
-        "that would end a Python triple-quoted string early if inlined as source.\n"
-        "## Decisions\n## Implementation phases\n## Acceptance and verification\n"
-        "## Out of scope\n## Open questions\n"
-    )
+    draft.write_text(_draft().replace("Fixture body.", 'Contains a literal """ sequence.'))
 
-    command = _extract_safe_write_command()
-    # The documented `depends_on=[...], documents={...}` is prose shorthand for "decide the real
-    # pairing inputs" (F01); substitute concrete fixture values, and the draft's real path, to
-    # make the example runnable - nothing about the safe-write shape itself changes. The extracted
-    # block is already a complete, runnable shell command (`uv run python -c "..." <path>`).
-    command = command.replace("depends_on=[...], documents={...}", "depends_on=[], documents={}")
-    command = command.replace(_PLACEHOLDER, str(draft))
-
-    result = subprocess.run(
-        ["bash", "-c", command],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    )
+    result = _run_for_path(draft)
 
     assert "SyntaxError" not in result.stderr, result.stderr
     assert result.returncode == 0, result.stderr
     assert "conformant" in result.stdout.lower()
 
 
-def test_documented_command_handles_a_path_with_a_space_and_an_apostrophe(tmp_path: Path) -> None:
-    """Round-3 (minor): the trailing path argument must be quoted - a reserved code's slug can
-    carry a space and an apostrophe, and only double quotes survive both. This drops the draft
-    under a directory literally named "it's a dir" and confirms the extracted command still
-    succeeds.
+def test_documented_command_reads_the_exact_file_for_a_combined_hazardous_path(
+    tmp_path: Path,
+) -> None:
+    """Round 3/4's regression case, combined: a path containing `"`, `$HOME`-style text, a
+    backtick, an apostrophe and a space, under a quoted heredoc the shell never expands.
+
+    Two distinct drafts are written at two distinct hazardous paths, each missing a *different*
+    GOV-010 section. The command is run once per path, and each result must name that path's own
+    missing section and only that one - proving the exact file named by that path was read, not a
+    cached, wrong, or partially-expanded one.
     """
-    odd_dir = tmp_path / "it's a dir"
-    odd_dir.mkdir()
-    draft = odd_dir / "fixture draft.md"
-    draft.write_text(
-        "# Fixture draft\n\n## Context and scope\n\nOrdinary content; the path is the hazard "
-        "here, not the draft's body.\n"
-        "## Decisions\n## Implementation phases\n## Acceptance and verification\n"
-        "## Out of scope\n## Open questions\n"
-    )
+    hazard_a = tmp_path / 'it\'s "weird" $HOME `touch pwned` dir one'
+    hazard_a.mkdir()
+    draft_a = hazard_a / "draft one.md"
+    draft_a.write_text(_draft(omit="Open questions"))
 
-    command = _extract_safe_write_command()
-    command = command.replace("depends_on=[...], documents={...}", "depends_on=[], documents={}")
-    command = command.replace(_PLACEHOLDER, str(draft))
+    hazard_b = tmp_path / 'another `$(rm -rf)` "dir" with spaces'
+    hazard_b.mkdir()
+    draft_b = hazard_b / "draft two.md"
+    draft_b.write_text(_draft(omit="Decisions"))
 
-    result = subprocess.run(
-        ["bash", "-c", command],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    )
+    result_a = _run_for_path(draft_a)
+    assert result_a.returncode == 0, result_a.stderr
+    assert "missing=('Open questions" in result_a.stdout
+    assert "missing=('Design" not in result_a.stdout
 
-    assert result.returncode == 0, result.stderr
-    assert "conformant" in result.stdout.lower()
+    result_b = _run_for_path(draft_b)
+    assert result_b.returncode == 0, result_b.stderr
+    assert "missing=('Design" in result_b.stdout
+    assert "missing=('Open questions" not in result_b.stdout

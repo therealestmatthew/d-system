@@ -124,19 +124,31 @@ substitute the draft's bytes into a Python string literal via `$(cat <path>)` �
 `$(cat <path>)` use does not carry, since there the substitution lands inside a quoted CLI
 argument, not inside Python source the shell re-parses as code. Write the draft to its destination
 file with your file-write tool first. If a later command in the same dispatch needs the draft's
-bytes — the section check run from the command line rather than in-process, say — pass the file's
-**path** as an argument and have Python read the file itself, so no draft content ever passes
-through shell substitution into source code:
+bytes — the section check run from the command line rather than in-process, say — have Python read
+the file itself, so no draft content ever passes through shell substitution into source code.
+
+**The path itself is also hazardous text, not a safe shell argument.** A reserved code's slug can
+carry a space, an apostrophe, a double quote, a `$`-prefixed token, or a backtick. No quoting style
+on a command-line argument survives all of those at once: double quotes still let the shell expand
+`$...` and `` `...` `` inside them, and break outright on an embedded `"`. So the path never appears
+on the command line or inside the Python source at all — pass it on **stdin**, through a heredoc
+whose delimiter is quoted (`<<'EOF'`, not `<<EOF`), which is the one shell construct that expands
+nothing inside it, and have Python read it from `sys.stdin`:
 
 ```bash
 uv run python -c "
 import sys
 from src.governance.plan_quality import check_plan_conformance
-text = open(sys.argv[1]).read()
+path = sys.stdin.read().rstrip('\n')
+text = open(path).read()
 print(check_plan_conformance(text, depends_on=[...], documents={...}))
-" "docs/00-working/promoted/<reserved-code>-<slug>.md"
+" <<'EOF'
+docs/00-working/promoted/<reserved-code>-<slug>.md
+EOF
 ```
 
-Keep the double quotes around the trailing path argument when you fill in the real path — a
-reserved code's slug can carry a space or an apostrophe, and double quotes are the one quoting
-style that survives both; single quotes break on an apostrophe.
+Fill in the real path only on the line between `<<'EOF'` and the closing `EOF`, typed literally —
+never quoted, never escaped, and never substituted via `$(...)` or backticks, since the quoted
+heredoc already protects it from the shell. Strip only the trailing newline the heredoc adds
+(`.rstrip('\n')`); do not use a broader strip that could remove a path's own meaningful leading or
+trailing character.
