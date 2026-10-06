@@ -164,5 +164,23 @@ The Session Manager dispatched three rounds of build review:
   the planner legitimately builds can contain that line, and
   `test_delimiter_cannot_be_produced_by_any_legitimate_slug_or_code` covers that.
 
-Fix cycles used: six, all on the same safe-write command after cycle 1. Two is `PROMPT-036`'s
-cap; the owner granted cycles 3 to 6.
+- **Round 6, at `d09dc52b`.** Gating **reject**, shadow pass with a major. Records:
+  `docs/08-governance/reviews/verdicts/2026-10-06-phase-idg-12-demo-adversary-5.json` and
+  `docs/08-governance/reviews/verdicts/2026-10-06-phase-idg-12-review-judge-5.json`. The blocker,
+  reproduced live: the fixed delimiter is public in the agent text, so a path payload containing
+  that line plus a `touch` command ran the command, and Python's check never ran. This is the
+  limit recorded under round 5. The Session Manager also noted that the planner was told to use a
+  file-write tool it did not have. On 2026-10-06 the owner ruled, relayed by the Session Manager,
+  to give the planner the Write tool. Fix cycle 7 (`59290bbe`) does three things. `Write` is added
+  to the planner's tools, and it writes only its draft under `docs/00-working/promoted/` plus the
+  draft's path to the fixed, gitignored file `_working/idea-planner/draft-path.txt` (named by the
+  coordinator). The heredoc is removed. The check is a constant command: Python reads the path
+  file and refuses, before opening anything, any path that does not `re.fullmatch`
+  `docs/00-working/promoted/(PLAN|REQ)-[0-9]{3}(?:\.[0-9]{2})?-[a-z0-9]+(?:-[a-z0-9]+)*\.md`. The
+  slug part is stricter than the ruling's `[a-z0-9-]+`: it also forbids leading, trailing and
+  doubled hyphens. The tests cover the reviewer's live payload (refused, and its marker never
+  created), the 11 earlier hazards, `PLAN`, `REQ` and child-code paths, and a refused non-`PLAN`/`REQ`
+  series.
+
+Fix cycles used: seven, all on the same safe-write command after cycle 1. Two is `PROMPT-036`'s
+cap; the owner granted cycles 3 to 7.
