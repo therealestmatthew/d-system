@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-10-05'
+updated: '2026-10-06'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -983,3 +983,26 @@ The owner's answer reached Builder A after the withdrawal and was not acted on.
 **Why recorded here:** `PROMPT-037`'s Builder role said the question "still goes to the owner, as
 written", and `/session-start` step 2 says an unanswered question is not a yes. A builder reading
 either alone would block an unattended run on a question nobody can answer.
+
+## The phase-irs-11 hold is lifted: build the run caps fail closed — 2026-10-06
+
+Owner ruling of 2026-10-06, given in the Session Manager's session and relayed to the builder in
+its `ASSIGN`. The owner's choice, verbatim: "Build it, fail closed". **Standing** for
+`phase-irs-11`.
+
+The hold on `phase-irs-11` (run budgets, hard caps and the kill switch) is lifted. The phase builds
+the budget, hard-cap and kill-switch mechanism with **no cap values**. While no cap is configured,
+the dispatch path dispatches nothing and says why. Cap values remain the owner's, set later from
+measured baselines. The earlier ruling that budgets come from measured baselines only still
+governs the values. It no longer governs whether the mechanism may be built.
+
+The deadlock it resolves: the hold was set on 2026-09-27 (`17e24d89`, "budgets from measured
+baselines only") with no reachable lift condition. The baselines come from `phase-irs-12`, which
+depends on `phase-irs-14`, which depends on `phase-irs-11`. So the hold could never be lifted by
+its own condition, and it blocked `phase-irs-14`, `phase-irs-13` and batches 005 and 006 behind
+them.
+
+**Why recorded here:** the hold existed only in `backlog.yaml`'s `blocked_reason` and
+`resume_when` and in the batch tables' prose, never in this record. Lifting it here puts both the
+hold's end and the rule that still binds the cap values in the one place a claimant reads for owner
+rulings.
