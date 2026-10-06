@@ -25402,18 +25402,48 @@ Related ideas (all triaged): 000014 (audit hooks and settings.json), 000306 (.co
 
 ## 000593 · Close the mandatory-requirement rule's split loophole
 
-**Created 2026-10-05T19:23:11-04:00 · Status: `open`**
+**Created 2026-10-05T19:23:11-04:00 · Status: `triaged`**
 
 The rule (GOV-001, phase-dgov-01) requires a requirement document once one plan has more than one backlog phase, so splitting a multi-phase plan into several one-phase plan documents escapes it. Fix the rule text, the check and a test.
 
 Source: phase-dgov-01 gating review F02, accepted by the owner 2026-10-05 for a follow-up. Sent by Session 5 - Batch Runner.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T20:38:44-04:00): Not yet delivered; no phase schedules it. Source confirmed: phase-dgov-01 gating review finding F02 (major), docs/08-governance/reviews/verdicts/2026-10-05-phase-dgov-01-demo-adversary.json — "the mandatory condition triggers only when one plan id is named by more than one backlog item", evidence src/governance/requirement_rule.py:185-187 mirrored in GOV-001-protocol.md:26-33. Owner accepted it for follow-up in SESS-2026-10-05-10 (mandatory-requirement rule session).
+
+Where the fix lands: the rule text in GOV-001-protocol.md ("When a requirement document is mandatory"); the check in src/governance/requirement_rule.py (requirement_mandatory, phase_counts, unpaired_mandatory_plans; surfaced through `python -m src.governance --classify-requirements`); and test/test_requirement_rule.py (8 tests today). Governing documents: REQ-015 (R01-R03) and PLAN-030 (document and backlog governance), the parent plan of phase-dgov-01.
+
+Open design question, not decided anywhere found: how a check recognises split plans (a parent link, a new field, or something else). No related ideas found; no proposed link or promotion.
+
+</details>
+
 ---
 
 ## 000594 · File Browser shows "Loading…" forever when a folder's fetch fails after a folder change
 
-**Created 2026-10-05T20:36:00-04:00 · Status: `open`**
+**Created 2026-10-05T20:36:00-04:00 · Status: `triaged`**
 
 FileBrowserRegion's render checks entriesFolder !== contextFolder before loadState === 'error', so the error message never appears. Pre-existing on dev; seen while fixing lint in phase-sch-03.
 
 Sent by Session 2 - Builder B.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-05T20:38:45-04:00): Confirmed on dev, not scheduled. ts/src/stage/FileBrowserRegion.tsx:576-581 renders "Loading…" when `loadState === 'loading' || entriesFolder !== contextFolder` before it tests `loadState === 'error'`, so a failed fetch after a folder change leaves entriesFolder behind contextFolder and the error branch is never reached.
+
+History: phase-wb-05 (File Browser panel, complete) added the entriesFolder gate to stop a stale-render race (commit e700c85); that gate now masks the error state. Commit 51d3086 (000569) added role="status" / role="alert" to these messages but did not change the order.
+
+Governing documents: REQ-007 W09 (workbench File Browser); PLAN-027 (workbench features and defects). No phase schedules this fix. Found during phase-sch-03 (ts/ lint and test gate in CI). No test of the File Browser error state was found (not exhaustively confirmed).
+
+PROPOSED LINK: 000594 --relates_to--> 000569 (000569 is error/loading status across the stage panels; 000594 is one concrete render-order defect in that area)
+
+</details>
