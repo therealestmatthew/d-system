@@ -129,7 +129,12 @@ The Session Manager dispatched three rounds of build review:
   `docs/08-governance/reviews/verdicts/2026-10-06-phase-idg-12-demo-adversary-2.json` and
   `docs/08-governance/reviews/verdicts/2026-10-06-phase-idg-12-review-judge-2.json`. The reopened
   F03 is fixed. New F01 (minor): the draft path in the safe-write command is unquoted, so a path
-  with a space or apostrophe breaks it. On 2026-10-06 the owner accepted it as is, relayed by the
-  Session Manager, and the Session Manager files the follow-up idea through Ideation.
+  with a space or apostrophe breaks it. It was first relayed as accepted as is. The Session Manager
+  then withdrew that acceptance on 2026-10-06, because it had rested on the wrong claim that paths
+  never contain spaces; the owner corrected it. The owner's ruling, relayed by the Session Manager,
+  replaces it: fix the finding in this phase before it merges. Fix cycle 4 quotes the path and
+  extends `test/test_planner_safe_write.py` to cover a path containing a space and an apostrophe.
+  Idea `000596` (quote the draft-path argument in the idea planner's safe-write command) records
+  this fix.
 
-Fix cycles used: three. Two is `PROMPT-036`'s cap, and the owner granted the third.
+Fix cycles used: four. Two is `PROMPT-036`'s cap, and the owner granted the third and fourth.
