@@ -25326,6 +25326,10 @@ The built-in reviewer is ruled: PLAN-047 (reviewer contract) line 135 says the s
 
 </details>
 
+**Links**
+
+- relates_to ← `000595`
+
 ---
 
 ## 000590 · Backlog status-regression end-to-end tests should not depend on live backlog order
@@ -25471,3 +25475,7 @@ The verdict schema (schemas/review-verdict.schema.json) requires reviewer.defini
 PROPOSED LINK: 000595 --relates_to--> 000589 (000595 would remove the built-in-reviewer case that 000589 asks the schema to accommodate)
 
 </details>
+
+**Links**
+
+- relates_to → `000589`
