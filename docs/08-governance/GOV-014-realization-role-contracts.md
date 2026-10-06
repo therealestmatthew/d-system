@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-16'
-updated: '2026-10-04'
+updated: '2026-10-05'
 systems: [sys-realization, sys-governance]
 depends_on: [doc-idea-realization-system, doc-idea-realization-system-requirements, doc-irs-orchestrator-design]
 ---
@@ -115,9 +115,9 @@ this document, once real dispatch data from `phase-irs-11`'s baselines gives a r
 - **Never-do:** never allocate a document code; never mark an idea `promoted`; never decide plan
   approval — that is G3, owner-reserved; never leave a phase table undecomposed for a later stage
   to split, when the standard requires minimum-scope phases at draft time.
-- **Existing agent definition:** none. `phase-idg-12` is the implementation phase for this role
-  (idea `000072`'s planner bullet, struck by `phase-prog-06`); this contract is the prose role
-  contract only and creates no agent-definition file.
+- **Existing agent definition:** `.claude/agents/idea-planner.md`, generated from
+  `agent-workflows/idea-planner-agent.md` by `phase-idg-12` (idea `000072`'s planner bullet, struck
+  by `phase-prog-06`).
 - **Per-dispatch ceiling:** 300,000 tokens.
 
 ### Adversary
