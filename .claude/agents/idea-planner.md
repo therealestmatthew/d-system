@@ -89,7 +89,12 @@ came from should move to `promoted`. Those are gates `G2`/`G3`, owner-reserved (
    and `GOV-011`'s "Location" section — the filename carries the reserved code you were given from
    the start, so `GOV-011`'s later move into `docs/01-plans/` or `docs/06-requirements/` leaves the
    filename unchanged. Use the reserved plan code for the plan document and the reserved
-   requirement code for the paired requirement, when step 4 makes one mandatory. **If step 4 makes
+   requirement code for the paired requirement, when step 4 makes one mandatory. **The slug is
+   lowercase letters, digits and hyphens only (`[a-z0-9-]+`) — nothing else, ever**, matching the
+   pattern "How you write the draft" below validates the finished path against before any command
+   reads it. Derive it from the track's name by lowercasing it and replacing every run of other
+   characters with a single hyphen, never carrying through a space, an apostrophe, a quote, or any
+   other raw character from the track's name. **If step 4 makes
    a requirement mandatory and you were not given a reserved requirement code, or you have no
    reserved plan code at all, stop and report that the needed reservation is missing — never draft
    without the code you need and never invent one.** You still never write to `codes.yaml`
@@ -143,23 +148,45 @@ carry a space, an apostrophe, a double quote, a `$`-prefixed token, or a backtic
 on a command-line argument survives all of those at once: double quotes still let the shell expand
 `$...` and `` `...` `` inside them, and break outright on an embedded `"`. So the path never appears
 on the command line or inside the Python source at all — pass it on **stdin**, through a heredoc
-whose delimiter is quoted (`<<'EOF'`, not `<<EOF`), which is the one shell construct that expands
-nothing inside it, and have Python read it from `sys.stdin`:
+whose delimiter is quoted and fixed, which is the one shell construct that expands nothing inside
+it, and have Python read it from `sys.stdin`. **The delimiter must be the exact fixed token
+`PLANNER_DRAFT_PATH_EOF_9f3b6a2d1e8c4caa` below, quoted — never the bare word `EOF`, and never a
+token you generate or vary per run.** A plain `EOF` is a word a hostile or merely unlucky path can
+contain on a line by itself (a path with an embedded newline whose own line reads exactly `EOF`
+ends the heredoc early and lets the rest of the path execute as shell commands); the fixed token
+here is long and specific enough that no real slug — restricted to `[a-z0-9-]+` — could ever
+collide with it, since a slug cannot contain the uppercase letters or underscores the token uses.
+Before opening anything, the script **validates the path it read against the exact promoted-draft
+pattern** (`ADR-019`'s `docs/00-working/promoted/<code>-<slug>.md`, with `<code>` in the repository's
+real code format — `[A-Z]+-[0-9]{3}` optionally followed by `.NN`, per `src/governance/codes.py`'s
+`COUNTER` pattern — and `<slug>` restricted to `[a-z0-9-]+`) using `re.fullmatch()`, never a pattern
+anchored with `^`/`$` alone — `fullmatch` is what actually refuses a string carrying an embedded
+newline, where `$` would not. A path that does not fully match is refused with a clear message and
+a nonzero exit, before any `open()` call:
 
 ```bash
 uv run python -c "
+import re
 import sys
 from src.governance.plan_quality import check_plan_conformance
+
 path = sys.stdin.read().rstrip('\n')
+pattern = r'docs/00-working/promoted/[A-Z]+-[0-9]{3}(?:\.[0-9]{2})?-[a-z0-9-]+\.md'
+if not re.fullmatch(pattern, path):
+    print(f'refusing: {path!r} is not a promoted-draft path (ADR-019)', file=sys.stderr)
+    sys.exit(1)
+
 text = open(path).read()
 print(check_plan_conformance(text, depends_on=[...], documents={...}))
-" <<'EOF'
+" <<'PLANNER_DRAFT_PATH_EOF_9f3b6a2d1e8c4caa'
 docs/00-working/promoted/<reserved-code>-<slug>.md
-EOF
+PLANNER_DRAFT_PATH_EOF_9f3b6a2d1e8c4caa
 ```
 
-Fill in the real path only on the line between `<<'EOF'` and the closing `EOF`, typed literally —
-never quoted, never escaped, and never substituted via `$(...)` or backticks, since the quoted
-heredoc already protects it from the shell. Strip only the trailing newline the heredoc adds
-(`.rstrip('\n')`); do not use a broader strip that could remove a path's own meaningful leading or
-trailing character.
+Fill in the real path only on the line between the two occurrences of the fixed delimiter, typed
+literally — never quoted, never escaped, and never substituted via `$(...)` or backticks, since
+the quoted heredoc already protects it from the shell. Strip only the trailing newline the heredoc
+adds (`.rstrip('\n')`); do not use a broader strip that could remove a path's own meaningful
+leading or trailing character. If the path fails the pattern check — an uppercase letter or a
+space in the slug, a missing code, an embedded newline that broke the heredoc, or anything else
+not matching exactly — stop and report that; never relax the pattern to make a given path pass.
