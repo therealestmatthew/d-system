@@ -25484,8 +25484,22 @@ PROPOSED LINK: 000595 --relates_to--> 000589 (000595 would remove the built-in-r
 
 ## 000596 · Quote the trailing draft-path argument in the idea planner agent's safe-write command
 
-**Created 2026-10-06T05:29:01-04:00 · Status: `open`**
+**Created 2026-10-06T05:29:01-04:00 · Status: `triaged`**
 
 In .claude/agents/idea-planner.md (generated from agent-workflows/idea-planner-agent.md), the safe-write command's trailing draft-path argument is unquoted, so a path containing a space or apostrophe breaks it. Latent today: promoted-plan filenames are kebab-case, but nothing enforces that.
 
 Source: owner-accepted review finding, phase-idg-12 round 3, 2026-10-06. Relayed by the Session Manager.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-06T05:31:34-04:00): Realized by phase-idg-12 (build the idea planner agent and check it against the standard; PLAN-027), per the owner's ruling relayed by the Session Manager on 2026-10-06: the fix goes into phase-idg-12 before it merges, not a later phase. Not yet delivered.
+
+Confirmed on branch agent/phase-idg-12 (the files are not on dev yet): the plan-conformance check command passes the draft path unquoted after the python -c script — `" docs/00-working/promoted/<reserved-code>-<slug>.md` — at .claude/agents/idea-planner.md:143-149 and agent-workflows/idea-planner-agent.md:132-138 (the generated copy and its source). The branch tip (ca47ee02) records that the round-3 acceptance of this finding was withdrawn, consistent with the ruling.
+
+Secondary, not part of this ask: nothing enforces kebab-case promoted-plan filenames; that would be separate hardening. No related ideas found beyond 000046 (idea planner agent, the parent concept); no proposed link or promotion.
+
+</details>
