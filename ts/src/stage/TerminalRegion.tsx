@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
@@ -126,6 +126,9 @@ const TerminalSession = forwardRef<
   TerminalSessionHandle,
   { visible: boolean; shell: TerminalShell }
 >(function TerminalSession({ visible, shell }, ref) {
+  // The shell this session was opened with. It names the panel instance's fixed shell (every
+  // "CMD" panel session always requests "cmd"), and the mount effect below reads it once.
+  const [sessionShell] = useState(shell)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [connectionState, setConnectionState] = useState<ConnectionState>('connecting')
   // REQ-007 W12: set only when the backend refuses this session's requested shell (unlisted, or
@@ -204,7 +207,8 @@ const TerminalSession = forwardRef<
     // and applies the `D_SYSTEM_DEMO_SHELL` operator override only when none is given, so
     // omitting it is what keeps that override in effect for this panel's default sessions
     // (owner ruling 2026-10-04, REQ-012 R22).
-    const shellQuery = shell === 'bash' ? '' : `?shell=${encodeURIComponent(shell)}`
+    const shellQuery =
+      sessionShell === 'bash' ? '' : `?shell=${encodeURIComponent(sessionShell)}`
     const socketUrl = `${protocol}//${window.location.host}${TERMINAL_WEBSOCKET_PATH}${shellQuery}`
     const socket = new WebSocket(socketUrl)
     socket.binaryType = 'arraybuffer'
@@ -302,10 +306,8 @@ const TerminalSession = forwardRef<
     }
     // Mount once per TerminalSession instance — a session's socket and shell live for the
     // instance's whole lifetime, ending only when the parent unmounts it (guarded drop/close).
-    // `shell` is read once here (it names the panel instance's fixed shell, e.g. every "CMD"
-    // panel session always requests "cmd") and never changes for an already-mounted session.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    // `sessionShell` is fixed for the instance's lifetime, so listing it never re-runs this.
+  }, [sessionShell])
 
   // Refit when this session becomes visible again — a CSS display:none -> block transition
   // (tab activation, or the region re-expanding from collapsed) doesn't reliably produce a
@@ -401,9 +403,12 @@ export default function TerminalRegion({ shell = 'bash' }: { shell?: TerminalShe
   // shared-state mechanism, matching the repo's existing ref-based prop-drilling style.
   const sessionHandlesRef = useRef<Map<number, TerminalSessionHandle>>(new Map())
 
-  const sendToActiveSession = (text: string, appendNewline: boolean) => {
-    sessionHandlesRef.current.get(activeSessionId)?.sendCommand(text, appendNewline)
-  }
+  const sendToActiveSession = useCallback(
+    (text: string, appendNewline: boolean) => {
+      sessionHandlesRef.current.get(activeSessionId)?.sendCommand(text, appendNewline)
+    },
+    [activeSessionId],
+  )
 
   useEffect(() => {
     let cancelled = false
@@ -460,8 +465,7 @@ export default function TerminalRegion({ shell = 'bash' }: { shell?: TerminalShe
     }
     terminalBridge.register(handle)
     return () => terminalBridge.unregister(handle)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabledState, dropped, activeSessionId])
+  }, [enabledState, dropped, sendToActiveSession])
 
   // REQ-007 W12: bash keeps the pre-existing bare "Terminal" title (nothing about the bash
   // panel's own label changes), cmd/powershell name themselves so the presenter can tell the

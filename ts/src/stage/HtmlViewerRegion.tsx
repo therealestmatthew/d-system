@@ -164,6 +164,8 @@ export default function HtmlViewerRegion() {
   // The search input is a shared header control (one `<input>`), but the text it shows and writes
   // is the active tab's own (REQ-007 W08), so switching tabs swaps the displayed text.
   const searchText = activeTab?.searchText ?? ''
+  const activeDirectory = activeTab?.directory ?? null
+  const activeSelectedFile = activeTab?.selectedFile ?? null
   const filesKey = activeTab === null ? null : `${activeTab.id}|${activeTab.directory}`
   const filesLoadState: FilesLoadState =
     settledFiles !== null && settledFiles.key === filesKey ? settledFiles.state : 'loading'
@@ -221,9 +223,9 @@ export default function HtmlViewerRegion() {
   // (REQ-007 W07). Text filtering happens client-side against this same fetched list, below — no
   // round trip per keystroke. Re-fetches whenever the active tab or its directory changes.
   useEffect(() => {
-    if (activeTab === null || activeTab.directory === null || filesKey === null) return
+    if (activeDirectory === null || filesKey === null) return
     let cancelled = false
-    fetchWorkbench(buildSearchUrl(activeTab.directory))
+    fetchWorkbench(buildSearchUrl(activeDirectory))
       .then((response) => {
         if (!response.ok) throw new Error(`status ${response.status}`)
         return response.json() as Promise<DirectoryEntry[]>
@@ -239,16 +241,15 @@ export default function HtmlViewerRegion() {
     return () => {
       cancelled = true
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab?.id, activeTab?.directory])
+  }, [filesKey, activeDirectory])
 
   // Confirm the active tab's selected page actually exists before rendering it — a selection can
   // point at a file that has since been removed, and `refreshToken` re-runs this same check for
   // the refresh control (REQ-007 W07: "a refresh button re-fetching the current page").
   useEffect(() => {
-    if (activeTab === null || !activeTab.selectedFile || pageKey === null) return
+    if (!activeSelectedFile || pageKey === null) return
     let cancelled = false
-    fetch(`${WORKBENCH_FILE_PREFIX}${activeTab.selectedFile}`, { method: 'HEAD', cache: 'no-store' })
+    fetch(`${WORKBENCH_FILE_PREFIX}${activeSelectedFile}`, { method: 'HEAD', cache: 'no-store' })
       .then((response) => {
         if (!cancelled) setSettledPage({ key: pageKey, state: response.ok ? 'ready' : 'missing' })
       })
@@ -258,8 +259,7 @@ export default function HtmlViewerRegion() {
     return () => {
       cancelled = true
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab?.id, activeTab?.selectedFile, refreshToken])
+  }, [pageKey, activeSelectedFile])
 
   // Persist every open tab's directory/search/page and which tab is active (REQ-007 W08 / ADR-016
   // rule 3) — best-effort, merged into the shared key so this write never clobbers the layout

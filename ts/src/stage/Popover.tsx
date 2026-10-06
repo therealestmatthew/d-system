@@ -105,9 +105,15 @@ export default function Popover({
     setStyle(next)
   }, [width])
 
+  // The latest `onOpenChange`, so the effect below fires only when `open` changes, never because a
+  // caller passed a new inline callback on its own re-render.
+  const onOpenChangeRef = useRef(onOpenChange)
   useEffect(() => {
-    onOpenChange?.(open)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    onOpenChangeRef.current = onOpenChange
+  })
+
+  useEffect(() => {
+    onOpenChangeRef.current?.(open)
   }, [open])
 
   // Force-close whenever the caller disables the trigger — a bubble left open while its trigger
