@@ -12642,7 +12642,7 @@ items:
   - sys-ui
   - sys-gov-docs
   owner: repository-owner
-  status: active
+  status: complete
   agent: agent-builder-b
   priority: 2
   session_budget: 1
@@ -12689,8 +12689,25 @@ items:
   - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
   - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
   - docs/08-governance/OPS-029-run-review-checks.md
-  next_action: Claimed 2026-10-05 by agent-builder-b under the Session Manager's ASSIGN; redefined from
-    _working/session-manager/sch-03-plan.md (stale "no test file" line replaced, 000582 absorbed).
+  next_action: Complete. ts/ lints with the Vite react-ts ruleset at --max-warnings 0, CI runs lint and tests
+    after the build, and the merge gate runs the frontend tests as its fifth check.
+  session: doc-session-ts-lint-and-test-gate
+  completion_evidence:
+  - .github/workflows/ci.yaml
+  - ts/eslint.config.js
+  - ts/package.json
+  - tools/run_review_checks.py
+  - test/test_run_review_checks.py
+  - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  - docs/08-governance/OPS-029-run-review-checks.md
+  - docs/03-sessions/SESS-2026-10-05-11-ts-lint-and-test-gate.md
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-sch-03-demo-adversary-3.json
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-sch-03-demo-adversary-4.json
+  - docs/08-governance/reviews/verdicts/2026-10-05-phase-sch-03-review-judge-2.json
+  result: 'Merged onto dev at e3babd2 with the owner''s approval on 2026-10-05. 34 lint findings found and fixed,
+    none disabled; lint fails on any warning; CI and the merge gate run the frontend tests (idea 000582). Round 1
+    gating F01 and F02 fixed on the owner''s rulings; round 2 gating and security reviews pass with no findings.'
 - id: phase-sch-04
   title: Write the per-layer testing standard
   plan: doc-schema-consistency-testing
