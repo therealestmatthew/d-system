@@ -12635,29 +12635,40 @@ items:
   sources:
   - doc-schema-consistency-testing-requirements
   - doc-schema-consistency-testing
+  ideas:
+  - '000582'
   systems:
   - sys-delivery
+  - sys-ui
+  - sys-gov-docs
   owner: repository-owner
-  status: queued
+  status: active
+  agent: agent-builder-b
   priority: 2
   session_budget: 1
   depends_on: []
   scope:
-  - Add an eslint configuration under ts/ and a test runner in ts/package.json, and wire both into .github/workflows/ci.yaml's
-    frontend job, which today runs npm ci and npm run build and nothing else.
-  - 'Script names (owner ruling, 2026-09-30): "lint" becomes eslint; the existing "lint": "tsc --noEmit"
-    is renamed "typecheck"; the test runner is "test". The frontend job runs npm run lint and npm test
-    after npm run build, which already type-checks through tsc -b.'
-  - No test file exists under ts/ today. Add the first one, so R07 has a suite that can fail.
-  - 'Lint baseline (owner ruling, 2026-09-30): use a standard default eslint ruleset and fix the
-    violations it flags in the existing tree in this phase, recording how many were found and fixed.
-    Do not choose or trim a ruleset so that today''s tree passes.'
-  - Fail the build on a lint error and on a failing test.
-  - Keep the runner configured in package.json rather than invoked ad hoc in the workflow.
+  - 'Add ts/eslint.config.js with the Vite react-ts template ruleset: @eslint/js recommended, typescript-eslint
+    recommended, eslint-plugin-react-hooks recommended and eslint-plugin-react-refresh (owner ruling,
+    2026-10-05). Rename "lint": "tsc --noEmit" to "typecheck", and make "lint" run eslint (owner ruling,
+    2026-09-30).'
+  - 'Lint baseline (owner ruling, 2026-09-30): fix every violation the ruleset flags in the existing
+    tree in this phase, recording how many were found and fixed. Do not trim a rule so that today''s
+    tree passes.'
+  - vitest is already ts/package.json's "test" script, with existing test files under ts/src/; keep
+    it.
+  - The CI frontend job in .github/workflows/ci.yaml runs npm run lint and npm test after npm run build.
+    Either failure fails the build. Keep the runners configured in package.json rather than invoked
+    ad hoc in the workflow.
+  - 'Idea 000582''s merge-gate half: add cd ts && npm test to tools/run_review_checks.py''s GATE_CHECKS,
+    with cd ts && npm ci as a setup step; change every "four gate checks" to five in GOV-017, PROMPT-037
+    (contract item 4 and the builder role) and OPS-029, listing each change in the session record; regenerate
+    OPS-029''s tool reference with tools/generate_tool_docs.py.'
   acceptance:
   - 'REQ-020 R06 holds: a lint violation fails CI and is named; a clean tree passes.'
   - 'REQ-020 R07 holds: a deliberately failing frontend test fails CI.'
   - The existing build step still runs and still passes.
+  - The merge-gate runner includes the frontend tests, and a test proves it.
   - 'The session record shows a local self-check: an introduced lint violation and a deliberately failing
     test each exit non-zero, and both are reverted.'
   verification:
@@ -12665,13 +12676,21 @@ items:
   - cd ts && npm run lint
   - cd ts && npm test
   - uv run python -m src.governance
+  - uv run pytest test/test_run_review_checks.py
   - No command observes the self-check acceptance line. It is checked by reading the session record.
   deliverables:
   - .github/workflows/ci.yaml
   - ts/package.json
-  - ts/
-  next_action: 'Confirmed open on dev be4ab36: ci.yaml''s frontend job (lines 45-46) runs npm ci and npm
-    run build with nothing after them. This touches ts/, so it cannot run while a demo is live.'
+  - ts/package-lock.json
+  - ts/eslint.config.js
+  - ts/src/
+  - tools/run_review_checks.py
+  - test/test_run_review_checks.py
+  - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  - docs/08-governance/OPS-029-run-review-checks.md
+  next_action: Claimed 2026-10-05 by agent-builder-b under the Session Manager's ASSIGN; redefined from
+    _working/session-manager/sch-03-plan.md (stale "no test file" line replaced, 000582 absorbed).
 - id: phase-sch-04
   title: Write the per-layer testing standard
   plan: doc-schema-consistency-testing
