@@ -45,7 +45,8 @@ until a cap is configured.
 
 Not changed, as the assignment directed:
 
-- `batch-007`'s table, in the first commit. Its prose states the hold, at lines 12–13, line 23 and lines 57–62
+- `batch-007`'s table, in the first commit; its hold sentences were changed after review, as
+  described under Review. Its prose states the hold, at lines 12–13, line 23 and lines 57–62
   ("…phase-irs-11 returns to queued and this table opens normally."). That table's composition and
   prose are the owner's, so the Session Manager is taking those lines to the owner.
   `batch-003`'s notes, lines 14–18, also describe the hold, as history.
@@ -76,11 +77,14 @@ What was done:
 - No composition, stage, phase, status or exclusion changed.
 - Both tables validate against `schemas/batch.schema.json`.
 
+## Verification
 
-In the worktree, after the change:
+In the worktree, after the first commit:
 
 ```
 uv run python -m src.governance --check-ideas   Idea field check: 102 phases name 170 ideas; 0 phases differ (0 missing, 0 extra)
 uv run python -m src.governance                 Governance OK: 45 systems, 454 documents, 37 memories, 347 backlog phases
 uv run pytest                                   1655 passed, 1 warning in 206.25s (0:03:26)
 ```
+
+After the batch-table change: governance OK (455 documents); pytest 1655 passed.
