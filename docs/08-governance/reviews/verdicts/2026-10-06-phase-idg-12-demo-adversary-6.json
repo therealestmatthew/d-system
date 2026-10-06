@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-06-phase-idg-12-demo-adversary-6",
+  "date": "2026-10-06",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "41dbfbb8f1aba59fd826be59475126c3ea8371ef",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "The fix replaces a per-invocation path with a single fixed, shared scratch file _working/idea-planner/draft-path.txt with no track-id or dispatch-unique component, so two concurrent planner dispatches in one worktree can overwrite each other's path before the check reads it.",
+      "evidence": ".claude/agents/idea-planner.md:150-153 / agent-workflows/idea-planner-agent.md:150-153. The planner is invoked once per accepted track; nothing in the fix or GOV-014 restricts an orchestrator to one planner dispatch at a time in a worktree. Every test uses an isolated tmp_path; none exercises concurrent writers.",
+      "consequence": "A track's conformance check silently validates against the wrong track's draft, or a path no longer matching what that dispatch wrote. A regression introduced by this fix, untested."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Write is granted with no path-scoping at the tool-permission level; the restriction to the draft and the path file is prose-only.",
+      "evidence": ".claude/settings.json has only unrelated deny rules; no Write(docs/00-working/promoted/**)-style allow-list exists in .claude/agents/*.md. Matches every other Write-capable agent (demo-creator-*, demo-orch-*).",
+      "consequence": "A confused or adversarially-prompted planner dispatch could Write anywhere Write is otherwise permitted, including over docs/01-plans/ or source files. Not a new gap; consistent with the owner's instruction-level ruling."
+    }
+  ],
+  "raw_reply_sha256": "354232b4c1e788201f9212bc968a2d213e7d883af05d9fe54c7d65eb46abf4ea",
+  "outcomes": [],
+  "notes": "Round 7, a short re-review of one fix under the owner's 2026-10-06 ruling to give the planner the Write tool and remove all variable text from the check command. Dispatched and briefed by the Session Manager after the runner finished. Brief: the round-6 blocker and the missing-Write-tool observation, the owner's ruling, the checks to make, the fix delta a9038976 -> 41dbfbb8 as a file path (docs/03-sessions excluded), and the runner manifest _working/review-checks/phase-idg-12/41dbfbb8f1ab/ (8 entries, passed). Raw reply kept at _working/session-manager/review-replies/phase-idg-12-41dbfbb8-demo-adversary.md, as received with the harness's indentation removed; the harness flagged instruction-shaped text (settings-json) in the reply and neutralized control tags, recorded as a note at the head of the evidence file. The round-6 blocker was confirmed closed (the payload and 11 hazards refused live; legitimate PLAN, REQ and PLAN-NNN.NN paths pass). Its point 3 (non-finding) is not recorded as a finding. The reviewer labelled F02 \"MINOR / informational\"; recorded as minor."
+}
