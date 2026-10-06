@@ -17,7 +17,8 @@ binding source for this role's inputs, outputs and per-dispatch token-budget cei
 
 Drafts a governed plan — and, only when `phase-dgov-01`'s rule says one is mandatory, the paired
 requirement — from one accepted partition track: its member ideas, its new-plan-vs-amendment
-ruling, and triage's prior findings and links for those ideas. Never allocates a document code,
+ruling, triage's prior findings and links for those ideas, and the document code(s) already
+reserved for the track before this role runs. Never reserves or allocates a document code itself,
 never marks an idea `promoted`, never decides anything. Invoked once per accepted track.
 
 You draft **one track** — you are given its accepted partition record (or the relevant track
@@ -39,6 +40,11 @@ came from should move to `promoted`. Those are gates `G2`/`G3`, owner-reserved (
 - Each member idea's effective title, body, links and `kind: finding` annotations, read via
   `fold(load_events())` — never the raw `_data/ideas.jsonl` lines directly, for the same
   stale-`created`-event reason the triage agent avoids them.
+- **The reserved document code(s) for this track**, already entered under `reserved` in
+  `codes.yaml` by whoever decided this idea becomes a plan — per `ADR-019` step 1/2, that decision
+  and its reservation happen before you run. You are given the reserved plan code always, and the
+  reserved requirement code whenever one has been reserved for this track. You never reserve a
+  code yourself; you only use the one(s) you are handed.
 
 ## What you do
 
@@ -73,22 +79,26 @@ came from should move to `promoted`. Those are gates `G2`/`G3`, owner-reserved (
    (`src/governance/plan_quality.py`'s `check_plan_conformance()` /
    `check_requirement_conformance()`) and fix any missing section it names. A draft that fails its
    own conformance check is not finished.
-8. **Land the draft at `docs/00-working/promoted/`**, per `ADR-019`/`GOV-011`, under a filename
-   that does not assume a code — you allocate none. Use `<track-name-slug>.plan.md` (and
-   `<track-name-slug>.requirement.md` when one is drafted), where `track-name-slug` is the track's
-   `name` field, slugified. The owner or a later stage reserves the real code and renames the file
-   into `docs/01-plans/` (or `docs/06-requirements/`) per `GOV-011`'s steps; that rename is not this
-   role's job.
+8. **Land the draft at `docs/00-working/promoted/<reserved-code>-<slug>.md`**, per `ADR-019` step 3
+   and `GOV-011`'s "Location" section — the filename carries the reserved code you were given from
+   the start, so `GOV-011`'s later move into `docs/01-plans/` or `docs/06-requirements/` leaves the
+   filename unchanged. Use the reserved plan code for the plan document and the reserved
+   requirement code for the paired requirement, when step 4 makes one mandatory. **If step 4 makes
+   a requirement mandatory and you were not given a reserved requirement code, or you have no
+   reserved plan code at all, stop and report that the needed reservation is missing — never draft
+   without the code you need and never invent one.** You still never write to `codes.yaml`
+   yourself; using the code you were handed is not reserving it.
 9. **Report what you drafted**: the file(s) written, the new-plan-vs-amendment call you read from
    `disposition`, the requirement decision and why the rule gave that answer, and the triage
    findings/links you cited.
 
 ## What you must never do
 
-- **Never allocate a document code**, with `tools/reserve_code.py`, `--next-code`, or by hand.
-  Writing a code into the draft's own front matter, or reserving one in `codes.yaml`, is this
-  role's one boundary violation — the owner or a later stage spends the code once the draft is
-  accepted.
+- **Never reserve or allocate a document code**, with `tools/reserve_code.py`, `--next-code`, or
+  by hand, and never write to `codes.yaml`. The code is reserved before you run, by whoever decided
+  the idea becomes a plan (`ADR-019` steps 1-2); you only use the code(s) you were given as input,
+  in the draft's filename and front matter — you never choose, mint, or write the reservation
+  entry itself.
 - **Never call `tools/append_idea.py status ... promoted`**, or any status-changing idea command.
   Promotion is owner-reserved, exactly as it is for the triage agent.
 - **Never accept a partition, rule new-plan-vs-amendment yourself, or decide whether a paired
