@@ -10849,11 +10849,12 @@ items:
   - doc-idea-graph-lifecycle-requirements
   - doc-idea-graph-lifecycle
   ideas:
-  - '000072'
+  - '000046'
   systems:
   - sys-governance
   owner: repository-owner
-  status: queued
+  agent: agent-batch-runner
+  status: active
   priority: 3
   session_budget: 1
   depends_on:
@@ -10862,8 +10863,11 @@ items:
   - phase-dgov-01
   - phase-irs-03
   scope:
-  - Build an agent that drafts a governed plan - and where the idea implies observable behaviour, the
-    paired requirement - from a promoted idea.
+  - 'Build the agent (idea 000046) that drafts a governed plan - and where the idea implies observable
+    behaviour, the paired requirement - from an accepted partition track: its member ideas and a
+    new-plan-vs-amendment ruling, per GOV-014''s planner contract and ARCH-006 stage 4. It drafts one
+    plan per accepted track, honouring the amendment case; REQ-014 R19''s single promoted idea is
+    tested as a one-member track.'
   - 'It drafts and does not decide: it allocates no code and marks nothing promoted, mirroring the triage
     agent''s boundary.'
   - It pulls in what triage already found - related plans, phases, overlapping ideas - so the draft does
@@ -10871,25 +10875,34 @@ items:
   - Per ARCH-006's stage 4 minimum-scope duty, the draft's phases are already decomposed to minimum
     scope - one session each - not left as a descriptive phase table for a later phase to split.
   - Its decision between drafting a paired requirement and drafting a plan only uses phase-dgov-01's
-    rule for when a requirement is mandatory (GOV-001-protocol.md), not the agent's own judgement.
+    rule for when a requirement is mandatory (GOV-001-protocol.md, "When a requirement document is
+    mandatory"), not the agent's own judgement. GOV-014 and ARCH-006 still say the pair is drafted
+    unconditionally; amending them to match this rule is a separate governed change raised with the
+    owner, not made in this phase.
+  - Build the REQ-022 R20 conformance check as code in src/governance/, checking a draft against
+    GOV-010's named sections.
   acceptance:
-  - 'REQ-014 R19 holds: run against a promoted idea carrying findings and links, the draft cites them,
-    and the agent allocated no code and marked nothing promoted.'
-  - 'REQ-014 R20 holds: the draft is checked against phase-idg-10''s standard and conforms to its named
-    sections.'
+  - 'REQ-014 R19 holds: run against a promoted idea treated as a one-member accepted track, carrying
+    findings and links, the draft cites them, and the agent allocated no code and marked nothing
+    promoted.'
+  - 'REQ-014 R20 holds: the check rejects a non-conformant fixture draft and names the missing
+    sections, against phase-idg-10''s standard.'
   - The draft lands at the promoted-plan location phase-idg-11 defines (ADR-019 and GOV-011), not straight
     into docs/01-plans/. That location is where phase-irs-07 reads the approved plan from.
-  - 'REQ-022 R09 holds: the draft''s phases are already split to minimum scope; a deliberately
-    non-conformant draft is returned to the planner.'
+  - 'REQ-022 R09''s return-to-planner-and-escalate loop is phase-irs-14''s, not built here: this phase''s
+    part is that the draft''s phases are already split to minimum scope.'
   verification:
   - uv run pytest
   - uv run python -m src.governance
+  - One recorded run against a promoted idea with findings and links, its draft and citations quoted
+    in the phase's session record (no code is reserved for it).
   deliverables:
   - .claude/agents/
-  - docs/08-governance/
+  - docs/08-governance/GOV-014-realization-role-contracts.md
+  - src/governance/
   - test/
-  next_action: 000072's planner bullet in P4 duplicates this. phase-prog-06 owns that ruling - confirm
-    it was struck before building, or this gets built twice.
+  next_action: Write the agent against the GOV-014/ARCH-006 shape - track in, one draft per accepted
+    track, amendment case honoured - then build the REQ-022 R20 section checker in src/governance/.
 - id: phase-dgov-01
   title: Rule when a requirement is mandatory, classify the corpus, enforce forward
   plan: doc-document-backlog-governance
