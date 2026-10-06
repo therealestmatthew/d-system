@@ -226,6 +226,7 @@ workflows:
   - read_files
   - search_files
   - run_commands
+  - write_files
   targets:
   - host: claude
     kind: agent
@@ -234,9 +235,10 @@ workflows:
       read_files: Read
       search_files: Grep
       run_commands: Bash
+      write_files: Write
     unsupported: []
     render:
-      tools: "Read, Grep, Bash"
+      tools: "Read, Grep, Bash, Write"
       model: haiku
       effort: medium
       max_turns: 30

@@ -1,7 +1,7 @@
 ---
 name: idea-planner
 description: Drafts a governed plan - and, only when phase-dgov-01's rule says one is mandatory, the paired requirement - from one accepted partition track: its member ideas, its new-plan-vs-amendment ruling, and triage's prior findings and links. Never allocates a document code, never marks an idea promoted. Invoked once per accepted track.
-tools: Read, Grep, Bash
+tools: Read, Grep, Bash, Write
 model: haiku
 effort: medium
 maxTurns: 30
@@ -90,7 +90,8 @@ came from should move to `promoted`. Those are gates `G2`/`G3`, owner-reserved (
    the start, so `GOV-011`'s later move into `docs/01-plans/` or `docs/06-requirements/` leaves the
    filename unchanged. Use the reserved plan code for the plan document and the reserved
    requirement code for the paired requirement, when step 4 makes one mandatory. **The slug is
-   lowercase letters, digits and hyphens only (`[a-z0-9-]+`) — nothing else, ever**, matching the
+   lowercase letters and digits, joined by single hyphens between groups — never a leading or
+   trailing hyphen, never a doubled one (`[a-z0-9]+(?:-[a-z0-9]+)*`) — nothing else, ever**, matching the
    pattern "How you write the draft" below validates the finished path against before any command
    reads it. Derive it from the track's name by lowercasing it and replacing every run of other
    characters with a single hyphen, never carrying through a space, an apostrophe, a quote, or any
@@ -134,35 +135,26 @@ what triage actually recorded.
 A drafted plan or requirement is long Markdown containing backticks, `$(...)`-shaped text and
 fenced code blocks of its own — exactly the content a shell would mis-parse if inlined into a
 command, the same corruption the triage agent's writing step guards against (idea `000019`; see
-the `idea` workflow). **Never inline the draft's prose directly into a shell command, and never
-substitute the draft's bytes into a Python string literal via `$(cat <path>)` — a draft containing
-`"""` ends a triple-quoted literal early and breaks the script**, a risk the triage agent's own
-`$(cat <path>)` use does not carry, since there the substitution lands inside a quoted CLI
-argument, not inside Python source the shell re-parses as code. Write the draft to its destination
-file with your file-write tool first. If a later command in the same dispatch needs the draft's
-bytes — the section check run from the command line rather than in-process, say — have Python read
-the file itself, so no draft content ever passes through shell substitution into source code.
+the `idea` workflow). The path itself is no safer: a reserved code's slug could in principle carry
+a space, an apostrophe, a double quote, a `$`-prefixed token, a backtick, or a newline. **No shell
+construct is safe against text like that once it is on the command line, in Python source, or on
+stdin — not a quoted argument, not a quoted heredoc.** A heredoc's delimiter, even a long fixed
+one, is still public (written in this very file) and still terminates on any line that matches it
+verbatim; a path containing that exact line as embedded text ends the heredoc early and lets
+whatever follows run as real shell commands, which is exactly what broke under that shape. So
+**the draft's content and its path never pass through `Bash` at all, in either direction.** Use
+your `Write` tool for both, and `Write` only these two things, nothing else:
 
-**The path itself is also hazardous text, not a safe shell argument.** A reserved code's slug can
-carry a space, an apostrophe, a double quote, a `$`-prefixed token, or a backtick. No quoting style
-on a command-line argument survives all of those at once: double quotes still let the shell expand
-`$...` and `` `...` `` inside them, and break outright on an embedded `"`. So the path never appears
-on the command line or inside the Python source at all — pass it on **stdin**, through a heredoc
-whose delimiter is quoted and fixed, which is the one shell construct that expands nothing inside
-it, and have Python read it from `sys.stdin`. **The delimiter must be the exact fixed token
-`PLANNER_DRAFT_PATH_EOF_9f3b6a2d1e8c4caa` below, quoted — never the bare word `EOF`, and never a
-token you generate or vary per run.** A plain `EOF` is a word a hostile or merely unlucky path can
-contain on a line by itself (a path with an embedded newline whose own line reads exactly `EOF`
-ends the heredoc early and lets the rest of the path execute as shell commands); the fixed token
-here is long and specific enough that no real slug — restricted to `[a-z0-9-]+` — could ever
-collide with it, since a slug cannot contain the uppercase letters or underscores the token uses.
-Before opening anything, the script **validates the path it read against the exact promoted-draft
-pattern** (`ADR-019`'s `docs/00-working/promoted/<code>-<slug>.md`, with `<code>` in the repository's
-real code format — `[A-Z]+-[0-9]{3}` optionally followed by `.NN`, per `src/governance/codes.py`'s
-`COUNTER` pattern — and `<slug>` restricted to `[a-z0-9-]+`) using `re.fullmatch()`, never a pattern
-anchored with `^`/`$` alone — `fullmatch` is what actually refuses a string carrying an embedded
-newline, where `$` would not. A path that does not fully match is refused with a clear message and
-a nonzero exit, before any `open()` call:
+1. **Write the draft** itself to `docs/00-working/promoted/<reserved-code>-<slug>.md` (per step 8
+   above).
+2. **Write the chosen path, alone on one line, to the fixed scratch file
+   `_working/idea-planner/draft-path.txt`** (gitignored, ungoverned; this is the only other file
+   you ever write). Nothing else goes in it — not the draft's bytes, not a command, just the one
+   path on its own line.
+
+Only then run the section check, with a command that is **constant across every dispatch** — it
+names the fixed scratch file's path as a plain string literal in its own source, so no draft path
+and no draft byte is ever substituted into it by the shell or by you:
 
 ```bash
 uv run python -c "
@@ -170,23 +162,25 @@ import re
 import sys
 from src.governance.plan_quality import check_plan_conformance
 
-path = sys.stdin.read().rstrip('\n')
-pattern = r'docs/00-working/promoted/[A-Z]+-[0-9]{3}(?:\.[0-9]{2})?-[a-z0-9-]+\.md'
+with open('_working/idea-planner/draft-path.txt') as f:
+    path = f.read().rstrip('\n')
+
+pattern = r'docs/00-working/promoted/(PLAN|REQ)-[0-9]{3}(?:\.[0-9]{2})?-[a-z0-9]+(?:-[a-z0-9]+)*\.md'
 if not re.fullmatch(pattern, path):
     print(f'refusing: {path!r} is not a promoted-draft path (ADR-019)', file=sys.stderr)
     sys.exit(1)
 
 text = open(path).read()
 print(check_plan_conformance(text, depends_on=[...], documents={...}))
-" <<'PLANNER_DRAFT_PATH_EOF_9f3b6a2d1e8c4caa'
-docs/00-working/promoted/<reserved-code>-<slug>.md
-PLANNER_DRAFT_PATH_EOF_9f3b6a2d1e8c4caa
+"
 ```
 
-Fill in the real path only on the line between the two occurrences of the fixed delimiter, typed
-literally — never quoted, never escaped, and never substituted via `$(...)` or backticks, since
-the quoted heredoc already protects it from the shell. Strip only the trailing newline the heredoc
-adds (`.rstrip('\n')`); do not use a broader strip that could remove a path's own meaningful
-leading or trailing character. If the path fails the pattern check — an uppercase letter or a
-space in the slug, a missing code, an embedded newline that broke the heredoc, or anything else
-not matching exactly — stop and report that; never relax the pattern to make a given path pass.
+Run this exact command verbatim; never edit it to insert the path or add a heredoc, pipe, or
+`$(cat ...)` — doing any of that reopens the exact hole this shape closes. Fill in only
+`depends_on=[...]`/`documents={...}` with your own pairing decision's literal Python list/dict
+(step 7's inputs), never with text copied from the draft or its path. Only once the script's own
+`re.fullmatch()` against `(PLAN|REQ)-[0-9]{3}(?:\.[0-9]{2})?-[a-z0-9]+(?:-[a-z0-9]+)*` has passed — refusing a
+missing or wrong-series code, an uppercase or space-bearing slug, or any text that is not exactly
+a promoted-draft path for either series ADR-019 actually covers — does it `open()` anything. If
+it refuses, stop and report that; never relax the pattern or hand-construct a path to make a given
+draft pass.
