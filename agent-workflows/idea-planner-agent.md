@@ -136,40 +136,75 @@ your `Write` tool for both, and `Write` only these two things, nothing else:
 
 1. **Write the draft** itself to `docs/00-working/promoted/<reserved-code>-<slug>.md` (per step 8
    above).
-2. **Write the chosen path, alone on one line, to the fixed scratch file
-   `_working/idea-planner/draft-path.txt`** (gitignored, ungoverned; this is the only other file
-   you ever write). Nothing else goes in it — not the draft's bytes, not a command, just the one
-   path on its own line.
+2. **Write the chosen path, alone on one line, to `_working/idea-planner/<reserved-code>.path`**
+   (gitignored, ungoverned) — the file's own **name** is your reserved plan code (or requirement
+   code, for a paired requirement's own path), never a fixed shared name. A single shared scratch
+   file let two concurrent dispatches in the same worktree overwrite each other's path and have
+   the check silently validate the wrong draft; naming the file by the code you were handed, which
+   no other concurrent dispatch is using, removes that collision at its source. Nothing else goes
+   in it — not the draft's bytes, not a command, just the one path on its own line.
 
 Only then run the section check, with a command that is **constant across every dispatch** — it
-names the fixed scratch file's path as a plain string literal in its own source, so no draft path
-and no draft byte is ever substituted into it by the shell or by you:
+never names a specific `.path` file; it globs `_working/idea-planner/*.path` and checks every
+draft currently staged there, including ones other concurrent dispatches wrote, so no draft path
+or byte is ever substituted into the command's own source by the shell or by you:
 
 ```bash
 uv run python -c "
+import glob
+import os
 import re
 import sys
 from src.governance.plan_quality import check_plan_conformance
 
-with open('_working/idea-planner/draft-path.txt') as f:
-    path = f.read().rstrip('\n')
+code_re = re.compile(r'(?:PLAN|REQ)-[0-9]{3}(?:\.[0-9]{2})?')
+path_re = re.compile(
+    r'docs/00-working/promoted/(?P<code>(?:PLAN|REQ)-[0-9]{3}(?:\.[0-9]{2})?)'
+    r'-[a-z0-9]+(?:-[a-z0-9]+)*\.md'
+)
 
-pattern = r'docs/00-working/promoted/(PLAN|REQ)-[0-9]{3}(?:\.[0-9]{2})?-[a-z0-9]+(?:-[a-z0-9]+)*\.md'
-if not re.fullmatch(pattern, path):
-    print(f'refusing: {path!r} is not a promoted-draft path (ADR-019)', file=sys.stderr)
-    sys.exit(1)
+had_error = False
+for path_file in sorted(glob.glob('_working/idea-planner/*.path')):
+    stem = os.path.basename(path_file)[: -len('.path')]
+    if not code_re.fullmatch(stem):
+        print(f'refusing {path_file}: {stem!r} is not a reserved code', file=sys.stderr)
+        had_error = True
+        continue
+    with open(path_file) as f:
+        draft_path = f.read().rstrip('\n')
+    match = path_re.fullmatch(draft_path)
+    if not match:
+        print(f'refusing {path_file}: {draft_path!r} is not a promoted-draft path (ADR-019)',
+              file=sys.stderr)
+        had_error = True
+        continue
+    if match.group('code') != stem:
+        print(f'refusing {path_file}: content code {match.group(\"code\")!r} does not match '
+              f'file name {stem!r}', file=sys.stderr)
+        had_error = True
+        continue
+    text = open(draft_path).read()
+    result = check_plan_conformance(text, depends_on=[...], documents={...})
+    print(f'{draft_path}: {result}')
 
-text = open(path).read()
-print(check_plan_conformance(text, depends_on=[...], documents={...}))
+sys.exit(1 if had_error else 0)
 "
 ```
 
-Run this exact command verbatim; never edit it to insert the path or add a heredoc, pipe, or
-`$(cat ...)` — doing any of that reopens the exact hole this shape closes. Fill in only
-`depends_on=[...]`/`documents={...}` with your own pairing decision's literal Python list/dict
-(step 7's inputs), never with text copied from the draft or its path. Only once the script's own
-`re.fullmatch()` against `(PLAN|REQ)-[0-9]{3}(?:\.[0-9]{2})?-[a-z0-9]+(?:-[a-z0-9]+)*` has passed — refusing a
-missing or wrong-series code, an uppercase or space-bearing slug, or any text that is not exactly
-a promoted-draft path for either series ADR-019 actually covers — does it `open()` anything. If
-it refuses, stop and report that; never relax the pattern or hand-construct a path to make a given
-draft pass.
+Run this exact command verbatim; never edit it to insert a path, a heredoc, a pipe, or
+`$(cat ...)` — doing any of that reopens the exact hole an earlier shape closed. Fill in only the
+one `depends_on=[...]`/`documents={...}` call with your own pairing decision's literal Python
+list/dict (step 7's inputs) before running it; the command has no other way to learn your pairing
+decision, so this one substitution stays manual — **you must do it for every run**, and it is the
+one piece of this command that is not, and cannot be made, constant. Never fill it with text
+copied from the draft or its path.
+
+The command prints **one result line per currently-staged `.path` file that passed both checks**,
+each line naming that draft's own path, and a `refusing ...` line on stderr for every file that
+failed either check (a non-code file name, or content whose path does not fully match the pattern
+or whose embedded code does not equal the file name) — a refused file is never opened. **Read only
+the line naming your own draft's path**; other lines belong to other concurrent dispatches sharing
+the same `_working/idea-planner/` directory, not to you. The command exits nonzero if *any* staged
+file was refused, even when your own draft's line printed cleanly — a sibling dispatch's bad file
+still turns the exit code red, so check the printed line for your own path rather than the exit
+code alone to learn whether your own draft specifically conforms.

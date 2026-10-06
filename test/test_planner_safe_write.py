@@ -1,4 +1,5 @@
-"""The planner's safe-write rule must never pass draft content or its path through the shell.
+"""The planner's safe-write rule must never pass draft content or its path through the shell, and
+two concurrent dispatches must never be able to overwrite each other's staged path.
 
 The documented command shape in `agent-workflows/idea-planner-agent.md` (and its generated
 `.claude/agents/idea-planner.md`) has gone through several hazards:
@@ -8,18 +9,23 @@ The documented command shape in `agent-workflows/idea-planner-agent.md` (and its
 - round 3/4: an unquoted, then double-quoted, then heredoc-on-stdin path argument broke on a path
   containing a space, an apostrophe, a double quote, a `$`-prefixed token, a backtick, or an
   embedded newline whose own line matched the heredoc delimiter.
-- round 6 (current, a reproduced REJECT): the heredoc delimiter, however long and fixed, is
-  public - written directly in this file - so a payload containing that exact line still ended
-  the heredoc early and let a trailing `touch ...` run as a real shell command, with Python's
-  `re.fullmatch()` never even reached. The fix removes the heredoc, `Bash`, and all path/byte
-  substitution entirely: `Write` puts the draft at its destination and the chosen path, alone, in
-  a fixed scratch file (`_working/idea-planner/draft-path.txt`); the check command that follows
-  is byte-identical on every dispatch - it names that fixed file as a literal string in its own
-  source and never receives the path or the draft's bytes as shell input of any kind.
+- round 6: the heredoc delimiter, however long and fixed, is public - written directly in this
+  file - so a payload containing that exact line still ended the heredoc early and let a trailing
+  `touch ...` run as a real shell command before `re.fullmatch()` ever ran. The fix moved the path
+  off `Bash` entirely: `Write` wrote it to a fixed scratch file the constant check command read.
+- round 7 (current, gating major): that fixed scratch file is shared, so two concurrent planner
+  dispatches in one worktree could overwrite each other's path and have the check silently
+  validate the wrong draft. The fix names the scratch file by the dispatch's own reserved code
+  (`<code>.path`), and the constant check command now globs every staged `.path` file, validates
+  each file's name against the code pattern and each file's content against the ADR-019 path
+  pattern - requiring the embedded code to equal the file name - printing one result line per
+  valid draft (naming its own path) and a `refusing ...` line per invalid one, and exiting nonzero
+  if any staged file was refused.
 
 Every test here extracts the exact command from the generated agent file (not a hand-written
 equivalent) and runs it via the shell against a temporary repository layout, so a regression back
-to any earlier shape - or a real draft-path.txt in the real repository - never happens.
+to any earlier shape - or a real file under the real repository's `_working/idea-planner/` -
+never happens.
 """
 
 from __future__ import annotations
@@ -32,7 +38,7 @@ ROOT = Path(__file__).resolve().parents[1]
 AGENT_FILE = ROOT / ".claude" / "agents" / "idea-planner.md"
 
 _FENCE_RE = re.compile(r"```bash\n(.*?)\n```", re.DOTALL)
-_SCRATCH_PATH = "_working/idea-planner/draft-path.txt"
+_SCRATCH_DIR = "_working/idea-planner"
 
 _SECTIONS = (
     "## Context and scope\n\nFixture body.\n",
@@ -55,47 +61,45 @@ def _extract_check_command() -> str:
     blocks = _FENCE_RE.findall(text)
     assert blocks, "no fenced bash block found in the generated planner agent file"
     command = blocks[-1]
-    assert _SCRATCH_PATH in command, "expected the fixed scratch-file path in the command"
-    assert "re.fullmatch" in command
+    assert _SCRATCH_DIR in command, "expected the scratch directory in the command"
+    assert "glob.glob" in command, "expected the command to glob every staged .path file"
     return command
 
 
-def _run(workdir: Path, scratch_content: str) -> subprocess.CompletedProcess[str]:
-    """Write `scratch_content` to the fixed scratch file under `workdir` and run the constant
-    check command there, unmodified except for the pairing-decision placeholder."""
-    scratch = workdir / _SCRATCH_PATH
+def _write_path_file(workdir: Path, code: str, content: str) -> None:
+    scratch = workdir / _SCRATCH_DIR / f"{code}.path"
     scratch.parent.mkdir(parents=True, exist_ok=True)
-    scratch.write_text(scratch_content)
+    scratch.write_text(content)
 
+
+def _run(workdir: Path) -> subprocess.CompletedProcess[str]:
     command = _extract_check_command()
     command = command.replace("depends_on=[...], documents={...}", "depends_on=[], documents={}")
     return subprocess.run(["bash", "-c", command], cwd=workdir, capture_output=True, text=True)
 
 
-def _run_for_promoted_path(
-    workdir: Path, relative_path: str, content: str
-) -> subprocess.CompletedProcess[str]:
-    """Write a real draft at `relative_path` under `workdir`, point the scratch file at it (with
-    a trailing newline, matching what `Write` would produce), and run the check command."""
+def _stage_draft(workdir: Path, code: str, relative_path: str, content: str) -> None:
+    """Write a real draft file at `relative_path` and its matching `<code>.path` scratch file."""
     full = workdir / relative_path
     full.parent.mkdir(parents=True, exist_ok=True)
     full.write_text(content)
-    return _run(workdir, relative_path + "\n")
+    _write_path_file(workdir, code, relative_path + "\n")
 
 
-def test_generated_command_has_no_heredoc_bash_substitution_or_path_placeholder() -> None:
-    """Round 6: the fix removes the heredoc and all shell-level path/byte substitution."""
+def test_generated_command_has_no_heredoc_bash_substitution_or_shared_fixed_name() -> None:
+    """Round 6/7: no heredoc, no stdin/argv substitution, and no single shared scratch file name -
+    the command globs every `*.path` file instead of naming one fixed file."""
     command = _extract_check_command()
     assert "<<" not in command, "no heredoc of any kind"
     assert "$(cat" not in command
     assert "sys.argv" not in command
     assert "sys.stdin" not in command
-    assert "<reserved-code>" not in command, "no path placeholder - the command is constant"
-    assert f"open('{_SCRATCH_PATH}')" in command
+    assert "draft-path.txt" not in command, "the single shared scratch file must be gone"
+    assert "glob.glob('_working/idea-planner/*.path')" in command
 
 
 def test_generated_agent_declares_write_in_its_tools() -> None:
-    """Part 1: the planner's generated frontmatter now includes `Write`."""
+    """The planner's generated frontmatter includes `Write`."""
     frontmatter = AGENT_FILE.read_text().split("---", 2)[1]
     tools_line = next(line for line in frontmatter.splitlines() if line.startswith("tools:"))
     tools = {t.strip() for t in tools_line.split(":", 1)[1].split(",")}
@@ -103,120 +107,168 @@ def test_generated_agent_declares_write_in_its_tools() -> None:
     assert "Bash" in tools
 
 
-def test_live_reject_payload_in_scratch_file_is_refused_and_marker_never_created(
-    tmp_path: Path,
-) -> None:
-    """The round-6 reproduced REJECT: a scratch-file payload carrying the old heredoc delimiter
-    line, an `EOF` line, and a `touch <marker>` line. Since there is no heredoc any more, this is
-    just inert file content read by `open()` - the `touch` line can never run as a shell command,
-    and the embedded newlines fail `re.fullmatch()` regardless."""
+def test_two_concurrent_drafts_each_get_their_own_result_line(tmp_path: Path) -> None:
+    """Round 7's actual fix: two distinct codes staged at once, each missing a *different* GOV-010
+    section, each produce a result line naming only that draft's own path and its own missing
+    section - proving one dispatch's check can never read or report on another's draft."""
+    _stage_draft(
+        tmp_path,
+        "PLAN-930",
+        "docs/00-working/promoted/PLAN-930-track-one.md",
+        _draft(omit="Open questions"),
+    )
+    _stage_draft(
+        tmp_path,
+        "REQ-931",
+        "docs/00-working/promoted/REQ-931-track-two.md",
+        _draft(omit="Decisions"),
+    )
+
+    result = _run(tmp_path)
+
+    assert result.returncode == 0, result.stderr
+    lines = result.stdout.strip().splitlines()
+    assert len(lines) == 2
+    plan_line = next(line for line in lines if "PLAN-930" in line)
+    req_line = next(line for line in lines if "REQ-931" in line)
+    assert "missing=('Open questions" in plan_line
+    assert "missing=('Design" not in plan_line
+    assert "missing=('Design" in req_line
+    assert "missing=('Open questions" not in req_line
+
+
+def test_mismatched_code_between_file_name_and_content_is_refused(tmp_path: Path) -> None:
+    """A `.path` file named `PLAN-932.path` whose content names a *different* code
+    (`PLAN-933-...`) is refused - the file name is the only thing a concurrent dispatch cannot
+    collide on, so content must be checked against it, not trusted alone."""
+    draft = tmp_path / "docs/00-working/promoted/PLAN-933-track.md"
+    draft.parent.mkdir(parents=True, exist_ok=True)
+    draft.write_text(_draft())
+    _write_path_file(tmp_path, "PLAN-932", "docs/00-working/promoted/PLAN-933-track.md\n")
+
+    result = _run(tmp_path)
+
+    assert result.returncode != 0
+    assert "does not match" in result.stderr
+    assert "PLAN-930" not in result.stdout
+
+
+def test_path_file_name_outside_the_code_pattern_is_refused(tmp_path: Path) -> None:
+    """A `.path` file whose stem is not a reserved-code shape at all is refused, not silently
+    skipped."""
+    _write_path_file(tmp_path, "not-a-code", "docs/00-working/promoted/PLAN-934-track.md\n")
+
+    result = _run(tmp_path)
+
+    assert result.returncode != 0
+    assert "is not a reserved code" in result.stderr
+
+
+def test_live_reject_payload_is_refused_and_marker_never_created(tmp_path: Path) -> None:
+    """Round 6's reproduced REJECT, restaged under the new per-code file: the old heredoc
+    delimiter line, an `EOF` line, and a `touch <marker>` line as file *content* never execute -
+    there is no heredoc any more, so this is just inert text `open()` reads, and the embedded
+    newlines fail the path pattern regardless."""
     marker = tmp_path / "PWNED_MARKER.txt"
     payload = (
-        "docs/00-working/promoted/PLAN-909-fixture.md\n"
+        "docs/00-working/promoted/PLAN-935-fixture.md\n"
         "PLANNER_DRAFT_PATH_EOF_9f3b6a2d1e8c4caa\n"
         "EOF\n"
         f"touch {marker}\n"
     )
-    result = _run(tmp_path, payload)
+    _write_path_file(tmp_path, "PLAN-935", payload)
+
+    result = _run(tmp_path)
+
     assert result.returncode != 0
     assert "refusing" in result.stderr.lower()
-    assert not marker.exists(), "nothing in the scratch file may ever execute as a shell command"
+    assert not marker.exists()
 
 
 _HAZARDS = {
-    "double_quote": 'docs/00-working/promoted/PLAN-910-it"s.md',
-    "dollar_home": "docs/00-working/promoted/PLAN-911-$HOME.md",
-    "command_sub": "docs/00-working/promoted/PLAN-912-$(id).md",
-    "backtick": "docs/00-working/promoted/PLAN-913-`id`.md",
-    "apostrophe": "docs/00-working/promoted/PLAN-914-it's.md",
-    "space": "docs/00-working/promoted/PLAN-915-bad slug.md",
-    "backslash": "docs/00-working/promoted/PLAN-916-bad\\slug.md",
-    "trailing_space": "docs/00-working/promoted/PLAN-917-slug.md ",
-    "leading_dash": "docs/00-working/promoted/PLAN-918--leading-dash.md",
-    "unicode": "docs/00-working/promoted/PLAN-919-café.md",
-    "tab": "docs/00-working/promoted/PLAN-920-bad\tslug.md",
+    "double_quote": 'docs/00-working/promoted/PLAN-940-it"s.md',
+    "dollar_home": "docs/00-working/promoted/PLAN-941-$HOME.md",
+    "command_sub": "docs/00-working/promoted/PLAN-942-$(id).md",
+    "backtick": "docs/00-working/promoted/PLAN-943-`id`.md",
+    "apostrophe": "docs/00-working/promoted/PLAN-944-it's.md",
+    "space": "docs/00-working/promoted/PLAN-945-bad slug.md",
+    "backslash": "docs/00-working/promoted/PLAN-946-bad\\slug.md",
+    "trailing_space": "docs/00-working/promoted/PLAN-947-slug.md ",
+    "leading_dash": "docs/00-working/promoted/PLAN-948--leading-dash.md",
+    "unicode": "docs/00-working/promoted/PLAN-949-café.md",
+    "tab": "docs/00-working/promoted/PLAN-950-bad\tslug.md",
 }
 
 
-def test_eleven_hazardous_paths_are_refused_cleanly(tmp_path: Path) -> None:
-    """The earlier rounds' character hazards, now all exercised as pure path-file content: none
-    of them matches `[a-z0-9-]+`'s slug restriction, and each is refused with a clear message and
-    a nonzero exit - nothing is ever executed as a shell command, because the command never puts
-    any of this text on a command line or in a heredoc."""
+def test_eleven_hazardous_path_contents_are_refused_and_nothing_runs(tmp_path: Path) -> None:
+    """The earlier rounds' character hazards, each staged as one code's `.path` content: none of
+    them matches the restricted slug shape, each is refused with a clear message, and nothing is
+    ever executed as a shell command, because the command never puts any of this text on a
+    command line or in a heredoc."""
     marker = tmp_path / "hazard_marker.txt"
-    for name, hazard_path in _HAZARDS.items():
-        result = _run(tmp_path, hazard_path + "\n")
-        assert result.returncode != 0, f"{name}: expected refusal, got {result.stdout!r}"
-        assert "refusing" in result.stderr.lower(), f"{name}: expected a refusal message"
+    for index, (name, hazard_path) in enumerate(_HAZARDS.items()):
+        code = f"PLAN-9{index:02d}"
+        _write_path_file(tmp_path, code, hazard_path + "\n")
+
+    result = _run(tmp_path)
+
+    assert result.returncode != 0
+    assert result.stderr.lower().count("refusing") == len(_HAZARDS)
     assert not marker.exists()
     assert len(_HAZARDS) == 11
 
 
 def test_legitimate_plan_path_reads_the_exact_file(tmp_path: Path) -> None:
-    """A valid PLAN path passes and the exact drafted file is read."""
-    result = _run_for_promoted_path(
-        tmp_path, "docs/00-working/promoted/PLAN-921-fixture-track.md", _draft()
+    """A valid PLAN code and path pass and the exact drafted file is read."""
+    _stage_draft(
+        tmp_path, "PLAN-951", "docs/00-working/promoted/PLAN-951-fixture-track.md", _draft()
     )
+    result = _run(tmp_path)
     assert result.returncode == 0, result.stderr
     assert "conformant=True" in result.stdout
 
 
 def test_legitimate_req_path_reads_the_exact_file(tmp_path: Path) -> None:
-    """A valid REQ path passes too - both series ADR-019 actually covers."""
-    result = _run_for_promoted_path(
-        tmp_path, "docs/00-working/promoted/REQ-922-fixture-track.md", _draft()
+    """A valid REQ code and path pass too - both series ADR-019 actually covers."""
+    _stage_draft(
+        tmp_path, "REQ-952", "docs/00-working/promoted/REQ-952-fixture-track.md", _draft()
     )
+    result = _run(tmp_path)
     assert result.returncode == 0, result.stderr
     assert "conformant=True" in result.stdout
 
 
 def test_child_code_path_reads_the_exact_file(tmp_path: Path) -> None:
     """A child code such as PLAN-041.02 (the `.NN` sub-plan suffix `codes.py`'s `COUNTER`
-    pattern allows) is accepted."""
-    result = _run_for_promoted_path(
-        tmp_path, "docs/00-working/promoted/PLAN-041.02-fixture-child.md", _draft()
+    pattern allows), including in the `.path` file's own name, is accepted."""
+    _stage_draft(
+        tmp_path,
+        "PLAN-041.02",
+        "docs/00-working/promoted/PLAN-041.02-fixture-child.md",
+        _draft(),
     )
+    result = _run(tmp_path)
     assert result.returncode == 0, result.stderr
     assert "conformant=True" in result.stdout
-
-
-def test_two_distinct_valid_paths_each_read_their_own_exact_file(tmp_path: Path) -> None:
-    """Two distinct, valid promoted-draft paths, each missing a *different* GOV-010 section, each
-    produce a result naming only that path's own missing section."""
-    result_a = _run_for_promoted_path(
-        tmp_path,
-        "docs/00-working/promoted/PLAN-923-track-one.md",
-        _draft(omit="Open questions"),
-    )
-    assert result_a.returncode == 0, result_a.stderr
-    assert "missing=('Open questions" in result_a.stdout
-    assert "missing=('Design" not in result_a.stdout
-
-    result_b = _run_for_promoted_path(
-        tmp_path,
-        "docs/00-working/promoted/REQ-924-track-two.md",
-        _draft(omit="Decisions"),
-    )
-    assert result_b.returncode == 0, result_b.stderr
-    assert "missing=('Design" in result_b.stdout
-    assert "missing=('Open questions" not in result_b.stdout
 
 
 def test_a_draft_containing_triple_quotes_still_works(tmp_path: Path) -> None:
     """Round 2's regression case: `\"\"\"` inside the draft's body is fine - it is read with
     `open()`, never interpolated into Python source."""
     content = _draft().replace("Fixture body.", 'Contains a literal """ sequence.')
-    result = _run_for_promoted_path(
-        tmp_path, "docs/00-working/promoted/PLAN-925-triple-quote-fixture.md", content
+    _stage_draft(
+        tmp_path, "PLAN-953", "docs/00-working/promoted/PLAN-953-triple-quote-fixture.md", content
     )
+    result = _run(tmp_path)
     assert "SyntaxError" not in result.stderr, result.stderr
     assert result.returncode == 0, result.stderr
     assert "conformant=True" in result.stdout
 
 
 def test_non_plan_req_series_is_refused(tmp_path: Path) -> None:
-    """Minor finding: the series is restricted to PLAN or REQ - ADR-019's own scope - so an ADR
-    (or any other series) path is refused even though it otherwise fits the shape."""
-    result = _run(tmp_path, "docs/00-working/promoted/ADR-019-x.md\n")
+    """The series is restricted to PLAN or REQ - ADR-019's own scope - so an ADR (or any other
+    series) path is refused even though the file name/content pairing otherwise lines up."""
+    _write_path_file(tmp_path, "ADR-019", "docs/00-working/promoted/ADR-019-x.md\n")
+    result = _run(tmp_path)
     assert result.returncode != 0
     assert "refusing" in result.stderr.lower()
