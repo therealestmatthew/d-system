@@ -25407,3 +25407,13 @@ Related ideas (all triaged): 000014 (audit hooks and settings.json), 000306 (.co
 The rule (GOV-001, phase-dgov-01) requires a requirement document once one plan has more than one backlog phase, so splitting a multi-phase plan into several one-phase plan documents escapes it. Fix the rule text, the check and a test.
 
 Source: phase-dgov-01 gating review F02, accepted by the owner 2026-10-05 for a follow-up. Sent by Session 5 - Batch Runner.
+
+---
+
+## 000594 · File Browser shows "Loading…" forever when a folder's fetch fails after a folder change
+
+**Created 2026-10-05T20:36:00-04:00 · Status: `open`**
+
+FileBrowserRegion's render checks entriesFolder !== contextFolder before loadState === 'error', so the error message never appears. Pre-existing on dev; seen while fixing lint in phase-sch-03.
+
+Sent by Session 2 - Builder B.
