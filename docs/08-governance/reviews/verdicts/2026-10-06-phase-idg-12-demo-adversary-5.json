@@ -1,0 +1,26 @@
+{
+  "verdict_id": "2026-10-06-phase-idg-12-demo-adversary-5",
+  "date": "2026-10-06",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "d09dc52b061a150a121220eef8858aa04b321fd7",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "The fix does not make injection impossible: the heredoc delimiter PLANNER_DRAFT_PATH_EOF_9f3b6a2d1e8c4caa is checked into the tracked agent prompt, so a payload containing a line matching it verbatim still terminates the heredoc early, before Python's check runs.",
+      "evidence": "agent-workflows/idea-planner-agent.md:141-147, .claude/agents/idea-planner.md. Reproduced live: a path payload containing the delimiter line followed by `touch .../PWNED_MARKER` executed the touch as a shell command (marker file created) while Python saw only the truncated first line (FileNotFoundError); re.fullmatch() never ran. test/test_planner_safe_write.py:364-378 only checks properties of the delimiter string and documents the gap as an accepted limit; no test feeds the token through the real command.",
+      "consequence": "Injection remains possible for anyone who reads the repository; the prose claim that the delimiter is unguessable is false.",
+      "minimal_fix": "Stop passing the path through a shell heredoc at all: the agent writes the path to a fixed scratch file with its file-write tool (not bash) and the Python command open()s that file directly."
+    }
+  ],
+  "raw_reply_sha256": "13c7f556f2e65f97c6d64c5e9941904c1857a9b88fef59a6ee7151af7cea9f71",
+  "outcomes": [],
+  "notes": "Round 6, a short re-review of one fix under the owner's 2026-10-06 slug-enforcement ruling. Dispatched and briefed by the Session Manager after the runner finished. Brief: the round-5 finding, the owner's ruling, the questions on the regex and on injection before the shell parses the heredoc, the fix delta 4ddc4484 -> d09dc52b as a file path (docs/03-sessions excluded), and the runner manifest _working/review-checks/phase-idg-12/d09dc52b061a/ (8 entries, passed). Raw reply kept at _working/session-manager/review-replies/phase-idg-12-d09dc52b-demo-adversary.md, as received with the harness's indentation removed. Its \"Minor\" paragraph lists checks that held (regex matches codes.py COUNTER including child codes; tests fail on the pre-fix form; generated file current) and is not recorded as findings. SM observation, not a change to the finding: the agent definition's tools line is `Read, Grep, Bash`, yet its \"How you write the draft\" section tells it to write the draft \"with your file-write tool\"; without a Write tool the draft content itself would also pass through Bash."
+}
