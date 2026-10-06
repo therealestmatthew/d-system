@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-06-phase-idg-12-demo-adversary-4",
+  "date": "2026-10-06",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "d466d5772b6fac5416c8c691fece7e5e4fd9e81b",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "A path containing an embedded newline where one internal line is literally EOF breaks the heredoc: the first line becomes the path, EOF ends the heredoc early, and the rest is parsed as separate shell commands.",
+      "evidence": "Tried `weird\\nEOF\\nrest.md` with the exact extracted command: observed FileNotFoundError + `bash: rest.md: command not found`.",
+      "consequence": "The reviewer judged it does not matter for this use case, since the path is built from a reserved code and a slug, \"neither of which can contain a newline by construction\" — recorded as a minor/non-blocking observation."
+    }
+  ],
+  "raw_reply_sha256": "9175c1ce4604bff71f511d7f79cc445fa785e8654c49b8da24f4007cc2eabd69",
+  "outcomes": [],
+  "notes": "Round 5, a short re-review of one fix under the owner's 2026-10-06 ruling to pass the draft path through a quoted heredoc. Dispatched and briefed by the Session Manager after the runner finished. Brief: the round-4 finding, the owner's ruling, the hazards to try, the fix delta 548156a6 -> d466d577 as a file path (docs/03-sessions excluded), and the runner manifest _working/review-checks/phase-idg-12/d466d5772b6f/ (8 entries, passed). Raw reply kept at _working/session-manager/review-replies/phase-idg-12-d466d577-demo-adversary.md, as received with the harness's indentation removed. All 11 named hazards passed; the tests fail on the round-3 form. The reviewer labelled the EOF case \"Minor/non-blocking observation only\"; it is recorded as minor. SM note, not a change to the finding: no code in src/ or tools/ validates a slug's characters, so \"by construction\" is not enforced; the SM raised this with the owner."
+}

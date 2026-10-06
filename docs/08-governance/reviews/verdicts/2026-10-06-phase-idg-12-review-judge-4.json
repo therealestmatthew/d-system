@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-06-phase-idg-12-review-judge-4",
+  "date": "2026-10-06",
+  "phase": "phase-idg-12",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "reviewed_commit": "d466d5772b6fac5416c8c691fece7e5e4fd9e81b",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "The quoted heredoc would mis-terminate early if a path's own line were literally EOF.",
+      "evidence": "Informational; the owner's ruling did not ask for that case and the test suite did not add it.",
+      "consequence": "Noted only because it is the one hazard class outside the ruling's named set; not scored as unmet."
+    }
+  ],
+  "raw_reply_sha256": "30d4a6664dd6f383d66f27f7dd76c77741f9d252cb57e90f12ddeea403adeec5",
+  "outcomes": [],
+  "notes": "Round 5, a short re-review of one fix under the owner's 2026-10-06 ruling to pass the draft path through a quoted heredoc. Dispatched and briefed by the Session Manager after the runner finished. Brief: the round-4 finding, the owner's ruling, the hazards to try, the fix delta 548156a6 -> d466d577 as a file path (docs/03-sessions excluded), and the runner manifest _working/review-checks/phase-idg-12/d466d5772b6f/ (8 entries, passed). Raw reply kept at _working/session-manager/review-replies/phase-idg-12-d466d577-review-judge.md. No checkout (shadow judge). It labelled its point \"Minor (informational, not a defect)\"; recorded as minor."
+}
