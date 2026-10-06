@@ -25508,18 +25508,48 @@ Secondary, not part of this ask: nothing enforces kebab-case promoted-plan filen
 
 ## 000597 · Record who created each idea on its created event
 
-**Created 2026-10-06T07:53:00-04:00 · Status: `open`**
+**Created 2026-10-06T07:53:00-04:00 · Status: `triaged`**
 
 Record who created each idea — the owner or a named agent/session — as a field on the `created` event written by append_idea.py, so agent-generated ideas can be counted and filtered. Today only annotations and classifications carry an author.
 
 Sent by Session 1 - Builder A, for the owner.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-06T08:25:16-04:00): Not yet delivered; no plan, requirement, ADR or backlog phase covers it. The created event carries only idea, event, at, eid, title and body: tools/append_idea.py:207-208 (build_created) takes no author, and schemas/idea.schema.json's created-event branch lists author among forbidden properties (around line 244). src/db/ideas.py's fold initialises no author from a created event. Annotations and classifications already carry author, so the field shape exists elsewhere in the schema.
+
+The change touches the schema, build_created and its CLI, and fold together (REQ-014 R06 expects schema changes to land in one commit across them). Open questions for whoever plans it: what to record for the 598 existing ideas, and whether the value is free text or a controlled list (owner vs named session/agent).
+
+Related, not overlapping: 000048 (idea scribe agent) and 000127 (idea skill delegates capture to a subagent) move where capture runs; either would supply the author this field records. PLAN-029 / REQ-014 (idea graph and lifecycle) and ADR-010 (idea staging) do not address authorship of created events. No proposed link or promotion.
+
+</details>
+
 ---
 
 ## 000598 · An owner review session over every triaged idea, to pick out the meaningful ones and set aside or discard the rest
 
-**Created 2026-10-06T07:53:04-04:00 · Status: `open`**
+**Created 2026-10-06T07:53:04-04:00 · Status: `triaged`**
 
 An owner review session over every triaged idea (565 on 2026-10-06; 417 named in no backlog phase) to pick out which ones are meaningful and which to set aside or discard.
 
 Sent by Session 1 - Builder A, for the owner.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-06T08:25:17-04:00): Not yet delivered as asked; no backlog phase or plan schedules an owner review session over all triaged ideas. Counts reproduced on dev 2026-10-06 via fold: 565 triaged, 417 of them not named anywhere in docs/09-backlog/backlog.yaml (six-digit id match).
+
+Closest existing mechanism: the partition-ideas workflow (agent-workflows/partition-ideas.md; PLAN-025, built by phase-part-03), which groups triaged ideas and puts grouping, hold-outs and a decline tier to the owner at three gates. It ran once, on 2026-09-23, over 383 triaged ideas; the result is docs/00-working/idea-partition-2026-09-23.md (ungoverned staging). That run predates about 180 of today's triaged ideas, and it partitions ideas into tracks and groups rather than asking the owner to judge each idea's worth, so it is a possible input to this session, not a substitute for it.
+
+Related: 000395 (idea clusters above a threshold go through partition-ideas before planning), 000453 (terminology for idea dispositions: discard, set aside, include), 000456 (extend the plugin to the whole pipeline including partition).
+
+PROPOSED LINK: 000598 --relates_to--> 000453 (000598 needs the set-aside and discard dispositions that 000453 names)
+
+</details>
