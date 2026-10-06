@@ -1,0 +1,26 @@
+{
+  "verdict_id": "2026-10-06-phase-idg-12-demo-adversary-3",
+  "date": "2026-10-06",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "4be47bdbce5183f4353c125df48c19fb43bce9ad",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Double quotes do not survive every hazard: a path containing \" breaks the command, and $ or backtick content is expanded inside the double quotes, silently mangling the path; the instruction does not warn about these or tell the agent to refuse such a path.",
+      "evidence": "Literal extracted command from .claude/agents/idea-planner.md run against: embedded \" → `bash: -c: line 6: unexpected EOF while looking for matching `\"'`; $VAR fragment → argv[1] with $VAR stripped, FileNotFoundError; backtick fragment → command substitution, path mangled. Guidance text at .claude/agents/idea-planner.md:157-159 and agent-workflows/idea-planner-agent.md:137-139 names only spaces and apostrophes. No slug-sanitization rule is enforced in src/governance or ADR/GOV text.",
+      "consequence": "$/backtick remain a real, demonstrated silent-corruption path the current instruction text does not warn about; \" is a loud failure.",
+      "minimal_fix": "Name \", $ and backtick in the caution note and tell the agent to refuse/escalate rather than substitute such a path, since no quoting style in this command shape survives all three."
+    }
+  ],
+  "raw_reply_sha256": "c4ddfdf73051017b397d1158154a83a41fb1812ba36bde42c9dea28efd9b4a3f",
+  "outcomes": [],
+  "notes": "Round 4, a short re-review of one fix under the owner's 2026-10-06 ruling to fix round 3's unquoted-path finding (an earlier acceptance, relayed on the SM's wrong claim that paths never contain spaces, was withdrawn). Dispatched and briefed by the Session Manager after the runner finished. Brief: the finding, the owner's ruling, the hazards to try (space, apostrophe, double quote, $, backtick, leading dash, unicode), the fix delta 4be47bdb~1 -> 4be47bdb as a file path (docs/03-sessions excluded), and the runner manifest _working/review-checks/phase-idg-12/4be47bdbce51/ (8 entries, passed). Raw reply kept at _working/session-manager/review-replies/phase-idg-12-4be47bdb-demo-adversary.md, as received with the harness's indentation removed. The space/apostrophe finding was confirmed fixed (reverting the quoting made both new tests fail); leading dash and unicode paths passed."
+}
