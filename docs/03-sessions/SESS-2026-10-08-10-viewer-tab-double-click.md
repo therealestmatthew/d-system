@@ -108,3 +108,14 @@ This phase touched no Python; the failure was not retried or skipped and is reco
   (outside the deliverable); reported as an idea.
 - Commit trailers use `Claude Sonnet 5.5` per the session's attribution reminder; the builder
   contract's text names `Claude Fable 5.1`. The session URL line is identical.
+
+## Review
+
+Gating review by `demo-adversary` at commit `6dc3656`: verdict pass, two minor findings. The verdict
+record is `docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-01-demo-adversary.json`.
+
+- F01 (Shift+Space may also fire a click on keyup in Firefox): fixed. The tab-select button now has an
+  `onKeyUp` handler that calls `preventDefault` for Shift+Space, and the keyboard test fires `keyUp`
+  too, asserting the event is cancelled for Shift+Space only and that Tab 3 is not selected.
+- F02 (the same-URL test cannot tell the active tab from the clicked tab): accepted, no change. The
+  own-file-URL and keyboard tests cover that case, as the reviewer confirmed by mutation.
