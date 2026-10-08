@@ -8676,7 +8676,8 @@ items:
   - sys-wb-explorers
   - sys-wb-viewer
   owner: repository-owner
-  status: queued
+  agent: agent-batch-runner
+  status: active
   priority: 2
   session_budget: 1
   depends_on:
@@ -9376,7 +9377,8 @@ items:
   systems:
   - sys-ui
   owner: repository-owner
-  status: queued
+  agent: agent-builder-b
+  status: active
   priority: 2
   session_budget: 1
   depends_on:

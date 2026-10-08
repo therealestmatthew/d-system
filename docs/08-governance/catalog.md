@@ -511,8 +511,8 @@ CI regenerates it and fails on any difference.
 | PLAN-024 | doc-consultant-demo-kit | draft | 0 | 0 | 4 | agent-kit |
 | PLAN-025 | doc-repeatable-idea-partition | draft | 0 | 0 | 3 | agent-build, agent-builder-b, agent-partition |
 | PLAN-026 | doc-concurrency-git-safety | active | 6 | 0 | 4 | agent-conc, agent-coord, agent-night |
-| PLAN-027 | doc-workbench-features-defects | draft | 12 | 2 | 5 | agent-builder-a, agent-builder-b, agent-demo-a, agent-prog, agent-standby, agent-standby-3 |
-| PLAN-028 | doc-workbench-architecture-quality | draft | 15 | 0 | 5 | agent-arch, agent-arch-vocab, agent-batch-runner, agent-builder-a, agent-prog |
+| PLAN-027 | doc-workbench-features-defects | draft | 11 | 3 | 5 | agent-builder-a, agent-builder-b, agent-demo-a, agent-prog, agent-standby, agent-standby-3 |
+| PLAN-028 | doc-workbench-architecture-quality | draft | 14 | 1 | 5 | agent-arch, agent-arch-vocab, agent-batch-runner, agent-builder-a, agent-prog |
 | PLAN-029 | doc-idea-graph-lifecycle | active | 15 | 0 | 5 | agent-builder-a, agent-builder-b, agent-coord, agent-night |
 | PLAN-030 | doc-document-backlog-governance | active | 4 | 0 | 4 | agent-batch-runner, agent-builder-b, agent-coord, agent-night |
 | PLAN-031 | doc-agent-engineering-delegation | active | 12 | 0 | 2 | agent-build, agent-night |
