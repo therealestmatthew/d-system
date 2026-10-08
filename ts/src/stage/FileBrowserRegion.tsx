@@ -604,12 +604,15 @@ export default function FileBrowserRegion() {
           </select>
         </div>
         <div className="stage-file-browser__tree" role="tree" aria-label="File Browser tree">
-          {loadState === 'loading' || entriesFolder !== contextFolder ? (
-            <p className="stage-placeholder-text" role="status">Loading…</p>
-          ) : loadState === 'error' ? (
+          {loadState === 'error' ? (
+            // Tested first: a failed fetch never advances `entriesFolder`, so after a folder
+            // change the mismatch test below would otherwise hide the error behind "Loading…".
+            // `loadState` is 'error' only when the failure belongs to the current `contextFolder`.
             <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">
               Could not search <code>{contextFolder}</code>.
             </p>
+          ) : loadState === 'loading' || entriesFolder !== contextFolder ? (
+            <p className="stage-placeholder-text" role="status">Loading…</p>
           ) : tree.children.length === 0 ? (
             <p className="stage-placeholder-text">
               {filtersActive ? 'No matching files.' : 'No files here.'}
