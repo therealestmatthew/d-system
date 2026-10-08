@@ -1,0 +1,34 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-01-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-01",
+  "reviewed_commit": "6dc36563591b1b2c080e55ae74fdccdc3f15f57f",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Shift+Space may still fire click on keyup in Firefox",
+      "evidence": "onKeyDown preventDefault only; native button Space activates on keyup; test fires keyDown only",
+      "consequence": "At worst also selects the tab; no open/close misfire",
+      "minimal_fix": "Optional onKeyUp preventDefault for Shift+Space"
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Same-URL-as-link test does not distinguish active from clicked tab",
+      "evidence": "Active-tab mutation fails only tests 1 and 5 (2 of 5); test 2 passes because Tab 1 is active",
+      "consequence": "None; tests 1 and 5 cover it",
+      "minimal_fix": "None needed"
+    }
+  ],
+  "raw_reply_sha256": "005b6ab7775d0c29768ac848f8cf6ae1251be48abcfe157222fc75d16971f774",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager (subagent run, 2026-10-08). Brief: phase entry from dev's backlog.yaml (deliverables widened on the trunk at ad2d5cb by the vitest file), range 211ee2e..6dc3656, diff with the session record and backlog bookkeeping excluded, scratch clone at the reviewed commit; the adversary ran build, tests, lint, governance and three mutations itself. No builder-written input."
+}
