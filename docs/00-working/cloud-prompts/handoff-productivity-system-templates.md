@@ -1,0 +1,159 @@
+# Handoff: productivity-system review, portfolio guide, template exploration and GOV-022
+
+*Ran unclaimed: owner-directed work with no backlog phase; no peer holds a lock against it. Not a
+row of `status.md`: this session ran from the owner's own kickoff, not from `master-prompt.md`, and
+its hand-off follows the shape `GOV-022` prescribes.*
+
+## 1. Branch and tip
+
+- Branch: `claude/productivity-system-templates-ie1x8d` (assigned by the cloud harness).
+- Cut from `origin/dev` at `6951bb6`. `origin/dev` had not moved when the final gates ran.
+- Tip when the gates ran: `acd52ba`. Two commits follow it, both outside governed documents: the
+  guide page citing the recorded idea ids (`_public/` only) and this hand-off.
+- The clone opened shallow (52 commits). `git fetch --unshallow origin dev` was run for the gate;
+  see section 5.
+
+## 2. What changed
+
+- `docs/08-governance/GOV-022-single-session-orchestration-protocol.md`: added, `status: draft`.
+  The multi-session coordination protocol (`GOV-017`) restructured for one session that runs
+  subagents in its own checkout. Collapses the roster into the session, drops the
+  primary-checkout lock, turn messages, claim slots and the board, keeps every trunk and review
+  protection, adds the subagent model-tier and dispatch rules, the hand-off shape and a kickoff
+  text. Every rule not already in `GOV-017` or `GOV-013` is marked **proposed**; six open
+  questions.
+- `docs/08-governance/catalog.md`: regenerated for the new document.
+- `_public/portfolio-guide.html`: the executive guide to the personal productivity system, set in
+  the house family with native `<details>` cards and no script: records, data flow, using it
+  today, built versus planned, open work, the four template families, the timeline and Gantt
+  assessment, twelve further proposals, a build order, and decisions for the owner. Also published
+  as a private claude.ai artifact (link given to the owner in the session).
+- `_data/ideas.jsonl`: sixteen ideas appended through `tools/append_idea.py add --file`, ids
+  `000600` to `000615` (section 3). `docs/00-working/ideas.md` regenerated.
+- This file.
+
+Commits: `7537268` (GOV-022, catalog, guide), `acd52ba` (the sixteen ideas and `ideas.md`), then
+the guide citation and this hand-off.
+
+## 3. Codes and ids allocated
+
+- `GOV-022` (`uv run python -m src.governance --next-code governance`, run once, after
+  `uv sync --extra dev`). `--next-code` reserves only on this machine, so the gate should check it
+  is still free on current `dev`.
+- Ideas `000600` to `000615`, taken from `append_idea.py`'s own output after `git fetch origin dev`
+  showed `origin/dev` at `6951bb6` (last idea there: `000599`). If ideas were recorded on `dev`
+  after that, these ids collide and `_data/ideas.jsonl` conflicts on rebase; `GOV-022` Open
+  question 3 is this hazard. The ids and titles:
+
+  | Id | Title |
+  |---|---|
+  | 000600 | Template: simple timeline of a project's dated events |
+  | 000601 | Template: Gantt chart, project level first |
+  | 000602 | Template: commitments ledger |
+  | 000603 | Template: portfolio dashboard |
+  | 000604 | Template: one-page project brief |
+  | 000605 | Template: person profile and stakeholder card |
+  | 000606 | Template: kanban status board |
+  | 000607 | Template: agenda and calendar view |
+  | 000608 | Template: waiting-on board |
+  | 000609 | Template: stale radar and review queue page |
+  | 000610 | Template: weekly review page |
+  | 000611 | Template: decision register |
+  | 000612 | Template: commitment velocity trend |
+  | 000613 | Template: RACI and role matrix |
+  | 000614 | Shared portfolio data loader and a richer fictional fixture set |
+  | 000615 | phase-syn-05 depends on the cancelled phase-html-10 and a retired page pipeline |
+
+## 4. Review
+
+No adversarial review was dispatched. The owner's kickoff asked for a review-and-summarise pass, an
+artifact, a template exploration and the protocol restructuring, and set the subagent budget at
+Haiku by default with Sonnet as the ceiling; it did not ask for a review of the outputs. `GOV-022`
+is `draft` and its *Reviews in a single session* section says what a review of it would need. The
+gate may dispatch one (`partition-adversary`, Sonnet, brief: `GOV-022`, `GOV-017`, `GOV-013`, the
+three `cloud-prompts` hand-offs; nothing from this session's reasoning).
+
+## 5. Gate output
+
+Run in this clone at `acd52ba` after `uv sync --extra dev` and `cd ts && npm ci`.
+
+```text
+$ uv run python -m src.governance
+Governance OK: 45 systems, 456 documents, 37 memories, 347 backlog phases
+
+$ uv run ruff check src/ test/ tools/
+All checks passed!
+
+$ uv run mypy src/
+Success: no issues found in 50 source files
+
+$ uv run python tools/check_diff_patterns.py origin/dev..HEAD
+Diff patterns OK: no added type-ignore, cast(Any, or broad except/pass in origin/dev..HEAD.
+
+$ cd ts && npm test
+ Test Files  2 passed (2)
+      Tests  7 passed (7)
+
+$ uv run pytest -q  (shallow clone, 52 commits)
+4 failed, 1649 passed, 1 skipped, 1 deselected   [the deselected test failed in the -x run first]
+FAILED test/test_containment.py::test_repository_history_reports_the_known_phase_prog_cases
+FAILED test/test_idea_classification.py::test_every_pre_change_idea_folds_to_identical_state
+FAILED test/test_idea_classification.py::test_the_log_before_the_change_is_a_byte_identical_prefix
+FAILED test/test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused
+
+$ git fetch --unshallow origin dev   (1879 commits)
+$ uv run pytest -q test/test_idea_classification.py test/test_run_review_checks.py test/test_containment.py
+1 failed, 80 passed
+FAILED test/test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused
+E   Failed: DID NOT RAISE Refused
+```
+
+- Three failures were the shallow clone: the tests read `0f142ce:_data/ideas.jsonl` and walk
+  `phase-prog-*` history, neither of which the 52-commit clone held. They pass with full history.
+- One failure is the container: the test makes a directory unwritable and expects the runner to
+  refuse it; this session runs as `root`, for which `chmod` denies nothing. It does not touch this
+  branch's changes (`tools/run_review_checks.py` is unchanged) and should pass on the gate's
+  machine. Not fixed here: a fix would widen the branch into a tool this session did not change.
+- `docs/08-governance/catalog.md` was checked with `git diff --exit-code` after every `pytest` run:
+  unchanged each time.
+- The test-baseline check (`tools/check_test_baseline.py`, `OPS-031`) was not run: it needs a
+  base JUnit report from `dev`'s tip, and the same two environmental failures would appear in both.
+  The gate's machine should run it.
+
+## 6. Assumptions made
+
+Ranked by how much a different answer would change.
+
+1. **The clone is the worktree.** No sibling worktree was cut inside the container; the clone is the
+   isolation `AGENTS.md`'s rule exists for, as the three earlier cloud sessions did. `GOV-022`
+   departure 1, Open question 4.
+2. **Ideas recorded on the branch, not handed to Ideation.** The owner chose "record each as an
+   idea"; the id-collision hazard is stated in section 3 and in `GOV-022` Open question 3.
+3. **`GOV-022` is `draft`, with the model-tier rule marked proposed.** The owner's Haiku-default
+   instruction was treated as the rule for this session and recorded as a proposal, not a standing
+   rule, per `CLAUDE.md`'s rule against generalising a one-time instruction. Open question 1.
+4. **The guide's as-of figures are from this branch on 2026-10-08** and were computed by script
+   from `backlog.yaml` and `ideas.jsonl`, with three figures corrected after a verification run
+   (14, not 20, open phases sit on the blocker chain; 8 overview templates; 15 templates in all).
+5. **Sonnet for one agent.** The template exploration is design judgment; Haiku ran the document
+   digest. Stated in the kickoff reply before dispatch.
+
+## 7. Open questions and anything left undone
+
+- The six open questions in `GOV-022`, starting with whether the Haiku-default rule is standing.
+- The decisions list in the guide (section 9): the portfolio data question (`phase-proj-01`),
+  which template first, timeline shape, Gantt scope and the `start_date` field, the as-of date
+  rule, re-scoping `phase-syn-05`, and the structuring command gap.
+- `GOV-017` and `PROMPT-037` were not edited to point at `GOV-022`; that is Open question 6.
+- `docs/00-working/cloud-prompts/status.md` was not edited; this session is not one of its rows.
+- No pull request was opened; `dev` is the integration branch and the merge is the owner's call.
+
+## 8. Spend posture
+
+| Dispatch | Type | Model | Why this tier |
+|---|---|---|---|
+| Document digest (schemas, data root, capture, API, plans, procedures) | `Explore`, read-only | Haiku | Cited-fact extraction |
+| Template exploration (timeline, Gantt, further proposals, build order) | `general-purpose`, read-only | Sonnet | Design judgment and ranking; Haiku judged not fit |
+
+Two agents in total, both read-only, both dispatched in one turn. No Opus. No fix cycles. One worker
+restart mid-session, with nothing lost because every result was already in a file.
