@@ -4,15 +4,22 @@ id: doc-workbench-layout-decision
 code: ADR-016
 title: Layouts are versioned repository JSON; the browser stores only selections
 kind: adr
-status: accepted
+status: superseded
 owner: repository-owner
 created: '2026-09-10'
-updated: '2026-09-10'
+updated: '2026-10-08'
 systems: [sys-ui]
 depends_on: [doc-workbench-requirements]
 ---
 
 # Layouts are versioned repository JSON; the browser stores only selections
+
+> **Superseded 2026-10-08 by the slot configuration-schema model
+> ([ADR-031](ADR-031-slot-configuration-schema-model.md)), proposed and awaiting the owner's
+> ratification.** Decisions 1, 3 and 4 below carry forward (decision 1 without its "set of panel
+> types it admits" clause, decision 3 with its stored shape widened to panel instances); decision 2
+> (no geometry editing) is replaced. This record stays as the account of what demo week chose and why,
+> and describes what the workbench shipped under `schema_version` 3.
 
 ## Context
 

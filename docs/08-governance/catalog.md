@@ -20,7 +20,7 @@ CI regenerates it and fails on any difference.
 | ADR-013 | adr | superseded | repository-owner | docs/04-decisions/ADR-013-demo-terminal-capability.md |
 | ADR-014 | adr | accepted | repository-owner | docs/04-decisions/ADR-014-workbench-terminal-capability.md |
 | ADR-015 | adr | accepted | repository-owner | docs/04-decisions/ADR-015-workbench-api-surface.md |
-| ADR-016 | adr | accepted | repository-owner | docs/04-decisions/ADR-016-workbench-layout-persistence.md |
+| ADR-016 | adr | superseded | repository-owner | docs/04-decisions/ADR-016-workbench-layout-persistence.md |
 | ADR-017 | adr | accepted | repository-owner | docs/04-decisions/ADR-017-prompt-pack-methodology.md |
 | ADR-018 | adr | accepted | repository-owner | docs/04-decisions/ADR-018-langgraph-orchestration.md |
 | ADR-019 | adr | accepted | repository-owner | docs/04-decisions/ADR-019-promoted-plan-staging.md |
@@ -34,6 +34,7 @@ CI regenerates it and fails on any difference.
 | ADR-028 | adr | accepted | repository-owner | docs/04-decisions/ADR-028-build-in-public-content-chain.md |
 | ADR-029 | adr | draft | repository-owner | docs/04-decisions/ADR-029-bookmark-categories-and-batch-bridge.md |
 | ADR-030 | adr | draft | repository-owner | docs/04-decisions/ADR-030-terminal-interaction-api.md |
+| ADR-031 | adr | draft | repository-owner | docs/04-decisions/ADR-031-slot-configuration-schema-model.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
@@ -570,4 +571,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-467 documents — adr: 27, architecture: 12, governance: 19, operation: 29, plan: 81, prompt: 43, requirement: 36, session: 220.
+468 documents — adr: 28, architecture: 12, governance: 19, operation: 29, plan: 81, prompt: 43, requirement: 36, session: 220.
