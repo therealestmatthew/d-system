@@ -33,8 +33,8 @@ carried no mtime and the phase was not frontend-only. The `DirectoryEntry` model
 
 - **Route.** `DirectoryEntry.modified_at: str | None = None`, filled by both routes through
   `_to_entry`. Format: ISO 8601 UTC with millisecond precision and a `Z` suffix, for example
-  `2026-10-08T07:15:11.240Z`. `null` when `stat` fails (a dangling symlink, a delete between listing
-  and stat). The field is optional with a default, so a client that predates it reads the same
+  `2026-10-08T07:15:11.240Z`. `null` when the time cannot be read or held (a delete between listing
+  and stat, an out-of-range mtime); read with `lstat` after the fix round below. The field is optional with a default, so a client that predates it reads the same
   entries; the File Browser and the explorers were not edited and their tests pass.
 - **How the viewer learns the mtime.** It does not take the time from the dropdown's cached search
   result, which goes stale. For the displayed file it requests
@@ -88,7 +88,7 @@ alone is 324 px wide there and wrapping it costs the page area its 60 px floor.
 
 See the hand-off message for the command tails. In short: `pytest test/test_workbench_api.py` 50
 passed (4 new); `cd ts && npm test` 152 passed (6 new); `npm run build` built; the five gates ran
-after the last code commit. Full `pytest`: `2 failed, 2072 passed, 1 skipped in 399.17s`. The two
+after the last code commit (re-run after the fix round, below). Full `pytest`: `2 failed, 2072 passed, 1 skipped in 399.17s`. The two
 failures are the known ones, neither retried nor skipped: `test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused`
 (idea 000604, uid 0 ignores `chmod 0o500`) and `test_demo_terminal_api.py::test_control_characters_reach_the_shell`
 (load-sensitive flake; this phase touched no terminal code).
@@ -115,3 +115,69 @@ failures are the known ones, neither retried nor skipped: `test_run_review_check
   session URL line is identical. Left for the Session Manager to rule on.
 - `docs/06-requirements/REQ-037-workbench-content-fit-contracts.md` line 212 says phase-wbf-02 "will
   add" the badge; it was not edited (outside the deliverables).
+
+## Fix round after review
+
+The first review (at `3bdb606`) gave: gating adversary REJECT (1 major, 3 minor), gating security
+review PASS (3 minor), shadow judge PASS (5 findings). The three verdict records are committed
+unchanged under `docs/08-governance/reviews/verdicts/` (`2026-10-08-phase-wbf-02-demo-adversary.json`,
+`-security-review.json`, `-review-judge.json`). The Session Manager ruled: ISO 8601 UTC string with
+local display accepted; re-select reloads the frame accepted; trailers for new commits use
+`Claude Fable 5.1`, no history rewrite. The fix is one code-and-tests commit; this record and the
+verdicts are separate commits.
+
+- **Adversary F01 (major) and judge F01: the bridge paths never refreshed the badge.** Confirmed:
+  `openInTab` on the file a tab already shows changed no state. `openInTab` now bumps the refresh
+  token when the target tab's `selectedFile` equals the path, which re-checks the page, reloads the
+  frame and re-reads the mtime. `openFiles` needs no bump and none was added: `planOpenFiles`
+  only fills an empty tab (`pageKey` goes from null to the file) or a new tab (a new id) and never
+  replaces a tab holding a page, so a delivered file always starts a fresh read. A comment in
+  `openFiles` says so. Tests: `openInTab` on the displayed file with a changed mock mtime (fails
+  without the bump, checked by removing it), and `openFiles` of a file another tab already shows
+  (new tab, newer time).
+- **Adversary F02 and judge F02: inline wrap and styles; compact badge tried.** Styling stays inside
+  `HtmlViewerRegion.tsx` (`StagePage.css` is not a deliverable). A compact badge (`10-08 07:15`, 66
+  px against 167 px) was tried both with and without the header wrap, with a file selected
+  (`selected_file` seeded through `localStorage`; the fit script seeds null, so a separate
+  Playwright measurement was used: html-viewer in the primary slot, `_public/overview/index.html`
+  selected, headless Chromium). Without the wrap a compact badge still overflows the row (37 px at
+  layout 1 1024x768, 57 px at layout 2 1280x720, 143 px at layout 2 1024x768) and the header grows to 54 px.
+  With the wrap it gives exactly the heights of the full badge, because the controls group
+  (324 px) wraps under the title row regardless. No compact form keeps the header on one row at
+  1280x720 in layout 2 (the title and controls alone take 377 px of a 395 px section) or avoids the
+  1024x768 clip, so the full badge and the wrap are kept. Header height and page-area height per
+  cell (px), before this phase / with the committed badge and wrap:
+
+  | Cell | Header before | Header after | Page area before | Page area after | Controls past section edge before / after |
+  |---|---|---|---|---|---|
+  | layout 1, 1280x720 | 40 | 63 | 200 | 178 | none / none |
+  | layout 1, 1024x768 | 54 | 63 | 210 | 201 | none / none |
+  | layout 2, 1280x720 | 54 | 77 | 97 | 75 | none / none |
+  | layout 2, 1024x768 | 54 | 77 | 116 | 93 | 69 px / 16 px |
+
+  The layout 2 1024x768 clip (the Embedded toggle partly past the section edge) is the pre-existing
+  000637 finding; it is 53 px smaller than before, not fixed. The cost of the badge is 9 to 23 px of
+  header height and the same loss of page area in every cell; that is the trade this record
+  documents for the Session Manager. The live fit check (`--panel html-viewer`) is unchanged at 39
+  pass, 2 fail, 4 findings because it seeds no selected file and never renders the badge.
+- **Adversary F03 and security F01: out-of-range mtime.** `_modified_at` now builds the datetime
+  inside the `try` and catches `OSError`, `OverflowError` and `ValueError`, returning `None`. Test:
+  a patched `lstat` with `st_mtime = 2**40` gives HTTP 200 on `/list` and `/search` and a null
+  `modified_at` for that entry.
+- **Security F02: symlink target mtime.** `_modified_at` uses `lstat`, so a symlink reports its own
+  mtime and never the target's. Test: a symlink in the repository to a file outside it, with
+  different times on link and target, reports the link's time. The earlier test of a dangling link
+  now asserts the link still has its own time, and a removed path gives `None`.
+- **Adversary F04: pending state and zone.** A vitest holds the list response for the second tab
+  with a deferred promise and asserts the badge reads `Modified …`, then the new time once
+  released. The zone is stated in the badge's title ("your local time"), not in the visible text,
+  to keep the badge short; a test asserts the title. The visible text stays `Modified YYYY-MM-DD HH:mm:ss`.
+- **Notes with no code change.** Security F03: the viewer's one-directory list per select, tab
+  switch and Refresh costs a `git check-ignore` subprocess per listing, which the route already paid
+  for every listing before this phase. Judge F03: `Modified time unavailable` is shown for three cases
+  (a null mtime, no list entry for the file, a failed request); they are not told apart. Judge F04:
+  the `mtime_probe` fixture creates its temporary directory under the real `docs/` tree and removes
+  both in a `finally`. Judge F05: the two full-suite failures are the known environment ones.
+- **Rebase.** Rebased onto `ccr-b69b05b4-tdcrux` at `9f0b740`; the only conflict was
+  `docs/08-governance/catalog.md`, resolved by regenerating it.
+- **Checks after the fix.** See the hand-off message for the command tails.

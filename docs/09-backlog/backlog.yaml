@@ -9389,6 +9389,9 @@ items:
   - ts/src/stage/HtmlViewerRegion.tsx
   - ts/src/stage/HtmlViewerRegion.test.tsx
   - docs/03-sessions/SESS-2026-10-08-19-viewer-last-modified-badge.md
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-02-demo-adversary.json
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-02-security-review.json
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-02-review-judge.json
   result: 'The list and search routes now return modified_at (ISO 8601 UTC, ms, Z suffix; null when
     unreadable) on every entry, optional so the File Browser and explorers are unchanged. The viewer
     header shows Modified YYYY-MM-DD HH:mm:ss, re-read on tab switch, selection, re-selection of the
@@ -9396,7 +9399,9 @@ items:
     152 passed. npm run build built. Live Chromium check: badge equals stat on disk, swaps per tab, and
     advances after touch and re-select. REQ-037 html-viewer live check: before 39 pass, 2 fail, 4
     findings; after 39 pass, 2 fail, 4 findings, the layout 2 1024x768 header overflow down from 377 to
-    324 px. Full pytest: 2 failed (the two known environment and load failures), 2072 passed.'
+    324 px. Full pytest at the first review: 2 failed (the two known environment and load failures), 2072 passed.
+    Fix round after the review (bridge re-open, lstat, out-of-range mtime, pending test): test_workbench_api
+    52 passed, ts npm test 156 passed, build and lint clean.'
 - id: phase-wbf-03
   title: Decide the bookmark category storage, reference and batch-bridge model
   plan: doc-workbench-features-defects
