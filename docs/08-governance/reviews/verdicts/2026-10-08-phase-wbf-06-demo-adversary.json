@@ -1,0 +1,65 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-06-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-06",
+  "reviewed_commit": "08330a9f131994f02e92f83d9d952f83990ceca6",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "A single long entry stops scrolling forever once auto-advance was switched on, and the disabled control cannot undo it",
+      "evidence": "loop={!autoAdvance || entry === null} while autoAdvance survives a file switch. Browser: enable Auto-advance on a 3-entry file, switch to a 1-entry long file: button 'Auto-advance: On', disabled, aria-pressed true; animation running:1 then finished:1 at translateX(-514px), still parked at 17 s; nothing rotates or repeats. No vitest case covers it.",
+      "consequence": "The entry is parked at its tail with no way to restart it except reload or file switch; contradicts the stated rule that a scrolling entry repeats when the timed advance is not rotating.",
+      "minimal_fix": "loop={!(autoAdvance && entryCount >= 2) || entry === null} (or reset autoAdvance when entries < 2) and add a vitest case."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "Reduced-motion path is unreadable in layout 1 with classic scrollbars",
+      "evidence": "overflowX:'auto' on the 18.4 px entry; with Chromium scrollbars not hidden, offsetHeight - clientHeight = 15, clientHeight = 3 at 1280x720 and 1024x768 in layout 1; screenshot shows only a scrollbar. Hidden-scrollbar headless runs and the live check do not see it.",
+      "consequence": "A vertical clip (forbidden by R12 and the REQ-037 marquee rule) for readers who request reduced motion on desktops with visible scrollbars.",
+      "minimal_fix": "Use overflow-x:auto with scrollbar-width:none/thin so no height is lost, or fall back to the wrapped, vertically scrolling box for reduced motion."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Remaining live findings are four kinds, not two",
+      "evidence": "After the change: visible dropdown trigger (000628), silent-clip on section.stage-notes-strip (scroll 519x33 in 519x26, follows from the trigger), tooltip not-clipped (phase-wbf-14), and popover 'Choose a file' not-starved (HTML Viewer, 000117 / phase-wbf-13); all four exist on the base. The active-entry finding (441x71, 334x106 boxes) is gone: pass=14 fail=4, 8 findings vs base pass=12 fail=6, 10 findings.",
+      "consequence": "No effect on this phase; the gate record would otherwise misname the residue.",
+      "minimal_fix": "Record all four residual kinds with their owners."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Image entries are thumbnail-sized in layout 1",
+      "evidence": "1024x768 svg renders 436.7x18.4 (1280) and 330x18.4 (1024); minHeight 1.4em makes the 18.4 px entry taller than the 13 px padded row content. Layout 2 renders 329x205 correctly; no overflow, no page scroll.",
+      "consequence": "R14 met literally; the owner sees an unreadable image in layout 1.",
+      "minimal_fix": "State in the sizing rule that images are meant for layout 2 or a taller slot."
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "Notices scroll as a ticker in layout 1 and entry textContent is doubled",
+      "evidence": "Mixed-file rejection renders data-notes-variant=ticker in layout 1; image notices have textContent such as 'No images in docs.No images in docs.' (aria-hidden measurer plus visible text).",
+      "consequence": "Cosmetic; text-extraction tools and textContent-based tests see duplicates.",
+      "minimal_fix": "Optional: render notices without the ticker, keep the measurer outside the entry box."
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "title": "Inline styles override the stylesheet's overflow rule",
+      "evidence": "ENTRY_BOX_STYLE sets overflow:hidden inline over .stage-notes-strip__current { overflow-y: auto } in StagePage.css; no clash, inline wins; StagePage.css is not a deliverable.",
+      "consequence": "A later edit to that CSS overflow rule will silently have no effect.",
+      "minimal_fix": "None required; note for a later CSS pass."
+    }
+  ],
+  "raw_reply_sha256": "0724b2555d3f05489c2d3c9081d240256bfa3deb54bdad7be4fec268a0261c47",
+  "outcomes": []
+}

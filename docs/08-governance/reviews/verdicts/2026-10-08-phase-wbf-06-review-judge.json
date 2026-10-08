@@ -1,0 +1,50 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-06-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-06",
+  "reviewed_commit": "08330a9f131994f02e92f83d9d952f83990ceca6",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "reject",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "After the interval elapses mid-scroll, a manual Previous or Next double-steps",
+      "evidence": "NotesStripRegion.tsx: TextEntryView's second effect `() => () => onHold(false)` runs after the animation effect's cleanup has set scrollRef to null. holdEntry then calls advanceIfDue with intervalElapsedRef still true (reset only in the timer effect body) and heldRef false, so it calls setCurrent(v => v + 1) a second time. NotesStripRegion.test.tsx 'lets the dropdown move to the next entry at once, mid-scroll' clicks before the 6 s interval elapses, so it does not reach this state.",
+      "consequence": "With timed advance on, a long entry scrolling and the interval already elapsed, Next skips an entry and Previous nets zero movement. This contradicts the stated R13 rule that Previous and Next apply at once.",
+      "minimal_fix": "Reset intervalElapsedRef on every change of current, or have the unmount cleanup only clear heldRef without calling advanceIfDue. Add a test that elapses the interval mid-scroll and then clicks Previous or Next."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Live fit-contract run not evidenced and REQ-037 not amended",
+      "evidence": "The runner manifest has no --live run. REQ-037 'Boundaries and unresolved' says the fixing phase reruns the command and names the moving element if it is not .stage-notes-strip__current; the moving element is the data-notes-part=track span, and the diff does not touch REQ-037.",
+      "consequence": "R12's zero page scroll, the bounded marquee, the silent-clip rule and R14's image sizing in the real layout are unverified. jsdom tests stub every measurement.",
+      "minimal_fix": "Run uv run python test/test_workbench_fit_contracts.py --live <url> --self-test, record the result, and name the track element in the REQ-037 notes-strip row."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "A single unbroken token wider than the box clips",
+      "evidence": "The variant decision uses only measurer.offsetHeight <= box.clientHeight + 1. ENTRY_BOX_STYLE sets overflow: hidden, replacing the stylesheet's overflow-y: auto.",
+      "consequence": "A long URL or other unbroken token stays plain and is clipped with no scrollbar or animation, against R12 and the REQ-037 silent-clip rule.",
+      "minimal_fix": "Also treat measurer.scrollWidth > contentWidth as the ticker condition."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Mixing ruling recorded only in a code comment; single-entry loop differs from the written rule",
+      "evidence": "The NotesEntry docblock marks the ruling 'proposed, awaiting the owner's ratification'. loop = !autoAdvance || entry === null, so with auto-advance on and one entry the scroll plays one pass and stops, while the docblock says a scroller repeats until the reader moves on.",
+      "consequence": "R14's stated ruling is met in the implementation but absent from governed documents. The single-entry case contradicts the written rule.",
+      "minimal_fix": "Make loop true when entryCount < 2, and record the ruling in REQ-012 or GOV-003 once ratified."
+    }
+  ],
+  "raw_reply_sha256": "6bfc6ec9b15a89e3716850cec36b9daea25e892bc50ac7126ffe03b1baf8e787",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), same brief as the gating reviewer plus the runner manifest; no checkout. Its F01 (a reachable double-step on Previous/Next) is carried to the builder's fix round whatever the gating verdict. Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}
