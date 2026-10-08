@@ -9519,7 +9519,8 @@ items:
   systems:
   - sys-ui
   owner: repository-owner
-  status: queued
+  agent: agent-standby
+  status: active
   priority: 3
   session_budget: 1
   depends_on:
