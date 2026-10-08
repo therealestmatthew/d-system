@@ -1,0 +1,66 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-03-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-03",
+  "reviewed_commit": "4cc805c0584bc2ca791369ea5aab58467778e02b",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "wbf-04 cannot be built inside its deliverables; ADR does not assign the viewer's openFiles implementation",
+      "evidence": "ADR-029 lines 247-285 and 356-363 versus backlog phase-wbf-04 deliverables (ts/src/stage/panelBridge.ts only) and HtmlViewerRegion.tsx:289-295 (the handle literal that must implement openFiles); ADR widens wbf-05's deliverables but not wbf-04's",
+      "consequence": "A required openFiles member breaks wbf-04's npm run build; an optional or implemented one edits a file outside its deliverables; leaving it to wbf-05 leaves R07 without a real target or test file. The wbf-04 builder must guess.",
+      "minimal_fix": "State which phase implements viewer openFiles and the R07/R08 tests, and note that wbf-04's deliverables need widening to HtmlViewerRegion.tsx and a test file (or make the member optional in wbf-04 and implement in wbf-05)."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Keyed multi-handle BridgeSlot semantics under-specified (unregister key, get() fallback, stable getAll snapshot)",
+      "evidence": "ADR lines 249-254; callers HtmlViewerRegion.tsx:296-297 and TerminalRegion.tsx:466-467 pass no key; panelBridge.ts:100,107 use useSyncExternalStore",
+      "consequence": "A fresh array per getAll() call loops the hook; unregister-by-key and get() fallback order are left to the builder.",
+      "minimal_fix": "Specify unregister by handle identity across keys, a cached getAll() array replaced only on register/unregister, and get() falling back to the previous remaining handle."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "'slot' used for the bridge channel after adopting slot = container vocabulary",
+      "evidence": "ADR lines 132-134 versus lines 249, 262, 266, 288 ('A slot can hold several live handles', '{ slot, call, key? }')",
+      "consequence": "Readers will confuse bridge slots with layout slots; the glossary has no BridgeSlot entry.",
+      "minimal_fix": "Say 'bridge channel (BridgeSlot)' and rename the indicative target field."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "category_id derivation has unhandled cases (empty slug, Windows reserved device names)",
+      "evidence": "ADR lines 171-173 (slug pattern, id is file name stem) and 193-195 (Windows supported)",
+      "consequence": "Names with no ASCII alphanumerics yield an invalid empty id; 'con'/'nul' ids produce files Windows cannot create.",
+      "minimal_fix": "Add a fallback id with numeric suffix for empty slugs and a suffix rule for reserved device names."
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "Cross-OS validity claim contradicts case-preserving path storage",
+      "evidence": "ADR lines 193-195 versus line 199",
+      "consequence": "Mis-cased entries resolve on Windows but read missing on Linux, contrary to 'leaves every entry valid'.",
+      "minimal_fix": "Narrow the claim to absolute-path breakage and state case mismatches surface as missing."
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "title": "ADR-009 and ADR-015 extended in effect with no signpost; data root outside repo unaddressed",
+      "evidence": "src/db/source_validation.py:44-50 (only ENTITY_DIRECTORIES honour the override) versus ADR line 366; ADR-015 rule 4 'Read-only' text unchanged; data_root() may be absolute outside the repo",
+      "consequence": "A later reader of ADR-015 or ADR-009 meets an unflagged contradiction; write boundary for an out-of-repo data root is not stated.",
+      "minimal_fix": "Add an open item: on ratification add an 'extended by ADR-029' pointer to ADR-015 rule 4, update the data_root() docstring, and state the data root is itself the write boundary."
+    }
+  ],
+  "raw_reply_sha256": "11abba5f5da47bda3f92cb96714720e82e47a1428371511066f29258cf02ea9e",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager (subagent run, 2026-10-08). Brief: phase entry from dev's backlog.yaml, range fc7e42f..4cc805c, diff with the session record and backlog bookkeeping excluded, scratch clone at the reviewed commit. The runner manifest was still being produced when the adversary ran; it ran the verification itself. No builder-written input."
+}
