@@ -17782,3 +17782,14 @@ items:
   - docs/00-working/demo-runbook.md
   next_action: Read the runbook's HTML Viewer entry and the toggle's code, then add the entry. If
     phase-wbf-01 has changed the header since 2026-10-08, re-read the header before writing.
+  session: doc-session-html-viewer-toggle-runbook
+  completion_evidence:
+  - docs/00-working/demo-runbook.md
+  - docs/03-sessions/SESS-2026-10-08-04-html-viewer-toggle-runbook.md
+  result: 'Runbook HTML Viewer entry names the Embedded and Open-in-tab link (rung 3) toggle by both
+    labels, says what each state shows and how to switch back, and records the rung 3 versus rung 7
+    mismatch; neither ladder nor the label changed. grep -n "Open-in-tab" docs/00-working/demo-runbook.md
+    prints lines 254 and 256. uv run python -m src.governance exit 0: Governance OK: 45 systems, 459
+    documents, 37 memories, 354 backlog phases (run after this record was added). uv run pytest -q -x test/test_governance*.py
+    test/test_codes.py: 106 passed. uv run ruff check src/ test/ tools/: All checks passed. Click check
+    of R31 in a running viewer not run (no browser per dispatch).'

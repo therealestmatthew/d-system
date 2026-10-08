@@ -466,6 +466,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-10-08-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-01-bookmark-category-decision.md |
 | SESS-2026-10-08-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-02-execute-workbench-identifier-migration.md |
 | SESS-2026-10-08-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-03-ports-processes-lifecycle-exploration.md |
+| SESS-2026-10-08-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-04-html-viewer-toggle-runbook.md |
 
 ## Plans and their phases
 
