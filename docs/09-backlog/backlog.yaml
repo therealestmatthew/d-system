@@ -17765,6 +17765,21 @@ items:
     bubble's bounding box against the strip's, to confirm the clipping comes from the region's
     overflow hidden and not from the shared popover. If the measurement says otherwise, stop and
     report before editing.
+  session: doc-session-tooltip-bottom-clip
+  completion_evidence:
+  - ts/src/stage/Tooltip.tsx
+  - ts/src/stage/Tooltip.test.tsx
+  - ts/src/stage/StagePage.css
+  - docs/03-sessions/SESS-2026-10-08-18-tooltip-bottom-clip.md
+  result: 'Measured first: the notes strip bubble was 240x113 at (760,106), bottom 219, in a strip
+    whose bottom was 109 (1280x720), so the clip came from .stage-region overflow hidden and not
+    the shared popover. Tooltip now portals into document.body and is placed with choosePlacement.
+    Fit check --live --quick: tooltip not-clipped findings gone, 32 findings to 30. Playwright
+    hover on all 14 tooltip triggers (notes, terminal, overview; 1280x720 and 1024x768; layout-1,
+    layout-2, layout-2 with overview): bubble inside the viewport, text fits, collapses on
+    pointer leave, zero page scroll. ts: 123 tests pass (11 new in Tooltip.test.tsx), build and
+    lint clean. src.governance OK, ruff and mypy clean. Full pytest 1 failed
+    (test_an_unwritable_worktree_parent_is_refused, root; idea 000604), 2065 passed.'
 - id: phase-wbf-15
   title: Show the File Browser error when a folder listing fails after a folder change
   plan: doc-workbench-features-defects
