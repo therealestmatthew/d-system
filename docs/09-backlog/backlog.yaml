@@ -17397,7 +17397,6 @@ items:
   ideas:
   - '000246'
   systems:
-  - sys-api
   - sys-demo-stage
   - sys-wb-terminal
   owner: repository-owner
@@ -17414,11 +17413,13 @@ items:
     (src/api/routes/demo_terminal.py:377 breaks the receive loop after
     DEFAULT_IDLE_TIMEOUT_SECONDS = 300 with no client frame, and the panel sends frames only for
     keystrokes and resizes, so shell output alone does not reset it); the six-session cap; an
-    exception in the output pump; the shell exiting; and the effect cleanup in
-    ts/src/stage/TerminalRegion.tsx that closes and reopens a socket on a remount.'
+    exception in the output pump; the shell exiting; the effect cleanup in
+    ts/src/stage/TerminalRegion.tsx that closes and reopens a socket on a remount; and a Vite full
+    reload or HMR after a source edit, and the /api websocket proxy.'
   - 'For each candidate record which side closed the socket, with what close code and reason, after
     how long, whether the shell process survived, and whether the panel opened a second session or
-    only showed its closed message (TerminalRegion.tsx:341).'
+    only showed its closed message (TerminalRegion.tsx:341). Write the findings in
+    docs/00-working/terminal-unprovoked-drop-diagnosis.md (new).'
   - 'Add a test to test/test_demo_terminal.py that exercises the closing path found. Apply a fix
     only when the cause is found and the change is a few lines in demo_terminal.py or
     TerminalRegion.tsx; otherwise record the proposed fix in the note and stop.'
@@ -17478,8 +17479,10 @@ items:
   - 'Audit all nine consumers of the popover (HtmlViewerRegion, InjectionDropdowns, TerminalMenu,
     TerminalRegion, NotesStripRegion, DirectoryPickerDialog and CommandPanel in ts/src/stage;
     LayoutConfigDialog and Slot in ts/src/workbench) and record each one''s visible height and
-    outcome in docs/00-working/popover-consumer-audit.md. Fix only what the shared component
+    outcome in docs/00-working/popover-consumer-audit.md (new), measuring only the consumers
+    reachable in the stock layouts. Fix only what the shared component
     causes; list a consumer-specific problem in the note.'
+  - Add ts/src/stage/Popover.test.tsx (new) covering the side choice and the height clamp.
   - 'Leave out a user-resizable popup: idea 000108 calls it worth considering, not required.'
   acceptance:
   - REQ-012 R25 holds - at 1280x720 and 1024x768 in both layouts the file selector shows at least
@@ -17499,8 +17502,8 @@ items:
   - docs/00-working/popover-consumer-audit.md
   next_action: Before editing, open the file selector in the running workbench at 1280x720 and
     record which side it opens on, its bubble height and how many entries show, so the change is
-    measured against a baseline. Then list the consumers with grep -rln "Popover" ts/src and check
-    the count against the nine named here.
+    measured against a baseline. Then list the consumers with grep -rl "from '.*Popover'" ts/src (nine hits) and
+    check the count against the nine named here.
 - id: phase-wbf-14
   title: Stop the notes strip tooltip being cut off at the panel bottom
   plan: doc-workbench-features-defects
@@ -17527,6 +17530,7 @@ items:
     to the viewport as ts/src/stage/Popover.tsx already does with a portal, keeping the hover and
     focus open and the pointer-leave collapse of REQ-006 R03. It has three consumers
     (NotesStripRegion, TerminalRegion and OverviewRegion); all three get the fix.'
+  - Add ts/src/stage/Tooltip.test.tsx (new) covering the bubble's placement and the hover collapse.
   - Leave the notes strip's font size and text capacity unchanged. The idea asks for them to be
     reconsidered, which is a design decision for the owner, and phase-wbf-06 already changes how
     the strip handles long entries. Record the open question in the session record.
@@ -17571,8 +17575,9 @@ items:
   - Test the error state before the folder-mismatch test, and keep the stale-render protection the
     mismatch test exists for (buildTree at line 351 still receives no entries from another
     folder).
-  - 'Add a vitest test that fails on the current order: a fetch that succeeds for the first
-    folder and fails for the second, then a browse to the second.'
+  - 'Add ts/src/stage/FileBrowserRegion.test.tsx (new) with a vitest test that fails on the
+    current order: a fetch that succeeds for the first folder and fails for the second, then a
+    browse to the second.'
   acceptance:
   - REQ-012 R28 holds - after browsing to a folder whose listing fails, the panel shows the
     could-not-search message with role alert, not Loading, and a later successful browse replaces
@@ -17614,6 +17619,8 @@ items:
     on every file response (Content-Security-Policy: sandbox, ts/vite.config.ts:264) is the
     candidate discriminator; state the choice and its reason. Do not edit ts/vite.config.ts; if
     the discriminator needs a change there, stop and report.'
+  - Add ts/src/stage/HtmlViewerRegion.test.tsx (new), stubbing fetch to return an ok response
+    without the discriminating header and expecting the absent-page message.
   - 'Leave OverviewRegion.tsx:64 alone: it probes the generated-overview route, which is always
     registered.'
   acceptance:
@@ -17657,8 +17664,10 @@ items:
   - 'Make the panel quote the backend''s reason for a startup failure, using the existing
     refusal message path (connectionRefusalMessage), and keep the generic message for a session
     that ran and ended.'
-  - 'Add a vitest test with a stub WebSocket that opens and then closes with code 4003 and the
-    backend''s reason, and expect that reason on screen.'
+  - 'Add ts/src/stage/TerminalRegion.test.tsx (new) with a vitest test using a stub WebSocket
+    that opens and then closes with code 4003 and the backend''s reason, and expect that reason
+    on screen. The test may mock @xterm/xterm and @xterm/addon-fit, or the close-event handling
+    may be extracted into an exported function that the test calls directly.'
   - Leave out the Windows ConPTY adapter after a failed spawn. It is an owner-machine check;
     mark it not run.
   acceptance:

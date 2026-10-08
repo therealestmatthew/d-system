@@ -308,7 +308,7 @@ A scan of the idea log on 2026-10-08 found open workbench ideas that no phase co
 were raised after this plan was written (the unprovoked terminal drop on 2026-09-15, the review
 follow-ups of early October); others were recorded earlier and missed the partition. **The owner
 decided on 2026-10-08 to amend this plan with phases for the uncovered defect ideas, so they can be
-built in the same run.** The amendment adds `G57` to `G63`, seven phases and eight requirement rows
+built in the same run.** The amendment adds `G64` to `G70`, seven phases and eight requirement rows
 (`R24` to `R31`, in [REQ-012](../06-requirements/REQ-012-workbench-features-defects.md)).
 
 The amendment covers defects only. Five uncovered ideas that are not defects (`000360`, `000122`,
@@ -335,23 +335,23 @@ floor in `Popover.tsx`; `000130` guessed it was another popover consumer, but th
 
 | Group | Ideas | What it covers | Phase |
 |---|---|---|---|
-| `G57` Terminal unprovoked drop | `000246` | The bash panel dropped its connection and restarted with no trigger, and the owner ran a live demo outside the workbench. Diagnosis is the deliverable; the leading candidate is the 300 s receive-idle bound, which shell output does not reset | `phase-wbf-12` |
-| `G58` Popover height floor | `000108`, `000117` | The HTML Viewer file selector shows about two entries because the shared popover opens upward whenever 120 px are free above it. Fix the shared component and audit its nine consumers | `phase-wbf-13` |
-| `G59` Tooltip clipping | `000130` | The notes strip `?` tooltip is cut off at the panel bottom. The font size and text capacity half of the idea is left to the owner | `phase-wbf-14` |
-| `G60` File Browser error | `000594` | A failed folder listing shows "Loading…" forever because the folder-mismatch test runs before the error test | `phase-wbf-15` |
-| `G61` Viewer page check | `000555` | With the file route absent, the dev server's fallback answers the existence check and the viewer frames the app shell | `phase-wbf-16` |
-| `G62` Startup failure message | `000573` | The backend closes a failed session start with code 4003 and a reason; the panel does not show it | `phase-wbf-17` |
-| `G63` Runbook toggle | `000105` | The runbook does not describe the viewer header's Embedded and Open-in-tab toggle | `phase-wbf-18` |
+| `G64` Terminal unprovoked drop | `000246` | The bash panel dropped its connection and restarted with no trigger, and the owner ran a live demo outside the workbench. Diagnosis is the deliverable; the leading candidate is the 300 s receive-idle bound, which shell output does not reset | `phase-wbf-12` |
+| `G65` Popover height floor | `000108`, `000117` | The HTML Viewer file selector shows about two entries because the shared popover opens upward whenever 120 px are free above it. Fix the shared component and audit its nine consumers | `phase-wbf-13` |
+| `G66` Tooltip clipping | `000130` | The notes strip `?` tooltip is cut off at the panel bottom. The font size and text capacity half of the idea is left to the owner | `phase-wbf-14` |
+| `G67` File Browser error | `000594` | A failed folder listing shows "Loading…" forever because the folder-mismatch test runs before the error test | `phase-wbf-15` |
+| `G68` Viewer page check | `000555` | With the file route absent, the dev server's fallback answers the existence check and the viewer frames the app shell | `phase-wbf-16` |
+| `G69` Startup failure message | `000573` | The backend closes a failed session start with code 4003 and a reason; the panel does not show it | `phase-wbf-17` |
+| `G70` Runbook toggle | `000105` | The runbook does not describe the viewer header's Embedded and Open-in-tab toggle | `phase-wbf-18` |
 
 | Phase | Title | Group | Depends on |
 |---|---|---|---|
-| `phase-wbf-12` | Diagnose the terminal panel's unprovoked drop and restart | `G57` | — |
-| `phase-wbf-13` | Open popovers toward the side with room so the file selector shows its list | `G58` | — |
-| `phase-wbf-14` | Stop the notes strip tooltip being cut off at the panel bottom | `G59` | — |
-| `phase-wbf-15` | Show the File Browser error when a folder listing fails after a folder change | `G60` | — |
-| `phase-wbf-16` | Report a missing HTML Viewer page when the file route is absent | `G61` | — |
-| `phase-wbf-17` | Show the reason in the terminal panel when a session fails to start | `G62` | — |
-| `phase-wbf-18` | Document the HTML Viewer Embedded and Open-in-tab toggle in the runbook | `G63` | — |
+| `phase-wbf-12` | Diagnose the terminal panel's unprovoked drop and restart | `G64` | — |
+| `phase-wbf-13` | Open popovers toward the side with room so the file selector shows its list | `G65` | — |
+| `phase-wbf-14` | Stop the notes strip tooltip being cut off at the panel bottom | `G66` | — |
+| `phase-wbf-15` | Show the File Browser error when a folder listing fails after a folder change | `G67` | — |
+| `phase-wbf-16` | Report a missing HTML Viewer page when the file route is absent | `G68` | — |
+| `phase-wbf-17` | Show the reason in the terminal panel when a session fails to start | `G69` | — |
+| `phase-wbf-18` | Document the HTML Viewer Embedded and Open-in-tab toggle in the runbook | `G70` | — |
 
 None carries a `depends_on` edge. Their rows name the panels by product name and rename no slot,
 panel, region or layout identifier, so the vocabulary rule in *Sequencing against `P10`* does not
@@ -378,7 +378,10 @@ All seven are queued and sit at the end of the backlog's phase list, outside `ne
 The new phases share systems, so some cannot be active together. `phase-wbf-12` collides with
 `phase-wbf-17` (both declare `sys-wb-terminal`) and with `phase-wbf-18` (both declare
 `sys-demo-stage`); `phase-wbf-13` and `phase-wbf-14` share `sys-wb-shared`, `sys-wb-styles` and
-`StagePage.css`; `phase-wbf-16` shares `sys-wb-viewer` with `phase-wbf-01` and `phase-wbf-02`.
+`StagePage.css`; `phase-wbf-16` shares a deliverable file
+(`ts/src/stage/HtmlViewerRegion.tsx`) and `sys-wb-viewer` with `phase-wbf-01` and `phase-wbf-02`.
+`phase-arch-02` (active), `phase-arch-08`, `phase-arch-13`, `phase-irs-13` and `phase-wbf-05` also
+touch those files, so a coordinator sequences them against these phases.
 `phase-wbf-15` shares nothing with the other new phases.
 
 ### Requirement coverage added
