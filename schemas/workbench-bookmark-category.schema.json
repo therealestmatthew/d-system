@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "workbench-bookmark-category.schema.json",
+  "title": "Workbench bookmark category",
+  "description": "One named grouping of repository files (<data root>/workbench/bookmarks/<category_id>.json, ADR-029, REQ-012 R09). category_id is an immutable lowercase slug and is also the file name stem; a rename changes name only. entries is an ordered list of unique repository-relative forward-slash paths to files, validated against the working tree on write and resolved to present, missing or excluded on every read; it is never pruned automatically. Private-file entries (under _private/ or any gitignored path) are deliberately unsupported. This schema asserts structural shape only: that category_id equals the file name stem, that the Windows reserved device names are not used as ids, and that name is unique case-insensitively across the data root are asserted by test/test_workbench_bookmarks.py and the routes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "category_id", "name", "entries"],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "category_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "entries": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[^/\\\\:][^\\\\]*[^/\\\\]$|^[^/\\\\:]$",
+        "not": {
+          "pattern": "(^|/)\\.\\.?(/|$)|//|^[A-Za-z]:"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "category_id": "demo-tour",
+  "name": "Demo tour",
+  "entries": [
+    "_public/d-system-architecture.html",
+    "_public/engine/index.html",
+    "docs/04-decisions/ADR-016-workbench-layout-persistence.md"
+  ]
+}

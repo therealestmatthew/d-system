@@ -30,3 +30,10 @@ if os.environ.get("D_SYSTEM_DEMO_TERMINAL") == "1":
     from src.api.routes import workbench
 
     router.include_router(workbench.router, prefix="/workbench")
+
+    # The bookmark-category routes (ADR-029) are the workbench's first write routes, mounted under
+    # the same flag and loopback binding. Registered after `workbench` so its routes win any
+    # overlapping path; `/bookmarks` does not overlap any of them.
+    from src.api.routes import workbench_bookmarks
+
+    router.include_router(workbench_bookmarks.router, prefix="/workbench/bookmarks")
