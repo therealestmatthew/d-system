@@ -17869,6 +17869,8 @@ items:
   - ts/src/stage/HtmlViewerRegion.tsx
   - ts/src/stage/HtmlViewerRegion.test.tsx
   - docs/03-sessions/SESS-2026-10-08-16-viewer-missing-page-check.md
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-16-demo-adversary.json
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-16-review-judge.json
   result: 'cd ts && npm test: 9 files, 95 tests passed (6 new in HtmlViewerRegion.test.tsx; the
     two that cover the defect fail on the unmodified component). cd ts && npm run build built
     with no errors. src.governance: Governance OK. Playwright on ports 8026/5196, stored viewer

@@ -75,6 +75,21 @@ widening (pre-approved run, 2026-10-08).
   shell. `.html`, `.md` and image cases are covered by the new vitest cases and the two existing
   files (passing).
 
+## Live evidence (the review runner could not run the prose live check)
+
+Run from `ts/` on API port 8026 (`uv run uvicorn src.main:app --port 8026`) and Vite port 5196
+(`VITE_API_TARGET=http://127.0.0.1:8026 npx vite --port 5196 --strictPort`), once with
+`D_SYSTEM_DEMO_TERMINAL=` (unset) and once with `D_SYSTEM_DEMO_TERMINAL=1`. A Playwright script
+(`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node check.cjs 5196`, headless Chromium from
+`/opt/node22/lib/node_modules/playwright`) seeded `localStorage['d-system:workbench-state:v3']` with
+`{schema_version: 3, html_viewer_tabs: {tabs: [{id: 1, directory: 'docs', search_text: '', selected_file: 'README.md'}], active_tab_id: 1}}`,
+loaded `/`, waited 3 s, and read `.stage-html-viewer__content`. Header probes used
+`curl -sI -X HEAD localhost:5196/workbench-file/README.md`.
+
+- Flag unset, after the change: `iframes: 0 | panel: Selected page is absent — README.md does not exist. | reqs: ["HEAD .../workbench-file/README.md","HEAD .../workbench-file/README.md"]`.
+- Flag set, after the change: `iframes: 1 | panel: (empty) | reqs: [HEAD, HEAD, GET .../workbench-file/README.md?v=0]`, and the
+  frame body began with the rendered README text (`frame http://localhost:5196/workbench-file/README.md?v=0 | D-System  An idea realization engine: it carries an idea fro`).
+
 ## Verification and gate checks
 
 - `cd ts && npm test`: 9 files, 95 tests passed. `cd ts && npm run build`: built, no errors (the
@@ -87,6 +102,9 @@ widening (pre-approved run, 2026-10-08).
   relies on `chmod 0o500` blocking directory creation and this sandbox runs as uid 0. This phase
   touched no Python; the test was not retried or skipped.
 - Owner-machine cells (Windows browsers, CMD, PowerShell): not run.
+- Runner note: during the review gate, `test/test_demo_terminal_api.py::test_control_characters_reach_the_shell`
+  failed once ("'after-ctrl-c-4' never appeared") while several suites ran on this machine at once. It
+  passed in every other run that day and this phase's diff is TypeScript only; the test was not touched.
 
 ## Unresolved and assumptions
 
@@ -94,3 +112,17 @@ widening (pre-approved run, 2026-10-08).
 - Commit trailers follow the builder contract's text (`Claude Fable 5.1`), as the claim commit does;
   the session's attribution reminder names `Claude Sonnet 5.5`. The session URL line is identical.
   Left for the Session Manager to rule on.
+
+## Fix round after review
+
+Gating adversary PASS (1 minor) and shadow judge PASS (2 minor notes) at `482282c`; the two verdict
+records are committed under `docs/08-governance/reviews/verdicts/`.
+
+- A-F01 (the directive parse split on `;` only, so a comma-merged multi-policy value such as
+  `default-src 'self', sandbox` would be rejected): fixed. The parse splits on `/[;,]/`, and a new
+  vitest case serves that value and expects the iframe.
+- J-F01 (the prose live check could not run in the runner): the live evidence is recorded above.
+- J-F02 (one flaky terminal test during the gate): noted in the verification section; test untouched.
+- Rulings from the Session Manager: the deliverable widening of the two existing viewer test files is
+  applied on the trunk (`f82d2ae`); the contract's `Claude Fable 5.1` trailer is kept for this run and
+  the owner rules on it later. Both decisions are therefore closed.
