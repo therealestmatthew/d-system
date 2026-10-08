@@ -14,7 +14,75 @@ const VIEWPORT_MARGIN = 8
 // Mirrors the 16rem width the bubble used to carry in CSS, converted to px for the clamp math
 // below (the trigger's layout is unaffected by the page's root font size in this app).
 const BUBBLE_WIDTH_PX = 256
+// The smallest bubble worth opening when the room allows it. It is a lower bound on the bubble's
+// height only up to the room the chosen side actually has: a floor larger than that room pushed the
+// bubble off the viewport edge (idea 000117), so `choosePlacement` never returns more than the room.
 const MIN_BUBBLE_HEIGHT_PX = 120
+// The largest share of the viewport height a bubble may take.
+const MAX_BUBBLE_VIEWPORT_FRACTION = 0.6
+
+export interface PlacementInput {
+  // Free viewport height above the trigger and below it, each already net of the viewport margin.
+  spaceAbove: number
+  spaceBelow: number
+  viewportHeight: number
+  // The bubble's height with no limit applied (header plus the body's full scroll height), or
+  // undefined/0 when it could not be measured.
+  naturalHeight?: number
+}
+
+export interface Placement {
+  openUpward: boolean
+  maxHeight: number
+}
+
+/**
+ * Chooses the side a bubble opens toward and the height it may take (idea 000108, REQ-012 R25).
+ *
+ * The side is chosen from the room each side has for the bubble, not from a fixed threshold: the
+ * upward side is kept when the whole content fits there (the trigger's usual position is near the
+ * bottom of its region), then the downward side when the content fits there, and otherwise the side
+ * with more room. The height is the room on the chosen side, capped at 60% of the viewport, and is
+ * never more than that room, so the bubble and its dismiss control stay inside the viewport.
+ */
+// Exported for Popover.test.tsx. A separate module would keep the component file components-only, but
+// the phase's deliverables name no such file.
+// eslint-disable-next-line react-refresh/only-export-components
+export function choosePlacement({
+  spaceAbove,
+  spaceBelow,
+  viewportHeight,
+  naturalHeight,
+}: PlacementInput): Placement {
+  const above = Math.max(0, spaceAbove)
+  const below = Math.max(0, spaceBelow)
+  const cap = viewportHeight * MAX_BUBBLE_VIEWPORT_FRACTION
+  let openUpward: boolean
+  if (naturalHeight !== undefined && naturalHeight > 0) {
+    const fitsAbove = naturalHeight <= Math.min(above, cap)
+    const fitsBelow = naturalHeight <= Math.min(below, cap)
+    openUpward = fitsAbove || (!fitsBelow && above >= below)
+  } else {
+    openUpward = above >= below
+  }
+  const room = openUpward ? above : below
+  const limit = Math.min(room, cap)
+  return { openUpward, maxHeight: Math.max(Math.min(MIN_BUBBLE_HEIGHT_PX, room), limit) }
+}
+
+// The bubble's height with no maxHeight applied, at the width it will have. Measured on the live
+// element (its inline size is restored straight after, because React skips a style property whose
+// value it believes unchanged). Returns undefined before the bubble has rendered.
+function measureNaturalHeight(bubble: HTMLDivElement | null, width: number): number | undefined {
+  if (!bubble) return undefined
+  const { maxHeight, width: previousWidth } = bubble.style
+  bubble.style.maxHeight = 'none'
+  bubble.style.width = `${width}px`
+  const natural = bubble.offsetHeight
+  bubble.style.maxHeight = maxHeight
+  bubble.style.width = previousWidth
+  return natural
+}
 
 /**
  * A click-triggered popup. Opens on trigger click; dismissible three ways — REQ-006 R03:
@@ -82,15 +150,12 @@ export default function Popover({
     }
     left = Math.max(VIEWPORT_MARGIN, left)
 
-    const spaceAbove = rect.top - VIEWPORT_MARGIN
-    const spaceBelow = viewportHeight - rect.bottom - VIEWPORT_MARGIN
-    // Prefer opening upward (matches the trigger's usual position near the bottom of its
-    // region) unless there isn't even the minimum usable height above and downward has more
-    // room to offer.
-    const openUpward = spaceAbove >= MIN_BUBBLE_HEIGHT_PX || spaceAbove >= spaceBelow
-
-    const available = openUpward ? spaceAbove : spaceBelow
-    const maxHeight = Math.max(MIN_BUBBLE_HEIGHT_PX, Math.min(available, viewportHeight * 0.6))
+    const { openUpward, maxHeight } = choosePlacement({
+      spaceAbove: rect.top - VIEWPORT_MARGIN,
+      spaceBelow: viewportHeight - rect.bottom - VIEWPORT_MARGIN,
+      viewportHeight,
+      naturalHeight: measureNaturalHeight(bubbleRef.current, clampedWidth),
+    })
 
     const next: CSSProperties = {
       left,
