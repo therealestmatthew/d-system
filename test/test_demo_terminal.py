@@ -182,10 +182,13 @@ def _uncache_demo_terminal_module() -> None:
     attribute too is what makes the reload below actually re-run the module body (and, with
     it, the loopback-bind check that module runs at import time).
     """
-    sys.modules.pop("src.api.routes.demo_terminal", None)
     routes_package = sys.modules.get("src.api.routes")
-    if routes_package is not None and hasattr(routes_package, "demo_terminal"):
-        delattr(routes_package, "demo_terminal")
+    # `demo_terminal_api` (ADR-030) imports `demo_terminal`, so a stale copy of it would point at
+    # the module object being discarded here.
+    for name in ("demo_terminal", "demo_terminal_api"):
+        sys.modules.pop(f"src.api.routes.{name}", None)
+        if routes_package is not None and hasattr(routes_package, name):
+            delattr(routes_package, name)
 
 
 @pytest.fixture
@@ -203,6 +206,9 @@ def rebuild_app(monkeypatch: pytest.MonkeyPatch) -> Callable[..., FastAPI]:
             monkeypatch.delenv("D_SYSTEM_DEMO_TERMINAL", raising=False)
         else:
             monkeypatch.setenv("D_SYSTEM_DEMO_TERMINAL", flag)
+        # The terminal interaction API's flag (ADR-030) is a separate decision from this
+        # fixture's: every app built here has it unset, whatever the runner's environment says.
+        monkeypatch.delenv("D_SYSTEM_TERMINAL_API", raising=False)
         if bind_host is None:
             monkeypatch.delenv(BIND_HOST_ENV_VAR, raising=False)
         else:
@@ -215,6 +221,7 @@ def rebuild_app(monkeypatch: pytest.MonkeyPatch) -> Callable[..., FastAPI]:
     yield _build
 
     monkeypatch.delenv("D_SYSTEM_DEMO_TERMINAL", raising=False)
+    monkeypatch.delenv("D_SYSTEM_TERMINAL_API", raising=False)
     monkeypatch.delenv(BIND_HOST_ENV_VAR, raising=False)
     _uncache_demo_terminal_module()
     importlib.reload(api_module)
@@ -789,6 +796,82 @@ def test_idle_timeout_reaps_orphaned_shell_after_abrupt_disconnect(
             session.close(1006)
         with contextlib.suppress(Exception):
             session.__exit__(None, None, None)
+
+
+def test_first_flag_alone_mounts_no_api_routes_and_keeps_no_output_record(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    """ADR-030 / REQ-012 R19: with `D_SYSTEM_DEMO_TERMINAL=1` and `D_SYSTEM_TERMINAL_API` unset
+    the terminal interaction API does not exist. Its module is never imported, its three routes
+    answer the framework 404, capture is off, and a live session leaves no output record.
+    """
+    app = rebuild_app(flag="1")
+    module = sys.modules["src.api.routes.demo_terminal"]
+    assert "src.api.routes.demo_terminal_api" not in sys.modules
+    assert module.OUTPUT_CAPTURE_ENABLED is False
+    assert module.OUTPUT_RECORDS == {}
+
+    with TestClient(app, client=("127.0.0.1", 50000)) as client:
+        with client.websocket_connect(DEMO_TERMINAL_WS_PATH) as websocket:
+            websocket.send_bytes(b"echo first-flag-alone-marker\n")
+            output = b""
+            deadline = time.monotonic() + 5.0
+            while b"first-flag-alone-marker" not in output and time.monotonic() < deadline:
+                output += websocket.receive_bytes()
+            assert b"first-flag-alone-marker" in output
+            assert len(module.SESSIONS) == 1
+            assert module.OUTPUT_RECORDS == {}
+        for method, path in (
+            ("get", "/api/v1/demo/terminal/sessions"),
+            ("post", f"/api/v1/demo/terminal/sessions/{'0' * 32}/input"),
+            ("get", f"/api/v1/demo/terminal/sessions/{'0' * 32}/output"),
+        ):
+            response = getattr(client, method)(path, headers={"Authorization": "Bearer x"})
+            assert response.status_code == 404
+            assert response.json() == {"detail": "Not Found"}
+    assert module.OUTPUT_RECORDS == {}
+
+
+def test_second_flag_without_the_first_mounts_nothing(
+    rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """`D_SYSTEM_TERMINAL_API=1` alone is inert: the terminal flag gates the whole block, so
+    neither the websocket nor the API routes exist and no module is imported."""
+    app = rebuild_app(flag=None)
+    monkeypatch.setenv("D_SYSTEM_TERMINAL_API", "1")
+    _uncache_demo_terminal_module()
+    importlib.reload(api_module)
+    importlib.reload(main_module)
+    assert "src.api.routes.demo_terminal" not in sys.modules
+    assert "src.api.routes.demo_terminal_api" not in sys.modules
+    client = TestClient(main_module.app, client=("127.0.0.1", 50000))
+    assert client.get("/api/v1/demo/terminal/sessions").status_code == 404
+    del app
+
+
+def test_idle_bound_is_unchanged_under_the_first_flag_alone(
+    rebuild_app: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """With no output record the idle loop has no API clock to consult: a silent session is reaped
+    at the idle bound exactly as before ADR-030."""
+    monkeypatch.setenv(IDLE_TIMEOUT_ENV_VAR, "0.4")
+    app = rebuild_app(flag="1")
+    module = sys.modules["src.api.routes.demo_terminal"]
+    with TestClient(app) as client:
+        session = client.websocket_connect(DEMO_TERMINAL_WS_PATH)
+        session.__enter__()
+        try:
+            deadline = time.monotonic() + 5.0
+            while not module.SESSIONS and time.monotonic() < deadline:
+                time.sleep(0.02)
+            assert len(module.SESSIONS) == 1
+            deadline = time.monotonic() + 5.0
+            while module.SESSIONS and time.monotonic() < deadline:
+                time.sleep(0.05)
+            assert module.SESSIONS == {}
+        finally:
+            with contextlib.suppress(Exception):
+                session.__exit__(None, None, None)
 
 
 def test_registration_fails_fast_for_non_loopback_bind_with_flag_set(

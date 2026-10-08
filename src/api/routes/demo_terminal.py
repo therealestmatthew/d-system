@@ -11,6 +11,13 @@ registry that bounds concurrent sessions to six (section 4; raised from four by 
 decision of 2026-09-11, REQ-007 W17), and per-session shell selection against a fixed
 allowlist — bash, cmd, powershell — with a structured in-panel refusal for a shell the host
 cannot run (section 5).
+
+ADR-030 adds an opt-in layer used only by `src/api/routes/demo_terminal_api.py`, which
+`src/api/__init__.py` imports under a second flag, `D_SYSTEM_TERMINAL_API=1`. That module switches
+`OUTPUT_CAPTURE_ENABLED` on; only then does a session get a `SessionOutput` record, does the pump
+copy each chunk into its ring and drain the shell's tail after exit, and does an accepted inject
+extend the idle bound. With the flag off, which is every launch under the first flag alone, none
+of that runs.
 """
 
 from __future__ import annotations
@@ -21,7 +28,9 @@ import json
 import logging
 import os
 import sys
+import time
 import uuid
+from dataclasses import dataclass, field
 from typing import Final, TypeGuard
 
 from fastapi import APIRouter, WebSocket
@@ -81,6 +90,74 @@ SESSIONS: Final[dict[str, TerminalAdapter]] = {}
 # connections can no longer both pass the cap while one awaits `accept()` (REQ-012 R20). The cap
 # counts both collections; a slot is released in `terminal_websocket`'s `finally` on any exit.
 RESERVED: Final[set[str]] = set()
+
+
+# ADR-030 section 5: the per-session output record exists only when the terminal interaction API
+# is mounted. `src/api/routes/demo_terminal_api.py` sets `OUTPUT_CAPTURE_ENABLED` to True when it
+# is imported, which `src/api/__init__.py` does only under both `D_SYSTEM_DEMO_TERMINAL=1` and
+# `D_SYSTEM_TERMINAL_API=1`. Under the first flag alone it stays False: no record is created,
+# nothing is buffered, and the pump and the idle loop below behave as they did before ADR-030.
+# A module-level setting rather than a constant so the API module can switch it on; it is read at
+# the point of use, never copied.
+OUTPUT_CAPTURE_ENABLED: bool = False
+
+# Per-session ring size (ADR-030 section 5): 256 KiB of raw PTY output, so six sessions hold at
+# most 1.5 MiB.
+OUTPUT_RING_BYTES: Final[int] = 262144
+
+# ADR-030 section 6: an accepted inject extends the idle bound, but not past this many seconds
+# since the last websocket frame (or since the session started, when none arrived). Read at the
+# point of use so tests can lower it.
+TERMINAL_API_INJECT_CEILING_SECONDS: float = 3600.0
+
+# Upper bound on the time the pump spends reading the tail a shell left behind when it exited
+# (capture on only). A background process that inherited the PTY could otherwise keep the read
+# returning data indefinitely.
+OUTPUT_DRAIN_SECONDS: Final[float] = 2.0
+
+
+@dataclass
+class SessionOutput:
+    """One session's retained output and its API bookkeeping (ADR-030 section 5).
+
+    Created and removed in the same two places as the `SESSIONS` entry, and never consulted for
+    membership or the cap: `SESSIONS` and `RESERVED` remain the one structure deciding whether a
+    session exists. All access is on the server's single event loop, so the byte ring needs no
+    lock; `condition` only wakes long-poll readers, and `write_lock` serialises HTTP injects.
+    """
+
+    shell: str | None
+    created_at: float = field(default_factory=time.time)
+    last_frame: float = field(default_factory=time.monotonic)
+    last_inject: float | None = None
+    ended: bool = False
+    pump_done: bool = False
+    total: int = 0
+    buffer: bytearray = field(default_factory=bytearray)
+    condition: asyncio.Condition = field(default_factory=asyncio.Condition)
+    write_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+
+    @property
+    def start(self) -> int:
+        """Absolute offset of the oldest retained byte."""
+        return self.total - len(self.buffer)
+
+    def append(self, data: bytes) -> None:
+        """Add `data` to the ring, dropping the oldest bytes beyond `OUTPUT_RING_BYTES`."""
+        self.buffer.extend(data)
+        self.total += len(data)
+        excess = len(self.buffer) - OUTPUT_RING_BYTES
+        if excess > 0:
+            del self.buffer[:excess]
+
+    async def notify(self) -> None:
+        """Wake every long-poll waiter so it re-reads the buffer and the session state."""
+        async with self.condition:
+            self.condition.notify_all()
+
+
+# Session id -> output record. Populated only while `OUTPUT_CAPTURE_ENABLED` is True.
+OUTPUT_RECORDS: Final[dict[str, SessionOutput]] = {}
 
 
 def _slots_in_use() -> int:
@@ -240,15 +317,49 @@ def enforce_loopback_bind() -> None:
 router = APIRouter()
 
 
-async def _pump_adapter_to_websocket(adapter: TerminalAdapter, websocket: WebSocket) -> None:
-    """Forward shell output to the client until the shell exits or the pump is cancelled."""
+async def _pump_adapter_to_websocket(
+    adapter: TerminalAdapter, websocket: WebSocket, output: SessionOutput | None = None
+) -> None:
+    """Forward shell output to the client until the shell exits or the pump is cancelled.
+
+    This is the only reader of the adapter (adapter reads are destructive). With `output` set
+    (capture on, ADR-030 section 5) each chunk is appended to the session's ring before it is
+    sent, so a failed send cannot drop bytes from the ring, and after the shell exits the pump
+    keeps reading until the adapter returns empty so the tail written just before exit is
+    appended and sent too. With `output` None the loop is the one it always was.
+    """
     loop = asyncio.get_event_loop()
-    while adapter.alive:
-        data = await loop.run_in_executor(
-            None, adapter.read, READ_CHUNK_SIZE, READ_TIMEOUT_SECONDS
-        )
-        if data:
+    if output is None:
+        while adapter.alive:
+            data = await loop.run_in_executor(
+                None, adapter.read, READ_CHUNK_SIZE, READ_TIMEOUT_SECONDS
+            )
+            if data:
+                await websocket.send_bytes(data)
+        return
+    try:
+        while adapter.alive:
+            data = await loop.run_in_executor(
+                None, adapter.read, READ_CHUNK_SIZE, READ_TIMEOUT_SECONDS
+            )
+            if data:
+                output.append(data)
+                await output.notify()
+                await websocket.send_bytes(data)
+        drain_deadline = loop.time() + OUTPUT_DRAIN_SECONDS
+        while loop.time() < drain_deadline:
+            data = await loop.run_in_executor(
+                None, adapter.read, READ_CHUNK_SIZE, READ_TIMEOUT_SECONDS
+            )
+            if not data:
+                break
+            output.append(data)
+            await output.notify()
             await websocket.send_bytes(data)
+    finally:
+        output.pump_done = True
+        with contextlib.suppress(Exception):
+            await output.notify()
 
 
 def _is_valid_dimension(value: object) -> TypeGuard[int]:
@@ -287,6 +398,23 @@ def _apply_control_message(adapter: TerminalAdapter, text: str) -> None:
     adapter.resize(cols, rows)
 
 
+def _inject_extends_idle_bound(
+    output: SessionOutput, idle_timeout_seconds: float, now: float
+) -> bool:
+    """True when an idle timeout should be ignored because the API injected recently (ADR-030).
+
+    The bound is extended only when an inject was accepted inside the idle window that just
+    elapsed, and only while less than `TERMINAL_API_INJECT_CEILING_SECONDS` has passed since the
+    last websocket frame (or since the session started). A read never counts: a poller of the
+    output route must not keep a dead-peer shell and its cap slot alive.
+    """
+    if output.last_inject is None:
+        return False
+    if now - output.last_inject >= idle_timeout_seconds:
+        return False
+    return now - output.last_frame < TERMINAL_API_INJECT_CEILING_SECONDS
+
+
 @router.websocket("/ws")
 async def terminal_websocket(websocket: WebSocket) -> None:
     """Bridge a websocket connection to a real shell session via the `src.demo` adapter.
@@ -323,6 +451,7 @@ async def terminal_websocket(websocket: WebSocket) -> None:
     finally:
         RESERVED.discard(session_id)
         SESSIONS.pop(session_id, None)
+        OUTPUT_RECORDS.pop(session_id, None)
 
 
 async def _run_session(websocket: WebSocket, session_id: str) -> None:
@@ -366,7 +495,11 @@ async def _run_session(websocket: WebSocket, session_id: str) -> None:
         return
     SESSIONS[session_id] = adapter
     RESERVED.discard(session_id)
-    pump_task = asyncio.create_task(_pump_adapter_to_websocket(adapter, websocket))
+    output: SessionOutput | None = None
+    if OUTPUT_CAPTURE_ENABLED:
+        output = SessionOutput(shell=requested_shell)
+        OUTPUT_RECORDS[session_id] = output
+    pump_task = asyncio.create_task(_pump_adapter_to_websocket(adapter, websocket, output))
     idle_timeout_seconds = _resolve_idle_timeout_seconds()
     try:
         while True:
@@ -375,7 +508,13 @@ async def _run_session(websocket: WebSocket, session_id: str) -> None:
                     websocket.receive(), timeout=idle_timeout_seconds
                 )
             except TimeoutError:
+                if output is not None and _inject_extends_idle_bound(
+                    output, idle_timeout_seconds, time.monotonic()
+                ):
+                    continue
                 break
+            if output is not None:
+                output.last_frame = time.monotonic()
             if message["type"] == "websocket.disconnect":
                 raise WebSocketDisconnect(message["code"], message.get("reason"))
             data = message.get("bytes")
@@ -390,6 +529,10 @@ async def _run_session(websocket: WebSocket, session_id: str) -> None:
     finally:
         pump_task.cancel()
         adapter.close()
+        if output is not None:
+            output.ended = True
+            with contextlib.suppress(Exception):
+                await output.notify()
 
 
 # This module is imported only when D_SYSTEM_DEMO_TERMINAL=1 (see src/api/__init__.py), so

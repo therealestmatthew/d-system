@@ -27,6 +27,16 @@ if os.environ.get("D_SYSTEM_DEMO_TERMINAL") == "1":
 
     router.include_router(demo_terminal.router, prefix="/demo/terminal")
 
+    # The terminal interaction API (ADR-030) needs a second flag on top of the first. With
+    # D_SYSTEM_TERMINAL_API unset, src.api.routes.demo_terminal_api is never imported: its three
+    # routes do not exist (404), no bearer token is generated or written, and the websocket route
+    # keeps no output record. Importing it writes the token file and turns output capture on in
+    # demo_terminal, and a failure to write the token stops the application from starting.
+    if os.environ.get("D_SYSTEM_TERMINAL_API") == "1":
+        from src.api.routes import demo_terminal_api
+
+        router.include_router(demo_terminal_api.router, prefix="/demo/terminal")
+
     from src.api.routes import workbench
 
     router.include_router(workbench.router, prefix="/workbench")
