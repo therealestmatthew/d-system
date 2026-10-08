@@ -97,7 +97,22 @@ def test_shipped_layout_matches_schema(path: Path) -> None:
 
 @pytest.mark.parametrize("path", LAYOUT_FILES, ids=lambda p: p.stem)
 def test_shipped_layout_schema_version_is_bumped(path: Path) -> None:
-    assert _load(path)["schema_version"] >= 2
+    """Version 3 is the one that renamed the slot ids to role names. Dropping the bump would leave
+    browsers holding version-2 assignments that name slots which no longer exist."""
+    assert _load(path)["schema_version"] >= 3
+
+
+@pytest.mark.parametrize("path", LAYOUT_FILES, ids=lambda p: p.stem)
+def test_shipped_layout_slot_ids_never_equal_a_panel_id(path: Path) -> None:
+    """REQ-007's slot naming rule (`brain/concepts/terms-workbench-ui.md`, REQ-011 R03): a slot id
+    names the slot's role and may never equal a panel id. Every panel id in a layout file is a
+    panel type name, so this also keeps a slot from being named for a panel type."""
+    layout = _load(path)
+    slot_ids = {slot["slot_id"] for slot in layout["slots"]}
+    panel_ids = {panel["panel_id"] for panel in layout["panels"]}
+    assert slot_ids & panel_ids == set(), (
+        f"{path.name}: slot ids equal panel ids {sorted(slot_ids & panel_ids)}"
+    )
 
 
 @pytest.mark.parametrize("path", LAYOUT_FILES, ids=lambda p: p.stem)

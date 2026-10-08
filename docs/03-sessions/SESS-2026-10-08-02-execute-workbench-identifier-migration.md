@@ -147,3 +147,18 @@ all three pass once the catalog is regenerated.)
   six ruled classes; this is the assumption that a comment saying "the terminal slot" about a slot
   now called `secondary` would be a stray old identifier.
 - No ADR was written; no decision awaits ratification beyond those two.
+
+## Review
+
+Gating review by `demo-adversary` at `e2edb8d`: **pass**, three minor findings. The verdict record is
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-arch-02-demo-adversary.json`, copied unchanged.
+
+- F01 (the `schema_version` bump was not guarded by a test): **fixed**.
+  `test_shipped_layout_schema_version_is_bumped` now asserts `>= 3`.
+- F02 (no mechanical check for R03 or R05): **fixed**. `test_shipped_layout_slot_ids_never_equal_a_panel_id`
+  asserts per shipped layout that slot ids and panel ids are disjoint (every panel id is a panel type
+  name). `ts/src/workbench/storage.test.tsx` asserts that `loadStoredState(3)` returns null when only
+  a version-2 key is present, that nothing is migrated or written by reading it, and that a
+  version-3 write does not carry version-2 fields.
+- F03 (`schemas/workbench-layout.schema.json` prose still describes `schema_version` 2): **accepted**,
+  outside this phase's deliverables, raised as an idea.
