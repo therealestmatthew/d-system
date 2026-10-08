@@ -1,0 +1,50 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-03-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-03",
+  "reviewed_commit": "4cc805c0584bc2ca791369ea5aab58467778e02b",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "ADR is draft/proposed while REQ-012 R05 says accepted ADR",
+      "evidence": "ADR-029 front matter status: draft; Status section 'Proposed; awaiting the owner's ratification'; REQ-012 line 66 'An accepted ADR records...'",
+      "consequence": "R05 cannot be fully closed, and wbf-04/05 build on an unratified decision, until the owner ratifies.",
+      "minimal_fix": "Owner ratifies and the status moves to accepted; nothing to change in this phase."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Tracked example-category fixture exists only when no data root is set",
+      "evidence": "ADR-029 section 1: tracked _data/ ships an example only with no D_SYSTEM_DATA_ROOT; the owner's configuration sets it.",
+      "consequence": "wbf-05 tests relying on the tracked example would find nothing on a machine with the variable set.",
+      "minimal_fix": "State that wbf-05 tests create their own category under a temporary data root."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Private-file entries are unsupported but not stated as deliberate",
+      "evidence": "Section 3 rule 2 rejects _private/ and gitignored entries on write.",
+      "consequence": "An owner wanting a category that names a private file cannot add it, and the ADR does not say that is intended.",
+      "minimal_fix": "Add one sentence saying private-file entries are deliberately unsupported."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "uv run pytest gate exits 1 from a runner-environment test failure unrelated to the diff",
+      "evidence": "04-gate.txt lines 85-91, 99-100: test_an_unwritable_worktree_parent_is_refused DID NOT RAISE Refused, run as root (/tmp/pytest-of-root).",
+      "consequence": "The pytest gate reads as failed although the diff is one new ADR file.",
+      "minimal_fix": "Make the test skip when running as root, or run the review checks as a non-root user."
+    }
+  ],
+  "raw_reply_sha256": "c416a5a99441054ad9a035ea48e1fbb46acc82c2ff296eae0a9377a294d3cc1d",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), same brief as the gating reviewer plus the runner manifest; no checkout. Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed. Its F02 and F03 are carried to wbf-05's brief; F01 is the owner's ratification."
+}
