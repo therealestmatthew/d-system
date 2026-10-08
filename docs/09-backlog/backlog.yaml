@@ -8754,6 +8754,19 @@ items:
   - docs/04-decisions/
   next_action: Read ADR-016 decision by decision and state, for each of its four, whether the
     new model keeps it or replaces it. That table is the ADR's spine.
+  session: doc-session-slot-configuration-schema-decision
+  completion_evidence:
+  - docs/04-decisions/ADR-031-slot-configuration-schema-model.md
+  - docs/04-decisions/ADR-016-workbench-layout-persistence.md
+  - docs/03-sessions/SESS-2026-10-08-12-slot-configuration-schema-decision.md
+  result: 'ADR-031 (status draft, proposed; awaiting the owner''s ratification, pre-approved
+    run 2026-10-08) carries supersedes [doc-workbench-layout-decision]; ADR-016 reads
+    superseded with a pointer. uv run python -m src.governance printed Governance OK: 45
+    systems, 468 documents, 37 memories, 354 backlog phases. ruff and mypy clean. uv run
+    pytest printed 1 failed, 1899 passed, 1 skipped; the one failure
+    (test_an_unwritable_worktree_parent_is_refused) is uid 0 ignoring directory modes and
+    fails identically with the change stashed. npm test not run (no ts/node_modules, nothing
+    under ts/ touched). Nothing built.'
 - id: phase-arch-07
   title: Implement schema-owned slots and sub-slots with structural eligibility
   plan: doc-workbench-architecture-quality
