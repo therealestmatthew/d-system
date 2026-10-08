@@ -1,0 +1,74 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-07-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-07",
+  "reviewed_commit": "f07cad04caebc10cb66ce5e8770c1c8f6d3c73bd",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "HTTP reads and injects extend the idle bound, so a token holder can keep a dead-peer shell and cap slot alive indefinitely",
+      "evidence": "ADR-030 section 6 ('An accepted inject and a read both update the session's last-activity time'; 'The websocket still has to be open'); src/api/routes/demo_terminal.py:51-60 (idle bound exists because a vanished peer never sends disconnect) and :372-378 (sole reaper); cap at :68",
+      "consequence": "Polling GET output with wait=10 resets the clock forever; a SIGKILLed browser leaves its shell running and one of six slots occupied until restart; six such sessions block all new terminals. Reintroduces the orphaned-shell defect D06-A finding 2.",
+      "minimal_fix": "Reads never extend; injects extend only up to an absolute ceiling since the last websocket frame, or drop the extension and document the 300 s reap; rewrite open item 4 accordingly."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "Stated check order (peer, token, request) and single error shape are not what FastAPI produces; a literal build breaks the contract",
+      "evidence": "Ran /tmp/claude-0/scratch/exp.py: malformed JSON without token -> 422 (not 401); text/plain valid JSON with token -> 422 (not 415); bad query -> {\"detail\":[...]} not {\"error\":{...}}. ADR section 'The contract phase-wbf-08 builds'.",
+      "consequence": "Unauthenticated callers can observe 422 before auth; 415 and the error shape need hand-written handling or an app-wide RequestValidationError handler outside wbf-08's declared deliverables; builder must guess.",
+      "minimal_fix": "Specify raw-body reading and manual JSON/query validation behind an auth dependency, and an explicit precedence order for 403, 401, 404, 415, 413, 422, 409."
+    },
+    {
+      "id": "F03",
+      "severity": "major",
+      "title": "Token-in-file rationale is false: shells start in the server cwd and can read data/terminal-api-token, the same exposure used to reject the env-var form",
+      "evidence": "ADR section 3 and alternatives ('readable from inside the sessions it protects ... a file that only the caller reads'); src/demo/factory.py create_adapter(cwd=None) and demo_terminal.py:355 pass no cwd; src/db/connection.py:6 data/ is cwd-relative.",
+      "consequence": "An agent or process inside any terminal session can cat the token and drive other sessions; the owner would ratify on an incorrect advantage claim.",
+      "minimal_fix": "Correct the alternative's reasoning to the real differences, and optionally place the file outside the shell's cwd tree or start shells elsewhere."
+    },
+    {
+      "id": "F04",
+      "severity": "major",
+      "title": "Token file scheme underspecified: creation mode and symlink handling, cwd-relative path, import-time rewrite under tests and multi-process, Windows protection unverified",
+      "evidence": "ADR section 3 ('generated when the API module is imported', 'rewritten on each server start', 'mode 0600 on POSIX'); verified open(p,'w') on an existing 0644 file keeps 0644; test/test_demo_terminal.py:195-217 reloads src.api per test; ADR states owner machine is Windows and 0600 is best-effort and unrun.",
+      "consequence": "Pre-existing or symlinked file can leak or redirect the token; tests or --reload/--workers clobber a running server's token causing 401s; no test path override so the builder invents one; the 'other users' benefit is unproven on Windows.",
+      "minimal_fix": "Require atomic create (unlink, O_CREAT|O_EXCL|O_NOFOLLOW, 0o600), a repo-root-anchored absolute path logged in full, an overridable path parameter for tests, a single-process note, and reclassify the Windows protection as unverified."
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "Buffer and last-activity record exist on first-flag-only launches, contradicting 'additive' and 'browser behaviour unchanged'",
+      "evidence": "ADR 'Absence with the flag unset' ('they exist but no route reads them'); Consequences; src/api/__init__.py:27 imports demo_terminal under the first flag alone.",
+      "consequence": "Every rehearsed demo launch retains up to 256 KiB of raw shell output per session in memory for an API that is off, and runs a changed idle loop.",
+      "minimal_fix": "Create the record only when the second flag is set, or disclose the change in open item 1."
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "title": "Pump and inject behaviours differ from the description: blocked send stalls the buffer, tail after exit can be lost, lock does not cover websocket writes, write OSError gives 500",
+      "evidence": "demo_terminal.py:243-251 (send_bytes awaited between reads; loop ends on adapter.alive), :383 (unlocked adapter.write), src/demo/posix.py:47-49 (os.write without OSError handling) and :52-61 (read returns b'' on EIO).",
+      "consequence": "Flaky R17/R18 tests on shell exit and on slow browsers; session_ended race returns 500; blocked executor writes can starve pump reads.",
+      "minimal_fix": "Document stall coupling, drain to EOF after exit, map write OSError to 409 session_ended, use a dedicated executor or state the lock's limit."
+    },
+    {
+      "id": "F07",
+      "severity": "minor",
+      "title": "Contract gaps a wbf-08 builder must guess: raw body limit, parameter bounds, session_id format, peer edge cases, long-poll wake mechanism",
+      "evidence": "ADR contract sections for input (4096 bytes applies to decoded input only), output (limit, wait, after bounds), peer check (two literals only; request.client may be None).",
+      "consequence": "Different builders ship different status codes and edge behaviour; tests cannot be written from the ADR alone.",
+      "minimal_fix": "Add a short validation table covering these cases and name the wake mechanism."
+    }
+  ],
+  "raw_reply_sha256": "045949ccd8b59c176c8c545e0a0a45134b92da6ee78ce958cea4c07376dc0a18",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager (subagent run, 2026-10-08). Brief: phase entry from dev's backlog.yaml, range 327ac0d..f07cad0, diff with the session record and backlog bookkeeping excluded, scratch clone at the reviewed commit; the runner manifest was still being produced, the adversary ran the verification itself. The reviewer notes it saw one backlog result: fragment while grepping for the wbf-08 entry and did not use it. No builder-written input."
+}
