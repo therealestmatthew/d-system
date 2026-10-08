@@ -157,7 +157,7 @@ for a run of many units. A session that dispatches two to six agents needs these
 
 **Owner ruling, 2026-10-08.** The session is an orchestrator only. It dispatches, verifies, commits and reports; it does not write a deliverable itself. That includes documents, pages, scripts and data edits, not only code. Research returned by a reconnaissance agent is the brief for a creator agent, never material the session turns into a file in its own context.
 
-The reason is the coordinator protocol's rule that context discipline is the coordinator's whole job (`GOV-013`, "Context discipline is the coordinator's whole job"): a session that reads and writes the work itself fills its context with the work and runs out of room to coordinate. The ruling was made in this session, after it dispatched two read-only research agents and then wrote the protocol document, the guide page and its inventory scripts itself. The owner corrected it.
+The reason is the coordinator protocol's rule that context discipline is the coordinator's whole job (`GOV-013`, "Context discipline is the coordinator's whole job"): a session that reads and writes the work itself fills its context with the work and runs out of room to coordinate. The ruling was made in this session, after it dispatched two read-only research agents and then wrote the protocol document, the guide page and its inventory scripts itself. The owner corrected it. The rule is recorded in `brain/procedures/an-orchestrator-dispatches-the-writing-too.md` as well, so it reaches the next model.
 
 The one exception is a verification command the session must run itself to hold the real output (`GOV-013`, "Verification discipline"), and the commit that follows a creator's work.
 
@@ -187,7 +187,7 @@ stated it as the rule for this session and the one before; whether it is standin
 
 ### Dispatch rules
 
-- **Every file is written by a creator agent.** The session's own tools write nothing but the hand-off's commit and the verification output it keeps (owner ruling, 2026-10-08; see *The session writes no deliverable*).
+- **Every file is written by a creator agent.** The hand-off file is a deliverable too, written by a creator from the session's gate output; the session's own tools make commits and keep verification output, nothing else (owner ruling, 2026-10-08; see *The session writes no deliverable*).
 - **Independent dispatches go out in one turn**, so they run in parallel and the session keeps
   working. A dispatch whose input is another's output waits for it.
 - **The session does not duplicate an agent's work.** Once a sweep is dispatched the session reads

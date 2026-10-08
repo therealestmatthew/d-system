@@ -64,6 +64,7 @@ brain/
 - [Verify a Cause Before You Report It](procedures/verify-a-cause-before-you-report-it.md)
 - [An Expected Hook Failure Is Still a Stop](procedures/an-expected-hook-failure-is-still-a-stop.md)
 - [A Later Step Does Not Absorb an Earlier One](procedures/earlier-steps-are-not-absorbed-by-a-later-one.md)
+- [An Orchestrator Dispatches the Writing Too](procedures/an-orchestrator-dispatches-the-writing-too.md)
 
 ### Episodes
 *(none yet — add session summaries here)*

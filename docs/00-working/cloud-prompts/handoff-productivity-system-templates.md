@@ -8,8 +8,11 @@ its hand-off follows the shape `GOV-022` prescribes.*
 
 - Branch: `claude/productivity-system-templates-ie1x8d` (assigned by the cloud harness).
 - Cut from `origin/dev` at `6951bb6`. `origin/dev` had not moved when the final gates ran.
-- Tip when the gates ran: `acd52ba`. Two commits follow it, both outside governed documents: the
-  guide page citing the recorded idea ids (`_public/` only) and this hand-off.
+- Tip when the gates ran: `acd52ba`. Commits after it: the guide page citing the recorded idea ids
+  (`197a246`, `_public/` only), the hand-off (`0f673e4`), the GOV-022 amendment recording the
+  owner's orchestrator-only ruling (`1f84815`), and the final commit adding the brain procedure, its
+  index line, two GOV-022 cross-reference edits and this hand-off update. Governance was re-run on
+  each; the gate output in section 5 is from `acd52ba`.
 - The clone opened shallow (52 commits). `git fetch --unshallow origin dev` was run for the gate;
   see section 5.
 
@@ -22,6 +25,8 @@ its hand-off follows the shape `GOV-022` prescribes.*
   protection, adds the subagent model-tier and dispatch rules, the hand-off shape and a kickoff
   text. Every rule not already in `GOV-017` or `GOV-013` is marked **proposed**; six open
   questions.
+- `brain/procedures/an-orchestrator-dispatches-the-writing-too.md` and its `brain/index.md` line: added, on the owner's approval of the text, recording the orchestrator-only correction (section 6, item 1).
+- `GOV-022`: amended after the owner's correction with the subsection *The session writes no deliverable* (owner ruling, 2026-10-08), a first dispatch rule, a hand-off clause and the brain cross-reference.
 - `docs/08-governance/catalog.md`: regenerated for the new document.
 - `_public/portfolio-guide.html`: the executive guide to the personal productivity system, set in
   the house family with native `<details>` cards and no script: records, data flow, using it
@@ -124,18 +129,24 @@ E   Failed: DID NOT RAISE Refused
 
 Ranked by how much a different answer would change.
 
-1. **The clone is the worktree.** No sibling worktree was cut inside the container; the clone is the
+1. **Correction, 2026-10-08.** The session dispatched two research agents and then wrote GOV-022,
+   the guide page, the scripts and the idea files itself, against `GOV-013`'s context-discipline
+   rule. The owner corrected it to orchestrate only. After the correction every file was written by
+   a creator agent: the GOV-022 amendment, the brain procedure, and this hand-off's update. The
+   session's own writes before the correction are listed in section 2 and stay as the record of
+   what happened.
+2. **The clone is the worktree.** No sibling worktree was cut inside the container; the clone is the
    isolation `AGENTS.md`'s rule exists for, as the three earlier cloud sessions did. `GOV-022`
    departure 1, Open question 4.
-2. **Ideas recorded on the branch, not handed to Ideation.** The owner chose "record each as an
+3. **Ideas recorded on the branch, not handed to Ideation.** The owner chose "record each as an
    idea"; the id-collision hazard is stated in section 3 and in `GOV-022` Open question 3.
-3. **`GOV-022` is `draft`, with the model-tier rule marked proposed.** The owner's Haiku-default
+4. **`GOV-022` is `draft`, with the model-tier rule marked proposed.** The owner's Haiku-default
    instruction was treated as the rule for this session and recorded as a proposal, not a standing
    rule, per `CLAUDE.md`'s rule against generalising a one-time instruction. Open question 1.
-4. **The guide's as-of figures are from this branch on 2026-10-08** and were computed by script
+5. **The guide's as-of figures are from this branch on 2026-10-08** and were computed by script
    from `backlog.yaml` and `ideas.jsonl`, with three figures corrected after a verification run
    (14, not 20, open phases sit on the blocker chain; 8 overview templates; 15 templates in all).
-5. **Sonnet for one agent.** The template exploration is design judgment; Haiku ran the document
+6. **Sonnet for one agent.** The template exploration is design judgment; Haiku ran the document
    digest. Stated in the kickoff reply before dispatch.
 
 ## 7. Open questions and anything left undone
@@ -154,6 +165,9 @@ Ranked by how much a different answer would change.
 |---|---|---|---|
 | Document digest (schemas, data root, capture, API, plans, procedures) | `Explore`, read-only | Haiku | Cited-fact extraction |
 | Template exploration (timeline, Gantt, further proposals, build order) | `general-purpose`, read-only | Sonnet | Design judgment and ranking; Haiku judged not fit |
+| GOV-022 amendment (orchestrator-only ruling) | `general-purpose`, creator | Haiku | Mechanical edit from a specified brief |
+| Brain procedure draft | `general-purpose`, creator | Haiku | Shaped by the logging skill and schema |
+| Index line, cross-references, hand-off update | `general-purpose`, creator | Haiku | Mechanical edits |
 
-Two agents in total, both read-only, both dispatched in one turn. No Opus. No fix cycles. One worker
+Five agents in total: two read-only researchers dispatched together at the open, and three creators dispatched after the owner's correction. No Opus. No fix cycles. One worker
 restart mid-session, with nothing lost because every result was already in a file.
