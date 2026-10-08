@@ -27,7 +27,8 @@ before any work here renames anything. The plan codes were already permanent by 
 
 > **Amended 2026-10-08.** Seven phases, `phase-wbf-12` to `phase-wbf-18`, were added for workbench
 > defect ideas that no phase covered. The counts below describe the plan as first written; the
-> *Amendment, 2026-10-08* section gives the additions.
+> *Amendment, 2026-10-08* section gives the additions. A second amendment the same day adds three
+> owner-ruled phases, `phase-wbf-19` to `phase-wbf-21`.
 
 **16 ideas across 9 fine groups**, from the accepted partition of 2026-09-13. Six of the sixteen were
 already delivered when this plan was written. This plan turns the remaining ten into **10 phases**
@@ -398,6 +399,110 @@ touch those files, so a coordinator sequences them against these phases.
 | R31 The runbook documents the viewer toggle | `phase-wbf-18` |
 
 Every new row maps to one phase and every new phase carries at least one row.
+
+## Amendment, 2026-10-08 (second): three owner-ruled follow-ups
+
+### What was added and why
+
+After the first amendment the owner ruled on three further items the same day. Each was recorded as
+an idea; this amendment turns them into queued phases so the run can build them. It adds `G71` to
+`G73`, three phases and three requirement rows (`R32` to `R34`, in
+[REQ-012](../06-requirements/REQ-012-workbench-features-defects.md)).
+
+| Group | Ideas | What it covers | Phase |
+|---|---|---|---|
+| `G71` Websocket token | `000669`, `000614` | The demo terminal websocket accepts any connection, so any local process or open web page can start a shell. The owner ruled that it checks a token on connect. The check refuses before a shell starts and before a cap slot is reserved. Closes `ADR-030` open item 7 | `phase-wbf-19` |
+| `G72` Rung label | `000670` | The HTML Viewer and overview toggles read "Open-in-tab link (rung 3)"; the runbook's ladder lists that fallback as rung 7. The label becomes rung 7 and the toggle stays visible | `phase-wbf-20` |
+| `G73` Session persistence decision | `000671`, `000651`, `000652`, `000107`, `000087` | Panel and layout switches end terminal sessions (audit findings F1 and F2). The owner ruled they should be preserved, not warned about. A decision record comes first; nothing is built | `phase-wbf-21` |
+
+| Phase | Title | Group | Depends on |
+|---|---|---|---|
+| `phase-wbf-19` | Require a token on the demo terminal websocket before it starts a shell | `G71` | — |
+| `phase-wbf-20` | Renumber the HTML Viewer open-in-tab toggle label to rung 7 | `G72` | `phase-arch-07` |
+| `phase-wbf-21` | Decide how terminal sessions survive panel and layout switches | `G73` | — |
+
+All three are queued, sit at the end of the backlog's phase list and are outside `next_up`.
+
+The checks that shaped the phases, each made against the code on this branch:
+
+- **`phase-wbf-19`.** `terminal_websocket` checks the session cap first and then the shell name,
+  and has no authentication or `Origin` check, so the token check goes ahead of both. The browser
+  cannot read `~/.d-system`, where `ADR-030` keeps its file token, and a route that handed that
+  token to any loopback caller would remove the protection from other operating-system users
+  that `ADR-030` section 3 relies on. The phase therefore issues a separate websocket token
+  through a route and sends it in the `Sec-WebSocket-Protocol` header, which keeps it out of
+  URLs and logs as `ADR-030` requires. The phase's scope states the five design points and the
+  alternative to each.
+- **`phase-wbf-20`.** The label's "rung 3" is `PLAN-021`'s four-rung ladder, where the fallback
+  is "Embedded overview panel becomes an open-in-tab link". The runbook's own ladder has eight
+  rungs and lists "Embedded HTML Viewer falls back to an open-in-tab link" as rung 7, and the
+  runbook says it describes the final workbench UI (`REQ-007` W13). The runbook is therefore the
+  authority and the label becomes "Open-in-tab link (rung 7)". No existing test quotes the label.
+- **`phase-wbf-21`.** `ADR-014` decision 4 and `ADR-030` section 6 and open item 3 both say a
+  session ends with its websocket. `ADR-030` rejected detach as a headless-shell capability and
+  named its revisit trigger. The owner's ruling reopens it. `ADR-031` decision 7 keeps session
+  ownership per instance in the browser and leaves the server unchanged, so the record must say
+  whether detach is consistent with that.
+
+### Assumptions the amendment makes
+
+These are choices the plan made without the owner. Each can be ratified or changed before the
+phase is claimed.
+
+1. **A separate websocket token, not the `ADR-030` file token.** The ruling says the websocket
+   reuses the `ADR-030` token (or an `Origin` check). The plan reads "reuses" as the same
+   mechanism: a bearer token compared in constant time and refused before any state changes. It
+   does not hand the file token to the browser, because the token route would give it to any
+   process that can reach the port, and the file's permissions are what protect it from other
+   users. If the owner wants the literal file token, the cost is that protection.
+2. **The token route and the `Origin` check protect against the same threat.** Either keeps a web
+   page on another origin from starting a shell. Neither stops a local process, which can call the
+   route or set any header. The plan prefers the route because an `Origin` allowlist would have
+   to accept every loopback port (the audit ran the dev server on 5199), while the browser's own
+   CORS enforcement keeps a cross-origin page from reading the route's answer.
+3. **The check applies whenever `D_SYSTEM_DEMO_TERMINAL=1`, not only with the second flag.** The
+   rehearsed launch sets only the first flag. The cost is that every direct websocket client
+   (the test suite, measurement scripts) must fetch the token.
+4. **Close code 4004 and the subprotocol header** are the plan's choices; the phase may change
+   either if the Vite proxy or the browser forbids it, and records why.
+5. **No `depends_on` edge from `phase-wbf-19` to `phase-arch-07`**, although `phase-arch-07`
+   lists `ts/src/stage/TerminalRegion.tsx` among its deliverables. `phase-wbf-17` has no edge
+   either; a coordinator sequences them. Add the edge if the owner prefers it enforced.
+6. **`phase-wbf-19` adds `ADR-014` to its deliverables** for one pointer line under decision 4,
+   the same kind of line `ADR-030` open item 8 added. The owner's list named only `ADR-030`. The
+   runbook is left out because the launch commands do not change.
+7. **The rung label's authority is the runbook.** The runbook's rung 7 names the HTML Viewer,
+   not the overview panel. `OverviewRegion` carries the same control and the owner named both
+   files, so both are renumbered.
+8. **`phase-wbf-21` does not edit `ADR-014` or `ADR-030`.** The new record says what those
+   documents should say once the owner ratifies it; the edit follows ratification.
+9. **`phase-wbf-21` has no `depends_on` edge** and builds nothing. A later fix phase builds on
+   the recommended option only after the owner ratifies it; the owner asked for the decision
+   first.
+
+### Concurrency
+
+`phase-wbf-19` and `phase-wbf-21` share `sys-wb-terminal` with `phase-wbf-17` and `phase-wbf-12`,
+and `phase-wbf-19` shares `ts/src/stage/TerminalRegion.tsx` and the close handler with them. They
+must run serially: `phase-wbf-12`, then `phase-wbf-17`, then `phase-wbf-19`. `phase-wbf-21`
+writes only documents and does not collide on files, but it declares the same systems, so a
+coordinator holding the system locks cannot run it beside them. `phase-wbf-19` also shares
+`src/api/routes/demo_terminal.py` and `src/api/routes/demo_terminal_api.py` with any later
+terminal API change, and `TerminalRegion.tsx` with `phase-arch-07`, which owns it until it
+merges. `phase-wbf-20` waits for `phase-arch-07` through its `depends_on` edge because that phase
+owns `HtmlViewerRegion.tsx`, `OverviewRegion.tsx` and the stage test glob until it merges;
+`phase-wbf-20` shares `sys-wb-viewer` with `phase-wbf-16` and, through
+`HtmlViewerRegion.tsx`, with `phase-wbf-01` and `phase-wbf-02`.
+
+### Requirement coverage added
+
+| Requirement | Phases |
+|---|---|
+| R32 The terminal websocket refuses without a valid token, before any shell or cap slot | `phase-wbf-19` |
+| R33 The open-in-tab toggle label matches the runbook's ladder (rung 7) | `phase-wbf-20` |
+| R34 A decision record settles how sessions survive panel and layout switches | `phase-wbf-21` |
+
+Every new row maps to one phase and every new phase carries one row.
 
 ## Key references
 

@@ -90,6 +90,9 @@ settle.
 | R29 | With `D_SYSTEM_DEMO_TERMINAL` unset in the frontend process, an HTML Viewer tab holding a persisted file selection shows the absent-page message and does not frame the application shell. With the flag set, the same selection renders as before for `.html`, `.md` and image files. | Run the dev server on a free port with the flag unset, store a viewer tab naming an existing file, load the page, and read the panel: absent-page text and no iframe loading the app's `index.html`. Repeat with the flag set and confirm the file renders. A panel reading "ready" over the app shell is the defect `000555` records. |
 | R30 | A terminal session that fails to start (the backend accepts, then closes with the startup-failure code and its reason) shows that reason in the panel. A session that ran and was closed by the idle bound or by the shell exiting still shows the generic closed message. | In a vitest test, use a stub socket that opens and closes with the startup-failure code and reason, and expect the reason on screen; repeat with an ordinary close and expect the generic message. Run `uv run pytest test/test_demo_terminal.py` to confirm the backend half of `000573` still holds. |
 | R31 | The demo runbook's HTML Viewer entry names the header toggle by both of its labels ("Embedded" and "Open-in-tab link (rung 3)"), says what each state shows, says how to switch back, and states which descope-ladder rung the control is. No wording contradicts the control's behaviour in `HtmlViewerRegion.tsx`. | Read the entry beside `ts/src/stage/HtmlViewerRegion.tsx` and click the toggle in the running viewer; confirm each statement matches what appears. A presenter who clicks the control mid-demo must be able to explain and reverse it from the script (`000105`). |
+| R32 | A websocket connection to the demo terminal route without a valid token is closed with a structured refusal (close code 4004 and a fixed reason that does not say whether the token was missing or wrong) before any shell is started or any cap slot is reserved. A connection that presents the token the page fetched behaves as it did before: same cap, same shell selection, same session semantics. With `D_SYSTEM_DEMO_TERMINAL` unset the token route and the check do not exist, and loading the workbench still produces no 404 console entries (`R23`). | In pytest, open the websocket with no token, a wrong token and the right token. Expect 4004 and the fixed reason for the first two, with the adapter factory uncalled and `SESSIONS` and `RESERVED` unchanged; expect a working shell for the third. Fill the cap and confirm an unauthenticated connection gets 4004, not the cap refusal. In vitest, expect the panel to open its socket with the fetched token and to quote the reason on a 4004 close. Call the token route from a non-loopback peer and expect 403. A refusal that arrives after the shell has started is the defect idea `000669` and `ADR-030` open item 7 describe. |
+| R33 | The HTML Viewer and overview panel toggles read "Embedded" in the embedded state and "Open-in-tab link (rung 7)" in the open-in-tab state, matching the descope ladder in the demo runbook, which lists that fallback as rung 7. The toggle stays visible, and no document or test quotes the old "rung 3" label as the current one. | In vitest, click each toggle and expect the new label and the "Open page in a new tab" link. Run `grep -rn "Open-in-tab link (rung" ts/src docs/00-working docs/06-requirements` and confirm every hit reads rung 7. Compare the label with the runbook ladder. A label whose number disagrees with the ladder a presenter reads from is the defect idea `000670` records. |
+| R34 | A decision record states how terminal sessions are preserved across a visible-panel switch and a layout switch, and answers six questions with a decision each: the server-side session lifetime independent of a websocket, the identity a returning page presents, the output kept while no page is attached, the interaction with the six-session cap, what the panel switcher and the layout switch do in the browser, and what changes for CMD and PowerShell. It names one recommended option, argues the alternatives against, states its effect on `ADR-014` decision 4, `ADR-030` open item 3 and `ADR-031` decision 7, and is marked proposed and awaiting the owner's ratification. Warn-and-confirm is not offered as an option. No fix is built by this record. | Read the record for six decisions, one recommendation and a rejected-alternatives section. Search it for the three named decisions and confirm each is addressed. Confirm the status note says proposed and awaiting ratification, and that `git diff` for the phase touches no file under `src/` or `ts/`. A record that leaves a question open without saying so, or that recommends warning before ending a session, is the defect. |
 
 **`R14`'s mixing ruling (owner, 2026-10-08).** A rotation is all text or all images; mixing is not
 allowed. A notes file that lists `points` and names an `imageDirectory` is rejected with a message
@@ -115,6 +118,21 @@ dropped or narrowed, because the defect no longer reproduces:
 
 No row covers the three fixed ideas. They remain `triaged` in the log; closing them is the idea
 lifecycle's work, not this document's.
+
+## Amendment, 2026-10-08 (second): three owner-ruled follow-ups
+
+The owner ruled on 2026-10-08, after the first amendment, on three further items. Rows `R32` to
+`R34` cover them; each maps to one new phase in
+[`PLAN-027`](../01-plans/PLAN-027-workbench-features-defects.md)'s second *Amendment* section.
+
+| Row | Idea | What the owner ruled |
+|---|---|---|
+| `R32` | `000669`, `000614` | The demo terminal websocket checks a token on connect, closing `ADR-030` open item 7 |
+| `R33` | `000670` | The HTML Viewer toggle label's "rung 3" becomes "rung 7" to match the runbook's ladder; the toggle stays visible |
+| `R34` | `000671`, `000651`, `000652`, `000087` | Sessions are preserved across panel and layout switches instead of the user being warned; a decision record comes before any fix |
+
+`R31` quotes the old label. Its text is updated by `phase-wbf-20` when the label changes, not by
+this amendment, because until then the label still reads rung 3.
 
 ## Out of scope
 
