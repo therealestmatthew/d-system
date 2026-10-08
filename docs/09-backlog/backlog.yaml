@@ -9299,6 +9299,18 @@ items:
   next_action: Confirm first that the new-tab URL already renders markdown. 000119 was ruled and
     implemented route-side in ts/vite.config.ts on 2026-09-14, so the raw-source defect this idea
     was paired against should already be gone - verify it before writing any rendering code.
+  session: doc-session-viewer-tab-double-click
+  completion_evidence:
+  - ts/src/stage/HtmlViewerRegion.tsx
+  - ts/src/stage/HtmlViewerRegion.doubleClick.test.tsx
+  - docs/03-sessions/SESS-2026-10-08-10-viewer-tab-double-click.md
+  result: 'cd ts && npm run build built with no errors. src.governance: Governance OK. Vitest:
+    5 new double-click tests pass (89 tests in the full ts suite). Playwright on ports 8017/5187:
+    double-click opened the .html, .md (rendered, not raw source) and .png (wrapper page) tabs in
+    new browser tabs, each with Content-Security-Policy: sandbox; Shift+Enter opened the same URL;
+    single click opened nothing. Route-side markdown rendering (000119) already covered the new-tab
+    URL, so no rendering code was added. The vitest file widens the deliverable (Session Manager to
+    apply).'
 - id: phase-wbf-02
   title: Show a last-modified badge on the HTML Viewer header
   plan: doc-workbench-features-defects
