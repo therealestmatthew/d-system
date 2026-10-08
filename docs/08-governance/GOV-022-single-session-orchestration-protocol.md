@@ -90,7 +90,7 @@ is either the session itself or a subagent it dispatches.
 | `GOV-017` role | Single-session equivalent |
 |---|---|
 | Session Manager | The session. It sequences, dispatches, verifies and reports. There is no lock to hold and no slot to allocate |
-| Builder A, Builder B, Standby Builder | Creator subagents the session dispatches, or the session itself for a small change. One branch, the assigned one, carries all of it |
+| Builder A, Builder B, Standby Builder | Creator subagents the session dispatches. The session writes no deliverable itself (see *The session writes no deliverable*). One branch, the assigned one, carries all of it |
 | Batch Runner | Not present. A batch run under `PROMPT-036` is a coordinator run and follows `GOV-013` and `PROMPT-036`, not this document |
 | Scout | Read-only research agents (`Explore`, or `general-purpose` with a read-only brief) dispatched in parallel at the open |
 | Ideation | The session records ideas itself on its branch through `tools/append_idea.py` (see *Ideas*) |
@@ -153,6 +153,14 @@ The session dispatches agents the way `GOV-013` describes a coordinator dispatch
 `GOV-013`'s full apparatus (a tracker as memory, a dispatch template per unit, a descope ladder) is
 for a run of many units. A session that dispatches two to six agents needs these rules and no more.
 
+### The session writes no deliverable
+
+**Owner ruling, 2026-10-08.** The session is an orchestrator only. It dispatches, verifies, commits and reports; it does not write a deliverable itself. That includes documents, pages, scripts and data edits, not only code. Research returned by a reconnaissance agent is the brief for a creator agent, never material the session turns into a file in its own context.
+
+The reason is the coordinator protocol's rule that context discipline is the coordinator's whole job (`GOV-013`, "Context discipline is the coordinator's whole job"): a session that reads and writes the work itself fills its context with the work and runs out of room to coordinate. The ruling was made in this session, after it dispatched two read-only research agents and then wrote the protocol document, the guide page and its inventory scripts itself. The owner corrected it.
+
+The one exception is a verification command the session must run itself to hold the real output (`GOV-013`, "Verification discipline"), and the commit that follows a creator's work.
+
 ### Model tiers
 
 **Proposed, from the owner's instruction of 2026-10-08, repeated from the previous cloud session:**
@@ -179,6 +187,7 @@ stated it as the rule for this session and the one before; whether it is standin
 
 ### Dispatch rules
 
+- **Every file is written by a creator agent.** The session's own tools write nothing but the hand-off's commit and the verification output it keeps (owner ruling, 2026-10-08; see *The session writes no deliverable*).
 - **Independent dispatches go out in one turn**, so they run in parallel and the session keeps
   working. A dispatch whose input is another's output waits for it.
 - **The session does not duplicate an agent's work.** Once a sweep is dispatched the session reads
@@ -299,7 +308,7 @@ the owner. It carries, in this order:
    summarised. A failure is pasted as a failure.
 6. Assumptions made while the owner was away, ranked by what a different answer would change.
 7. Open questions for the owner, and anything left undone and why.
-8. Spend posture: agents dispatched, with model and kind; any escalation above Haiku and its reason.
+8. Spend posture: agents dispatched, with model and kind; any escalation above Haiku and its reason; and any file the session wrote itself, with the reason, since under the owner's ruling of 2026-10-08 there should be none.
 
 After the push, the owner or the local Session Manager runs `GOV-017`'s merge gate on the branch:
 the review runner or the five checks in a detached worktree, the code check, the dirty-integration
