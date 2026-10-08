@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D-System Portfolio Guide</title>
+<style>
+/* Layout: one reading column in the house magazine style; depth lives in collapsible cards
+   (native <details>, no script), so the primary flow stays short. Every colour, font and
+   spacing value below is a house token from templates/styles/house-tokens.json. */
+/*
+  House family — token stylesheet. GENERATED: do not edit by hand.
+
+  Source: templates/styles/house-tokens.json, regenerated with
+  `uv run python tools/generate_house_css.py`. Edit the tokens file and regenerate;
+  tests fail when this file and the tokens disagree (REQ-036 R01).
+
+  Provenance: House style round-two gallery, approved by the owner as shown on 2026-09-30 (REQ-036, PLAN-036 amendment)
+  https://claude.ai/artifact/D15aCx8HqwfVmKmKtKDKFi (artifact version 1790623455-daec).
+
+  Usage: inline this file, then templates/styles/house-components.css, into
+  templates/html/house-page.html's {{INLINE_STYLES}}. Select a variant with
+  data-variant="swiss" or data-variant="mono" on <html>, and force a mode with
+  data-theme="light" or data-theme="dark"; without data-theme the page follows
+  prefers-color-scheme. Fonts load from Google Fonts; every font token ends in a
+  system stack, so a page whose font request fails still renders.
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap");
+
+:root {
+  --sys-sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --sys-serif: Georgia, "Times New Roman", serif;
+  --sys-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --display: "Bricolage Grotesque", var(--sys-sans);
+  --body: "Literata", var(--sys-serif);
+  --label: "Bricolage Grotesque", var(--sys-sans);
+  --mono: "JetBrains Mono", var(--sys-mono);
+  --fs: 17px;
+  --lh: 1.62;
+  --h1: 3.4;
+  --h2: 1.6;
+  --htrack: -.04em;
+  --hw: 800;
+  --pad: 22px;
+  --gap: 24px;
+  --rule: 1px;
+  --label-track: .1em;
+  --cell: 10px 14px;
+  --radius-pill: 999px;
+  --bg: #ffffff;
+  --surface: #f6f1ea;
+  --line: #ddd6cd;
+  --strong: #1a1a1a;
+  --text: #141414;
+  --muted: #5a5a5a;
+  --accent: #c8205f;
+  --on-accent: #ffffff;
+  --accent-2: #0f7b6c;
+  --ok: #17693a;
+  --ok-bg: #e3f4e8;
+  --warn: #8a5a00;
+  --warn-bg: #fdf1d4;
+  --info: #1d5fa8;
+  --info-bg: #e4eefb;
+  --err: #b3162f;
+  --err-bg: #fbe5e8;
+  --soft: color-mix(in srgb, var(--accent) 10%, var(--bg));
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121015;
+    --surface: #1d1a22;
+    --line: #39333f;
+    --strong: #e9e4ee;
+    --text: #f1edf4;
+    --muted: #aaa3b3;
+    --accent: #ff5c9a;
+    --on-accent: #121015;
+    --accent-2: #3cc9b4;
+    --ok: #5fd68d;
+    --ok-bg: #16291e;
+    --warn: #f0b74a;
+    --warn-bg: #2d2412;
+    --info: #7fb2f0;
+    --info-bg: #172335;
+    --err: #ff7a8c;
+    --err-bg: #341820;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #121015;
+  --surface: #1d1a22;
+  --line: #39333f;
+  --strong: #e9e4ee;
+  --text: #f1edf4;
+  --muted: #aaa3b3;
+  --accent: #ff5c9a;
+  --on-accent: #121015;
+  --accent-2: #3cc9b4;
+  --ok: #5fd68d;
+  --ok-bg: #16291e;
+  --warn: #f0b74a;
+  --warn-bg: #2d2412;
+  --info: #7fb2f0;
+  --info-bg: #172335;
+  --err: #ff7a8c;
+  --err-bg: #341820;
+  color-scheme: dark;
+}
+
+:root[data-variant="swiss"] {
+  --body: "Archivo", var(--sys-sans);
+  --label: "Archivo", var(--sys-sans);
+  --fs: 15.5px;
+  --lh: 1.55;
+  --h1: 3.1;
+  --h2: 1.5;
+  --pad: 18px;
+  --gap: 20px;
+  --rule: 2px;
+  --label-track: .16em;
+  --cell: 9px 12px;
+}
+
+:root[data-variant="mono"] {
+  --body: "JetBrains Mono", var(--sys-mono);
+  --label: "JetBrains Mono", var(--sys-mono);
+  --fs: 14px;
+  --lh: 1.62;
+  --h1: 2.5;
+  --h2: 1.35;
+  --htrack: -.03em;
+  --pad: 16px;
+  --gap: 18px;
+  --label-track: .06em;
+  --cell: 8px 12px;
+}
+
+/*
+  House family — page shell and component rules.
+
+  Provenance: the component rules of the round-two house-style gallery the owner approved on
+  2026-09-30 (https://claude.ai/artifact/D15aCx8HqwfVmKmKtKDKFi, artifact version
+  1790623455-daec), rescoped from the gallery's .spec wrapper to page-global selectors, since
+  house pages are standalone documents.
+
+  Every colour, font, size, spacing, rule and radius here is a var() reference to a token in
+  templates/styles/house.css, which is generated from templates/styles/house-tokens.json. This file
+  carries no value of its own for any of them: a colour literal here fails REQ-036 R01's test.
+  Change the look by editing the tokens and regenerating, never by editing this file.
+
+  Usage: inline after house.css into templates/html/house-page.html's {{INLINE_STYLES}}. The
+  canonical markup for each component is in templates/html/house-components.html.
+
+  Components: page shell (.page, .kicker, .lede, .meta, .rule), stat row (.stats), columns
+  (.cols), callout (.callout), pill (.pill with .ok / .warn / .info / .err), table (.tbl-wrap with
+  a plain <table>), and the inline gate badge (.gate). None needs script.
+*/
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: var(--fs);
+  line-height: var(--lh);
+}
+
+/* ---- page shell ---- */
+.page {
+  max-width: 1140px;
+  margin-inline: auto;
+  padding: calc(var(--pad) * 1.6) clamp(16px, 4vw, 52px);
+  display: grid;
+  gap: calc(var(--gap) * 1.3);
+}
+.kicker, .lab {
+  font-family: var(--label);
+  font-size: .72em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--label-track);
+  color: var(--muted);
+}
+.kicker { color: var(--accent); }
+h1, h2, h3, h4 {
+  font-family: var(--display);
+  font-weight: var(--hw);
+  letter-spacing: var(--htrack);
+  line-height: 1.05;
+  margin: 0;
+  text-wrap: balance;
+}
+h1 { font-size: calc(1em * var(--h1)); max-width: 18ch; }
+h2 { font-size: calc(1em * var(--h2)); }
+h3 { font-size: 1.1em; letter-spacing: -.02em; }
+p { margin: 0; max-width: 64ch; }
+.lede { font-size: 1.15em; color: var(--muted); }
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-family: var(--label);
+  font-size: .8em;
+  color: var(--muted);
+}
+.rule { border: 0; border-top: var(--rule) solid var(--strong); margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code {
+  font-family: var(--mono);
+  font-size: .86em;
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  padding: 1px 5px;
+}
+.section { display: grid; gap: 14px; }
+.footer { font-family: var(--label); font-size: .8em; color: var(--muted); }
+
+/* ---- stat row ---- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: var(--rule) solid var(--strong);
+  border-bottom: var(--rule) solid var(--strong);
+}
+.stats > div {
+  padding: 14px 16px;
+  border-left: 1px solid var(--line);
+  display: grid;
+  gap: 4px;
+}
+.stats > div:first-child { border-left: 0; }
+.stats .v {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 2.3em;
+  line-height: 1;
+  letter-spacing: -.04em;
+  font-variant-numeric: tabular-nums;
+}
+.stats .v.acc { color: var(--accent); }
+.stats .d { font-size: .8em; color: var(--muted); }
+
+/* ---- columns ---- */
+.cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap);
+}
+.cols > div {
+  border-top: var(--rule) solid var(--strong);
+  padding-top: 12px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+/* ---- callout ---- */
+.callout {
+  border-left: 5px solid var(--accent);
+  background: var(--soft);
+  padding: 14px 18px;
+  display: grid;
+  gap: 6px;
+}
+.callout .lab { color: var(--accent); }
+
+/* ---- pill ---- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  font-family: var(--label);
+  font-size: .74em;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.pill::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.pill.ok { color: var(--ok); background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+.pill.warn { color: var(--warn); background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+.pill.info { color: var(--info); background: var(--info-bg); border-color: color-mix(in srgb, var(--info) 35%, transparent); }
+.pill.err { color: var(--err); background: var(--err-bg); border-color: color-mix(in srgb, var(--err) 35%, transparent); }
+
+/* ---- gate badge ---- */
+.gate {
+  display: inline-block;
+  font-family: var(--label);
+  font-size: .72em;
+  font-weight: 800;
+  background: var(--accent);
+  color: var(--on-accent);
+  padding: 1px 7px;
+  letter-spacing: .04em;
+}
+
+/* ---- table ---- */
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 600px; font-size: .9em; }
+th, td {
+  text-align: left;
+  padding: var(--cell);
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+thead th {
+  font-family: var(--label);
+  font-size: .72em;
+  text-transform: uppercase;
+  letter-spacing: var(--label-track);
+  color: var(--muted);
+  border-bottom: var(--rule) solid var(--strong);
+}
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.id { font-family: var(--mono); font-size: .9em; white-space: nowrap; }
+
+@media (max-width: 860px) {
+  .cols { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stats > div:nth-child(3) { border-left: 0; }
+}
+
+
+/* ---- page-local additions: collapsible card, flow, matrix (tokens only) ---- */
+.page { max-width: 980px; }
+.toc { display: flex; flex-wrap: wrap; gap: 8px 18px; font-family: var(--label); font-size: .85em; }
+.toc a { color: var(--muted); text-decoration: none; border-bottom: var(--rule) solid var(--line); }
+.toc a:hover, .toc a:focus-visible { color: var(--accent); border-color: var(--accent); }
+.section > p, .card-body > p, .card-body li, .section > ul li { max-width: 68ch; }
+.section > ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: .86em; }
+pre { font-family: var(--mono); font-size: .8em; line-height: 1.5; background: var(--surface); border: var(--rule) solid var(--line); padding: 12px 14px; overflow-x: auto; margin: 0; }
+.cards { display: grid; gap: 12px; }
+.card { background: var(--surface); border: var(--rule) solid var(--line); }
+.card > summary {
+  list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  padding: 12px var(--pad); font-family: var(--display); font-weight: 700; font-size: 1.02em; letter-spacing: -.02em;
+}
+.card > summary::-webkit-details-marker { display: none; }
+.card > summary::before { content: "+"; font-family: var(--mono); color: var(--accent); width: 1em; flex: 0 0 auto; }
+.card[open] > summary::before { content: "\2212"; }
+.card > summary .lab { margin-left: auto; font-weight: 700; }
+.card > summary .pill { font-size: .62em; }
+.card > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.card-body { padding: 4px var(--pad) var(--pad); display: grid; gap: 12px; border-top: var(--rule) solid var(--line); }
+.card-body p, .card-body ul { margin: 0; }
+.card-body ul { padding-left: 1.2em; display: grid; gap: 4px; }
+.card-body h4 { font-size: .95em; margin-top: 6px; }
+.flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+.flow > div { flex: 1 1 140px; min-width: 0; background: var(--surface); border: var(--rule) solid var(--line); padding: 10px 12px; position: relative; }
+.flow > div .lab { display: block; margin-bottom: 4px; }
+.flow > div strong { font-family: var(--display); letter-spacing: -.02em; }
+.flow > div.planned { border-style: dashed; }
+.flow > div p { margin: 4px 0 0; font-size: .85em; color: var(--muted); }
+.legend { font-family: var(--label); font-size: .78em; color: var(--muted); display: flex; gap: 16px; flex-wrap: wrap; }
+.legend span::before { content: ""; display: inline-block; width: 14px; height: 10px; border: var(--rule) solid var(--line); margin-right: 6px; vertical-align: -1px; background: var(--surface); }
+.legend span.pl::before { border-style: dashed; }
+table td, table th { vertical-align: top; }
+td.id { white-space: nowrap; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.decisions { counter-reset: d; display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; }
+.decisions li { counter-increment: d; display: grid; grid-template-columns: 2.4em 1fr; gap: 10px; max-width: none; }
+.decisions li::before { content: "D" counter(d); font-family: var(--mono); font-weight: 700; color: var(--accent); }
+@media (prefers-reduced-motion: no-preference) { .card-body { animation: fade .18s ease-out; } }
+@keyframes fade { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+<header class="section" id="top">
+  <span class="kicker">D-System · personal productivity system</span>
+  <h1>Portfolio Guide</h1>
+  <p class="lede">What the system tracks, how information moves through it, what works today, what is planned, and the templates it could grow. Written for a reader who decides, with the detail folded into cards.</p>
+  <div class="meta"><span>As of 2026-10-08</span><span>Source: the repository on branch <code>claude/productivity-system-templates-ie1x8d</code></span><span>Every figure below was read from a file or computed, none typed from memory</span></div>
+  <nav class="toc" aria-label="Sections">
+    <a href="#glance">At a glance</a><a href="#records">The records</a><a href="#flow">How information moves</a><a href="#use">Using it today</a><a href="#state">Built vs planned</a><a href="#open">Open work</a><a href="#templates">Templates</a><a href="#proposals">Template proposals</a><a href="#decisions">Decisions for the owner</a><a href="#method">How this was produced</a>
+  </nav>
+</header>
+<hr class="rule">
+
+<section class="section" id="glance">
+  <span class="lab">1 · At a glance</span>
+  <h2>A ledger of promises, people and projects, with the analysis still to come</h2>
+  <p>The personal productivity system is the secondary purpose of D-System: tracking the owner's <strong>people, projects, commitments and tasks</strong>, plus the tags that connect them. Records are plain JSON files, validated against schemas, loaded into a DuckDB database that is rebuilt on demand. Real records live in a private, untracked folder; the tracked repository holds a small fictional example set so every tool can be tested without exposing anything.</p>
+  <p>The capture pipeline that turns a rough note into a validated record is <strong>built and tested</strong>. The analysis layer that was meant to sit on top of the records, six signals and four syntheses such as a stale-project radar and a weekly review, is <strong>planned and unbuilt</strong>. Nothing serves the records to a screen yet: there are no API routes and no UI views for the four core entities. The single most important open question is whether the real portfolio holds any people or commitments at all, which only the owner can answer.</p>
+  <div class="stats">
+    <div><span class="lab">Record types</span><span class="v acc">9</span><span class="d">5 core, 4 supporting</span></div>
+    <div><span class="lab">Database tables</span><span class="v">16</span><span class="d">3 derived views</span></div>
+    <div><span class="lab">Entity API routes</span><span class="v">0</span><span class="d">no UI views either</span></div>
+    <div><span class="lab">Open phases</span><span class="v">25</span><span class="d">23 queued, 2 deferred</span></div>
+  </div>
+  <div class="callout">
+    <span class="lab">The one blocker</span>
+    <p>Fourteen of the twenty-five open phases wait, directly or through a dependency chain, on <strong>seeding the portfolio through the capture pipeline</strong> (<code>phase-cap-08</code>) and on <strong>the portfolio data question</strong> (<code>phase-proj-01</code>): do people and commitments hold real records, and if not, is that friction or no need? Until those two are answered, the syntheses, the ledger and the projections build against a one-commitment example set. The other eleven wait on the reliability track's atomic rebuild or are ready now.</p>
+  </div>
+</section>
+<hr class="rule">
+
+<section class="section" id="records">
+  <span class="lab">2 · The records</span>
+  <h2>Nine record types, five of them core</h2>
+  <p>Each record type is a JSON Schema under <code>schemas/</code> and a table in the database. Open a card for the fields that matter: required values, status vocabularies, dates and links to other records. Every schema rejects unknown fields, so adding a field is a schema change.</p>
+  <div class="cards">
+    <details class="card"><summary>Project <span class="pill ok">core</span><span class="lab">5 example records</span></summary><div class="card-body">
+      <p>A unit of work or attention with a lifecycle. It is the hub the other records attach to.</p>
+      <ul>
+        <li><strong>Required:</strong> id, name, status, category, type.</li>
+        <li><strong>Status:</strong> active · inactive · planning · blocked · complete · archived. <strong>Category:</strong> work · learning · system · personal. <strong>Type:</strong> project · activity · goal · system · certification.</li>
+        <li><strong>Dates:</strong> started, target_date, last_reviewed. A review cadence (daily to quarterly, or ad-hoc) says how often it should be looked at. <code>last_touched</code> is derived at rebuild, never stored.</li>
+        <li><strong>Links:</strong> tags (tag ids) and stakeholders (person ids). The project side is the intended authority for membership (<code>phase-rel-04</code>, queued).</li>
+      </ul>
+    </div></details>
+    <details class="card"><summary>Person <span class="pill ok">core</span><span class="lab">1 example record</span></summary><div class="card-body">
+      <p>A canonical individual. Today it is deliberately thin: name, optional role and contact details, and the projects they belong to.</p>
+      <ul>
+        <li><strong>Required:</strong> id, name. No status and no dates.</li>
+        <li><strong>Links:</strong> projects (project ids). Commitments point at a person through <code>promised_to</code>; waiting-on records through <code>owed_by</code>.</li>
+        <li><strong>Planned extensions</strong> (draft architecture <code>ARCH-007</code>): companies, time-bounded affiliations, typed aliases such as several email addresses resolving to one person, and project parties with dated roles.</li>
+      </ul>
+    </div></details>
+    <details class="card"><summary>Commitment <span class="pill ok">core</span><span class="lab">1 example record</span></summary><div class="card-body">
+      <p>A promise made to someone, or to yourself. The record the whole system exists to keep honest.</p>
+      <ul>
+        <li><strong>Required:</strong> id (<code>c-N</code>), description, status, priority, created.</li>
+        <li><strong>Status:</strong> open · in_progress · complete · blocked · cancelled. <strong>Priority:</strong> high · medium · low.</li>
+        <li><strong>Dates:</strong> created (required), due_date, completed. There is no start date and no estimate.</li>
+        <li><strong>Links:</strong> project_id (optional), promised_to (a person id, the name as written, or null for a promise to yourself), tags, and the raw capture it came from. Tasks point back at it; they are not embedded.</li>
+        <li><strong>Protected fields:</strong> promised_to, due_date and completed may never be invented by an agent during capture. They come from the owner's words or stay empty.</li>
+      </ul>
+    </div></details>
+    <details class="card"><summary>Task <span class="pill ok">core</span><span class="lab">3 example records</span></summary><div class="card-body">
+      <p>A step of work. It may hang off a commitment, a project, both, or neither.</p>
+      <ul>
+        <li><strong>Required:</strong> id (<code>t-N</code>), description, status, created.</li>
+        <li><strong>Status:</strong> open · in_progress · complete · blocked · cancelled. <strong>Priority:</strong> high · medium · low, or none.</li>
+        <li><strong>Dates:</strong> created, due_date, completed. No start date, no duration.</li>
+        <li><strong>Links:</strong> commitment_id and project_id, both optional. Parentless records appear in the derived <code>unfiled</code> view so they are never lost.</li>
+      </ul>
+    </div></details>
+    <details class="card"><summary>Tag <span class="pill ok">core</span><span class="lab">29 in the shared taxonomy</span></summary><div class="card-body">
+      <p>The shared vocabulary. Tags are the one record always read from the tracked repository, whichever data root is active.</p>
+      <ul>
+        <li><strong>Required:</strong> id, label, category. <strong>Category:</strong> client · platform · tech · domain · methodology · context.</li>
+        <li><strong>Links:</strong> related tags. A deprecated flag retires a tag without deleting it.</li>
+        <li>Every tag a project uses must already exist in <code>_data/tags.json</code>; the rebuild refuses an unknown tag.</li>
+      </ul>
+    </div></details>
+    <details class="card"><summary>Interaction, Decision, Waiting-on, Development event <span class="pill info">supporting</span><span class="lab">no example records yet</span></summary><div class="card-body">
+      <p>Four record types added in 2026-09 when the capture system was defined. They have schemas, tables and tests, but the fictional example set holds none of them yet.</p>
+      <ul>
+        <li><strong>Interaction:</strong> a meeting, call, email, message or conversation on a date, with confirmed participants and unresolved participant names kept apart.</li>
+        <li><strong>Decision:</strong> what was decided, the rationale and alternatives, with a status of active, superseded or reversed.</li>
+        <li><strong>Waiting-on:</strong> something owed to you. Dates for requested, last_chased, due and received; status open, chased, received or abandoned. The <code>requested</code> date is the clock for "gone quiet".</li>
+        <li><strong>Development event:</strong> a dated learning or milestone event with hours. Its <code>milestone</code> type is the only milestone-shaped field in the system.</li>
+      </ul>
+    </div></details>
+  </div>
+</section>
+<hr class="rule">
+
+<section class="section" id="flow">
+  <span class="lab">3 · How information moves</span>
+  <h2>Note in, validated record out, analysis on top</h2>
+  <p>Solid boxes exist and are tested. Dashed boxes are planned in approved documents and have no code.</p>
+  <div class="flow">
+    <div><span class="lab">1 · Capture</span><strong>Raw note</strong><p>Verbatim, timestamped, never edited. From a session, the inbox folder or the CLI.</p></div>
+    <div><span class="lab">2 · Structure</span><strong>Staged record</strong><p>An agent proposes fields; every value is scored explicit, inferred or guessed with a quote as evidence.</p></div>
+    <div><span class="lab">3 · Route</span><strong>Clean · flagged · held</strong><p>Stakes crossed with evidence decide the route. Any new person, project or tag is held, never created.</p></div>
+    <div><span class="lab">4 · Review</span><strong>Promote</strong><p>The owner promotes clean records in one action and rules on flagged and held ones.</p></div>
+    <div><span class="lab">5 · Store</span><strong>Data root</strong><p>JSON files under the private portfolio, or the tracked example set.</p></div>
+    <div><span class="lab">6 · Project</span><strong>DuckDB</strong><p>Rebuilt from JSON on demand. 16 tables, 3 views. Never edited directly.</p></div>
+    <div class="planned"><span class="lab">7 · Signals</span><strong>Six SQL views</strong><p>Health, load, stale radar, accountability ledger, velocity, tag clusters.</p></div>
+    <div class="planned"><span class="lab">8 · Synthesis</span><strong>Four workflows</strong><p>Context pack, session briefing, weekly review, monthly digest.</p></div>
+    <div class="planned"><span class="lab">9 · Present</span><strong>Pages and UI</strong><p>Generated HTML from the template library; later, API routes and workbench views.</p></div>
+  </div>
+  <div class="legend"><span>built and tested</span><span class="pl">planned, no code</span></div>
+  <div class="cards">
+    <details class="card"><summary>Why capture is strict about evidence</summary><div class="card-body">
+      <p>The capture routing decision (<code>ADR-007</code>) and the capture requirements (<code>REQ-002</code>) set three rules. A raw note is written before any interpretation and is never changed. Every agent-filled field carries provenance: a verbatim quote with its offset, scored explicit, inferred or guessed. Four fields can never be invented: who a promise was made to, when it is due, the text of a decision, and a completion. A record whose stakes are high or whose evidence is weak is flagged for the owner; a record that would create a new person, project or tag is held until the owner takes the identity decision. This is what makes it safe to let an agent read a messy note.</p>
+    </div></details>
+    <details class="card"><summary>Where the real data lives, and how the tools find it</summary><div class="card-body">
+      <p>The structure-content boundary decision (<code>ADR-009</code>) separates what is tracked from what is private. The repository tracks the schemas, tools and a fictional example set under <code>_data/</code>. The owner's real records live under <code>_private/portfolio/</code>, which is gitignored and absent from every worktree and every cloud session. Tools find the real data through one environment variable:</p>
+      <pre>D_SYSTEM_DATA_ROOT=_private/portfolio uv run python tools/rebuild_db.py</pre>
+      <p>Tags and the idea log are always read from the tracked tree regardless of the override. A fresh clone with nothing set must still pass the tests and a rebuild, and does.</p>
+    </div></details>
+    <details class="card"><summary>What the database holds today</summary><div class="card-body">
+      <p>Sixteen tables: projects, people, project_people, tags, project_tags, commitments, tasks, interactions, decisions, waiting_on, development_events, memories, and four idea tables. Three views: project activity, the derived <code>last_touched</code> per project, and <code>unfiled</code> for parentless records. The rebuild validates every source file first and writes nothing if any file fails. None of the six planned signal views exists; a search of the source for their names returns nothing.</p>
+    </div></details>
+  </div>
+</section>
+<hr class="rule">
+
+<section class="section" id="use">
+  <span class="lab">4 · Using it today</span>
+  <h2>Five operations, all from the command line</h2>
+  <p>There is no screen for the records yet. Everything below is a terminal command run from the repository, with the data root pointed at the private portfolio for real work.</p>
+  <div class="cards">
+    <details class="card"><summary>Capture a note</summary><div class="card-body">
+      <pre>uv run python tools/capture.py "Promised Jordan the vendor shortlist by Friday"
+uv run python tools/capture.py --inbox     # convert every file dropped in _capture/inbox/</pre>
+      <p>Writes one raw record under <code>_capture/raw/</code>. Nothing is interpreted at this step. Operations document: <code>OPS-008</code>.</p>
+    </div></details>
+    <details class="card"><summary>Review and promote staged records</summary><div class="card-body">
+      <pre>uv run python tools/review.py show
+uv run python tools/review.py promote --clean          # every clean record in one action
+uv run python tools/review.py promote staged-… --set due_date=2026-10-17
+uv run python tools/review.py create staged-…          # take the identity decision for a held person or project
+uv run python tools/review.py discard staged-…
+uv run python tools/review.py correct commitment c-12 due_date 2026-10-24 --reason "date moved"</pre>
+      <p>Promotion is the only path into the data root. Corrections append a dated entry to the promoted record; the raw capture is never touched.</p>
+      <p><strong>Gap worth knowing:</strong> the structuring step between a raw note and a staged record is a library function an agent calls. No command-line entry point exists for it, so today a session or an agent runs it, not the owner by hand.</p>
+    </div></details>
+    <details class="card"><summary>Add a project directly</summary><div class="card-body">
+      <p>The written procedure (<code>brain/procedures/add-new-project.md</code>): create <code>projects/&lt;id&gt;.json</code> under the data root with id, name, status, category, type, tags, stakeholders and a review cadence; add any missing tag to <code>_data/tags.json</code> first; rebuild; verify the row with a query. The id is permanent. There is no equivalent written procedure for adding a person; today a person is created through a held capture or by writing the JSON by hand.</p>
+    </div></details>
+    <details class="card"><summary>Rebuild the database</summary><div class="card-body">
+      <pre>uv run python tools/rebuild_db.py                                   # example set
+D_SYSTEM_DATA_ROOT=_private/portfolio uv run python tools/rebuild_db.py   # real records</pre>
+      <p>Validates every source, drops and recreates all tables and views, writes <code>data/d_system.duckdb</code>. Operations document: <code>OPS-002</code>, whose prose still says "eight tables"; the code creates sixteen.</p>
+    </div></details>
+    <details class="card"><summary>Load context into a session</summary><div class="card-body">
+      <pre>uv run python tools/load_context.py --project example-web-platform
+uv run python tools/load_context.py -q "vendor" --type decision --limit 5</pre>
+      <p>Prints Markdown to paste into a model that has no repository access. It reads only the <code>memories</code> table, meaning the durable notes under <code>brain/</code>; it does not load projects, people, commitments or tasks. A project context pack that would (<code>phase-syn-01</code>) is queued.</p>
+    </div></details>
+  </div>
+</section>
+<hr class="rule">
+
+<section class="section" id="state">
+  <span class="lab">5 · Built vs planned</span>
+  <h2>The honest matrix</h2>
+  <p>Plans in this repository are design sources, not evidence of implementation. This table says which is which, checked against code.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Capability</th><th>State</th><th>Evidence</th></tr></thead>
+    <tbody>
+      <tr><td>Schemas for all nine record types</td><td><span class="pill ok">built</span></td><td><code>schemas/</code>, <code>test/test_schemas.py</code></td></tr>
+      <tr><td>Private data root and example-set separation</td><td><span class="pill ok">built</span></td><td><code>ADR-009</code>, <code>phase-priv-03</code> complete</td></tr>
+      <tr><td>DuckDB rebuild with validation and derived views</td><td><span class="pill ok">built</span></td><td><code>tools/rebuild_db.py</code>, <code>sql/001</code>, <code>sql/003</code></td></tr>
+      <tr><td>Capture: raw intake, structuring, routing, review, promotion</td><td><span class="pill ok">built</span></td><td><code>src/capture/</code>, phases cap-02 to cap-07 complete, five test modules</td></tr>
+      <tr><td>Command-line structuring step</td><td><span class="pill warn">gap</span></td><td>library function only; no <code>tools/</code> entry point</td></tr>
+      <tr><td>Seeding the real portfolio through capture</td><td><span class="pill info">queued</span></td><td><code>phase-cap-08</code>, first in the queue</td></tr>
+      <tr><td>Six signal views</td><td><span class="pill info">planned</span></td><td><code>PLAN-002</code>; phases sig-01 to sig-09 queued; no code</td></tr>
+      <tr><td>Four synthesis workflows</td><td><span class="pill info">planned</span></td><td>phases syn-01 to syn-05 queued; syn-05 depends on a cancelled phase</td></tr>
+      <tr><td>API routes and UI views for the four entities</td><td><span class="pill err">absent</span></td><td>idea 000360; the router has two commented placeholder lines</td></tr>
+      <tr><td>Quick-entry writer for people, commitments and tasks</td><td><span class="pill err">absent</span></td><td>idea 000361</td></tr>
+      <tr><td>Reminders when a commitment falls due</td><td><span class="pill err">absent</span></td><td>idea 000362; everything today is pull-based</td></tr>
+      <tr><td>Companies, affiliations, aliases, project parties, WBS</td><td><span class="pill info">draft design</span></td><td><code>ARCH-007</code>, <code>ARCH-008</code>, <code>ARCH-010</code>; ideas 000258 to 000266; no phase</td></tr>
+      <tr><td>As-of snapshots and what-if simulation</td><td><span class="pill info">queued / deferred</span></td><td><code>phase-proj-02</code> ready now; proj-03 and proj-04 gated</td></tr>
+      <tr><td>HTML templates for portfolio data</td><td><span class="pill err">absent</span></td><td>four template families exist, none reads the records (section 7)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout"><span class="lab">A documentation drift to fix</span><p>The capture requirements (<code>REQ-002</code>) still say structuring, routing, review and promotion are "proposed only", and the capture build plan (<code>PLAN-009</code>) is still <code>draft</code>, while the backlog marks those phases complete and the code and tests exist. Reconciling durable documents with shipped behaviour is <code>phase-rel-10</code>, queued.</p></div>
+</section>
+<hr class="rule">
+
+<section class="section" id="open">
+  <span class="lab">6 · Open work</span>
+  <h2>Twenty-five phases in five tracks, and eighteen related ideas</h2>
+  <p>Every phase below is in the backlog with a one-session scope. The dependency chains matter more than the count: the signals wait on the capture seed, the syntheses wait on the signals, and the projections wait on the owner's answer.</p>
+  <div class="cards">
+    <details class="card"><summary>Capture <span class="pill info">2 queued</span><span class="lab">first in the queue</span></summary><div class="card-body">
+      <ul>
+        <li><strong>Seed the portfolio through the capture pipeline</strong> (<code>phase-cap-08</code>): run a real working period through intake, structuring, review and promotion against the private root, so real records exist. Head of <code>next_up</code>.</li>
+        <li><strong>Confirm the signal and synthesis tracks are unblocked</strong> (<code>phase-cap-09</code>): measure real row counts per table before declaring any downstream phase ready; put the waiting-on scope question to the owner.</li>
+      </ul>
+    </div></details>
+    <details class="card"><summary>Signals <span class="pill info">9 queued</span><span class="lab">PLAN-002, tier 2</span></summary><div class="card-body">
+      <ul>
+        <li><strong>SQL view installation boundary</strong> (sig-01): where derived views live and how they are installed after a rebuild. Depends on atomic rebuild (rel-06).</li>
+        <li><strong>Stale Radar</strong> (sig-02): projects whose last review exceeds their cadence.</li>
+        <li><strong>Accountability Ledger</strong> (sig-03): open external commitments joined to people, ordered by due date. Depends on the capture seed.</li>
+        <li><strong>Project Health Signal</strong> (sig-04): red, amber, green from review recency, overdue commitments and blocked tasks.</li>
+        <li><strong>Cognitive Load Estimator</strong> (sig-05): weighted load per project and portfolio.</li>
+        <li><strong>Commitment Velocity</strong> (sig-06), <strong>snapshot ownership</strong> (sig-07) and <strong>persisted weekly observations</strong> (sig-08): created versus completed per week, and whether a snapshot is a durable observation.</li>
+        <li><strong>Tag Cluster Analyzer</strong> (sig-09): co-occurrence, shared-tag project pairs, a deterministic graph export.</li>
+      </ul>
+    </div></details>
+    <details class="card"><summary>Synthesis <span class="pill info">5 queued</span><span class="lab">PLAN-002, tier 3</span></summary><div class="card-body">
+      <ul>
+        <li><strong>Project context packs</strong> (syn-01): portable Markdown per project with signals, stakeholders and open work.</li>
+        <li><strong>Session briefing</strong> (syn-02): daily inputs and a model-independent prompt for three to five actions.</li>
+        <li><strong>Weekly review</strong> (syn-03) and <strong>monthly portfolio digest</strong> (syn-04): governed, append-only outputs with dated provenance.</li>
+        <li><strong>Digest as generated HTML</strong> (syn-05): <strong>stale</strong>. It depends on <code>phase-html-10</code> and names a YAML-to-JSON page pipeline, both cancelled when <code>PLAN-003</code> was retired. It needs re-scoping to the house template family before anyone claims it.</li>
+      </ul>
+    </div></details>
+    <details class="card"><summary>Projections <span class="pill info">2 queued</span> <span class="pill warn">2 deferred</span><span class="lab">PLAN-034</span></summary><div class="card-body">
+      <ul>
+        <li><strong>The portfolio data question</strong> (proj-01): one question to the owner, with the exact command that produces the evidence. An agent cannot answer it; the private root is off limits.</li>
+        <li><strong>As-of snapshots and two-point diffs</strong> (proj-02): ready now; its stated prerequisite is already met.</li>
+        <li><strong>Scenario simulation</strong> (proj-03, deferred until proj-01 is answered and signals exist) and <strong>recommendation calibration</strong> (proj-04, deferred until recommendations accumulate).</li>
+      </ul>
+    </div></details>
+    <details class="card"><summary>Reliability <span class="pill info">5 queued</span><span class="lab">PLAN-004</span></summary><div class="card-body">
+      <ul>
+        <li><strong>Project stakeholders as the membership authority</strong> (rel-04): record it in an ADR, then update schemas, loader and procedures.</li>
+        <li><strong>Failure-safe projection publication</strong> (rel-05) and <strong>atomic rebuild</strong> (rel-06): keep the previous usable database when a rebuild fails.</li>
+        <li><strong>Unified database paths</strong> (rel-07) and <strong>documentation reconciliation</strong> (rel-10).</li>
+      </ul>
+    </div></details>
+    <details class="card"><summary>Related ideas <span class="pill info">18 triaged</span><span class="lab">_data/ideas.jsonl</span></summary><div class="card-body">
+      <h4>Portfolio capability gaps (from the 2026-09-23 inventory)</h4>
+      <ul>
+        <li><strong>000022</strong> (people and commitments have zero real records): the parent of the data question.</li>
+        <li><strong>000360</strong> (API routes and UI views for the four entities), <strong>000361</strong> (quick-entry writer), <strong>000362</strong> (due-date reminders), <strong>000363</strong> (intake from email, calendar and transcripts), <strong>000364</strong> (the opportunity entity).</li>
+        <li><strong>000033</strong> (temporal projection explorer) and <strong>000034</strong> (what-if simulator), both now phases.</li>
+        <li><strong>000537</strong> (idea types: realization versus personal productivity): where the boundary between the two systems sits.</li>
+      </ul>
+      <h4>Data-model extensions (from the 2026-09-17 schema discussion)</h4>
+      <ul>
+        <li><strong>000258</strong> (affiliations over time), <strong>000259</strong> (typed aliases), <strong>000263</strong> (WBS elements), <strong>000264</strong> (WBS baselines and change history), <strong>000265</strong> (companies as counterparties), <strong>000266</strong> (vocabulary).</li>
+      </ul>
+      <h4>Template library</h4>
+      <ul>
+        <li><strong>000083</strong> (template library with deterministic or AI population; now built as <code>library.yaml</code>), <strong>000092</strong> (HTML Designer agent; <code>phase-des-06</code>), <strong>000511</strong> (design system and theme library; the house style came from it).</li>
+      </ul>
+    </div></details>
+  </div>
+</section>
+<hr class="rule">
+
+<section class="section" id="templates">
+  <span class="lab">7 · Templates today</span>
+  <h2>Four families, none for portfolio data</h2>
+  <p>The template library (<code>templates/html/library.yaml</code>) declares every HTML template, its family and how it is populated: <strong>slot-fill</strong> (every slot filled by code), <strong>ai-adaptation</strong> (an agent adapts it) or <strong>both</strong>. A page can be read with scripts disabled, follows light and dark mode in CSS alone, and takes every colour from one token file. None of the fifteen templates reads a project, person, commitment or task.</p>
+  <div class="cards">
+    <details class="card"><summary>House <span class="pill ok">the approved style</span><span class="lab">house-page, house-components</span></summary><div class="card-body">
+      <p>The house style the owner approved on 2026-09-30 (<code>REQ-036</code>): a magazine default with Swiss and mono variants that change type, spacing and rules only. Five components: stat row, columns, callout, pill and table. No JavaScript. Generators: the engine pages and the house CSS specimen. This guide is set in it.</p>
+    </div></details>
+    <details class="card"><summary>Overview <span class="lab">overview-*.html, 8 templates</span></summary><div class="card-body">
+      <p>Embeddable data panels for the live-demo overview page, generated by <code>tools/generate_overview.py</code> from the governance corpus: metrics, systems, concepts, terms. Slot-fill, no script, scoped under <code>.overview</code>.</p>
+    </div></details>
+    <details class="card"><summary>Atlas <span class="lab">atlas-page, atlas-components</span></summary><div class="card-body">
+      <p>Standalone showcase and architecture pages with an interactive shell: sidebar navigation, collapsible sections, focusable SVG diagrams. The one family that ships script. Population is <strong>both</strong>: the shell slots are mechanical, the masthead, sections and page script are an author's.</p>
+    </div></details>
+    <details class="card"><summary>Lit-report <span class="lab">lit-report-*.html, 3 templates</span></summary><div class="card-body">
+      <p>The literature-review campaign report: an index, a deliverable page and a browsable table rendered by <code>tools/lit_report_render.py</code>. Slot-fill.</p>
+    </div></details>
+    <details class="card"><summary>Constraints any new portfolio template inherits</summary><div class="card-body">
+      <ul>
+        <li>House family by default; no colour literals, every value a token; status is always one of four pills; one accent.</li>
+        <li>No script in house pages. Native <code>&lt;details&gt;</code> is not script and is already used in the overview family.</li>
+        <li>Declared in <code>library.yaml</code> as a file or a new pattern; the library refuses an undeclared file.</li>
+        <li>Deterministic: same commit, same bytes. An "overdue" or "today" marker therefore needs an explicit as-of date passed in, not the wall clock.</li>
+        <li>Generated pages contain no confidential identifier; build against the example set, render real data only to a gitignored location.</li>
+        <li>No generator reads portfolio data yet. The first template pays for a shared loader that uses the data root.</li>
+      </ul>
+    </div></details>
+  </div>
+</section>
+<hr class="rule">
+
+<section class="section" id="proposals">
+  <span class="lab">8 · Template proposals</span>
+  <h2>Timeline and Gantt, and twelve more the data could feed</h2>
+  <p>The owner named a simple timeline and a Gantt chart. A design agent assessed both against the house constraints and the schemas, then proposed twelve more. The short version: the <strong>timeline is buildable today</strong>; a <strong>Gantt is buildable at project level today</strong> and needs a start-date field for tasks; the cheapest first build is a <strong>commitments ledger</strong>, because it needs no new component and proves the data loader everything else shares.</p>
+  <div class="cards">
+    <details class="card" open><summary>Simple timeline <span class="pill ok">data ready</span><span class="lab">effort M · house · slot-fill</span></summary><div class="card-body">
+      <p><strong>What it shows.</strong> A per-project vertical timeline of dated events: started, last reviewed, each commitment's created, due and completed dates, each task's, the target date, and later interactions, decisions and milestone events. The example web platform project yields about twelve events today. A portfolio-wide view is the same component with a project column.</p>
+      <p><strong>How.</strong> A CSS-only vertical list with a left rule and markers, chronological rather than proportional, which suits sparse personal data. One new component in the house stylesheet, tokens only. Inline SVG only if proportional spacing is wanted.</p>
+      <p><strong>Decisions for the owner:</strong> per-project, portfolio or person view first; chronological or proportional; whether <code>created</code> dates count as events; whether a milestone development event is an acceptable milestone source; shared component or page-local CSS; as-of date from a parameter or the commit date.</p>
+    </div></details>
+    <details class="card" open><summary>Gantt chart <span class="pill warn">project level only today</span><span class="lab">effort M, L with tasks · house · slot-fill</span></summary><div class="card-body">
+      <p><strong>Data readiness.</strong> Projects have <code>started</code> and <code>target_date</code>: three of the five example projects draw as bars, one is open-ended, one unscheduled. Commitments and tasks have no start date, no duration and no dependency field, so a task-level bar from <code>created</code> to <code>due_date</code> would show lead time, not a schedule. <strong>Minimal schema change for a real task Gantt:</strong> a nullable <code>start_date</code> on task and commitment, with the matching column and loader change. Dependencies are planned as a separate work-dependency record in the draft data model, so an interim field on tasks would cut across that direction.</p>
+      <p><strong>How.</strong> CSS grid, one row per item and one column per week or month, bars placed by inline grid-column; labels stay real text, dark mode is free, the table wrapper gives horizontal scroll on a phone. SVG is day-accurate and can draw dependency arrows but wraps no text; a hybrid adds an SVG arrow overlay once dependency data exists.</p>
+      <p><strong>No-script consequences.</strong> No drag, zoom or live filter. Zoom becomes separate renders at week, month and quarter. The "today" line is the as-of date stamped on the page. Interaction belongs in the workbench, which is the live view.</p>
+      <p><strong>Decisions for the owner:</strong> accept project level first; add <code>start_date</code> to tasks, commitments or both; interim dependency field or wait for the work-dependency record; how to show open-ended and unscheduled projects; what colour encodes, since the status colours are taken.</p>
+    </div></details>
+    <details class="card"><summary>Twelve further proposals <span class="lab">ranked by data readiness, then value</span></summary><div class="card-body">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Template</th><th>Answers</th><th>Data</th><th>Method</th><th>Effort</th><th>Depends on</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Commitments ledger</strong></td><td>What do I owe, to whom, by when, and what is overdue?</td><td>commitments: due, status, priority, promised_to; as-of date</td><td>slot-fill</td><td>S</td><td>none; the page for the planned ledger view (sig-03)</td></tr>
+          <tr><td><strong>Portfolio dashboard</strong></td><td>Is my portfolio healthy?</td><td>project status, category, target, last review vs cadence; open and overdue counts</td><td>slot-fill</td><td>M</td><td>none today; later sig-02, sig-04; overlaps syn-05</td></tr>
+          <tr><td><strong>Project brief</strong></td><td>What is the state of this project, on one page?</td><td>project fields, stakeholders, tags, open commitments and tasks</td><td>both (summary slot)</td><td>M</td><td>none; share a data function with syn-01</td></tr>
+          <tr><td><strong>Person profile / stakeholder card</strong></td><td>Who is this, and what is open with them?</td><td>person, projects, commitments promised_to, waiting-on owed_by</td><td>slot-fill</td><td>S</td><td>none; exclude email from shareable output</td></tr>
+          <tr><td><strong>Kanban / status board</strong></td><td>What is in each state?</td><td>tasks and commitments by status; projects by status</td><td>slot-fill</td><td>S</td><td>new card component; static snapshot</td></tr>
+          <tr><td><strong>Agenda / calendar</strong></td><td>What is coming up?</td><td>every due_date and target_date; next review from cadence</td><td>slot-fill</td><td>S list, M month grid</td><td>none</td></tr>
+          <tr><td><strong>Waiting-on board</strong></td><td>What do others owe me, and who has gone quiet?</td><td>waiting-on: requested, last_chased, due, status, owed_by</td><td>slot-fill</td><td>S</td><td>fixtures; no example data</td></tr>
+          <tr><td><strong>Stale radar / review queue</strong></td><td>Which projects am I neglecting?</td><td>last_reviewed or derived last_touched vs cadence</td><td>slot-fill</td><td>S</td><td>sig-02 builds the view; computable inline now</td></tr>
+          <tr><td><strong>Weekly review</strong></td><td>What happened, what slipped, what next?</td><td>completed and created this week, due next week, stale list</td><td>both (narrative slot)</td><td>M</td><td>duplicates syn-03 in content (Markdown)</td></tr>
+          <tr><td><strong>Decision register</strong></td><td>What did we decide, and why?</td><td>decision: date, text, rationale, alternatives, status</td><td>slot-fill</td><td>S</td><td>fixtures; no example data</td></tr>
+          <tr><td><strong>Velocity trend</strong></td><td>Am I creating faster than completing?</td><td>weekly created vs completed</td><td>slot-fill</td><td>M</td><td>sig-06 to sig-08 snapshots</td></tr>
+          <tr><td><strong>RACI / role matrix</strong></td><td>Who is responsible, accountable, consulted, informed?</td><td>planned project parties and role definitions (ARCH-007)</td><td>slot-fill</td><td>M</td><td>blocked: no schema, no phase; interim people-by-projects matrix</td></tr>
+        </tbody>
+      </table></div>
+      <p>Checked against the backlog: the queued HTML component library (<code>phase-des-04</code>) builds interactive components only, and the HTML Designer agent (<code>phase-des-06</code>) extracts families from pages after they ship. No queued phase builds a timeline, Gantt, kanban, calendar or any portfolio page, so none of these duplicates queued work.</p>
+    </div></details>
+    <details class="card"><summary>Suggested build order</summary><div class="card-body">
+      <ol>
+        <li><strong>Shared loader and a richer fictional fixture.</strong> Not a template. Reads the data root, takes an as-of date, and adds example records covering overdue, blocked, a milestone, an interaction and a waiting-on item. The current set shows exactly one overdue task.</li>
+        <li><strong>Commitments ledger.</strong> Data ready, no new CSS; proves the loader and the as-of handling.</li>
+        <li><strong>Portfolio dashboard.</strong> Same components plus counts by status and cadence.</li>
+        <li><strong>Project brief and person card.</strong> First new component, the card. After the owner answers the data question, in case people records do not exist.</li>
+        <li><strong>Timeline.</strong> One new component; data ready for the per-project view.</li>
+        <li><strong>Agenda, then kanban.</strong> Reuse the card.</li>
+        <li><strong>Project-level Gantt.</strong> Grid-based, no schema change. The start-date change only after the owner decides.</li>
+        <li><strong>Waiting-on board and decision register.</strong> Easy, but need fixtures.</li>
+        <li><strong>Stale radar page, velocity trend, weekly review.</strong> After the signal views and snapshots land, so they read views instead of recomputing.</li>
+        <li><strong>RACI.</strong> Last; blocked on the draft data model, which has no phase.</li>
+      </ol>
+      <p>Each step adds at most one new component, and nothing that needs a schema or a view comes before the templates that read today's fields.</p>
+    </div></details>
+  </div>
+</section>
+<hr class="rule">
+
+<section class="section" id="decisions">
+  <span class="lab">9 · Decisions for the owner</span>
+  <h2>What only you can settle</h2>
+  <ol class="decisions">
+    <li><span><strong>The portfolio data question.</strong> Do people and commitments hold real records under the private root? If not, is that tooling friction or no current need? The command that produces the evidence is in section 3. Everything downstream is sized by the answer (<code>phase-proj-01</code>).</span></li>
+    <li><span><strong>Which template first.</strong> The recommendation is the shared loader, then the commitments ledger. Timeline and Gantt follow in the build order above unless you want them moved up.</span></li>
+    <li><span><strong>Timeline shape.</strong> Per-project, portfolio-wide or per-person first; chronological or proportional spacing; whether record-creation dates count as events.</span></li>
+    <li><span><strong>Gantt scope.</strong> Accept project level as the first version, or add a <code>start_date</code> field to tasks and commitments now, and decide between an interim dependency field and the planned work-dependency record.</span></li>
+    <li><span><strong>The as-of date rule.</strong> Pages are deterministic by requirement. Does a portfolio page take its as-of date from a parameter, or from the source commit date?</span></li>
+    <li><span><strong>Re-scope the digest export</strong> (<code>phase-syn-05</code>) from the cancelled page pipeline to the house family before anyone claims it.</span></li>
+    <li><span><strong>The structuring command gap.</strong> Whether the owner should be able to run the structuring step from the command line, or whether it stays an agent-only step by design.</span></li>
+    <li><span><strong>The single-session protocol</strong> drafted this session (<code>GOV-022</code>) lists six open questions of its own, starting with whether the Haiku-default model rule is standing.</span></li>
+  </ol>
+</section>
+<hr class="rule">
+
+<section class="section" id="method">
+  <span class="lab">10 · How this was produced</span>
+  <h2>Sources and method</h2>
+  <p>A cloud session on 2026-10-08 read the working agreement, the backlog, the idea log and the governing documents, then dispatched two read-only agents: a Haiku document digest over the schemas, data root, capture code, API, plans and procedures, returning cited facts only, and a Sonnet design exploration over the template library, house tokens, schemas and example data. Phase and idea counts were computed from <code>docs/09-backlog/backlog.yaml</code> and <code>_data/ideas.jsonl</code> by script. Nothing under <code>_private/</code> was read. Claims about what exists were checked against code, not plans.</p>
+  <div class="cards">
+    <details class="card"><summary>Documents behind each section</summary><div class="card-body">
+      <ul>
+        <li><strong>Records:</strong> <code>schemas/*.schema.json</code>; <code>ARCH-007</code>, <code>ARCH-008</code>, <code>ARCH-010</code> (all draft).</li>
+        <li><strong>Flow and storage:</strong> <code>ADR-007</code>, <code>ADR-009</code>, <code>REQ-002</code>, <code>PLAN-007</code>, <code>PLAN-009</code>, <code>GOV-001</code> "The data root", <code>sql/001_schema.sql</code>, <code>sql/003_capture_views.sql</code>, <code>tools/rebuild_db.py</code>.</li>
+        <li><strong>Using it:</strong> <code>OPS-002</code>, <code>OPS-003</code>, <code>OPS-008</code>, <code>tools/capture.py</code>, <code>tools/review.py</code>, <code>tools/load_context.py</code>, <code>brain/procedures/add-new-project.md</code>.</li>
+        <li><strong>Open work:</strong> <code>PLAN-002</code>, <code>PLAN-004</code>, <code>PLAN-034</code>, <code>REQ-019</code>, <code>docs/09-backlog/backlog.yaml</code>, <code>_data/ideas.jsonl</code>.</li>
+        <li><strong>Templates:</strong> <code>templates/README.md</code>, <code>templates/html/library.yaml</code>, <code>REQ-021</code>, <code>REQ-036</code>, <code>PLAN-036</code>, <code>OPS-033</code>, <code>templates/styles/house-tokens.json</code>.</li>
+      </ul>
+    </div></details>
+  </div>
+  <p class="footer">Generated by hand in a Claude Code cloud session from the files named above; set in the house family. Committed as <code>_public/portfolio-guide.html</code>.</p>
+</section>
+
+</main>
+</body>
+</html>
