@@ -1,0 +1,66 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-05-security-review",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-05",
+  "reviewed_commit": "4bb71ff8613a27398d723825476409bb3c3e4678",
+  "reviewer": {
+    "type": "security-review",
+    "definition_sha256": "99458416a8b582443baea7fa4341741cf80f8a56cd486e0d03ff3ad51c8ad689"
+  },
+  "model": "sonnet (general-purpose subagent running the coordinator's security review)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "Symlinked directory in an entry path defeats the private/ignored check; symlink to .git accepted",
+      "evidence": "workbench_bookmarks.py:353-370 and :316-344 depend on workbench.py:209-236 _git_ignored_paths, which ignores git's exit status. A path through a symlinked directory makes git check-ignore abort with 'beyond a symbolic link' (exit 128, empty stdout), read as 'nothing ignored'. Reproduced with git 2.43.0 in a sandbox repo: with linkdir -> _private, POST entries {path:'linkdir/s.md'} returned 201 status 'present'; gitlink -> .git/HEAD also 201. Controls (_private/s.md, .git/HEAD, symlink to an ignored file, ../x, /etc/passwd, C:\\x) were refused. The existing symlink test covers only a symlink to a file.",
+      "consequence": "Private or .git paths can be recorded in a tracked _data record and read as present, breaking the 'private files unsupported' invariant. The Vite /workbench-file route has the same fail-open and would serve the bytes. Needs a symlink already in the repo, so not web-exploitable.",
+      "minimal_fix": "Compute rel = resolved.relative_to(REPO_ROOT); apply _is_private_or_internal to rel and run check-ignore on [resolved] only; reject or mark excluded any entry where lexical != resolved; make the bookmark call sites treat a git check-ignore return code other than 0 or 1 as ignored; add a symlinked-directory test."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Hostile entry paths cause HTTP 500; one bad stored entry breaks the category GET",
+      "evidence": "workbench_bookmarks.py:307-312 catches only PathEscapesRepositoryError. NUL in the path raises ValueError, a 5000-character path raises OSError ENAMETOOLONG, a lone surrogate raises UnicodeEncodeError in _git_ignored_paths. Reproduced: 'pub.md\\u0000' returned 500; 5000 characters returned 500. resolve_entries (:331-344) runs on every GET, so a hand-edited record with such an entry fails the whole GET. No path length cap in the route or schema.",
+      "consequence": "Generic 500 (no leak); a category that cannot be read until the file is hand-repaired.",
+      "minimal_fix": "Catch (OSError, ValueError, UnicodeError) in _resolved_inside_repository (return None) and map to 400 on write; cap path length at about 1024 in normalize_entry_path and add maxLength to the schema."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": ".git/_private matched case-sensitively and lexically; Windows presentation machine not covered",
+      "evidence": "workbench_bookmarks.py:302-304 compares only the first lexical segment exactly. The Vite route compares every segment case-insensitively with trailing dots and spaces stripped; this route does not. On a case-insensitive filesystem .GIT/config or '.git./config' passes, and git check-ignore does not flag .git. Not verifiable on Linux.",
+      "consequence": "A .git file can be stored and reads as present; the viewer route still refuses to serve it, so damage is limited.",
+      "minimal_fix": "Test every segment of the resolved repo-relative path against .git and _private after casefold() and rstrip('. '), at any depth."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Cross-origin write protection rests on a FastAPI default; dependency floor does not guarantee it",
+      "evidence": "With locked FastAPI 0.141.1, cross-origin simple POSTs with text/plain, form-urlencoded and no Content-Type return 422 and create nothing; preflight from http://evil.example returns 400; PATCH and DELETE need a preflight. pyproject.toml:7 declares fastapi>=0.115, and older FastAPI releases parse a body with no Content-Type as JSON (a Blob fetch sends none). Not tested on an older release. No Origin or Host check on the backend (DNS rebinding to :8000 reaches it; existing exposure, smaller than the terminal websocket).",
+      "consequence": "Safe as locked. An older resolved FastAPI could allow drive-by category creation (limited damage).",
+      "minimal_fix": "Raise the fastapi floor to the locked release or add a router dependency returning 415 unless Content-Type is application/json on POST, PATCH and DELETE; optionally reject a mutating request whose Origin is present and not allow-listed; add a text/plain test."
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "No size or count limits on bodies, entries or categories",
+      "evidence": "A 10 MB name was parsed before the 400. Entries per category, categories and entry path length are unbounded. Each add rewrites the whole record and each GET runs git check-ignore over all entries. create_category globs the directory twice under the global lock.",
+      "consequence": "A local client can bloat files and slow the single lock; loopback only, nuisance level.",
+      "minimal_fix": "Cap entries per category (about 500), categories (about 200) and path length (1024); reject Content-Length over about 64 KB on these routes."
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "title": "No fsync, stray temp files in a tracked directory, process-local lock",
+      "evidence": "_write_record (:205-220) lacks fsync before os.replace. A hard kill leaves .{id}.XXXX.tmp in _data/workbench/bookmarks/, not covered by .gitignore. _WRITE_LOCK (:93) is per process while vite.config.ts documents several backends per worktree that could share a data root.",
+      "consequence": "At worst one record lost or unreadable and stray untracked files; no security boundary affected.",
+      "minimal_fix": "fsync the temp file before os.replace; add _data/workbench/bookmarks/.*.tmp to .gitignore; document in ADR-029 that a shared data root across backends is unsupported, or use an OS file lock."
+    }
+  ],
+  "raw_reply_sha256": "f91c3e905dfc2d7d625f9cfec3776b46e8e478ef108ec67f5bf41fc2af0eb1fa",
+  "outcomes": [],
+  "notes": "Diff-time security review required by GOV-017 (the diff touches src/api/: new write routes and their mount). The built-in /security-review skill failed to load against the scratch checkout (its preamble runs git log origin/HEAD..., unresolvable there), so the reviewer performed the review by hand in the scratch clone and exercised the routes with a TestClient; it did not run against the primary checkout. The built-in command has no agent definition file, so definition_sha256 is the sha256 of the output of claude --version (2.1.293 (Claude Code)), per GOV-017 and idea 000589. Dispatched and briefed by the Session Manager; no builder-written input."
+}

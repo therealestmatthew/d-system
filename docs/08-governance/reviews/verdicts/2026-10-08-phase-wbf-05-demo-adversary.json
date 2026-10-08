@@ -1,0 +1,50 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-05-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-05",
+  "reviewed_commit": "4bb71ff8613a27398d723825476409bb3c3e4678",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "NUL byte or over-long path component in an entry path gives HTTP 500 instead of 400, and a stored entry with one makes the whole category GET fail",
+      "evidence": "src/api/routes/workbench_bookmarks.py:357-363 and 331-344; POST /entries path 'a.md\\x00' -> 500, 300-char component -> OSError Errno 36; hand-edited record with a NUL entry -> GET /bookmarks/t ValueError",
+      "consequence": "A malformed path is a server error, and one malformed stored entry hides every other entry of its category (R11 degradation does not hold for it). No absolute path reaches the response body.",
+      "minimal_fix": "Reject NUL and segments over 255 characters in normalize_entry_path with 400; catch (OSError, ValueError) around resolve/is_file in _resolved_inside_repository and _entry_status."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Nested .git directories are accepted as entries (only the first path segment is checked)",
+      "evidence": "workbench_bookmarks.py:302-304; POST 'sub/.git/config' -> 201 present, 'nested/.git/HEAD' -> 201; workbench.py:241 excludes .git at every depth; ADR-029 section 3 'nothing under .git'. Case variants (.GIT, _Private) unverified on a case-insensitive filesystem.",
+      "consequence": "Git internals of a nested checkout or worktree can be bookmarked and opened though the tree never offers them.",
+      "minimal_fix": "Reject when any path segment, casefolded, is in ALWAYS_EXCLUDED_NAMES; compare the first segment to '_private' casefolded."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Category id validation (slug pattern, Windows reserved names, 64-char cap) is not pinned by any test",
+      "evidence": "Mutations removing the pattern fullmatch, the reserved-name check, and the length cap all leave 118 passed (SURVIVED). The guard itself is correct today.",
+      "consequence": "The ADR's named defence against write-path escape (backslash ids on Windows) can be deleted with the suite green.",
+      "minimal_fix": "Add unit tests of is_valid_category_id/_record_path for backslash, '..', uppercase, 'con', 'com1', 65 characters, empty, 'a--b'."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "'First delivered file becomes the active tab' is untested against the real viewer panel",
+      "evidence": "Removing setActiveTabId(plan.assignments[0].tabId) in HtmlViewerRegion.tsx leaves vitest at 80 passed; the three-file test's expected 'Tab 1' is already active.",
+      "consequence": "ADR-029 section 6 point 8 clause can regress unnoticed; in a real session Tab 1 holds the overview page so the set opens in Tabs 2-4 and activation is what shows it.",
+      "minimal_fix": "Add a test that opens one file first, then three via openFiles, and asserts the selected tab is 'Tab 2'."
+    }
+  ],
+  "raw_reply_sha256": "9bd5fadeaac7d05a49b9a1a315037de3a5bd9b9ba4e6f45c7f42db0c76e97207",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager (subagent run, 2026-10-08). Brief: phase entry from dev's backlog.yaml (deliverables as widened on the trunk at a7bbfe0), range 5198877..4bb71ff, diff with the session record and backlog bookkeeping excluded, scratch clone at the reviewed commit; the adversary ran the verification and a 25-mutation run itself. A diff-time security review (GOV-017) was run beside it and recorded separately. No builder-written input."
+}

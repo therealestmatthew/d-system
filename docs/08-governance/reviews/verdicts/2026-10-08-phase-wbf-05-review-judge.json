@@ -1,0 +1,42 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-05-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-05",
+  "reviewed_commit": "4bb71ff8613a27398d723825476409bb3c3e4678",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "uv run pytest exited 1 on a test unrelated to the diff",
+      "evidence": "03-verification+gate.txt lines 102-103: FAILED test/test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused, 'DID NOT RAISE Refused'; 1 failed, 1788 passed, 1 skipped. Runner path /tmp/pytest-of-root shows it ran as root, where chmod 0o500 does not block writes. test_run_review_checks.py is not in the diff. Not confirmed at the base commit, since it was not run there.",
+      "consequence": "A listed verification command is non-zero, from the runner environment and not from the bookmark work. All new bookmark tests passed.",
+      "minimal_fix": "No change to this phase. Run the check non-root, or skip that test when euid is 0 (review-checks tooling)."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "A hand-edited entry with an embedded NUL can turn GET /bookmarks/{id} into a 500",
+      "evidence": "workbench_bookmarks.py _resolved_inside_repository catches only PathEscapesRepositoryError; Path.resolve() raises a plain ValueError on NUL; _read_record and the schema accept such a string; the hand-edited-entries test does not cover it.",
+      "consequence": "A manually corrupted record makes the category fail to open instead of reading the entry as excluded, against the scope statement that nothing raises. The API itself cannot create such an entry.",
+      "minimal_fix": "Catch ValueError in _resolved_inside_repository and return None; add a NUL entry to test_hand_edited_unsafe_entries_read_excluded_and_nothing_raises."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Paths beginning with a letter and a colon are rejected as drive-lettered, including valid POSIX names",
+      "evidence": "normalize_entry_path: re.match(r\"^[A-Za-z]:\", unified); the schema pattern rejects the same form.",
+      "consequence": "A file named like a:b.md cannot be bookmarked on Linux. The rule is deliberate and consistent across code and schema.",
+      "minimal_fix": "None required."
+    }
+  ],
+  "raw_reply_sha256": "f911bd5bdcc734819d676a24f6bcdded7b32b488cabedf60f96e5b1d29c3e5ee",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), same brief as the gating reviewer plus the runner manifest; no checkout. Its F02 coincides with the security review's F02, which the builder fixes. Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}
