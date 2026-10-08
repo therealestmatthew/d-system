@@ -5599,7 +5599,7 @@ CORRECTED DIAGNOSIS (2026-09-11, phase-wb-08 session-close independent review). 
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-coordinator (2026-09-11T17:14:47-04:00): Session-close review evidence: layout-1.json and layout-2.json both carry default_panel: terminal for the terminal slot (verified by direct read); independent reviewer's clean-session run of the persistence guard on integrated dev passed cleanly (2 initial websockets only, zero during switches, MARKER echoed back); W08-A's earlier passing run is consistent. The only failing runs shared one browser profile that had PowerShell stored as layout 2's visible panel.
 - **finding** by agent-idea-triage (2026-09-11T20:44:25-04:00): ## Scout findings for 000107: Terminal session lost on layout switch when stored visible panel differs
@@ -5635,12 +5635,14 @@ The residual behavior—hidden panels dying on visibility-change (distinct from 
 - 000113 (audit terminal persistence and performance across all three shells): already linked `relates_to->000107` and may surface the residual visibility-change behavior in a systemic audit.
 
 **No related plan, phase or document found** that specifically addresses hidden-panel unmounting as a known design decision (as opposed to a code defect). The residual behavior is documented in this idea but not yet surfaced in governance, and W09-W's verification will clarify whether it is acceptable under the current W16 wording or requires separate attention.
+- **finding** by agent-ideation (2026-10-08T07:17:06+00:00): Raised again as 000652 (a layout switch can end a shell silently and bypasses the re-assignment dialog's confirmation), recorded as given and linked relates_to; the wave 6 builder's note said 'annotate 000107', so this records the residual's confirmation-bypass part as its own idea.
 
 </details>
 
 **Links**
 
 - relates_to ← `000113`
+- relates_to ← `000652`
 
 ---
 
@@ -12616,7 +12618,7 @@ show the same behavior is unknown and is an owner-machine check.
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-22T11:41:41-04:00): Defect is unowned — no phase claims investigation or fix.
 
@@ -12627,6 +12629,7 @@ REQ-012 R20–R21 cover two terminal defects scheduled for phase-wbf-09 (cap rac
 The defect blocked a live demo (2026-09-15). Diagnosis is the deliverable: what closes the socket, whether the restart is frontend reconnecting or a second session opening, whether the PTY survives backend-side, and whether it correlates with the dev server, orphaned processes, or the six-session cap being silently reached.
 
 No REQ-012 row, no phase-wbf-* or phase-arch-* phase, no plan entry covers this investigation. It is triaged and linked but not yet assigned or sequenced.
+- **finding** by agent-ideation (2026-10-08T07:17:06+00:00): Candidate cause raised as 000653 (the server closes any session with no client frame for 300 s, whatever it is running; close code 1006, no page keepalive), recorded as given and linked relates_to.
 
 </details>
 
@@ -12634,6 +12637,7 @@ No REQ-012 row, no phase-wbf-* or phase-arch-* phase, no plan entry covers this 
 
 - relates_to → `000113`
 - relates_to → `000137`
+- relates_to ← `000653`
 
 ---
 
@@ -26031,3 +26035,182 @@ Raised by Session 5 - Batch Runner (phase-arch-06) during the 2026-10-08 workben
 
 File Browser could show the API's error detail (or status) in the could-not-search alert; the listing fetch discards the response body today.
 Raised by Session 5 - Batch Runner (phase-wbf-15) during the 2026-10-08 workbench run.
+
+---
+
+## 000644 · The control-characters terminal test sleeps a fixed 0.3 s before Ctrl-C and should wait for evidence instead.
+
+**Created 2026-10-08T07:16:57+00:00 · Status: `open`**
+
+test/test_demo_terminal_api.py::test_control_characters_reach_the_shell failed once under machine load ("'after-ctrl-c-4' never appeared"; it sleeps 0.3 s before sending Ctrl-C and reads with an 8 s timeout) and passed in every other run of the day; make it wait for evidence that `sleep 30` started instead of a fixed delay.
+Raised by Session Manager (wbf-16 runner gate) during the 2026-10-08 workbench run.
+
+---
+
+## 000645 · The viewer's absent-page check prints the same message for a missing route and a missing file.
+
+**Created 2026-10-08T07:16:57+00:00 · Status: `open`**
+
+The viewer's absent-page check cannot tell "route absent" from "file missing"; both print "does not exist". When the route is absent, a message such as "the file route is not enabled; start the frontend with D_SYSTEM_DEMO_TERMINAL=1" would be more accurate.
+Raised by Builder A (phase-wbf-16) during the 2026-10-08 workbench run.
+
+---
+
+## 000646 · REQ-037 rows that name .stage-region__header need amending in arch-07's requirements work.
+
+**Created 2026-10-08T07:16:58+00:00 · Status: `open`**
+
+REQ-037 rows that name .stage-region__header, and the "Header controls" rows that measure bar controls against the panel box, need amending in arch-07's requirements work; test/test_workbench_fit_contracts.py references stage-region__header.
+Raised by Builder B (phase-arch-07) during the 2026-10-08 workbench run.
+
+---
+
+## 000647 · The notes-strip mixing ruling should be recorded in REQ-012 or GOV-003 once the owner ratifies it.
+
+**Created 2026-10-08T07:16:58+00:00 · Status: `open`**
+
+Record the notes-strip mixing ruling (one rotation is all text or all images) in REQ-012 or GOV-003 once the owner ratifies it.
+Raised by Standby Builder (phase-wbf-06 fix round) during the 2026-10-08 workbench run.
+
+---
+
+## 000648 · The entry-box overflow rules should move out of the inline style and into StagePage.css.
+
+**Created 2026-10-08T07:16:58+00:00 · Status: `open`**
+
+Move the entry-box overflow rules out of the inline style into StagePage.css in a later CSS pass (inline overflow: hidden overrides the stylesheet's overflow-y: auto).
+Raised by Standby Builder (phase-wbf-06 fix round) during the 2026-10-08 workbench run.
+
+---
+
+## 000649 · The fit check never measures the overview panel's tooltip, because its cells never place that panel.
+
+**Created 2026-10-08T07:16:58+00:00 · Status: `open`**
+
+The fit check only measures tooltips present in each layout's default panels, so the overview panel's tooltip (layout 2 main slot) is never measured; assign the overview panel to a slot in the fit check's cells.
+Raised by Batch Runner (phase-wbf-14) during the 2026-10-08 workbench run.
+
+---
+
+## 000650 · A tooltip bubble's roughly 8 px gap from its trigger collapses it before the pointer can reach it.
+
+**Created 2026-10-08T07:16:58+00:00 · Status: `open`**
+
+A tooltip bubble has a roughly 8 px gap from its trigger, so a fast pointer move across the gap collapses it before it reaches the bubble; a transparent bridge or a short close delay would let the user reach and scroll a tall bubble.
+Raised by Batch Runner (phase-wbf-14) during the 2026-10-08 workbench run.
+
+---
+
+## 000651 · The slot-header panel switcher silently ends every session of the panel it hides.
+
+**Created 2026-10-08T07:16:59+00:00 · Status: `open`**
+
+The slot-header panel switcher silently ends every session of the panel it hides (3 tabs to 0 observed); no warning, and the region tooltip's "switching ... never ends a session" reads as covering it.
+Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+---
+
+## 000652 · A layout switch can end a shell silently and bypasses the re-assignment dialog's confirmation.
+
+**Created 2026-10-08T07:16:59+00:00 · Status: `open`**
+
+A layout switch can end a shell silently when the stored visible panel differs between layouts (000107 residual); it also bypasses the re-assignment dialog's confirmation. (Annotate 000107.)
+Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Links**
+
+- relates_to → `000107`
+
+---
+
+## 000653 · The server closes any session with no client frame for 300 s, whatever it is running.
+
+**Created 2026-10-08T07:16:59+00:00 · Status: `open`**
+
+The server closes any session with no client frame for 300 s whatever it is running (close code 1006, empty reason, no page keepalive); a long build is killed like an abandoned prompt (candidate cause for 000246; annotate 000246).
+Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Links**
+
+- relates_to → `000246`
+
+---
+
+## 000654 · The 'Terminal connection closed' message advises a reload that ends every other live session.
+
+**Created 2026-10-08T07:17:00+00:00 · Status: `open`**
+
+The "Terminal connection closed. Reload the page to reconnect." message advises an action that ends every other live session in every panel; there is no per-tab reconnect.
+Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+---
+
+## 000655 · Under the dev server, StrictMode doubles each terminal mount and falsely refuses a new tab near the session cap.
+
+**Created 2026-10-08T07:17:00+00:00 · Status: `open`**
+
+Under the dev server, StrictMode opens two websockets and spawns two shells per terminal mount; at 5 live sessions a new tab was falsely refused with "Maximum of 6 ..." in 2 of 4 trials (production build 0 of 4); the runbook demos on the dev server.
+Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+---
+
+## 000656 · A tab refused at the session cap stays dead after slots free up.
+
+**Created 2026-10-08T07:17:00+00:00 · Status: `open`**
+
+A tab refused at the session cap stays dead after slots free; "+ New session" stays enabled at the cap; the tab shows only the server's reason, never the "close a session" instruction.
+Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+---
+
+## 000657 · Restore after a drop reopens one session per previous tab, and no document says so.
+
+**Created 2026-10-08T07:17:00+00:00 · Status: `open`**
+
+Restore after drop reopens one session per previous tab (3 to 3; 4 to 4, which is 8 websockets on the dev server); no document says so and the dropped message gives no count.
+Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+---
+
+## 000658 · Collapsed, dropped and tab-count state is component-local and lost on reload, with no stated intent.
+
+**Created 2026-10-08T07:17:01+00:00 · Status: `open`**
+
+Collapsed state, dropped state and tab count are component-local: lost on reload and on a visible-panel round trip, and a reload of a dropped terminal returns a live terminal; no document says which is intended.
+Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+---
+
+## 000659 · PosixPtyAdapter.close() sends SIGTERM to bash only and never waits, so shells can outlive their session.
+
+**Created 2026-10-08T07:17:01+00:00 · Status: `open`**
+
+PosixPtyAdapter.close() sends SIGTERM to bash only and never waits; shells inherit the backend's signal dispositions, so a backend started under nohup leaves foreground jobs running after the session ends; a defunct bash stayed a child of the backend.
+Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+---
+
+## 000660 · Client scrollback is xterm's unconfigured default of 1000 lines, and no document states it.
+
+**Created 2026-10-08T07:17:01+00:00 · Status: `open`**
+
+Client scrollback is xterm's unconfigured default of 1000 lines and is stated nowhere; long build logs cannot be scrolled back through.
+Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+---
+
+## 000661 · The only persistence regression guard, REQ-007 W15, covers bash alone, and no check covers CMD or PowerShell.
+
+**Created 2026-10-08T07:17:02+00:00 · Status: `open`**
+
+The only persistence regression guard (REQ-007 W15) is written with bash commands; no check covers CMD or PowerShell persistence.
+Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+---
+
+## 000662 · The terminal persistence audit's Playwright event matrix should become a committed regression test.
+
+**Created 2026-10-08T07:17:02+00:00 · Status: `open`**
+
+Turn the audit's Playwright event matrix and connect/echo/resize/cap measurements into a committed regression test; re-run the matrix after phase-arch-08 changes panel identity.
+Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
