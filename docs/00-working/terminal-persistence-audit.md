@@ -99,7 +99,7 @@ Each table is one shell. Rows are events. Every cell has the three parts `REQ-01
 
 ### 4.1 bash (Linux, measured)
 
-| Event | Survival (Measured, Linux) | Intent (Document) | Communication (Measured, Linux, except entries tagged Code reading) |
+| Event | Survival (Measured, Linux) | Intent (Document; Code reading where tagged) | Communication (Measured, Linux, except entries tagged Code reading) |
 |---|---|---|---|
 | **Layout switch** | **(a) Same shell shown in both layouts: survives.** Layout 1, 2, 1 from a cleared store: same pid and marker at each step, zero new terminal websockets in the production build, the same server session id (section 5.1). **(b) Shell in a different slot in each layout: survives.** bash assigned to Main in layout 1 and left in the Terminal slot in layout 2: same pid and marker across 1, 2, 1; the pty is resized from 10 by 62 (Main slot) to 17 by 156 (Terminal slot of layout 2). **(c) Destination layout's stored visible panel for that slot is another panel: ends.** Pid changed, marker lost, server session count 1 to 0 on arrival at layout 2, a fresh bash on return. This is the residual of `000107`. | (a) and (b): **intended.** `REQ-007` W15 names it as a regression guard: set a marker in layout 1, switch to layout 2 and back, "no new terminal websocket opens during the switches". `StagePage.tsx` explains the mechanism (stable per-panel host element). (c): **judged: the ending is a designed consequence, ending it silently is not documented as intended.** It follows from two rules that are intended separately: the visible-panel choice is stored per layout per slot (`ADR-016` decision 3) and a hidden panel is not mounted (`StagePage.tsx`: mounting hidden shells would consume the backend's six session slots, `ADR-014` decision 4). `REQ-007` W16's "never silently kills a shell session" is worded for re-assignment, not for layout switches, so no document says the silence is wanted or unwanted; by analogy with W16 it is a gap. Awaiting ratification (decision D1). | **None, in all three cases.** The layout choice applies immediately on selecting the radio button. In case (c) the only text on screen is the newly shown panel's own content. The confirmation that re-assignment has (section 4.1, row 3) is not reached by a layout switch. |
 | **Visible-panel switch** | **Ends.** Three tabs open with markers `tab1` to `tab3`; choosing CMD in the slot header changed the server session count 3 to 0. Choosing Terminal (bash) again produced one tab, a new pid and no marker (section 5.2). | **Judged: the ending is deliberate, ending it silently is not documented as intended.** `StagePage.tsx`: "Only the visible panel of each slot is portaled. A hidden panel stays unmounted, which is deliberate", for the six-slot cap reason. `REQ-006` R10 says "switching tabs or collapsing the region never terminates a session", where "tabs" are the session tabs inside one panel, not this switcher. `REQ-007` W16 says the header dropdowns "switch among a slot's assigned panels and never re-assign" and says nothing about the session. By analogy with W16 the silence is a gap. Awaiting ratification (D1). | **None.** The switcher popover contains only the title "Terminal: choose a panel" and the other panel names (`CMD`, `PowerShell`); there is no warning and no confirmation, and nothing is shown afterwards. The terminal region's own tooltip says "Switching tabs or collapsing this region never ends a session" (Code reading, `TerminalRegion.tsx`), which a person can read as covering this switch. |
@@ -275,7 +275,7 @@ its prompt as the first output.
 | Direct to the backend, port 8029 | 3.2 / 6.1 / 15.0 | 17.5 / 20.6 / 25.4 |
 | Through the Vite dev proxy, port 5199 | 4.3 / 5.6 / 6.5 | 18.7 / 23.8 / 30.4 |
 
-The first connection a client process makes is slower than the rest: in the first run of an earlier form of the appendix script it opened in 88 ms and reached its first byte in 110 ms, and a reviewer re-running that form against warm backends saw 75 to 100 ms to open and 88 to 114 ms to the first byte on sample 1 of every run and nothing like it afterwards. That is consistent with client-side initialisation (the headline figures above were taken after an HTTP request had already warmed the client, so they do not contain it), not with the backend's start-up. The appendix script now makes one warm-up connection and discards it.
+The first connection a client process makes can be slower than the rest. The appendix script as written in this document, run once with its warm-up line removed, gave open max 87.7 ms (median 5.0) and first-byte max 102.0 ms (median 22.0) over 30 connections; with the warm-up line, two runs gave open max 10.6 and 7.8 ms and first-byte max 32.7 and 28.5 ms. Per-sample values were not recorded, so that the outlier is the first sample is inferred from the removal of the warm-up, not read from a sample. It is consistent with client-side initialisation (the headline figures above were taken after an HTTP request had already warmed the client, so they do not contain it), not with the backend's start-up. The script discards one warm-up connection.
 
 In the page (Playwright, in-page timers):
 
@@ -390,8 +390,7 @@ The false refusals are consistent with the development server's doubled mount (s
 websocket of a mount can still hold the sixth slot when the second arrives, so the second is
 refused. This is inferred from the contrast with the production build, which does not double the
 mount; the order of slot release and arrival was not traced. The refusal rate varies from run to
-run: 2 of 4 in the first run, 4 of 8 in a second run (section 5.4's added experiment), and 3 of 4
-in a reviewer's re-run. The refused tab shows the server's reason only; the longer instruction in
+run: 2 of 4 in the first run and 4 of 8 in a second run (section 5.4's added experiment). The refused tab shows the server's reason only; the longer instruction in
 `connectionRefusalMessage` (Code reading) ("Close a session tab here or in another terminal panel, then open a new
 session.") is shown only when the browser reports a handshake failure, which this server does not
 produce.
@@ -407,7 +406,7 @@ section 1; the matrix cell or measurement it comes from is named.
 | F2 | **A layout switch can end a shell silently**, and it bypasses the confirmation the re-assignment dialog gives. The cause is the stored visible-panel choice differing between layouts (`000107`'s corrected diagnosis). It needs only one earlier visible-panel switch in the other layout to be left in browser storage. | Measured (Linux), section 5.1 case (c) |
 | F3 | **A session with no keystrokes for 300 seconds is closed by the server, whatever it is running, and the page has no keepalive.** The socket closes with code 1006 and an empty reason; the page shows "Terminal connection closed. Reload the page to reconnect." A long build or a `tail -f` that only produces output is closed at the same moment as an abandoned prompt. `000246` is the unprovoked-drop idea; this is one measured cause. | Measured (Linux), section 5.6 |
 | F4 | **The advice in the connection-closed message ends every other live session.** Reload is the only route the message offers; it ends all sessions in all panels (section 4.1, page reload). A closed tab can also be replaced by closing it and opening a new one, which the message does not say. | Measured (Linux) for the effect; Code reading for the message |
-| F5 | **In the development server each terminal mount opens two websockets and starts two shells**, one closed straight away (`StrictMode`). At five live sessions a new tab was refused with "Maximum of 6 concurrent terminal sessions reached" in 2 of 4 trials and 4 of 8 trials (3 of 4 in a reviewer's re-run; the rate varies) although a sixth slot was free; the production build refused 0 of 4. The doubled mount is consistent with this and was not traced. The runbook launches the development server for the demo. | Measured (Linux), sections 2 and 6.5 |
+| F5 | **In the development server each terminal mount opens two websockets**, the first closed as soon as its handshake completes (`StrictMode`; whether the first also starts a shell was not traced). At five live sessions a new tab was refused with "Maximum of 6 concurrent terminal sessions reached" in 2 of 4 trials and 4 of 8 trials although a sixth slot was free; the production build refused 0 of 4. The runbook launches the development server for the demo. | Measured (Linux): the two websockets per mount, the refusal counts and the production-build contrast, sections 2 and 6.5. Inferred, not traced: that the first websocket holds the slot the second needs. |
 | F6 | **A tab refused at the cap stays refused after slots free**, and **+ New session** is enabled while the cap is reached (its own limit is 4 per panel). The tab shows only the server's reason; the instruction to close a session is shown only on a handshake failure, which the server does not produce. | Measured (Linux), section 6.5; Code reading, `connectionRefusalMessage` |
 | F7 | **Restore after drop reopens one session per previous tab** (three to three; four to four, which is eight websockets in the development server). No document says this, and the dropped message does not give the count. | Measured (Linux), sections 5.4 and 6.5 |
 | F8 | **Collapse, drop and tab count are component-local and are lost on reload and on a visible-panel round trip.** A reload of a dropped terminal returns a live terminal with a new session. No document says whether that is intended. | Measured (Linux), section 5.4 |
@@ -415,7 +414,7 @@ section 1; the matrix cell or measurement it comes from is named.
 | F10 | **Client scrollback is 1000 lines and is stated nowhere.** It comes from xterm.js's default. | Measured (Linux), section 6.4 |
 | F11 | **The only persistence regression guard (`REQ-007` W15) is written with bash commands**, so no check covers CMD or PowerShell. | Document |
 | F12 | **A hidden session's pty keeps its old size until it is shown.** Output produced while hidden is laid out for the old size. By design (`attemptFit` skips zero-size containers); recorded because `REQ-006` R10 promises running processes survive hidden. | Measured (Linux), section 6.3 |
-| F13 | **On Windows the panel labelled Terminal (bash) is expected to start a Windows shell, not refuse.** `TerminalRegion.tsx` lines 210-211 send no `?shell=` for a bash session (`sessionShell === 'bash' ? '' : ...`). `_run_session` in `demo_terminal.py` checks availability only `if requested_shell is not None:` (line 465). `create_adapter(shell=None)` reaches `resolve_shell(None)` (`src/demo/factory.py` lines 43-48), which returns the `D_SYSTEM_DEMO_SHELL` override if set and otherwise `DEFAULT_WINDOWS_SHELL`, which is `cmd` (`src/demo/windows.py` line 16). No UI code hides the bash panel by platform: the only reader of `GET /api/v1/workbench/platform` is `useWorkbenchLayouts.ts`, and it reads `platform` for the fresh-store default only, not the per-shell availability the route also reports. The panel's label and its shell can therefore disagree, with no message. The explicit `?shell=bash` request is what is refused on Windows (`_shell_is_available_on_host`), and the panel never sends it. | Code reading; not observed (owner-machine, O11) |
+| F13 | **On Windows the panel labelled Terminal (bash) is expected to start a Windows shell, not refuse.** `TerminalRegion.tsx` lines 210-211 send no `?shell=` for a bash session (`sessionShell === 'bash' ? '' : ...`). `_run_session` in `demo_terminal.py` checks availability only `if requested_shell is not None:` (line 465). `create_adapter(shell=None)` reaches `resolve_shell(None)` (`src/demo/factory.py` lines 43-48), which returns the `D_SYSTEM_DEMO_SHELL` override if set and otherwise `DEFAULT_WINDOWS_SHELL`, which is `cmd`: the name is `DEFAULT_SHELL` at `src/demo/windows.py` line 16, imported as `DEFAULT_WINDOWS_SHELL` at `src/demo/factory.py` line 20. No UI code hides the bash panel by platform: the only reader of `GET /api/v1/workbench/platform` is `useWorkbenchLayouts.ts`, and it reads `platform` for the fresh-store default only, not the per-shell availability the route also reports. The panel's label and its shell can therefore disagree, with no message. The explicit `?shell=bash` request is what is refused on Windows (`_shell_is_available_on_host`), and the panel never sends it. | Code reading; not observed (owner-machine, O11) |
 
 ## 8. Owner-machine checks (the part agent evidence on Linux cannot supply)
 
@@ -472,7 +471,7 @@ For each of CMD and PowerShell, fill the **Survival** cells of sections 4.2 and 
 | Id | Measurement | Do | Look for |
 |---|---|---|---|
 | **O6** | Connect latency | `node measure-terminal.js ws://127.0.0.1:<backend port> cmd`, then `powershell` (appendix A; needs Node 22 or later for the global `WebSocket`; the checklist asks only for Node 18, so check `node --version`). Also, in the page, time 10 clicks of **+ New session** to a visible prompt with a stopwatch or a screen recording. | `connect_ms.open`, `first_byte` and `last_byte_of_startup_output` for each shell. The script discards one warm-up connection, so its first sample is not the client's slow first connection. Expected, not observed: on Windows the first byte may be terminal setup sequences before the prompt, in which case `last_byte_of_startup_output` is the closer figure for "prompt ready"; a PowerShell profile may add to start-up. Linux bash: open 3 to 5 ms, prompt 18 to 21 ms. |
-| **O7** | Echo latency | The same script prints `echo_ms` (200 keystrokes). In the page, type into the shell under screen recording at 60 frames per second and count frames from key to character. | `median` and `p95`. Caveat (expected, not observed): the script counts the first byte after each key, which in PowerShell (PSReadLine) and ConPTY may be a redraw sequence rather than the character, so also report the page-level figure. Linux bash: median 1.9 ms, page-level 28 ms. |
+| **O7** | Echo latency | The same script prints `echo_ms` (300 keystrokes). In the page, type into the shell under screen recording at 60 frames per second and count frames from key to character. | `median` and `p95`. Caveat (expected, not observed): the script counts the first byte after each key, which in PowerShell (PSReadLine) and ConPTY may be a redraw sequence rather than the character, so also report the page-level figure. Linux bash: median 1.9 ms, page-level 28 ms. |
 | **O8** | Resize | With the shell showing, set the window to 1280 by 720, 1366 by 768, 1920 by 1080 and 1024 by 768. At each, CMD: `mode con`; PowerShell: `$Host.UI.RawUI.WindowSize`. Compare rows and columns with what the page shows. Then drag the window edge continuously for five seconds and release. | Reported size equal to the visible grid at each size (bash: equal at all eight layout and size combinations). After the drag, the final size is correct within a second (bash: 33 to 40 ms) and the screen has no duplicated or torn lines (expected, not observed: ConPTY may repaint on resize). |
 | **O9** | Scrollback | Print 3000 numbered lines (CMD `for /l %i in (1,1,3000) do @echo %i`; PowerShell `1..3000`). Scroll to the top and read the first retained line number. Resize the window once and look again for repeated lines. Then flood: create a file with `1..200000 | Out-File $env:TEMP\f.txt` and print it (`type %TEMP%\f.txt` in CMD, `Get-Content $env:TEMP\f.txt` in PowerShell) while timing to the last line, and note whether the page stays responsive (DevTools Performance, long tasks). | First retained line (bash: 1969 of 3002, a 1000-line scrollback), duplicated lines after resize, time to finish (bash: 254 to 526 ms for 200,000 lines), any page freeze. |
 | **O10** | Six-session cap | Put PowerShell in the Terminal slot and CMD in **Main** (assign with the dialog). Open three tabs in each: six live. Click **+ New session** in either panel. Then free one tab and try again. Separately, with five live, click **+ New session** four times (closing the new tab each time) on the development server. | The seventh is refused with "Maximum of 6 concurrent terminal sessions reached" and the refused tab stays refused (bash: both). With five live, whether a free slot is ever refused (bash on the development server: 2 of 4 and 4 of 8). On the Linux development server a refusal is consistent with the doubled mount's first websocket still holding a slot when the second arrives (6.5); PowerShell is expected (not measured) to be slower to start and to end than bash, so this probe is the most likely to differ. |
@@ -527,10 +526,9 @@ Written under the pre-approved run of 2026-10-08; the owner has not reviewed the
 ## Appendix A. Standalone connect and echo measurement script
 
 Run on Linux against the backend on port 8029 for the figures in 6.1 and 6.2
-(`node measure-terminal.js ws://127.0.0.1:8029 bash`, which printed, with 30 connections and 300
-echoes 30 ms apart, open 4.7 ms median (p95 9.4, max 25.3), first byte 21.0 ms (p95 30.6, max 32.6)
-and echo 1.9 ms median (p95 3.3, max 8.1); through the Vite dev proxy, `ws://127.0.0.1:5199`: open
-6.3, first byte 20.6, echo 2.3) It uses the headline parameters of 6.1 and 6.2 (30 connections, 300 echoes, 30 ms apart) after one
+(`node measure-terminal.js ws://127.0.0.1:8029 bash`, extracted from this appendix with `awk` and run twice. The first run printed, with 30 connections after one discarded warm-up and 300 echoes 30 ms apart, open 5.6 ms median (p95 9.9, max 10.6), first byte 23.2 ms (p95 32.4, max 32.7) and echo 2.1 ms median (p95 3.2, max 29.6); the second run printed open 4.8 (7.7, 7.8), first byte 21.0 (27.8, 28.5) and echo 2.1 (3.8, 9.7).).
+
+The script uses the headline parameters of 6.1 and 6.2 (30 connections, 300 echoes, 30 ms apart) after one
 discarded warm-up connection. It differs from the run behind the headline tables only in that it also
 reports the time of the last byte of start-up output and does not poll the sessions list for slot
 release, so those tables' slot-release row is not reproduced by it. It is also the script for
@@ -542,6 +540,8 @@ has no other dependency. Save it as `measure-terminal.js`.
 // Usage: node measure-terminal.js <ws-base> [shell]
 //   node measure-terminal.js ws://127.0.0.1:8010 powershell
 // Needs Node 22 or later (global WebSocket). No other dependency. Opens sessions one at a time.
+// The first connection a Node process makes is slower than the rest, so one warm-up connection is
+// made and discarded first (see section 6.1).
 const base = process.argv[2] || 'ws://127.0.0.1:8029'
 const shell = process.argv[3] // bash | cmd | powershell; omit for the host default
 const url = `${base}/api/v1/demo/terminal/ws` + (shell ? `?shell=${shell}` : '')
@@ -573,7 +573,8 @@ function connect() {
 ;(async () => {
   const out = { url }
   const open = [], first = [], ready = []
-  for (let i = 0; i < 20; i++) {
+  { const w = await connect(); w.ws.close(); await sleep(300) } // warm-up, discarded
+  for (let i = 0; i < 30; i++) {
     const r = await connect()
     open.push(r.tOpen); first.push(r.tFirst); ready.push(r.tQuiet)
     r.ws.close(); await sleep(300)
@@ -581,13 +582,13 @@ function connect() {
   out.connect_ms = { open: stats(open), first_byte: stats(first), last_byte_of_startup_output: stats(ready) }
   const r = await connect()
   const lat = []
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < 300; i++) {
     const before = r.buf.length, t = performance.now()
     const got = new Promise((res) => { const f = (now) => { if (r.buf.length > before) { r.listeners = r.listeners.filter((g) => g !== f); res(now) } }; r.listeners.push(f) })
     r.ws.send(new TextEncoder().encode(String.fromCharCode(97 + (i % 26))))
     const now = await Promise.race([got, sleep(2000).then(() => null)])
     if (now) lat.push(now - t)
-    await sleep(40)
+    await sleep(30)
   }
   r.ws.send(new TextEncoder().encode('\x15')); r.ws.close()
   out.echo_ms = stats(lat)
