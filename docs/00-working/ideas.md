@@ -21557,7 +21557,7 @@ Reported by Session 1 - Builder A.
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-26T23:21:09-04:00): Idea 000463 (idea consumers outside phase-idg-01's lock do not know the new statuses) is confirmed. phase-idg-01 (complete) added three terminal statuses (delivered, resolved, absorbed) and made promoted non-terminal, but three consumers still hard-code the old five and will miscount or mislabel once the new statuses are written:
 
@@ -21570,6 +21570,7 @@ The phase-idg-01 session record (SESS-2026-09-25-01-idea-schema-bundle) names 00
 Related documents: ADR-024 (idea classification as schema fields); REQ-014 R21 (ideas whose work shipped are closed into delivered, resolved or absorbed). No backlog phase found that covers updating these three consumers.
 
 PROPOSED LINK: 000463 --relates_to--> 000464 (both are knock-ons of phase-idg-01's schema outside its lock; this one covers statuses, 000464 the DuckDB projection)
+- **finding** by agent-ideation (2026-10-08T02:25:21+00:00): Prompt Planner check 2026-10-08: fixed on the trunk. IdeaExplorerRegion.tsx:23-33 lists all nine statuses with a schema-comparison test; src/api/routes/workbench.py:507-517 includes set_aside with a test at test_workbench_api.py:550; tools/overview_metrics.py:47 and src/orchestrator/state.py:72 read the list from the schema. No phase was created; the idea awaits a status move by the owner.
 
 </details>
 
@@ -23209,9 +23210,10 @@ Session 2 - Builder B, 2026-09-29, as given: "teach the workbench's idea-queue p
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-09-30T10:14:28-04:00): Triage (Ideation, 2026-09-30). phase-idg-19 (set-aside status and partition hold-out field) is active, not merged. Today schemas/idea.schema.json:178 lists eight statuses without set-aside; the workbench queue precedence map (src/api/routes/workbench.py:504-510) and the idea explorer's STATUSES (ts/src/stage/IdeaExplorerRegion.tsx:23) also lack it. This idea applies once phase-idg-19 lands.
+- **finding** by agent-ideation (2026-10-08T02:25:21+00:00): Prompt Planner check 2026-10-08: fixed on the trunk. IdeaExplorerRegion.tsx:23-33 lists all nine statuses with a schema-comparison test; src/api/routes/workbench.py:507-517 includes set_aside with a test at test_workbench_api.py:550; tools/overview_metrics.py:47 and src/orchestrator/state.py:72 read the list from the schema. No phase was created; the idea awaits a status move by the owner.
 
 </details>
 
@@ -24447,13 +24449,14 @@ Workbench Idea Explorer status filter (ts/src/stage/IdeaExplorerRegion.tsx:23 ST
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-10-05T00:02:41-04:00): Idea 000556 asks for the Idea Explorer status filter to cover delivered, resolved, absorbed and set_aside. Commit 2e34704 ("List every schema idea status in the Idea Explorer filter"), on dev, does this: STATUSES in ts/src/stage/IdeaExplorerRegion.tsx now lists all nine values of the status enum in schemas/idea.schema.json, in order, and test_idea_explorer_status_filter_covers_every_schema_status in test/test_workbench_api.py compares the array to the enum so a new schema status fails the test by name.
 
 The work was owner-directed and unclaimed, with no backlog phase. Its session record is docs/03-sessions/SESS-2026-10-04-04-idea-explorer-status-filter.md; its Review section records a demo-adversary verdict of PASS with no blocker, major or minor findings.
 
 000554, named in the body, is only an example of a delivered idea the filter could not show. No plan, requirement, ADR or backlog phase covers this filter.
+- **finding** by agent-ideation (2026-10-08T02:25:21+00:00): Prompt Planner check 2026-10-08: fixed on the trunk. IdeaExplorerRegion.tsx:23-33 lists all nine statuses with a schema-comparison test; src/api/routes/workbench.py:507-517 includes set_aside with a test at test_workbench_api.py:550; tools/overview_metrics.py:47 and src/orchestrator/state.py:72 read the list from the schema. No phase was created; the idea awaits a status move by the owner.
 
 </details>
 
@@ -24826,7 +24829,7 @@ Raised by Session 1 - Builder A.
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-10-05T00:02:48-04:00): ADR-027 lists this gap among those that outlive PLAN-003: "the stage and workbench have no React error boundary and no accessible loading or error status (idea 000569)". ARCH-003 M4 is the earlier source of the accessible-status ask.
 
@@ -24835,6 +24838,7 @@ Work on it has since merged to dev as unclaimed, owner-directed work with no bac
 The record also lists what is left: the notes strip's loading and error states share an element with no live region, so they are not announced; Retry on a crashed terminal panel opens a new session; whether screen readers announce the File Browser's status inside role="tree" is unconfirmed; and nothing in CI or the merge gate runs npm test yet (idea 000582). The session record's status is active, and the idea's status was left for Ideation.
 
 PROPOSED LINK: 000569 --relates_to--> 000582 (000582 asks for the vitest suite added for this idea to run in CI and the merge gate)
+- **finding** by agent-ideation (2026-10-08T02:25:21+00:00): Prompt Planner check 2026-10-08: the error boundary, status roles and tests appear merged on dev (SESS-2026-10-04-15). The idea is still triaged; the owner should close it and record any residual as a new idea.
 
 </details>
 
@@ -25569,3 +25573,143 @@ PROPOSED LINK: 000598 --relates_to--> 000453 (000598 needs the set-aside and dis
 Consider Postgres or another server database for scalability and the future state, in place of the private-root file layout for tags and records.
 
 Owner, 2026-10-06, while ruling that project tags on ideas live under the private data root for now. Sent by Session 1 - Builder A, for the owner.
+
+---
+
+## 000600 · Correct the "no engine code reads a slot id literal" sentence in the workbench vocabulary note.
+
+**Created 2026-10-08T02:25:02+00:00 · Status: `open`**
+
+brain/concepts/terms-workbench-ui.md class 1 says no engine code reads a slot id literal; phase-arch-02 found useWorkbenchLayouts.ts held TERMINAL_SLOT_ID = 'terminal' (now SHELL_HOME_SLOT_ID = 'secondary'). The sentence needs the owner's approval to change; it was outside phase-arch-02's deliverables.
+
+Raised by Session 5 - Batch Runner (phase-arch-02) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000601 · Reword the "terminal slot" docstring in the workbench API route.
+
+**Created 2026-10-08T02:25:06+00:00 · Status: `open`**
+
+src/api/routes/workbench.py line 16 still says "default the terminal slot"; after the identifier migration the slot is the secondary slot. A phase that owns src/ should reword it.
+
+Raised by Session 5 - Batch Runner (phase-arch-02) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000602 · Update the workbench layout schema prose and minimum to schema_version 3.
+
+**Created 2026-10-08T02:25:06+00:00 · Status: `open`**
+
+schemas/workbench-layout.schema.json still describes schema_version 2 ("Bumped from 1 by the W16 delta") with minimum 2; the shipped layouts are at 3 since phase-arch-02. A phase that owns schemas/ should update the description and minimum.
+
+Raised by Session 5 - Batch Runner (phase-arch-02) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000603 · Separate the layout-selection storage key from notes-file and viewer-tab state.
+
+**Created 2026-10-08T02:25:06+00:00 · Status: `open`**
+
+ts/src/workbench/storage.ts keeps active_notes_file and html_viewer_tabs in the same versioned localStorage key as layout selections, so every layout schema_version bump resets the chosen notes file and open viewer tabs. Consider separate keys with their own versions.
+
+Raised by Session 5 - Batch Runner (phase-arch-02) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000604 · Make history-reading and root-sensitive tests skip with a stated reason in shallow or root environments.
+
+**Created 2026-10-08T02:25:07+00:00 · Status: `open`**
+
+Four pytest tests read git history (test_idea_classification x2, test_containment, test_engine_pages) and fail in a shallow clone; test_run_review_checks::test_an_unwritable_worktree_parent_is_refused fails when run as uid 0 because chmod 0o500 does not bind root. Seen on every branch of the 2026-10-08 run; the shallow clone was fixed with git fetch --unshallow, the root case remains. Skip with a reason, or have the gate run as non-root.
+
+Raised by Session 5 - Batch Runner (phase-arch-02) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000605 · PosixPtyAdapter.close() has no wait, no SIGKILL escalation and no process-group signal.
+
+**Created 2026-10-08T02:25:11+00:00 · Status: `open`**
+
+close() sends SIGTERM and closes the master fd; SIGTERM alone does not stop an interactive bash, the fd hangup does. Children that ignore SIGHUP (nohup) or call setsid survive close() with parent pid 1. This is the unexamined half of the PTY reaping thread behind 000099, 000129 and 000246; see docs/00-working/ports-and-processes-lifecycle.md section 4.4.
+
+Raised by Session 1 - Builder A (phase-arch-11) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000606 · The runbook's /orient port precondition uses ss, which is absent in some Linux environments.
+
+**Created 2026-10-08T02:25:11+00:00 · Status: `open`**
+
+docs/00-working/demo-runbook.md's precondition runs `ss -tlnp`; the 2026-10-08 cloud sandbox had no ss. lsof, fuser or a /proc-based check is the portable alternative.
+
+Raised by Session 1 - Builder A (phase-arch-11) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000607 · REQ-011 R18's "port is then bindable" verification should name the bind it means.
+
+**Created 2026-10-08T02:25:12+00:00 · Status: `open`**
+
+A plain bind fails for about 60 seconds after a listener exits because of TIME_WAIT sockets, while a bind with SO_REUSEADDR (as uvicorn does) succeeds at once. R18's verification should say which bind test applies.
+
+Raised by Session 1 - Builder A (phase-arch-11) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000608 · Record which worktree or session started each dev server.
+
+**Created 2026-10-08T02:25:12+00:00 · Status: `open`**
+
+No launcher records the owner of a dev server; the only ownership signal is the venv path in argv, present only for servers started from a worktree venv. phase-arch-12 should decide whether a launch record is in scope.
+
+Raised by Session 1 - Builder A (phase-arch-11) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000609 · Decide shell quoting of paths with spaces for bash, CMD and PowerShell terminal injection.
+
+**Created 2026-10-08T02:25:17+00:00 · Status: `open`**
+
+Injecting a bookmark category into the terminal as a set needs a quoting rule per shell; ADR-029 defers the terminal consumer of the batch contract until it is decided.
+
+Raised by Session 2 - Builder B (phase-wbf-03, ADR-029) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000610 · Decide whether the HTML Viewer's four-tab cap should rise or be configurable.
+
+**Created 2026-10-08T02:25:17+00:00 · Status: `open`**
+
+Opening a bookmark category as a set is capped by MAX_TABS = 4 in HtmlViewerRegion.tsx; ADR-029's viewer policy declines overflow with reason capacity.
+
+Raised by Session 2 - Builder B (phase-wbf-03, ADR-029) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000611 · Decide whether a governed-document validator should resolve bookmark category ids cited in plans and notes.
+
+**Created 2026-10-08T02:25:17+00:00 · Status: `open`**
+
+ADR-029 leaves category citations in documents as prose; a validator could check that a cited category id exists.
+
+Raised by Session 2 - Builder B (phase-wbf-03, ADR-029) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000612 · Document together the two workbench data locations: REPO_ROOT/_data/workbench and the data root.
+
+**Created 2026-10-08T02:25:17+00:00 · Status: `open`**
+
+Workbench routes read _data/workbench via REPO_ROOT and ignore D_SYSTEM_DATA_ROOT; ADR-029 makes bookmark categories the first workbench data to honour the data root. The two locations need one explanation.
+
+Raised by Session 2 - Builder B (phase-wbf-03, ADR-029) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000613 · Rule on the notes strip's font size and text capacity.
+
+**Created 2026-10-08T02:25:18+00:00 · Status: `open`**
+
+The second half of idea 000130 (rethink the rotator font size) has no owner ruling and no phase; phase-wbf-14 fixes only the tooltip cutoff. Needs a ruling and should be sequenced with phase-wbf-06.
+
+Raised by Prompt Planner (plan amendment for phase-wbf-12..18) during the 2026-10-08 workbench run (Session Manager relay).
