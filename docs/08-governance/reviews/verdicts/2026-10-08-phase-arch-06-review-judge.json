@@ -1,0 +1,50 @@
+{
+  "verdict_id": "2026-10-08-phase-arch-06-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-arch-06",
+  "reviewed_commit": "896982f7094f026646f7f021e07ae41b9ad7e4d0",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "uv run pytest exited 1 on an unrelated root-environment permissions test",
+      "evidence": "04-verification+gate.txt: 1 failed, 1899 passed; test/test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused DID NOT RAISE Refused; run under /tmp/pytest-of-root; diff touches only two docs/04-decisions files",
+      "consequence": "A non-zero verification command stays on record; baseline not run to confirm it is pre-existing",
+      "minimal_fix": "Confirm the same failure on base or rerun as a non-root user, and record it as pre-existing"
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "ADR-016 superseded while ADR-031 is still draft/proposed",
+      "evidence": "ADR-016 status: superseded; ADR-031 status: draft, 'Proposed; awaiting the owner's ratification'; open item 5",
+      "consequence": "Until ratification, dependents point at a superseded record that still describes the shipped workbench",
+      "minimal_fix": "Owner ratifies, or reverts both front matters in one commit, as the ADR states"
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Keep verdict on decision 1 understates layout shape and stored-geometry changes",
+      "evidence": "ADR-031 decisions 5 and 8 change the panels shape and add stored grid_tracks; the kept-versus-changed table lists decision 1 as Keep except one clause",
+      "consequence": "A reader of the table alone could miss that decision 8 touches the persistence posture; the supersede is meant to read as structural only",
+      "minimal_fix": "Add a line to the kept-versus-changed section saying grid_tracks is the one place stored selections gain geometry, pointing to open item 1"
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "ADR spans decisions beyond the slot model",
+      "evidence": "Decisions 7 (session ownership), 8 (geometry), 9 (maximize/collapse) and 10 (migration) in a 533-line record",
+      "consequence": "More for the owner to ratify in one record; all are flagged as open items",
+      "minimal_fix": "None required"
+    }
+  ],
+  "raw_reply_sha256": "c3e514d2551b9ea09b39aea3be2e0842b65a2f77c4b0ad26cb7a85f649eced15",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), same brief as the gating reviewer plus the runner manifest; no checkout. Its F03 is carried to the builder's fix round alongside the gating findings. Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}
