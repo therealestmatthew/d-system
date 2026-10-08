@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-14'
-updated: '2026-09-14'
+updated: '2026-10-08'
 systems: [sys-ui, sys-demo-stage, sys-api]
 depends_on: [doc-workbench-requirements, doc-workbench-layout-decision, doc-workbench-api-decision]
 ---
@@ -107,6 +107,12 @@ whole programme.
 **`R23`–`R24` cannot be fully verified on Linux.** CMD and PowerShell coverage needs the owner's
 Windows machine. The audit is required to name those checks rather than assert them, which is why
 `R24` makes the naming itself the observable.
+
+**`R09`'s "suite" is the documented `--live` command (ruled 2026-10-08).** The assertion suite
+the row names closes on the live check `REQ-037` documents, not on `uv run pytest`: the live check
+drives a browser through Playwright, which is not a dev dependency, so it is run and recorded
+rather than gated. The Session Manager took the ruling to resolve a judge reject on `phase-arch-05`
+and the owner ratified it on 2026-10-08 (`GOV-003`).
 
 **`R12` changes a shipped contract.** `REQ-007` W16 specifies per-panel eligibility lists, and W16
 is implemented. `R12` replaces the eligibility authority, so the phase delivering it amends W16's

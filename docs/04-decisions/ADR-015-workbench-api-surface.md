@@ -7,7 +7,7 @@ kind: adr
 status: accepted
 owner: repository-owner
 created: '2026-09-10'
-updated: '2026-09-10'
+updated: '2026-10-08'
 systems: [sys-api, sys-ui]
 depends_on: [doc-workbench-requirements, doc-workbench-terminal-decision]
 ---
@@ -43,6 +43,9 @@ a web route are new capabilities here whose boundaries need recording before the
    (`src/db/ideas.py`); a route or component parsing `_data/ideas.jsonl` directly is a defect
    (W10). The backlog route reads `docs/09-backlog/backlog.yaml` and orders its queue view as
    the governance `--ready` rendering does (`next_up` first, then ready phases by priority).
+   Extended by `ADR-029` (accepted 2026-10-08): the six bookmark category routes built by
+   `phase-wbf-05` write records under the data root behind the same gate, the first write routes
+   in this API; rule 2's path validation applies to every entry they store.
 5. **Reveal-in-explorer is the sole action route, allowlisted per platform.** POST only. It
    validates its path per rule 2, then spawns exactly one fixed opener: `explorer.exe /select,`
    on Windows, `xdg-open` on the entry's containing directory on Linux — argument lists built

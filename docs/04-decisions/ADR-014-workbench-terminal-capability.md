@@ -7,7 +7,7 @@ kind: adr
 status: accepted
 owner: repository-owner
 created: '2026-09-10'
-updated: '2026-09-11'
+updated: '2026-10-08'
 systems: [sys-demo-stage, sys-api, sys-ui]
 depends_on: [doc-workbench-requirements, doc-demo-terminal-decision]
 supersedes: [doc-demo-terminal-decision]
@@ -49,6 +49,10 @@ panels (REQ-007 W12).
    unaffected. One PTY per websocket stays; sessions still die with their websocket. This adopts
    the registry half of idea `000087` only — the outside-the-page inject/read HTTP API, detach/
    reattach, and output buffering stay parked in that idea and would start from a further record.
+   Extended by `ADR-030` (accepted 2026-10-08): the inject/read HTTP API and output buffering are
+   decided there and built by `phase-wbf-08`. Detach/reattach stayed parked, and the owner's ruling
+   of the same day that sessions should survive panel and layout switches reopens it for a further
+   record (idea `000671`).
 5. **The shell is selected per session over the existing adapter override.** Terminal (bash), CMD
    and PowerShell are three panel options, all through the one adapter interface (POSIX pty;
    ConPTY via `pywinpty` on Windows). A shell unavailable on the host is reported as a clear

@@ -91,6 +91,11 @@ settle.
 | R30 | A terminal session that fails to start (the backend accepts, then closes with the startup-failure code and its reason) shows that reason in the panel. A session that ran and was closed by the idle bound or by the shell exiting still shows the generic closed message. | In a vitest test, use a stub socket that opens and closes with the startup-failure code and reason, and expect the reason on screen; repeat with an ordinary close and expect the generic message. Run `uv run pytest test/test_demo_terminal.py` to confirm the backend half of `000573` still holds. |
 | R31 | The demo runbook's HTML Viewer entry names the header toggle by both of its labels ("Embedded" and "Open-in-tab link (rung 3)"), says what each state shows, says how to switch back, and states which descope-ladder rung the control is. No wording contradicts the control's behaviour in `HtmlViewerRegion.tsx`. | Read the entry beside `ts/src/stage/HtmlViewerRegion.tsx` and click the toggle in the running viewer; confirm each statement matches what appears. A presenter who clicks the control mid-demo must be able to explain and reverse it from the script (`000105`). |
 
+**`R14`'s mixing ruling (owner, 2026-10-08).** A rotation is all text or all images; mixing is not
+allowed. A notes file that lists `points` and names an `imageDirectory` is rejected with a message
+before the directory is read. `phase-wbf-06` built the rotator on that ruling, idea `000647` asked
+for it to be recorded here, and the owner ratified it on 2026-10-08 (`GOV-003`).
+
 ## Amendment, 2026-10-08: seven phases for uncovered defects
 
 The owner decided on 2026-10-08 to amend the features plan with phases for the workbench defect

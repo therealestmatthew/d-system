@@ -4,7 +4,7 @@ id: doc-adr-slot-configuration-schema-model
 code: ADR-031
 title: Slots are schema-owned frames with sub-slots, and panel instances are matched to slots by structure
 kind: adr
-status: draft
+status: accepted
 owner: repository-owner
 created: '2026-10-08'
 updated: '2026-10-08'
@@ -17,9 +17,10 @@ supersedes: [doc-workbench-layout-decision]
 
 ## Status
 
-**Proposed; awaiting the owner's ratification (pre-approved run, 2026-10-08).** Written by
+**Accepted by the owner on 2026-10-08**, every open item as proposed; the acceptance is recorded in
+`GOV-003` ("The 2026-10-08 workbench run's ratification table is accepted in full"). Written by
 `phase-arch-06` (decide the slot configuration-schema model, superseding `ADR-016`) under the
-Session Manager's pre-approved run. The owner has not reviewed it. It gates five phases, each of
+Session Manager's pre-approved run and proposed the same day. It gates five phases, each of
 which builds against the recommendation below, so a different ruling changes that phase's scope:
 `phase-arch-07` (schema-owned slots and sub-slots with structural eligibility), `phase-arch-08`
 (multi-instance panel identity), `phase-arch-09` (reconfigurable slot geometry with per-role content
@@ -30,7 +31,8 @@ is built by this record.
 `ADR-016` is marked `superseded` in the same change, because the governance validator rejects a
 `supersedes` target that is not (`GOV-001`). That has a side effect the owner should see: until this
 record is ratified, `ADR-016` still describes what the shipped workbench does, and its status says
-otherwise. If the owner rejects this record, revert both front matters in one commit.
+otherwise. If the owner rejects this record, revert both front matters in one commit. (Accepted on
+2026-10-08; both statuses stand.)
 
 The gating review of this record (`phase-arch-06`, verdict
 `docs/08-governance/reviews/verdicts/2026-10-08-phase-arch-06-demo-adversary.json`) passed with two
@@ -577,7 +579,8 @@ These are the points the owner is asked to ratify or change.
    instance last interacted with, chosen by a caller-level resolver, with `ADR-029` untouched.
 10. **No migration code, ever (decision 10).** This record keeps `ADR-016` rule 3 as written, "never
     a migration attempt in demo week", and uses silent discard for the three version bumps. Whether
-    to make "no migration code" permanent, dropping the time qualifier, is the owner's call.
+    to make "no migration code" permanent, dropping the time qualifier, is the owner's call. Ruled
+    on 2026-10-08: permanent; the qualifier is dropped from `ADR-016` rule 3.
 11. **Element configurations and the Python matcher (decision 4).** The matcher is implemented
     twice, guarded by a shared fixture test, over data files both read. The alternative is one
     implementation with a node call from `pytest`, at the cost of making the Python gate depend on

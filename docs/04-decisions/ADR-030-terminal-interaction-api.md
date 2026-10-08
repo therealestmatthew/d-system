@@ -4,7 +4,7 @@ id: doc-adr-terminal-interaction-api
 code: ADR-030
 title: The external terminal interaction API is a second-flag, token-authenticated, loopback HTTP surface over one shared output buffer
 kind: adr
-status: draft
+status: accepted
 owner: repository-owner
 created: '2026-10-08'
 updated: '2026-10-08'
@@ -16,8 +16,9 @@ depends_on: [doc-workbench-terminal-decision, doc-workbench-api-decision, doc-de
 
 ## Status
 
-**Proposed; awaiting the owner's ratification (pre-approved run, 2026-10-08).** Written by
-`phase-wbf-07` under the Session Manager's pre-approved run. The owner has not reviewed it. It
+**Accepted by the owner on 2026-10-08**, every open item as proposed; the acceptance is recorded in
+`GOV-003` ("The 2026-10-08 workbench run's ratification table is accepted in full"). Written by
+`phase-wbf-07` under the Session Manager's pre-approved run and proposed the same day. It
 gates `phase-wbf-08` (build the flag-gated terminal inject and read API), which builds against the
 recommendation below, so a different ruling changes that phase's scope. The ratification points are
 collected in "Open items for the owner" at the end. Nothing is built by this record.
@@ -644,7 +645,7 @@ Each of the following would be a new capability and starts from its own decision
 
 ## Open items for the owner
 
-(Amendment by the Session Manager on 2026-10-08 under the owner's pre-approval: the build phase `phase-wbf-08` bounded the PTY write after its security review and added the error code `write_timeout` (409) to the validation table above. The code is awaiting ratification with the rest of this record.)
+(Amendment by the Session Manager on 2026-10-08 under the owner's pre-approval: the build phase `phase-wbf-08` bounded the PTY write after its security review and added the error code `write_timeout` (409) to the validation table above. The code was ratified with the rest of this record on 2026-10-08.)
 
 These are the points the owner is asked to ratify or change.
 
@@ -656,7 +657,9 @@ These are the points the owner is asked to ratify or change.
    acceptable for the safety it buys. The token does not hide the file from a shell running as the
    owner (section 3).
 3. **No detach or reattach; sessions end with their websocket.** This keeps `ADR-014` decision 4 as
-   it is. A ruling for detach is a separate, larger decision.
+   it is. A ruling for detach is a separate, larger decision. Accepted on 2026-10-08 and reopened
+   the same day: the owner wants sessions preserved across visible-panel and layout switches
+   (detach and reattach), decided in a further record before any fix phase (idea `000671`).
 4. **An accepted inject extends the idle bound, up to a one hour ceiling since the last websocket
    frame (`TERMINAL_API_INJECT_CEILING_SECONDS`); a read never does.** The trade: a script that
    only reads, or that injects one long command, is reaped 300 seconds after its last inject, and
@@ -671,12 +674,14 @@ These are the points the owner is asked to ratify or change.
 7. **The websocket has no authentication or `Origin` check** (fact 4, from reading the code; not
    reproduced). It is outside this record's scope because `ADR-014` owns the route. The owner may
    want a separate decision on requiring the same token, or an `Origin` check, on the websocket;
-   that would need a change to the terminal panel code to send it.
+   that would need a change to the terminal panel code to send it. Ruled on 2026-10-08: a defect
+   phase that reuses this record's token on the websocket on connect is queued in `PLAN-027` and
+   `REQ-012` (idea `000669`).
 8. **Pointers on ratification.** Add a one-line "extended by ADR-030" pointer to `ADR-014`
    decision 4, which currently says the inject/read API "would start from a further record", and
    annotate idea `000087` so its remaining scope reads as delivered by this record and
    `phase-wbf-08`. The Session Manager's Ideation lane does the annotation; this phase records no
-   ideas.
+   ideas. Done on 2026-10-08.
 9. **Where the token file lives:** `~/.d-system/terminal-api/<key>.token`, outside the repository,
    keyed by a hash of the repository root. The alternatives are under `data/` (rejected: inside every
    shell's working tree) and a path the owner configures (more setup, and a second thing to

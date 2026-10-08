@@ -4,7 +4,7 @@ id: doc-adr-bookmark-categories-batch-bridge
 code: ADR-029
 title: Bookmark categories are data-root records referenced by stable id, opened as a set through a batch panel bridge
 kind: adr
-status: draft
+status: accepted
 owner: repository-owner
 created: '2026-10-08'
 updated: '2026-10-08'
@@ -16,8 +16,9 @@ depends_on: [doc-structure-content-boundary, doc-workbench-api-decision, doc-wor
 
 ## Status
 
-**Proposed; awaiting the owner's ratification (pre-approved run, 2026-10-08).** Written by
-`phase-wbf-03` under the Session Manager's pre-approved run. The owner has not reviewed it. The
+**Accepted by the owner on 2026-10-08**, every open item as proposed; the acceptance is recorded in
+`GOV-003` ("The 2026-10-08 workbench run's ratification table is accepted in full"). Written by
+`phase-wbf-03` under the Session Manager's pre-approved run and proposed the same day. The
 decision gates `phase-wbf-04` (extend the panel bridge to batch, multi-target actions) and
 `phase-wbf-05` (build the bookmark category surface and its consumers); both build against the
 recommendation below, so a different ruling changes their scope. The ratification points are
@@ -356,7 +357,7 @@ These are the points the owner is asked to ratify or change.
    `ADR-009` section 2 more widely than before: the data root now also holds workbench records, not
    only the entity directories listed in the `data_root()` docstring. On ratification, add a one-line
    "extended by ADR-029" pointer to `ADR-015` rule 4 and update that docstring. The data root is the
-   write boundary for the records (section 4).
+   write boundary for the records (section 4). Done on 2026-10-08.
 
 ## Revisit trigger
 

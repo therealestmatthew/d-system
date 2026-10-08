@@ -47,6 +47,10 @@ def data_root(root: Path) -> Path:
     directories in `ENTITY_DIRECTORIES` (projects, people, commitments, tasks, ...)
     honour the override — that is what lets a fresh clone validate against the tracked
     fictional set while the owner's own machine validates the real one.
+
+    Per ADR-029 (accepted 2026-10-08) the data root also holds workbench records: the bookmark
+    category files under ``workbench/bookmarks/``, which the bookmark routes resolve through
+    this function, so the same override moves them with the entity directories.
     """
     override = os.environ.get("D_SYSTEM_DATA_ROOT")
     if not override:

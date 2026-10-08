@@ -15,8 +15,8 @@ depends_on: [doc-workbench-requirements]
 # Layouts are versioned repository JSON; the browser stores only selections
 
 > **Superseded 2026-10-08 by the slot configuration-schema model
-> ([ADR-031](ADR-031-slot-configuration-schema-model.md)), proposed and awaiting the owner's
-> ratification.** Decisions 1, 3 and 4 below carry forward (decision 1 without its "set of panel
+> ([ADR-031](ADR-031-slot-configuration-schema-model.md)), accepted by the owner on
+> 2026-10-08.** Decisions 1, 3 and 4 below carry forward (decision 1 without its "set of panel
 > types it admits" clause, decision 3 with its stored shape widened to panel instances); decision 2
 > (no geometry editing) is replaced. This record stays as the account of what demo week chose and why,
 > and describes what the workbench shipped under `schema_version` 3.
@@ -45,7 +45,9 @@ panel selections locally; the configuration surface edits slot assignment only, 
    Viewer state (directory, search, page) — under a single namespaced key carrying the
    `schema_version` of the layouts it was written against. Stored selections referencing an
    unknown layout, slot, panel or version are discarded silently in favor of the layout file's
-   defaults — never an error, never a migration attempt in demo week.
+   defaults — never an error, never a migration attempt. (As first written the rule ended "in demo
+   week"; the owner's ruling of 2026-10-08 on `ADR-031` open item 10 dropped the qualifier, so it
+   holds for every `schema_version` bump.)
 4. **The repository defaults are the fallback state.** A fresh browser, a cleared store, or a
    version mismatch always yields layout-1 with its default assignments, so the demo machine's
    state is reproducible by clearing one key.

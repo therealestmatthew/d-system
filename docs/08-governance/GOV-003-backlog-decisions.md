@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-10-06'
+updated: '2026-10-08'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -1006,3 +1006,72 @@ them.
 `resume_when` and in the batch tables' prose, never in this record. Lifting it here puts both the
 hold's end and the rule that still binds the cap values in the one place a claimant reads for owner
 rulings.
+
+## The 2026-10-08 workbench run's ratification table is accepted in full — 2026-10-08
+
+Owner ruling of 2026-10-08, given to the Session Manager at the wind-down of the pre-approved
+workbench run on branch `ccr-b69b05b4-tdcrux`. The owner's words: "I approve the decisions in the
+artifact." The artifact is the run report the Session Manager maintained; its ratification table is
+reproduced here because the report is not a tracked file. Every row is **accepted as proposed**,
+and the rows the owner added a ruling to carry that ruling in the last column. **Standing.**
+
+| Source | Decision | Ruling |
+|---|---|---|
+| `ADR-029` item 1 (`phase-wbf-03`) | Bookmark categories are stored under the data root, not always tracked | accepted |
+| `ADR-029` item 2 | Six bookmark routes under the `ADR-015` gate, the first write routes in the workbench API | accepted |
+| `ADR-029` item 3 | `phase-wbf-05` covers the File Browser and the HTML Viewer only; terminal injection and rotator images deferred | accepted |
+| `ADR-029` item 4 | Set opens add to the viewer and never replace a tab holding a page | accepted |
+| `ADR-029` item 5 | Batch delivery is best-effort per target (`phase-wbf-04`) | accepted |
+| `ADR-029` item 6 | No rename tracking and no auto-prune; a moved file shows as missing until re-added | accepted |
+| `ADR-029` item 7 | Add an "extended by ADR-029" pointer to `ADR-015` rule 4 and update the `data_root()` docstring | accepted; done in this commit |
+| `ADR-030` item 1 (`phase-wbf-07`) | A second flag, `D_SYSTEM_TERMINAL_API=1`, besides the demo terminal flag | accepted |
+| `ADR-030` item 2 | A bearer token from a generated file on every route | accepted |
+| `ADR-030` item 3 | No detach or reattach; sessions end with their websocket | accepted, then reopened the same day: the owner wants sessions preserved across visible-panel and layout switches (detach and reattach). A decision record comes before any fix phase; warn-and-confirm is not built. Idea `000671` |
+| `ADR-030` item 4 | An accepted inject extends the idle bound up to one hour; a read never does | accepted |
+| `ADR-030` item 5 | Where the second flag and token path are documented | accepted |
+| `ADR-030` item 6 | 256 KiB buffer per session and a 4096 byte input limit | accepted |
+| `ADR-030` item 7 | The websocket has no authentication or `Origin` check; out of the record's scope | accepted as out of scope; the owner ruled that a defect phase reusing the `ADR-030` token on the websocket on connect is queued in `PLAN-027` and `REQ-012`. Idea `000669` |
+| `ADR-030` item 8 | Add an "extended by ADR-030" pointer to `ADR-014` decision 4 and annotate idea `000087` | accepted; done in this commit and in the Ideation commit before it |
+| `ADR-030` item 9 | Token file at `~/.d-system/terminal-api/<key>.token`, outside the repository | accepted |
+| `ADR-030` item 10 | The second flag also switches output capture on | accepted |
+| `ADR-030` amendment (Session Manager, from the `phase-wbf-08` security review) | Error code `write_timeout` (409) with a 5 second write deadline | accepted |
+| `ADR-031` item 1 (`phase-arch-06`) | Geometry: bounded track-size selections in the browser with floors derived from the schema; supersedes `ADR-016` decision 2 | accepted |
+| `ADR-031` item 2 | Instances are declared in layout data, never created in the browser | accepted |
+| `ADR-031` item 3 | `overview` becomes eligible for `secondary` in layout 2, the one change to `REQ-007` W16 | accepted |
+| `ADR-031` item 4 | The terminal's collapse toggle moves to the slot; its panel-local code is removed | accepted |
+| `ADR-031` item 5 | `ADR-016` reads `superseded` before the record is accepted | accepted; both statuses stand |
+| `ADR-031` item 6 | The three terminal types stay three types | accepted |
+| `ADR-031` item 7 | The server is not told instance ids | accepted |
+| `ADR-031` item 8 | The `strip` role uses an inline frame | accepted |
+| `ADR-031` item 9 | Default target for a cross-panel action with several instances: the visible instance last interacted with | accepted |
+| `ADR-031` item 10 | "No migration code, ever": whether to drop the time qualifier in `ADR-016` rule 3 | accepted; the qualifier is dropped and the rule is permanent for every version bump |
+| `ADR-031` item 11 | The element matcher is written twice (TypeScript and Python) with a shared fixture test | accepted |
+| `phase-arch-07` widening | Widen the phase's deliverables as `ADR-031` names them and re-claim it alone | accepted; built alone after the context reset |
+| `phase-wbf-14` | The tooltip prefers the side above (reusing `choosePlacement`); `Tooltip` imports from `Popover` | accepted |
+| `phase-wbf-06` | Reduced motion hides the rotator scrollbar; the image strip needs at least 100 px | accepted |
+| `phase-wbf-06` | A rotation is all text or all images; mixing is not allowed | accepted; recorded in `REQ-012` in this commit (idea `000647`) |
+| `phase-arch-16` D1 | A shell ending on a visible-panel switch, or on a layout switch with a differing stored panel, is a designed consequence; the missing warning is the gap | accepted as a judgment; the direction is to preserve sessions (see `ADR-030` item 3 above) |
+| `phase-arch-16` D2 | "Re-assignment" in `REQ-011` R23 means moving a panel with the configuration dialog | accepted |
+| `phase-arch-16` D3 | CMD and PowerShell intent is judged from documents and shared code, labelled as such | accepted |
+| `phase-arch-16` D4 | Both the development server and a production build were measured | accepted |
+| `phase-arch-16` D5 | The 300 second idle close is reported although not one of the five events | accepted |
+| `phase-arch-16` O11 | On Windows the panel labelled Terminal (bash) is expected to start the host's default shell with no message | accepted; every owner-machine check from the run goes into one checklist under `docs/00-working/` (idea `000672`) |
+| `phase-wbf-02` | The viewer header controls wrap to a second row to fit the last-modified badge; idea `000637` stays open | accepted |
+| `phase-wbf-16`, `phase-wbf-14`, `phase-arch-16` | Builder commits carry the builder model's own name in the trailer where the contract named the Session Manager's | accepted as they stand |
+| `phase-wbf-13` | The `eslint-disable` react-refresh line on the exported `choosePlacement` stays; layout-2 Skills, Prompts and Agents bubbles lose 8 px | accepted |
+| `REQ-011` R09 (`phase-arch-05`) | "Suite" closes on the documented `--live` command, not on `uv run pytest` | accepted; recorded in `REQ-011` in this commit |
+| `phase-wbf-05` | Private-file bookmark entries are deliberately unsupported; with the data root unset, writes land in the tracked directory | accepted |
+| `phase-arch-02` | Constant renamed to `SHELL_HOME_SLOT_ID`; slot comments updated to role names | accepted |
+| `phase-wbf-18` | The toggle label says rung 3, the runbook ladder says rung 7 | the label is renumbered to rung 7 and the toggle stays visible (idea `000670`; a small phase, because it touches `ts/`) |
+| Defect plan amendment | wbf-12 is diagnosis only; no resizable popup; tooltip font unchanged; the runbook toggle is not flag-gated | accepted |
+| Idea `000102` | `reviewing`, not `triaged` as the owner first named | moved to `delivered` through the writer, closed by `phase-wbf-02` |
+
+Two further rulings from the same conversation, not rows of the table: merged phases are accepted
+as they are, with no re-review sweep, and a gating reject still gets another gating round; and the
+owner-machine checklist (idea `000672`) is one ungoverned document under `docs/00-working/`.
+
+**Why recorded here:** the three decision records were proposed under the pre-approved run and
+built against before the owner read them (`ADR-029` by `phase-wbf-04` and `phase-wbf-05`,
+`ADR-030` by `phase-wbf-08`, `ADR-031` by `phase-arch-07` onward). Their `accepted` status is
+set in this commit, and this entry is the one place that says the acceptance covered the Session
+Manager's fix choices and the per-phase rulings as well as the records themselves.

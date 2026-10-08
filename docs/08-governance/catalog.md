@@ -32,9 +32,9 @@ CI regenerates it and fails on any difference.
 | ADR-025 | adr | accepted | repository-owner | docs/04-decisions/ADR-025-plugin-idea-log-lock.md |
 | ADR-027 | adr | accepted | repository-owner | docs/04-decisions/ADR-027-retire-plan-003.md |
 | ADR-028 | adr | accepted | repository-owner | docs/04-decisions/ADR-028-build-in-public-content-chain.md |
-| ADR-029 | adr | draft | repository-owner | docs/04-decisions/ADR-029-bookmark-categories-and-batch-bridge.md |
-| ADR-030 | adr | draft | repository-owner | docs/04-decisions/ADR-030-terminal-interaction-api.md |
-| ADR-031 | adr | draft | repository-owner | docs/04-decisions/ADR-031-slot-configuration-schema-model.md |
+| ADR-029 | adr | accepted | repository-owner | docs/04-decisions/ADR-029-bookmark-categories-and-batch-bridge.md |
+| ADR-030 | adr | accepted | repository-owner | docs/04-decisions/ADR-030-terminal-interaction-api.md |
+| ADR-031 | adr | accepted | repository-owner | docs/04-decisions/ADR-031-slot-configuration-schema-model.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
