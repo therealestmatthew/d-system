@@ -10,6 +10,7 @@ import { planOpenFiles } from './viewerPlacement'
 
 const OVERVIEW_LOCATION_URL = '/api/v1/demo/stage/overview-location'
 const SEARCH_URL = '/api/v1/workbench/search'
+const LIST_URL = '/api/v1/workbench/list'
 // Mirrors `ts/vite.config.ts`'s `serveRepositoryFiles` dev-server plugin, which serves any
 // non-ignored repository file at this prefix — the workbench search/listing routes
 // (`src/api/routes/workbench.py`, `phase-wb-01`) report paths only, never content (ADR-015), so
@@ -25,6 +26,9 @@ interface DirectoryEntry {
   name: string
   path: string
   is_dir: boolean
+  /** Last-modified time on disk, ISO 8601 UTC (`2026-10-08T07:15:02.123Z`), or null when the
+   * backend could not read it (REQ-012 R03). Optional so a response without it still parses. */
+  modified_at?: string | null
 }
 
 type FilesLoadState = 'loading' | 'loaded' | 'error'
@@ -63,6 +67,30 @@ function dirname(path: string): string {
 function basename(path: string): string {
   const index = path.lastIndexOf('/')
   return index === -1 ? path : path.slice(index + 1)
+}
+
+/** The header badge's text for a file's mtime: local date and time to the second, so a regenerated
+ * page visibly advances. The exact ISO UTC value goes in the badge's `title`. */
+function formatModified(iso: string): string | null {
+  const moment = new Date(iso)
+  if (Number.isNaN(moment.getTime())) return null
+  const pad = (value: number) => String(value).padStart(2, '0')
+  return (
+    `${moment.getFullYear()}-${pad(moment.getMonth() + 1)}-${pad(moment.getDate())} ` +
+    `${pad(moment.getHours())}:${pad(moment.getMinutes())}:${pad(moment.getSeconds())}`
+  )
+}
+
+/** Reads one file's mtime from the existing one-level listing route, asking for the file's own
+ * directory narrowed to its name so the response stays small. Resolves to the ISO string, or null
+ * when the route has no such entry (an ignored or removed file) or no time for it. Throws when the
+ * request itself fails. */
+async function fetchModifiedAt(path: string): Promise<string | null> {
+  const params = new URLSearchParams({ path: dirname(path), q: basename(path) })
+  const response = await fetchWorkbench(`${LIST_URL}?${params.toString()}`, { cache: 'no-store' })
+  if (!response.ok) throw new Error(`status ${response.status}`)
+  const entries = (await response.json()) as DirectoryEntry[]
+  return entries.find((entry) => entry.path === path)?.modified_at ?? null
 }
 
 function buildSearchUrl(directory: string): string {
@@ -181,6 +209,10 @@ export default function HtmlViewerRegion() {
     key: string
     state: Exclude<PageState, 'idle' | 'checking'>
   } | null>(null)
+  const [settledModified, setSettledModified] = useState<{
+    key: string
+    modifiedAt: string | null
+  } | null>(null)
   const [refreshToken, setRefreshToken] = useState(0)
 
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? null
@@ -202,6 +234,20 @@ export default function HtmlViewerRegion() {
       : settledPage !== null && settledPage.key === pageKey
         ? settledPage.state
         : 'checking'
+
+  // The displayed file's mtime for the header badge (REQ-012 R03/R04). Keyed like the page check,
+  // so it is read again on a tab switch, on selecting a file and on Refresh: that re-fetch on select
+  // is how the viewer learns a file changed on disk since it was last shown. Until the read for the
+  // current key settles the badge says so rather than showing the previous file's time.
+  const modifiedState: 'none' | 'loading' | 'known' | 'unknown' =
+    pageKey === null
+      ? 'none'
+      : settledModified === null || settledModified.key !== pageKey
+        ? 'loading'
+        : settledModified.modifiedAt !== null && formatModified(settledModified.modifiedAt) !== null
+          ? 'known'
+          : 'unknown'
+  const modifiedAt = settledModified?.modifiedAt ?? null
 
   // The tabs as of the latest committed render, plus any `openFiles` call since. `openFiles` must
   // answer synchronously with a receipt (ADR-029 section 6 point 2) and two calls can land before
@@ -331,6 +377,21 @@ export default function HtmlViewerRegion() {
     }
   }, [pageKey, activeSelectedFile])
 
+  useEffect(() => {
+    if (!activeSelectedFile || pageKey === null) return
+    let cancelled = false
+    fetchModifiedAt(activeSelectedFile)
+      .then((value) => {
+        if (!cancelled) setSettledModified({ key: pageKey, modifiedAt: value })
+      })
+      .catch(() => {
+        if (!cancelled) setSettledModified({ key: pageKey, modifiedAt: null })
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [pageKey, activeSelectedFile])
+
   // Persist every open tab's directory/search/page and which tab is active (REQ-007 W08 / ADR-016
   // rule 3) — best-effort, merged into the shared key so this write never clobbers the layout
   // engine's or the notes strip's own stored fields (`saveHtmlViewerTabs`).
@@ -406,8 +467,23 @@ export default function HtmlViewerRegion() {
 
   return (
     <section className="stage-region stage-region--html-viewer" aria-label="HTML Viewer">
-      <header className="stage-region__header">
+      <header className="stage-region__header" style={{ flexWrap: 'wrap' }}>
         <h2>HTML Viewer</h2>
+        {modifiedState === 'none' ? null : (
+          <span
+            className="stage-html-viewer__modified"
+            role="status"
+            data-testid="html-viewer-modified"
+            title={modifiedState === 'known' ? `Last modified ${modifiedAt} (UTC)` : undefined}
+            style={{ fontSize: '0.75rem', whiteSpace: 'nowrap', color: '#4a5568' }}
+          >
+            {modifiedState === 'known' && modifiedAt !== null
+              ? `Modified ${formatModified(modifiedAt)}`
+              : modifiedState === 'loading'
+                ? 'Modified …'
+                : 'Modified time unavailable'}
+          </span>
+        )}
         <div className="stage-html-viewer__controls">
           <button
             type="button"
@@ -452,7 +528,13 @@ export default function HtmlViewerRegion() {
                           type="button"
                           className="stage-html-viewer__file-option"
                           onClick={() => {
-                            if (activeTab) updateTab(activeTab.id, { selectedFile: file.path })
+                            if (activeTab) {
+                              // Re-selecting the file already displayed changes no state of its
+                              // own, so bump the refresh token: it re-checks the page, reloads the
+                              // frame and reads the file's mtime again (REQ-012 R04).
+                              if (activeTab.selectedFile === file.path) setRefreshToken((value) => value + 1)
+                              else updateTab(activeTab.id, { selectedFile: file.path })
+                            }
                             close()
                           }}
                         >
