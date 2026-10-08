@@ -9534,7 +9534,7 @@ items:
   - sys-ui
   owner: repository-owner
   agent: agent-standby
-  status: active
+  status: complete
   priority: 3
   session_budget: 1
   depends_on:
