@@ -8778,7 +8778,8 @@ items:
   - sys-wb-layout
   - sys-wb-styles
   owner: repository-owner
-  status: queued
+  agent: agent-builder-b
+  status: active
   priority: 2
   session_budget: 1
   depends_on:
@@ -17822,6 +17823,8 @@ items:
   deliverables:
   - ts/src/stage/HtmlViewerRegion.tsx
   - ts/src/stage/HtmlViewerRegion.test.tsx
+  - ts/src/stage/HtmlViewerRegion.doubleClick.test.tsx
+  - ts/src/stage/HtmlViewerRegion.openFiles.test.tsx
   next_action: Reproduce first - start the frontend with the flag unset, store a viewer tab naming
     an existing file under the key the viewer persists to, load the page and confirm the iframe
     frames the app shell. Then check that a HEAD to a real file carries the sandbox header and a
