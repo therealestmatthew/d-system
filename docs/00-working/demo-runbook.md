@@ -290,3 +290,9 @@ tr '\0' '\n' < "/proc/$(pgrep -f 'node.*vite --port 5180' | head -1)/environ" | 
 Both `D_SYSTEM_DEMO_TERMINAL=1` and `VITE_API_TARGET=http://localhost:8010` must appear; if they do not, the variables were dropped and the server needs restarting with the `env ...` form. (`head -1` guards against `pgrep -f` also matching the shell that invoked it. On Windows, use the Task Manager command-line column or restart rather than `/proc`.)
 
 The `--strictPort` flag ensures the frontend fails rather than silently falling back to another port.
+
+**Optional: the terminal interaction API (`ADR-030`, proposed; awaiting the owner's ratification).** The demo does not use it, and every launch above leaves it off. It lets a local script list terminal sessions, type into one and read its output, under `/api/v1/demo/terminal/sessions`. It mounts only when `D_SYSTEM_TERMINAL_API=1` is set on the backend in addition to `D_SYSTEM_DEMO_TERMINAL=1`:
+```
+env D_SYSTEM_DEMO_TERMINAL=1 D_SYSTEM_TERMINAL_API=1 uv run uvicorn src.main:app --port 8010
+```
+Every request needs `Authorization: Bearer <token>`. The server generates the token at start-up and writes it to `~/.d-system/terminal-api/<key>.token` (the user profile directory on Windows), where `<key>` identifies the checkout; the full path is printed in the server log at start-up. The file is the token, with no trailing newline. It is replaced on every start, so read it again after a restart. If the file cannot be written the server refuses to start. Use a single-process launch (no `--reload`, no `--workers`). Windows file permissions on the token file: owner-machine, not run.
