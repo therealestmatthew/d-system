@@ -82,3 +82,12 @@
 - Renumber the HTML Viewer toggle's ladder label to match the runbook ladder (rung 7); keep the toggle visible (phase-wbf-18 follow-up).
 - Preserve terminal sessions across visible-panel and layout switches (detach/reattach) instead of warning before ending them; reopens ADR-014 decision 4 and ADR-030 item 3; needs a decision phase (ADR) before a fix phase (link 000651, 000652, 000087).
 - Write one owner-machine checklist document under docs/00-working/ collecting every Windows/owner check raised by the run (arch-02 browser profile, ADR-030 ConPTY and token file mode, bookmark route paths, REQ-037 CMD/PowerShell fit, wbf-18 R31 click, arch-16 O1..O11).
+
+## PENDING (wave 8)
+### Prompt Planner (plan-wbf-followups)
+- ADR-030 section 3 and fact 4 still say the websocket has no authentication; the wbf-19 amendment paragraph must correct both and the Consequences lines (now that wbf-19 is an Origin check).
+- backlog.yaml session_budget is a schema constant of 1, so a phase spanning backend, frontend and an ADR cannot declare more; consider whether a larger budget should be allowed or such phases split.
+- ts/src/stage/StagePage.css line 397 comment ("rung-2/rung-3 style layout-state toggles") uses the old rung numbering and will read stale after wbf-20; arch-07 owns the file.
+- The optional D_SYSTEM_WORKBENCH_ORIGIN pin (wbf-19 design point), if built, needs a one-line entry in OPS-013 and the runbook's launch notes.
+### Session Manager
+- src/main.py checks no Host header, so a DNS-rebound page is same-origin to the HTTP API (found by the plan-wbf-followups adversary while testing the token route); the workbench and terminal API routes could check Host against loopback names. (ADR-015/ADR-030 territory; relates to 000614.)
