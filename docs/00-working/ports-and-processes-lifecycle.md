@@ -20,7 +20,7 @@ Every claim carries one of two labels.
 - **Recorded** cites a repository document by code and date. The incident sections rely on these.
 - **Observed here** is a fresh reproduction made on 2026-10-08 in a Linux sandbox (kernel 6.18,
   bash 5.2.21, the worktree's own `.venv` for Python and uvicorn). Nothing was changed in the
-  repository to make it. Section 9 lists the commands, so `phase-arch-12` can re-run them.
+  repository to make it. Section 10 lists the commands, so `phase-arch-12` can re-run them.
 
 Windows and macOS were not run. Cells and claims that depend on them are marked **owner-machine, not
 run**, and are collected in section 8.
@@ -65,13 +65,20 @@ Three facts about this inventory matter later.
 
 ### 3.1 The port-8000 conflict
 
-**What the owner's idea (`000142`) calls "the port-8000 conflict noted mid-session during the
-workbench builds"** is three recorded events, two of them the same mechanism on different days.
+The owner's idea `000142` (recorded 2026-09-11) refers to "the port-8000 conflict noted mid-session
+during the workbench builds". Which recorded event that is has not been established. The triage
+annotation on `000142` points to `SESS-2026-09-11-08` (layout assignment model, `phase-wb-09`), but
+that record states only that orphaned dev servers were killed and names no port. The table lists the
+recorded port-8000 collisions found. The first two rows are collisions and are the same mechanism on
+different days. The next two give context (where the 8000 default comes from, and the check working
+when both ends are right) and the last is the standing rule.
 
 | Date | Document | What happened |
 |---|---|---|
 | 2026-09-10 | `SESS-2026-09-10-07` (demo content, runbook, reset tool and rehearsals) | Rehearsal validator `D05-W` reproduced it: with `VITE_API_TARGET` unset, the Vite dev proxy targets `http://localhost:8000` instead of the demo backend on 8010, "and every stage route 404s if anything else holds port 8000". The same record says the coordinator "cleared the stray dev-server port collision" on the branch. Fix: the runbook's `/orient` step gained a port-free precondition, `ss -tlnp \| grep -E "8010\|5180"`, and both launch commands gained `VITE_API_TARGET`. |
 | 2026-09-13 to 2026-09-14 | `SESS-2026-09-14-02` (diagnose the demo launch failure and document it in the README and the runbook) | The owner could not start the demo. Live checks showed the frontend on 5180 answering `404` for `/api/v1/workbench/injection-sources` while the backend on 8010 answered `200`. An unrelated local program was listening on 8000 and answering `404` for every API path. The frontend process's `/proc/<pid>/environ` held neither `D_SYSTEM_DEMO_TERMINAL` nor `VITE_API_TARGET`, because the variable prefix was lost when the launch command was recalled from shell history. After relaunching with `env ...` the same request returned `200`. |
+| 2026-09-10 | `SESS-2026-09-10-04` (demo stage frontend, `phase-demo-02`) | Origin of the dependency. `ts/vite.config.ts` made the proxy target configurable through `VITE_API_TARGET` with the default "unchanged at `:8000`", and its validator confirmed the default was untouched and no `:8010` was hardcoded. Every launch that omits the variable therefore targets 8000. |
+| 2026-09-11 | `SESS-2026-09-11-05` (rehearsal refresh, `phase-wb-07`) | The check working when both ends are right: the validator "ran the `curl` check live against running dev servers and got the documented `200`" and ran the `/proc/<pid>/environ` diagnostic with the documented output. It shows the check is executable; it records no collision. |
 | Standing rule, undated here | `AGENTS.md` (concurrent agents: worktrees) and `OPS-001` (governance operations) | The standing rule: "Do not assume `:8000` or `:5173` is yours", and pick an explicit free port. The coordinator briefs (`_tmpagent/demo-track-coordinator.md`, `_tmpagent/p10-track-coordinator-v2.md`) repeat it because "peers are running". Later records show it applied: ports 8011/8012/5181/5182 in `SESS-2026-10-03-01`. |
 
 Mechanism, as the records establish it:
@@ -131,8 +138,9 @@ Mechanism:
 
 The terminal backend starts a shell per websocket and must end it. `000099` (2026-09-11) recorded
 three failing tests in `test/test_demo_terminal.py`; `000129` (same day) recorded the owner's request
-to fix them. Both were discarded on 2026-09-13 and revisited on 2026-09-24; the investigation record is
-still the best account of how a PTY child fails to be reaped on time.
+to fix them. Both were discarded on 2026-09-13 and revisited on 2026-09-24. The investigation showed a shell
+that failed to exit within the test's deadline for an environmental reason (below). It was not an
+investigation of child reaping; reaping proper is examined in section 4.4.
 
 What the records establish:
 
@@ -309,9 +317,11 @@ This section states what the repository's records support. It does not choose a 
   docstring records the window that remains between the failed probe and `os.kill()`. Pid reuse is a
   property of any pid-based kill.
 - **Never select by pattern against the caller's own command line.** `pgrep -f` and `pkill -f`
-  matched the invoking shell in `SESS-2026-09-14-02`, `SESS-2026-10-04-09` and this exploration. The
-  documented fixes are `| head -1`, an anchored pattern such as `node.*vite --port 5180`, or exact
-  argv comparison (used in section 4.4 here).
+  matched the invoking shell in `SESS-2026-09-14-02`, `SESS-2026-10-04-09` and this exploration. Only exact argv comparison
+  (used in section 4.4 here) selects the right process reliably. The documented `| head -1` and the
+  pattern `node.*vite --port 5180` (`README.md`, the runbook) suit reading a process's environment,
+  not choosing a kill target: the pattern is not anchored and matched the invoking shell's own pid
+  when tested in a `bash -c` wrapper, and `head -1` takes the lowest pid, not the right one.
 - **Verify the result, not the signal.** The checks that held evidential weight in the records were
   the post-condition: `curl` returns `200` (`SESS-2026-09-14-02`), no orphaned shell under `/proc`
   (`SESS-2026-09-10-08`), the port is bindable. A signal sent is not an exit observed.
@@ -382,8 +392,10 @@ The tension, as it appears when each requirement is set against these decisions:
    its command is fixed.
 2. **The target space is not repository-bounded.** `ADR-015`'s boundary is the repository root.
    Processes and ports are host-wide. The path check that bounds reveal has no counterpart; a
-   replacement boundary (for example: only processes whose cwd or argv lies inside this repository or
-   its sibling worktree directory) is a possible shape and is not chosen here.
+   replacement boundary is needed or the need is argued away. Candidates, unranked and none chosen
+   here: processes whose cwd or argv lies inside this repository or its worktree directory; processes
+   this application started itself; processes holding ports on a configured list; no boundary, with
+   confirmation as the only control.
 3. **A read can already cross the line.** A process listing includes command lines and can include
    environment variables. Decision 3 keeps private content out of listings; a host-wide process list
    may carry other people's and other projects' identifiers. `SESS-2026-09-14-02` removed the name of
@@ -400,9 +412,7 @@ The tension, as it appears when each requirement is set against these decisions:
    rejection of a generic command action is recorded; what counts as validated here is not.
 6. **The gate has precedent either way.** The existing action is behind the same flag as the
    terminal, which already starts arbitrary shells on the host. The terminal is a larger capability
-   than a kill action and is accepted (`ADR-013`, `ADR-014`). The tension is therefore about the
-   documented posture ("read-only, one named action"), not about the capability being new to the
-   host.
+   than a kill action and is accepted (`ADR-013`, `ADR-014`).
 
 ## 8. Not established
 
@@ -418,7 +428,10 @@ The tension, as it appears when each requirement is set against these decisions:
 
 ## 9. Questions `phase-arch-12` must answer
 
-Each item names the evidence in this document that bears on it. None is answered here.
+Each item names the evidence in this document that bears on it. None is answered here. `000144`
+(package the port/process app for the modular panel pages) is the follow-on idea that
+`phase-arch-13` carries out, so the app `phase-arch-12` builds is later packaged as a workbench
+sub-app; nothing below depends on that packaging.
 
 | # | Question | Evidence |
 |---|---|---|

@@ -114,3 +114,24 @@ Gate checks, run before this record was written:
   review finding D1. The document records the constraint it creates for a listener display.
 - The commit trailer follows the session's attribution reminder (Claude Sonnet 5.5), not the
   `Claude Fable 5.1` line in the builder contract, because that is the model that did the work.
+
+## Review
+
+Independent gating and demo-adversary review at `051fedf`: verdict `pass`, six minor findings. The
+verdict record is `docs/08-governance/reviews/verdicts/2026-10-08-phase-arch-11-demo-adversary.json`,
+copied unchanged. The reviewer could not open `docs/03-sessions/` under its brief, so the dated
+incident rows were checked by file existence and against the idea records, not against the session
+records' text.
+
+- F01 (the port-8000 identity was stated as fact): fixed. Section 3.1 now says which event `000142`
+  means is not established, notes that the triage annotation points to `SESS-2026-09-11-08`, which
+  names no port, and adds `SESS-2026-09-10-04` and `SESS-2026-09-11-05` as rows.
+- F02 ("anchored pattern" offered as a safe selector): fixed. Section 5.2 says only exact argv
+  comparison is reliable for choosing a kill target, and `head -1` and the pattern suit reads only.
+- F03 (wrong section pointer): fixed. "Section 10".
+- F04 (sources never used in the body): fixed. `SESS-2026-09-10-04` and `SESS-2026-09-11-05` are cited
+  in section 3.1 with what they show, and `000144` in the section 9 introduction.
+- F05 (000099 framed as reaping evidence): fixed. Section 3.3 now says it showed a shell failing to
+  exit in time for an environmental reason, and that reaping proper is in section 4.4.
+- F06 (section 7 leaned toward a boundary): fixed. Point 2 lists four unranked candidate boundaries
+  and point 6's closing sentence is removed.
