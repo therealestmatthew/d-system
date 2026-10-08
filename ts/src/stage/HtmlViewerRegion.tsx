@@ -39,7 +39,7 @@ type FilesLoadState = 'loading' | 'loaded' | 'error'
 function isServedByFileRoute(response: Response): boolean {
   if (!response.ok) return false
   const policy = response.headers.get('Content-Security-Policy') ?? ''
-  return policy.split(';').some((directive) => directive.trim().toLowerCase().split(/\s+/)[0] === 'sandbox')
+  return policy.split(/[;,]/).some((directive) => directive.trim().toLowerCase().split(/\s+/)[0] === 'sandbox')
 }
 
 type PageState = 'idle' | 'checking' | 'ready' | 'missing' | 'error'

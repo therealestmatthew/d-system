@@ -70,6 +70,22 @@ describe('HtmlViewerRegion page-exists check', () => {
     expect(document.querySelector('iframe')).toBeNull()
   })
 
+  it('accepts a comma-merged multi-policy value that includes sandbox (R29)', async () => {
+    stubBackend(
+      () =>
+        new Response(null, {
+          status: 200,
+          headers: { 'Content-Security-Policy': "default-src 'self', sandbox" },
+        }),
+    )
+    await viewerHoldingSelection('_public/a.html')
+    await waitFor(() =>
+      expect(document.querySelector('iframe')?.getAttribute('src') ?? '').toContain(
+        '/workbench-file/_public/a.html',
+      ),
+    )
+  })
+
   it.each([
     ['.html', '_public/a.html'],
     ['.md', 'docs/b.md'],
