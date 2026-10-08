@@ -101,6 +101,53 @@ state; both are covered by Vitest and pytest instead. One console error appeared
 blocked a script in `_public/d-system-architecture.html` because the viewer iframe is sandboxed with
 no `allow-scripts`. That sandbox predates this phase and is intended; it is not new behavior.
 
+## Review
+
+Three reviewers returned pass on commit `4bb71ff`. Verdict records, copied unchanged:
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-05-demo-adversary.json` (gating, 4 minor),
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-05-security-review.json` (gating, 1 major
+and 5 minor) and `docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-05-review-judge.json`
+(shadow, 3 minor).
+
+- SEC F01 (major, a symlinked directory defeats the private and ignored check; a symlink to `.git`
+  is accepted): fixed. `git check-ignore` runs on the resolved path only; the private test runs on
+  the resolved repo-relative path; an entry whose lexical path differs from its resolved path
+  (`os.path.normcase`) is refused on write and reads `excluded`; this module has its own ignore
+  check that treats a git exit code other than 0 or 1, or git failing to run, as everything ignored
+  (`workbench.py`'s helper fails open and is outside this phase's deliverables). Tests: a symlinked
+  directory into `_private/`, a symlinked directory and a file symlink to `.git`, a symlink to an
+  ordinary file, and a failing git.
+- SEC F02, ADV F01, JUDGE F02 (hostile paths give 500; one bad stored entry breaks the category
+  GET): fixed. `normalize_entry_path` refuses NUL, text that is not valid UTF-8, a path over 1024
+  characters and a segment over 255 with 400; `_inspect` and `validate_entry_file` catch
+  `OSError`, `ValueError` and `UnicodeError`; a hand-edited unusable entry reads `excluded`, the GET
+  succeeds, and the entry can be removed by its stored text. A record holding text that cannot be
+  encoded is treated as unreadable. Schema gained `maxLength` 1024 and `maxItems` 500.
+- SEC F03, ADV F02 (`.git` and `_private` matched by first lexical segment, case-sensitively):
+  fixed. Every segment of both the lexical and the resolved path is compared casefolded with
+  trailing dots and spaces removed, at any depth. Tests: `sub/.git/config`, `.GIT/config`,
+  `.git./config`, `docs/_PRIVATE/x.md`. The Windows presentation machine is owner-machine, not run.
+- SEC F04 (cross-origin write protection rests on a FastAPI default): fixed with a router
+  dependency: 415 unless `Content-Type` is `application/json` on POST, PATCH, and DELETE with a body
+  (the category delete has no body). `pyproject.toml` untouched.
+- SEC F05 (no size or count limits): fixed. 500 entries per category and 200 categories (409),
+  request bodies over 64 KB refused (413, by `Content-Length` and by the body read). The body is
+  still read by FastAPI before the dependency runs, so this bounds what is accepted, not what is
+  read; a streaming limit would need middleware, outside the deliverables.
+- SEC F06 (durability and locking): `os.fsync` before `os.replace`, fixed. The shared-data-root
+  limit (the lock is per process) is named in the module docstring. Not done, outside the
+  deliverables: a `.gitignore` entry for `_data/workbench/bookmarks/.*.tmp`, and an ADR-029 note that
+  a data root shared across backends is unsupported.
+- ADV F03 (the id guard is not pinned by a test): fixed. Unit tests of `is_valid_category_id` and
+  `_record_path` for backslash, `..`, uppercase, `con`, `com1`, 65 characters, empty and `a--b`,
+  plus valid ids.
+- ADV F04 (first delivered file becomes the active tab is untested against the real panel): fixed.
+  A vitest opens one file, then three, and asserts `Tab 2` is selected.
+- JUDGE F01 (the full suite exits 1 on a root-only test): not changed. The failing test is
+  unrelated and outside the deliverables; reported as an idea.
+- JUDGE F03 (a path beginning with a letter and a colon is rejected as drive-lettered, including a
+  valid POSIX name): accepted. Deliberate and consistent across the routes and the schema.
+
 ## Awaiting ratification
 
 `ADR-029` is proposed; awaiting the owner's ratification (pre-approved run, 2026-10-08). A different
