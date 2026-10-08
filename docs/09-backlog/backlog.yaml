@@ -9257,7 +9257,8 @@ items:
   systems:
   - sys-ui
   owner: repository-owner
-  status: queued
+  agent: agent-standby
+  status: active
   priority: 2
   session_budget: 1
   depends_on: []
@@ -9578,7 +9579,8 @@ items:
   - sys-api
   - sys-demo-stage
   owner: repository-owner
-  status: queued
+  agent: agent-builder-a
+  status: active
   priority: 2
   session_budget: 1
   depends_on:
