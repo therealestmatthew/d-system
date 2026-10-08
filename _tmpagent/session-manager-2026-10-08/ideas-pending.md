@@ -91,3 +91,8 @@
 - The optional D_SYSTEM_WORKBENCH_ORIGIN pin (wbf-19 design point), if built, needs a one-line entry in OPS-013 and the runbook's launch notes.
 ### Session Manager
 - src/main.py checks no Host header, so a DNS-rebound page is same-origin to the HTTP API (found by the plan-wbf-followups adversary while testing the token route); the workbench and terminal API routes could check Host against loopback names. (ADR-015/ADR-030 territory; relates to 000614.)
+### Builder A (phase-arch-07 checkpoint)
+- brain/concepts/terms-workbench-ui.md and docs/08-governance/GLOSSARY.md still describe a per-panel eligible_slots; update them for structural eligibility (ADR-031 decision 4).
+- InjectionDropdowns.tsx and TerminalMenu.tsx should expose each dropdown as its own bar element, so BarElement's `places` prop and the grouped declarations can go.
+- Re-run the full four-size REQ-037 --live --self-test after phase-arch-07 merges; the phase ran only --quick plus the runner self_test.
+- The terminal's panel-local collapse flag and the stage-region--terminal-collapsed class remain; phase-arch-17 moves them to a slot frame action (ADR-031 decision 9).
