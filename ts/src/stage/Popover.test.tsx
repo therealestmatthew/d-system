@@ -178,4 +178,63 @@ describe('Popover placement in the DOM', () => {
     })
     expect(offsetHeight.mock.calls.length).toBeGreaterThan(readsBefore)
   })
+
+  it('keeps the viewport margin below a bubble that is limited by the room, not by the cap', async () => {
+    mockGeometry(300, 330, 2000)
+    const bubble = await open()
+    const top = parseFloat(bubble.style.top)
+    expect(top).toBe(338)
+    expect(top + parseFloat(bubble.style.maxHeight)).toBe(VH - 8)
+  })
+
+  it('keeps the side chosen at open when the content later shrinks to fit the other side', async () => {
+    const offsetHeight = mockGeometry(300, 330, 2000)
+    const bubble = await open()
+    expect(bubble.style.top).toBe('338px')
+    offsetHeight.mockReturnValue(100)
+    const body = bubble.querySelector('.stage-popover__body') as HTMLElement
+    await act(async () => {
+      body.appendChild(document.createElement('p'))
+      await Promise.resolve()
+    })
+    expect(bubble.style.top).toBe('338px')
+    expect(bubble.style.bottom).toBe('')
+    expect(parseFloat(bubble.style.maxHeight)).toBeLessThanOrEqual(VH - 8 - 338)
+  })
+
+  it('remeasures when only a text node changes', async () => {
+    const offsetHeight = mockGeometry(157, 187, 2000)
+    const bubble = await open()
+    const body = bubble.querySelector('.stage-popover__body') as HTMLElement
+    const text = body.querySelector('p')!.firstChild as Text
+    const readsBefore = offsetHeight.mock.calls.length
+    await act(async () => {
+      text.data = 'a much longer line of entries'
+      await Promise.resolve()
+    })
+    expect(offsetHeight.mock.calls.length).toBeGreaterThan(readsBefore)
+  })
+
+  it('restores the body scroll position that lifting maxHeight clamps, after a resize', async () => {
+    const offsetHeight = mockGeometry(157, 187, 2000)
+    const bubble = await open()
+    const body = bubble.querySelector('.stage-popover__body') as HTMLElement
+    // jsdom does not clamp scrollTop; a browser does while the bubble has no maxHeight.
+    let scrollTop = 500
+    Object.defineProperty(body, 'scrollTop', {
+      configurable: true,
+      get: () => scrollTop,
+      set: (value: number) => {
+        scrollTop = value
+      },
+    })
+    offsetHeight.mockImplementation(function (this: HTMLElement) {
+      if (this.style.maxHeight === 'none') scrollTop = 0
+      return 2000
+    })
+    await act(async () => {
+      window.dispatchEvent(new Event('resize'))
+    })
+    expect(scrollTop).toBe(500)
+  })
 })

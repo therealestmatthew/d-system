@@ -29,6 +29,9 @@ export interface PlacementInput {
   // The bubble's height with no limit applied (header plus the body's full scroll height), or
   // undefined/0 when it could not be measured.
   naturalHeight?: number
+  // When set, the side is kept and only the height is worked out. Used while the bubble stays open
+  // and its content changes, so typing a filter does not move the bubble across the trigger.
+  keepSide?: 'above' | 'below'
 }
 
 export interface Placement {
@@ -53,12 +56,15 @@ export function choosePlacement({
   spaceBelow,
   viewportHeight,
   naturalHeight,
+  keepSide,
 }: PlacementInput): Placement {
   const above = Math.max(0, spaceAbove)
   const below = Math.max(0, spaceBelow)
   const cap = viewportHeight * MAX_BUBBLE_VIEWPORT_FRACTION
   let openUpward: boolean
-  if (naturalHeight !== undefined && naturalHeight > 0) {
+  if (keepSide) {
+    openUpward = keepSide === 'above'
+  } else if (naturalHeight !== undefined && naturalHeight > 0) {
     const fitsAbove = naturalHeight <= Math.min(above, cap)
     const fitsBelow = naturalHeight <= Math.min(below, cap)
     openUpward = fitsAbove || (!fitsBelow && above >= below)
@@ -144,7 +150,13 @@ export default function Popover({
   // The content height measured at the last open, resize or content change; a scroll reuses it.
   const naturalRef = useRef<number | undefined>(undefined)
 
-  const reposition = useCallback((remeasure: boolean) => {
+  // The side chosen at open or resize, kept while the content changes.
+  const sideRef = useRef<'above' | 'below' | undefined>(undefined)
+
+  // 'open' (open and resize): measure the content and choose the side. 'content' (the body's
+  // content changed): measure again but keep the side. 'move' (the trigger moved on a page scroll):
+  // reuse the last measurement and choose the side again.
+  const reposition = useCallback((mode: 'open' | 'content' | 'move') => {
     const trigger = triggerRef.current
     if (!trigger) return
     const rect = trigger.getBoundingClientRect()
@@ -158,13 +170,17 @@ export default function Popover({
     }
     left = Math.max(VIEWPORT_MARGIN, left)
 
-    if (remeasure) naturalRef.current = measureNaturalHeight(bubbleRef.current, clampedWidth)
+    if (mode !== 'move') naturalRef.current = measureNaturalHeight(bubbleRef.current, clampedWidth)
     const { openUpward, maxHeight } = choosePlacement({
-      spaceAbove: rect.top - VIEWPORT_MARGIN,
-      spaceBelow: viewportHeight - rect.bottom - VIEWPORT_MARGIN,
+      // The bubble sits VIEWPORT_MARGIN from the trigger and keeps VIEWPORT_MARGIN from the
+      // viewport edge, so each side loses the margin twice.
+      spaceAbove: rect.top - 2 * VIEWPORT_MARGIN,
+      spaceBelow: viewportHeight - rect.bottom - 2 * VIEWPORT_MARGIN,
       viewportHeight,
       naturalHeight: naturalRef.current,
+      keepSide: mode === 'content' ? sideRef.current : undefined,
     })
+    sideRef.current = openUpward ? 'above' : 'below'
 
     const next: CSSProperties = {
       left,
@@ -200,22 +216,23 @@ export default function Popover({
   useLayoutEffect(() => {
     if (!open) return
     naturalRef.current = undefined
-    reposition(true)
-    const onResize = () => reposition(true)
+    sideRef.current = undefined
+    reposition('open')
+    const onResize = () => reposition('open')
     // Capture phase, so it also sees scrolls of the page's inner scrollers that move the trigger.
     // A scroll inside the bubble (the body's own list) moves nothing and must not touch layout:
     // remeasuring there reset the body's scrollTop to 0.
     const onScroll = (event: Event) => {
       if (bubbleRef.current?.contains(event.target as Node)) return
-      reposition(false)
+      reposition('move')
     }
     window.addEventListener('resize', onResize)
     window.addEventListener('scroll', onScroll, true)
     // The content can change after open (a list that finishes loading, a filter typed): size the
     // bubble for what it holds now, not for what it held when it opened.
     const body = bubbleRef.current?.querySelector('.stage-popover__body')
-    const observer = body ? new MutationObserver(() => reposition(true)) : null
-    if (body) observer?.observe(body, { childList: true, subtree: true })
+    const observer = body ? new MutationObserver(() => reposition('content')) : null
+    if (body) observer?.observe(body, { childList: true, subtree: true, characterData: true })
     return () => {
       window.removeEventListener('resize', onResize)
       window.removeEventListener('scroll', onScroll, true)
