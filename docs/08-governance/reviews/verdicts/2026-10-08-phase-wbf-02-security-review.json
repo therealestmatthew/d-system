@@ -1,0 +1,41 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-02-security-review",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-02",
+  "reviewed_commit": "3bdb606dee91e626282403768aee7eb0304fdbf1",
+  "reviewer": {
+    "type": "security-review",
+    "definition_sha256": "99458416a8b582443baea7fa4341741cf80f8a56cd486e0d03ff3ad51c8ad689"
+  },
+  "model": "sonnet",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Out-of-range mtime raises ValueError/OverflowError outside the try in _modified_at, making list/search return 500",
+      "evidence": "src/api/routes/workbench.py:275-280 (datetime.fromtimestamp at line 279 is outside the try/except OSError); datetime.fromtimestamp(2**40, tz=UTC) raises ValueError, 1e300 raises OverflowError; tmpfs accepts os.utime 2**40",
+      "consequence": "One file with an mtime outside years 1-9999 breaks GET /workbench/list for its directory and GET /workbench/search for every ancestor, including the repo root. Availability regression needing write access to the tree; no disclosure",
+      "minimal_fix": "Move the fromtimestamp/isoformat lines inside the try and catch (OSError, OverflowError, ValueError), returning None; add a test patching Path.stat to return st_mtime=2**40"
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "modified_at follows symlinks and reports the mtime of a target outside the repository (extends pre-existing symlink following)",
+      "evidence": "src/api/routes/workbench.py:276 uses path.stat(); probe: docs/zz-link.html -> /etc/hostname listed with modified_at of the external file; is_dir/is_file at :287 and :470 already followed symlinks (pre-existing)",
+      "consequence": "One more attribute of an out-of-repo file visible on a loopback, flag-gated route; requires a non-ignored symlink already placed in the repo",
+      "minimal_fix": "Use path.lstat() for modified_at, or return None when the entry is a symlink whose resolved target is outside REPO_ROOT"
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Viewer issues a full one-directory listing (git check-ignore over all siblings) on every select, tab switch and Refresh (subprocess-per-listing cost is pre-existing)",
+      "evidence": "ts/src/stage/HtmlViewerRegion.tsx:374-380 and :421-434; src/api/routes/workbench.py:445-449 and :245-249 apply q after the ignore check",
+      "consequence": "Repeated git subprocesses on a loopback single-user server for very large directories; bounded by user clicks",
+      "minimal_fix": "None required; optionally filter by q/ext before calling _git_ignored_paths in /list"
+    }
+  ],
+  "raw_reply_sha256": "224bd35fd33751848f453c4f1ba334b994e97292e2c41df064f2086dc8f5fb36",
+  "outcomes": []
+}

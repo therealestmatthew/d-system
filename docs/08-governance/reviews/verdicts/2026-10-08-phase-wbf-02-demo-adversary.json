@@ -1,0 +1,49 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-02-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-02",
+  "reviewed_commit": "3bdb606dee91e626282403768aee7eb0304fdbf1",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet",
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "File Browser 'open in tab N' on the already displayed file never refreshes the badge or page",
+      "evidence": "openInTab handler only calls updateTab and setActiveTabId; pageKey is unchanged for an unchanged file in the active tab, so no re-fetch. Live repro: badge stayed 'Modified 2026-04-01 00:00:00' after the file was touched to 2026-04-05 and viewerBridge.get().openInTab(1, sameFile) was called. Dropdown re-select, Refresh and tab round trip do advance it.",
+      "consequence": "REQ-012 R04 (re-selecting a changed file shows the newer time) holds on only one of two selection paths; the badge shows a stale time after 'open in tab' of a regenerated file.",
+      "minimal_fix": "In the openInTab bridge handler, when the target tab already shows that file, call setRefreshToken((v) => v + 1); add a vitest case for openInTab on the displayed file with a changed mock mtime."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Header still clips the Embedded toggle at layout-2 primary 1024x768; live fit check does not render the badge",
+      "evidence": "Live REQ-037 check still reports wrap (324px in 307px) and silent-clip findings; toggle spans x 606.5-682.6 while the section ends at 666.7, screenshot shows 'Embedde'. Inline flexWrap on the header cannot shrink the non-wrapping .stage-html-viewer__controls item. Header height grows 40->63, 54->63 and 54->77 in several cells. The fit check seeds selected_file null so the badge is never rendered.",
+      "consequence": "Toggle partly unreachable at a named layout/size; extra 23px header row in 4 of 8 cells; the live check cannot see the badge's effect.",
+      "minimal_fix": "Add flex-wrap to .stage-html-viewer__controls and move the inline styles to StagePage.css (needs a deliverables amendment), or record the clip as an acknowledged pre-existing finding; seed the fit check with a selected file."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "_modified_at raises ValueError/OverflowError on out-of-range mtimes, failing the whole listing",
+      "evidence": "Only OSError around stat() is caught; datetime.fromtimestamp is outside the try. Patching Path.stat to st_mtime=3e11 gives 'ValueError year 11476 is out of range'. Docstring promises None whenever the time cannot be reported.",
+      "consequence": "One file with a far-future or corrupt mtime (possible on NTFS/XFS/btrfs, Windows paths exist) makes /workbench/list and /workbench/search return HTTP 500 for the whole directory, breaking the File Browser and pickers that do not use the field.",
+      "minimal_fix": "Move fromtimestamp into the try and catch (OSError, OverflowError, ValueError); add a test with a huge st_mtime expecting None."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Pending state untested; local time shown without a timezone label",
+      "evidence": "No vitest case asserts 'Modified \u2026' while the list read is pending (only verified live with a delayed route). Visible text 'Modified 2026-03-01 05:00:00' has no zone label while the title is UTC. The mtime is read concurrently with the page HEAD check, not the iframe load.",
+      "consequence": "A regression that shows the previous file's time during a pending read would pass the tests; the visible time can be misread against the UTC title.",
+      "minimal_fix": "Add a vitest case with a deferred list response asserting 'Modified \u2026'; append a zone indicator to the visible text."
+    }
+  ],
+  "raw_reply_sha256": "6c3586aec0d6bcb5de84466fe2c5e4cace2ff5793f9d65752ab5c5c5ff2ed797",
+  "outcomes": []
+}

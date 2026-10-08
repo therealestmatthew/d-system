@@ -1,0 +1,57 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-02-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-02",
+  "reviewed_commit": "3bdb606dee91e626282403768aee7eb0304fdbf1",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Same-file re-select via panel bridge (openInTab/openFiles) does not re-read the mtime",
+      "evidence": "ts/src/stage/HtmlViewerRegion.tsx: only the dropdown onClick was changed to bump refreshToken on a same-file re-select. openInTab calls updateTab(tabId,{selectedFile:path}) and openFiles' apply step assigns selectedFile; neither changes pageKey (tabId|file|refreshToken) when the file is already displayed, so the mtime effect does not re-run. No test covers this path.",
+      "consequence": "If the overview page is regenerated and then opened again through the File Browser context menu into the tab already showing it, the badge keeps the old time, which is the R04 scenario via a different entry point.",
+      "minimal_fix": "Bump refreshToken in openInTab and in openFiles' apply step when the target tab's selectedFile already equals the path; add a test."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Inline style changes to the shared stage-region__header and the badge are unverified visually",
+      "evidence": "HtmlViewerRegion.tsx header gets style={{flexWrap:'wrap'}}; the badge span has inline fontSize, whiteSpace and color. jsdom tests do not check layout.",
+      "consequence": "Possible header wrapping or visual regression in the viewer that no check would catch.",
+      "minimal_fix": "Move the styles into a CSS rule scoped to the viewer and check once in a browser."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "note: 'Modified time unavailable' conflates null mtime, absent list entry and request failure",
+      "evidence": "fetchModifiedAt returns null when no entry matches or modified_at is null, and the catch sets modifiedAt null; the test only covers the null-field case.",
+      "consequence": "Cosmetic only. The badge never shows a wrong time.",
+      "minimal_fix": "None required."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "note: mtime_probe fixture creates a temp directory under the real docs/ tree",
+      "evidence": "test/test_workbench_api.py mtime_probe uses tempfile.mkdtemp(dir=REPO_ROOT/'docs') with cleanup in finally.",
+      "consequence": "A killed test run leaves a docs/mtime-probe-* directory that governance or git status could pick up.",
+      "minimal_fix": "None required; optionally use a gitignored directory the route will still list."
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "note: gate pytest failures are the two known pre-existing tests",
+      "evidence": "07-gate.txt: 2 failed, 2072 passed. The failures are test_control_characters_reach_the_shell and test_an_unwritable_worktree_parent_is_refused.",
+      "consequence": "None for this diff; neither touches the changed files.",
+      "minimal_fix": "None."
+    }
+  ],
+  "raw_reply_sha256": "4a07dbf4c5079702be88bee6ae1a1946bf842170f331187a34e27eb42820de4d",
+  "outcomes": []
+}
