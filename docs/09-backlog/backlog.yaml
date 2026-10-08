@@ -18094,9 +18094,14 @@ items:
   scope:
   - 'Close ADR-030 open item 7 and the gap in ideas 000614 and 000669: src/api/routes/demo_terminal.py
     accepts any websocket connection, so any local process or any web page the owner has open can
-    start a shell. The owner ruled on 2026-10-08 (idea 000669): "the demo terminal websocket reuses
-    the ADR-030 bearer token (or an Origin check) on connect". This plan takes the Origin check
-    branch of that ruling. Link the two ideas through this entry''s ideas field; annotate nothing.'
+    start a shell. The owner''s ruling of 2026-10-08, as relayed in the Session Manager''s hand-off, was
+    "queue a phase in the features plan that reuses the ADR-030 token on the demo terminal
+    websocket on connect". The alternative, an Origin check, comes from ADR-030 open item 7 by way
+    of the record of idea 000669, not from the owner. The Session Manager ruled for the Origin
+    branch on 2026-10-08 on measured evidence: a route handing out the file token exposes it to
+    every local process, and a separate token protects no better than an Origin check while
+    costing a route, a frontend change and a rewrite of the direct tests. Link the two ideas
+    through this entry''s ideas field; annotate nothing.'
   - 'Security requirement: the route refuses before it spawns a shell and before it reserves a
     cap slot. The check is the first thing terminal_websocket does, ahead of the session-limit
     check, the shell-selection check and create_adapter(), so a refused connection can neither
@@ -18106,9 +18111,12 @@ items:
     browser always sends Origin on a websocket, and a page cannot forge it. The check accepts a
     request whose Origin header is absent (non-browser clients: the test suite, curl, the audit''s
     measure-terminal.js; measured on 2026-10-08, Node 22''s global WebSocket sends no Origin) and
-    one whose Origin has an http or https scheme and a host of localhost, 127.0.0.1 or [::1] on
-    any port. It refuses everything else, including the literal Origin "null" (a sandboxed frame
-    or a file page). Alternative named, and set aside: a bearer token fetched from a token route.
+    one whose Origin has an http or https scheme and a host of localhost, 127.0.0.1 or ::1 on
+    any port. Parse the header with urlsplit and compare the parsed hostname (urlsplit yields ::1
+    without brackets) against that set; never use a prefix or substring match. Scheme and host are
+    compared case-insensitively. It refuses everything else, including the literal Origin "null"
+    (a sandboxed frame or a file page) and an empty-string Origin (present but empty is not
+    absent). Alternative named, and set aside: a bearer token fetched from a token route.
     Measured with the repo''s Vite proxy in front of src/main.py''s CORS policy, such a route is
     readable by any localhost-origin page (Vite''s default CORS answers any localhost origin), and
     readable by a DNS-rebound page because src/main.py checks no Host, so the token would add less
@@ -18125,7 +18133,8 @@ items:
     (a different dev server on localhost:3000); design point 2 narrows that.'
   - 'Design point 2, an optional pin. Plan''s answer: honour an environment variable,
     D_SYSTEM_WORKBENCH_ORIGIN, read at connect time. When set to an exact origin such as
-    http://localhost:5180, a request that carries an Origin must match it exactly; an absent
+    http://localhost:5180, a request that carries an Origin must match it exactly (scheme, host
+    and port, case-insensitively); an absent
     Origin is still accepted, and unset keeps the loopback-any-port default. The launch commands
     do not change. Alternative named: leave the variable out, which keeps one rule and one fewer
     thing to document, at the cost of the other-loopback-port exposure above.'
@@ -18136,13 +18145,19 @@ items:
     the check needs no change to any direct client.'
   - 'Design point 4, the refusal. Plan''s answer: accept, then close with a new code,
     WEBSOCKET_ORIGIN_CLOSE_CODE = 4004 (4001 to 4003 are taken), and a fixed reason that quotes
-    no header value. A close before accept() becomes an HTTP 403 that the browser reports as code
+    no header value but names the remedy: "Open the workbench at http://localhost:<port> or set
+    D_SYSTEM_WORKBENCH_ORIGIN to this page''s origin". A close before accept() becomes an HTTP 403 that the browser reports as code
     1006 with an empty reason (REQ-012 R21), so the panel could not say why. Alternative named:
     close before accept(), which is simpler and loses the reason. demo_terminal.py has three
     accept() sites (the shell refusal, the cap refusal, the session start); a connection must
     accept exactly once, so the Origin refusal accepts and closes and returns, and every other
     path keeps its own single accept(). A pytest covers the success, cap-refusal, shell-refusal
-    and Origin-refusal paths.'
+    and Origin-refusal paths. Required parser cases, each a pytest: refuse
+    http://localhost.evil.example, http://127.0.0.1.evil.example, http://localhost@evil.example,
+    http://evil.example:80, "null" and an empty-string Origin; accept http://localhost:5180,
+    http://127.0.0.1:5180, http://[::1]:5180 and an upper-case scheme or host. Required pin
+    cases with D_SYSTEM_WORKBENCH_ORIGIN=http://localhost:5180: another loopback origin gets
+    4004, the exact origin connects, and an absent Origin connects.'
   - 'Design point 5, the panel. TerminalRegion.tsx opens its socket after an availability check,
     and its close handler quotes a reason only for code 4001, and for 4003 once phase-wbf-17 has
     merged. A 4004 close arrives after the socket has opened, so without a change the panel would
@@ -18154,8 +18169,10 @@ items:
     refuses with a close reason; this check adds one more refusal of the same shape ahead of the
     registry and changes neither the cap, the registry nor "one PTY per websocket". ADR-014 gets
     one pointer line. ADR-030 gets an amendment paragraph, not a new ADR: open item 7 closed;
-    fact 4 and the "Limits" bullet in section 3 corrected; the Consequences lines that say the
-    websocket has no authentication updated; and the revisit trigger answered ("both should use
+    fact 4 and the "Limits" bullet in section 3 corrected; the Alternatives paragraph under
+    "Authentication" that rejects an Origin or Host allowlist as redundant (it is redundant for
+    the HTTP API, whose token also stops the browser case, and not for the websocket) amended; the
+    Consequences lines that say the websocket has no authentication updated; and the revisit trigger answered ("both should use
     one mechanism" is not met by design: the API keeps its token and the websocket uses an
     Origin check, for the reasons in design point 1). If the design cannot be stated in one
     paragraph, stop and report; do not write a new ADR.'
@@ -18174,6 +18191,8 @@ items:
     connection with no Origin or a loopback Origin behaves as before.
   - The panel shows the 4004 reason, and the same connection is refused with 4004 rather than the
     cap refusal when the cap is full.
+  - Every parser and pin case listed in the scope passes, and the 4004 reason names
+    D_SYSTEM_WORKBENCH_ORIGIN as the remedy.
   - ADR-030 carries the amendment paragraph and ADR-014 decision 4 carries the pointer line.
   verification:
   - uv run pytest test/test_demo_terminal.py test/test_demo_terminal_api.py
@@ -18189,9 +18208,9 @@ items:
   - ts/src/stage/TerminalRegion.test.tsx
   - docs/04-decisions/ADR-030-terminal-interaction-api.md
   - docs/04-decisions/ADR-014-workbench-terminal-capability.md
-  next_action: 'Do not claim this phase until the owner has ratified PLAN-027 Assumption 1 (awaiting
-    ratification): the owner''s words in idea 000669 are "reuses the ADR-030 bearer token (or an
-    Origin check)", and this plan builds the Origin check branch. Then read terminal_websocket and
+  next_action: 'Claim only after GOV-003 records the owner''s ratification of PLAN-027 Assumption 1;
+    if the owner rules for the token, re-plan the design points before claiming. This plan builds
+    the Origin check branch, which the owner has not yet ratified. Then read terminal_websocket and
     _run_session in src/api/routes/demo_terminal.py and write the failing test first - a connection
     with Origin http://evil.example must close with 4004 and leave SESSIONS, RESERVED and the
     adapter factory untouched. Run after phase-wbf-12 and phase-wbf-17, which change the same
@@ -18214,7 +18233,8 @@ items:
   scope:
   - 'Change the toggle label "Open-in-tab link (rung 3)" to "Open-in-tab link (rung 7)" in
     ts/src/stage/HtmlViewerRegion.tsx (line 575) and ts/src/stage/OverviewRegion.tsx (line 93),
-    and the rung-3 sentences in their comments and in OverviewRegion.tsx line 85. Keep the
+    and the rung sentences in their comments and in the tooltip at OverviewRegion.tsx line 85,
+    rephrasing the comments to "the third rung of PLAN-021''s ladder, the runbook''s rung 7". Keep the
     toggle visible; do not hide it behind the demo flag (idea 000670, owner ruling 2026-10-08,
     follow-up to phase-wbf-18).'
   - 'Authority, checked before writing this entry: the label''s "rung 3" comes from PLAN-021''s
@@ -18228,8 +18248,8 @@ items:
     OverviewRegion carries the same control and the owner named both files, so both are renumbered.'
   - 'Update every live place that quotes the label: the REQ-012 R31 row (the "Open-in-tab link
     (rung 3)" text), the runbook''s toggle entry at line 256 (which records the mismatch; rewrite
-    it to say the label now matches the runbook''s ladder and keep the note that PLAN-021
-    numbered the same fallback 3), and docs/00-working/owner-machine-checklist.md section 5,
+    it to say the label now matches the runbook''s ladder and keep a note that PLAN-021
+    numbered the same fallback third, without repeating the full label string), and docs/00-working/owner-machine-checklist.md section 5,
     lines 132 to 137 (the sentence that the label "may read differently" and the V1 row''s "(or
     the renumbered rung)"). Records of the past (session records, GOV-003, PROMPT-018, the
     generated docs/00-working/ideas.md and _data/ideas.jsonl) keep "rung 3". Leave StagePage.css untouched: its "rung-2/rung-3 style"
@@ -18241,7 +18261,9 @@ items:
   acceptance:
   - REQ-012 R33 holds - both toggles read "Open-in-tab link (rung 7)" in the open-in-tab state
     and "Embedded" otherwise, and the runbook entry, the checklist section 5 and the REQ-012 R31
-    and R33 text quote the rung 7 label. Nothing under ts/src reads "rung 3".
+    and R33 text quote the rung 7 label. No label string or UI text under ts/src reads "rung 3"
+    (the tooltip at OverviewRegion.tsx line 85 included); comments that cite PLAN-021''s own
+    numbering as history may name its rung 3.
   - REQ-012 R31 still holds with the renumbered label in the runbook entry and the row text.
   verification:
   - cd ts && npm test

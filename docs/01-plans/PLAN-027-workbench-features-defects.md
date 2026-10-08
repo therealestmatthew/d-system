@@ -411,7 +411,7 @@ an idea; this amendment turns them into queued phases so the run can build them.
 
 | Group | Ideas | What it covers | Phase |
 |---|---|---|---|
-| `G71` Websocket origin | `000669`, `000614` | The demo terminal websocket accepts any connection, so any local process or open web page can start a shell. The owner ruled, in the words of idea `000669`, that it "reuses the ADR-030 bearer token (or an Origin check) on connect". The plan builds the `Origin` check branch, which is **awaiting ratification** (Assumption 1). The check refuses before a shell starts and before a cap slot is reserved. Closes `ADR-030` open item 7 | `phase-wbf-19` |
+| `G71` Websocket origin | `000669`, `000614` | The demo terminal websocket accepts any connection, so any local process or open web page can start a shell. The owner asked, as relayed in the Session Manager's hand-off, for a phase that "reuses the ADR-030 token on the demo terminal websocket on connect"; the Origin check alternative comes from `ADR-030` open item 7, not from the owner. The Session Manager ruled for the Origin branch on the measured evidence in Assumption 1. The check refuses before a shell starts and before a cap slot is reserved. Closes `ADR-030` open item 7. **Claim only after `GOV-003` records the owner's ratification of Assumption 1** | `phase-wbf-19` |
 | `G72` Rung label | `000670` | The HTML Viewer and overview toggles read "Open-in-tab link (rung 3)"; the runbook's ladder lists that fallback as rung 7. The label becomes rung 7 and the toggle stays visible | `phase-wbf-20` |
 | `G73` Session persistence decision | `000671`, `000651`, `000652`, `000107`, `000087` | Panel and layout switches end terminal sessions (audit findings F1 and F2). The owner ruled they should be preserved, not warned about. A decision record comes first; nothing is built | `phase-wbf-21` |
 
@@ -452,12 +452,16 @@ The checks that shaped the phases, each made against the code on this branch:
 These are choices the plan made without the owner. Each can be ratified or changed before the
 phase is claimed.
 
-1. **The `Origin` check, not a token.** The ruling says the websocket reuses the `ADR-030` token
-   (or an `Origin` check). The plan takes the `Origin` branch. It does not reuse the `ADR-030`
-   file token: a route that handed that token to the browser would give it to every process that
-   can reach the port, and the file's permissions are what protect it from other users. **Awaiting
-   the owner's ratification;** `phase-wbf-19` says so in its `next_action` and should not be
-   claimed before.
+1. **The `Origin` check, not a token.** The owner asked for token reuse; the `Origin` check is the
+   alternative named in `ADR-030` open item 7, reached through the record of idea `000669`. The
+   Session Manager ruled for the `Origin` branch on 2026-10-08 on measured evidence: a route
+   handing out the `ADR-030` file token exposes it to every local process (the file's permissions
+   are what protect it from other users), and a separate token protects no better than an
+   `Origin` check while costing a route, a frontend change and a rewrite of the direct tests.
+   **Ratified when the owner says so and the Session Manager records it as a `GOV-003` row naming
+   the chosen branch.** `GOV-003`'s existing line records the owner's ruling as given and is not
+   edited. `phase-wbf-19`'s `next_action` makes that row the claim precondition; if the owner
+   rules for the token, the design points are re-planned before the phase is claimed.
 2. **What the `Origin` check stops and does not.** It stops a web page on a non-loopback origin
    and a DNS-rebound page, whose `Origin` is the attacker's host name even after the name
    resolves to `127.0.0.1`. It does not stop a local process, which can send no `Origin` or any
