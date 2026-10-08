@@ -253,6 +253,7 @@ CI regenerates it and fails on any difference.
 | REQ-034 | requirement | draft | repository-owner | docs/06-requirements/REQ-034-session-autonomy-configuration.md |
 | REQ-035 | requirement | draft | repository-owner | docs/06-requirements/REQ-035-plugin-audit-remediation.md |
 | REQ-036 | requirement | draft | repository-owner | docs/06-requirements/REQ-036-engine-pages-house-style.md |
+| REQ-037 | requirement | draft | repository-owner | docs/06-requirements/REQ-037-workbench-content-fit-contracts.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -567,4 +568,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-464 documents — adr: 27, architecture: 12, governance: 19, operation: 29, plan: 81, prompt: 43, requirement: 35, session: 218.
+465 documents — adr: 27, architecture: 12, governance: 19, operation: 29, plan: 81, prompt: 43, requirement: 36, session: 218.
