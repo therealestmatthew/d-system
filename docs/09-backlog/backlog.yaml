@@ -8678,7 +8678,7 @@ items:
   owner: repository-owner
   agent: agent-batch-runner
   session: doc-session-workbench-content-fit-contracts
-  status: active
+  status: complete
   priority: 2
   session_budget: 1
   depends_on:
