@@ -90,3 +90,19 @@ policy, partial-target behavior, and no rename tracking or auto-prune.
   deliverable. Not edited here; the entry needs widening before it is claimed.
 - A category of more than four viewer-compatible files cannot fully open in the HTML Viewer while
   its tab cap is four.
+
+## Review
+
+The gating review passed with one major and five minor findings; the verdict record is
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-03-demo-adversary.json`. Each finding is
+fixed in `ADR-029`:
+
+- F01 (major): `openFiles` is an optional handle member in `phase-wbf-04`, implemented with its
+  test in `phase-wbf-05`; `wbf-04`'s deliverables must also name its bridge-level test file.
+- F02: unregister by handle identity across keys, cached `getAll()` array, `get()` falls back to the
+  previous remaining handle.
+- F03: "bridge channel (`BridgeSlot`)" replaces "slot" in the bridge sense; the target field is
+  `channel`.
+- F04: empty slugs fall back to `category`; Windows reserved device names get `-category`.
+- F05: the cross-OS claim is limited to absolute-path breakage; case mismatches read `missing`.
+- F06: new open item 7 gives the ratification pointers; the data root is the write boundary.

@@ -69,7 +69,9 @@ Facts from the repository that bind the decision:
 
 Vocabulary follows `brain/concepts/terms-workbench-ui.md`: a slot is the container and a panel is
 its content. This record names no slot by identifier. The panels involved are the HTML Viewer, the
-File Browser and the terminal panels.
+File Browser and the terminal panels. `BridgeSlot` is a code name only: it is the panel bridge's
+per-panel-type handle registry, called a **bridge channel** in this record, and is not a slot in the
+container sense.
 
 ## Decision
 
@@ -109,6 +111,11 @@ delivered in. Entries are files only; a directory is rejected on write.
 - `category_id` is a lowercase slug (`^[a-z0-9]+(-[a-z0-9]+)*$`, at most 64 characters) generated
   from the name when the category is created, with `-2`, `-3` appended on collision. **It never
   changes.** It is also the file name stem, so a record cannot name a different file than its id.
+  Two cases need a fixed rule. A name with no ASCII letters or digits (for example `!!!` or
+  non-Latin text) yields an empty slug, so the id falls back to `category`, with the same numeric
+  suffix on collision (`category`, `category-2`). A slug that equals a Windows reserved device name
+  (`con`, `prn`, `aux`, `nul`, `com1` to `com9`, `lpt1` to `lpt9`) gets `-category` appended
+  (`con-category`), because Windows cannot create `con.json`. The display `name` is unaffected.
 - `name` is free text for display, 1 to 80 characters, unique case-insensitively within the data
   root. **Rename changes `name` only.** This is why references use the id: `R09` requires rename,
   and a reference by name would break on the first one.
@@ -129,8 +136,11 @@ delivered in. Entries are files only; a directory is rejected on write.
 ### 3. Path validity as the repository moves
 
 1. **Stored paths are repository-relative with forward slashes, never absolute.** Moving or
-   re-cloning the repository, or opening it on Windows after Linux, leaves every entry valid
-   because each is resolved against the current repository root at read time.
+   re-cloning the repository, or opening it on Windows after Linux, cannot break an entry through
+   an absolute-path change, because each is resolved against the current repository root at read
+   time. This claim is limited to that. Case is preserved as stored, so an entry whose case differs
+   from the file on disk can resolve on Windows and read `missing` on Linux; that is reported as
+   `missing` by design and the owner re-adds the entry with the correct case.
 2. **Every path is validated on write** with the same rule the rest of the API uses
    (`ADR-015` rules 2 and 3): reject absolute paths, `..` escapes, symlinks leaving the root,
    `_private/` and gitignored entries, and directories. Paths are stored as the file tree produces
@@ -157,6 +167,9 @@ Constraints, each inherited from `ADR-015` rather than new: mounted only when
 `D_SYSTEM_DEMO_TERMINAL=1` and under the loopback-only binding; ids validated against the slug
 pattern before any file name is formed, so a request cannot steer a write outside
 `<data root>/workbench/bookmarks/`; paths validated per section 3; no shell or OS command involved.
+The data root itself is the write boundary for the records: `data_root()` may return an absolute
+path outside the repository, and the repository-root check applies to the bookmarked file paths,
+not to the location of the records.
 Writes use a temporary file and an atomic replace. Each add or remove is a read-modify-write under
 a process lock, so two browser tabs adding different files to one category do not lose either one.
 `ADR-015` rule 4 is read as "GET only, plus the routes in this section", and rule 5's allowlist of
@@ -182,26 +195,34 @@ files only through `panelBridge.ts` (section 6).
 batch, multi-target contract in `panelBridge.ts`. Calling `openInTab` once per file from category
 code is not that contract, and a second file-passing path outside `panelBridge.ts` is a defect.**
 
-The contract, which `phase-wbf-04` implements (names are indicative; the properties are binding):
+The contract, which `phase-wbf-04` implements for the bridge and `phase-wbf-05` for the viewer's
+member (names are indicative; the properties are binding):
 
-1. **A slot can hold several live handles, keyed by panel-instance key.** `register(handle, key)`
-   replaces the handle with the same key and leaves others. While panels are singletons the key
-   defaults to the panel type id, so today's behavior is unchanged; `phase-arch-08` supplies real
-   instance ids. `unregister` keeps its identity guard. `get()` still returns the most recently
-   registered handle or `null`, so the context menu's single-file actions are untouched. A new
-   `getAll()` and a hook over it return `null` when nothing is registered.
+1. **A bridge channel (`BridgeSlot`) can hold several live handles, keyed by panel-instance key.**
+   `register(handle, key)` replaces the handle with the same key and leaves others. While panels
+   are singletons the key defaults to the panel type id, so today's behavior is unchanged and
+   existing callers that pass no key keep working; `phase-arch-08` supplies real instance ids.
+   `unregister(handle)` finds the entry by handle identity across all keys and removes it only if
+   that exact handle is still registered, which keeps the identity guard against a superseded
+   handle's belated cleanup. `get()` returns the most recently registered remaining handle, or
+   `null`; when that handle unregisters it falls back to the previous remaining one, so the
+   context menu's single-file actions are untouched. `getAll()` returns an array cached by the
+   channel and replaced only on register or unregister, because `useSyncExternalStore` needs a
+   referentially stable snapshot; a hook over it returns `null` when the array is empty.
 2. **A target handle exposes a batch method that takes the whole ordered list and returns a
-   receipt synchronously.** The viewer adds `openFiles(paths)`; the terminal adds `injectPaths(paths)`
-   only when its quoting is decided. A receipt is
+   receipt synchronously.** The viewer adds `openFiles(paths)`, an optional member of `ViewerBridgeHandle` in
+   `phase-wbf-04` (so the existing handle literal in `HtmlViewerRegion.tsx` still type-checks) that
+   `phase-wbf-05` implements; the terminal adds `injectPaths(paths)` only when its quoting is
+   decided. A receipt is
    `{ delivered: string[], declined: { path: string, reason: 'incompatible' | 'capacity' | 'failed' }[] }`.
    **Every requested path appears in exactly one list.** This is the testable form of `R07`: N in,
    N accounted for.
 3. **One entry point delivers a batch.** `deliverBatch(paths, targets)` takes an explicit list of
-   targets, each `{ slot, call, key? }`; an omitted key means the slot's current handle. Each listed
+   targets, each `{ channel, call, key? }`; an omitted key means the channel's current handle. Each listed
    target receives the full ordered list. The caller chooses fan-out; the bridge never fans out on
    its own, because delivering a set to every instance of a panel type would open each file twice.
 4. **The outcome is a value, never an exception:**
-   `{ requested, targets: [{ slot, key, absent: boolean, receipt?, error? }] }`. A target with no
+   `{ requested, targets: [{ channel, key, absent: boolean, receipt?, error? }] }`. A target with no
    registered handle has `absent: true`. A target whose method throws is caught, recorded in
    `error`, and all its paths are reported as declined with reason `failed`; it does not stop the
    other targets.
@@ -223,7 +244,7 @@ The contract, which `phase-wbf-04` implements (names are indicative; the propert
    first delivered file becomes the active tab. The surface reports "opened X of Y" from the receipt.
 
 Sequence for opening a category in the HTML Viewer: `GET /bookmarks/{id}`, split entries by
-`status`, `deliverBatch(presentPaths, [{ slot: viewer, call: openFiles }])`, then show the declined
+`status`, `deliverBatch(presentPaths, [{ channel: viewerBridge, call: openFiles }])`, then show the declined
 and non-present paths by name.
 
 ## Alternatives considered
@@ -295,6 +316,12 @@ it opens each file once per instance.
   batch receipt and `deliverBatch`, with existing single-handle callers unchanged. Its checks are
   the `R07` invariant (delivered plus declined equals requested), the `R08` absent and partial
   cases, and a grep of `ts/src/stage/` for any file-passing path outside `panelBridge.ts`.
+  `phase-wbf-04` does not touch `HtmlViewerRegion.tsx`: it makes `openFiles` an optional handle
+  member and tests the contract in a bridge-level test file using stub handles. That test file is
+  not in the entry's current deliverables (`ts/src/stage/panelBridge.ts` only), so the entry's
+  deliverables must also name its test file.
+- `phase-wbf-05` implements the viewer's `openFiles` (the placement policy in section 6 point 8) in
+  `HtmlViewerRegion.tsx` with its own test, so the `R10` check runs against a real target.
 - `phase-wbf-05` builds the six routes, the schema and its test, the example category, and the
   File Browser and HTML Viewer consumers. Its entry lists `ts/src/stage/` as its only deliverable
   but declares `sys-api` and verifies with `uv run pytest`; the routes, schema and tests are
@@ -325,6 +352,11 @@ These are the points the owner is asked to ratify or change.
 5. **Partial targets.** Best-effort per target, as in section 6.
 6. **No rename tracking and no auto-prune.** A moved file shows as missing until the owner
    re-adds it.
+7. **Pointers on ratification.** This record extends `ADR-015` rule 4 (GET only) and reads
+   `ADR-009` section 2 more widely than before: the data root now also holds workbench records, not
+   only the entity directories listed in the `data_root()` docstring. On ratification, add a one-line
+   "extended by ADR-029" pointer to `ADR-015` rule 4 and update that docstring. The data root is the
+   write boundary for the records (section 4).
 
 ## Revisit trigger
 
