@@ -8562,6 +8562,30 @@ items:
   - ts/src/stage/
   next_action: Grep for every occurrence of each old identifier before changing one, so the
     rename is one atomic diff rather than a chase through tests.
+  session: doc-session-execute-workbench-identifier-migration
+  completion_evidence:
+  - _data/workbench/layouts/layout-1.json
+  - _data/workbench/layouts/layout-2.json
+  - ts/src/workbench/useWorkbenchLayouts.ts
+  - test/test_workbench_layout_schema.py
+  - docs/03-sessions/SESS-2026-10-08-02-execute-workbench-identifier-migration.md
+  result: >-
+    Executed the arch-01 rulings. Layout slot ids renamed terminal/main/notes-strip to
+    secondary/primary/strip (explorer unchanged) in both layouts, with eligible_slots, default
+    assignment, default visible panel and grid areas following, and schema_version bumped 2 to 3 so
+    the stored v2 browser state is never read again; no alias or migration code. Test fixtures
+    renamed in the same commit; CSS classes, REQ-007 wording and panel registry ids left alone as
+    ruled. Found one engine literal the ruling said did not exist (TERMINAL_SLOT_ID, now
+    SHELL_HOME_SLOT_ID = secondary) and renamed it, or the Windows PowerShell default would have
+    stopped applying silently. No slot id equals a panel id in either layout. R05 run in Chromium
+    against the Vite dev server on 5181 with the API on 8011 - pre-migration v2 state, a v3 key with old
+    slot ids and a malformed v3 key all render the layout-1 defaults with no page error or alert;
+    a valid v3 key is honoured. Verification - npm run build ok, npm test 7 passed, governance OK
+    (45 systems, 456 documents), ruff and mypy clean, layout schema test 21 passed. Full pytest
+    1649 passed, 5 failed - four read git history the shallow clone lacks (commit 0f142ce and the
+    phase-prog-04 claim history) and one expects an unwritable directory but the sandbox runs as
+    root; none touches this diff. Not exercised - a real pre-migration browser profile and
+    the Windows default (owner-machine).
 - id: phase-arch-03
   title: Duplication audit across the workbench and API
   plan: doc-workbench-architecture-quality
