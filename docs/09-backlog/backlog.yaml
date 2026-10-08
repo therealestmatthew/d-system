@@ -18073,7 +18073,7 @@ items:
     test/test_codes.py: 106 passed. uv run ruff check src/ test/ tools/: All checks passed. Click check
     of R31 in a running viewer not run (no browser per dispatch).'
 - id: phase-wbf-19
-  title: Require a token on the demo terminal websocket before it starts a shell
+  title: Refuse a demo terminal websocket from a non-loopback origin before it starts a shell
   plan: doc-workbench-features-defects
   sources:
   - doc-workbench-features-defects-requirements
@@ -18089,79 +18089,91 @@ items:
   status: queued
   priority: 2
   session_budget: 1
-  depends_on: []
+  depends_on:
+  - phase-wbf-17
   scope:
-  - 'Close ADR-030 open item 7 and the gap in ideas 000614 and 000669: src/api/routes/demo_terminal.py accepts
-    any websocket connection, so any local process or any web page the owner has open can start a
-    shell. The owner ruled on 2026-10-08 (idea 000669) that the websocket checks a token on
-    connect. Link the two ideas through this entry''s ideas field; annotate nothing.'
+  - 'Close ADR-030 open item 7 and the gap in ideas 000614 and 000669: src/api/routes/demo_terminal.py
+    accepts any websocket connection, so any local process or any web page the owner has open can
+    start a shell. The owner ruled on 2026-10-08 (idea 000669): "the demo terminal websocket reuses
+    the ADR-030 bearer token (or an Origin check) on connect". This plan takes the Origin check
+    branch of that ruling. Link the two ideas through this entry''s ideas field; annotate nothing.'
   - 'Security requirement: the route refuses before it spawns a shell and before it reserves a
-    cap slot. The check is the first thing terminal_websocket does after accept(), ahead of the
-    session-limit check, the shell-selection check and create_adapter(), so an unauthenticated
-    connection can neither start a shell nor use up or probe the six-session cap. A test asserts
-    that a refused connection creates no adapter and leaves SESSIONS and RESERVED unchanged.'
-  - 'Design point 1, how the browser obtains the token. Plan''s answer: a token route under the
-    first flag, GET /api/v1/demo/terminal/ws-token on the existing demo_terminal router, which the
-    page calls once on load (after its availability check, so REQ-012 R23 still holds) and before
-    it opens a socket. The route checks that the peer is loopback, answers with Cache-Control:
-    no-store, and relies on the CORS policy in src/main.py (one allowed origin) to keep a
-    cross-origin page from reading the response; it needs no Origin allowlist, which would have to
-    match whatever port the owner starts the dev server on (the audit used 5199). The token is a
-    distinct websocket token, secrets.token_urlsafe(32), generated when demo_terminal is imported
-    and held in memory only. It is NOT the ADR-030 file token: a route that hands the file token
-    to any loopback caller would remove the other-OS-user protection ADR-030 section 3 rests on.
-    "Reuse" is read as reusing the mechanism (a bearer token compared with hmac.compare_digest,
-    refused before any state changes), which is what ADR-030''s revisit trigger asks for ("both
-    should use one mechanism"). Alternative named: return the ADR-030 file token from the route,
-    which is literally one token but gives up that protection. A second alternative is an Origin
-    check alone, with no route and no change under ts/; it is rejected as the primary control
-    because the allowlist would have to accept any loopback origin. State in the amendment that
-    neither design stops a local process, which can call the route or set any Origin.'
-  - 'Design point 2, how the token travels. Plan''s answer: the Sec-WebSocket-Protocol header,
-    new WebSocket(url, [''d-system-terminal.<token>'']), because a browser cannot set an
-    Authorization header on a websocket and ADR-030 forbids the token in a query string (it would
-    reach server and proxy logs). The server accepts, echoing the offered subprotocol, so the
-    browser keeps the connection long enough to read the close code. Alternative named: a first
-    text frame carrying the token, with the shell started only after it arrives; it needs a
-    timeout and delays every session start by a round trip. Confirm through the Vite dev proxy
-    that the header is forwarded.'
+    cap slot. The check is the first thing terminal_websocket does, ahead of the session-limit
+    check, the shell-selection check and create_adapter(), so a refused connection can neither
+    start a shell nor use up or probe the six-session cap. A pytest asserts that a refused
+    connection creates no adapter and leaves SESSIONS and RESERVED unchanged.'
+  - 'Design point 1, the control. Plan''s answer: an Origin check on the websocket handshake. A
+    browser always sends Origin on a websocket, and a page cannot forge it. The check accepts a
+    request whose Origin header is absent (non-browser clients: the test suite, curl, the audit''s
+    measure-terminal.js; measured on 2026-10-08, Node 22''s global WebSocket sends no Origin) and
+    one whose Origin has an http or https scheme and a host of localhost, 127.0.0.1 or [::1] on
+    any port. It refuses everything else, including the literal Origin "null" (a sandboxed frame
+    or a file page). Alternative named, and set aside: a bearer token fetched from a token route.
+    Measured with the repo''s Vite proxy in front of src/main.py''s CORS policy, such a route is
+    readable by any localhost-origin page (Vite''s default CORS answers any localhost origin), and
+    readable by a DNS-rebound page because src/main.py checks no Host, so the token would add less
+    than it appears to. It would also need a change in the page, a subprotocol or first-frame
+    transport, and a rewrite of every direct websocket test. The ADR-030 file token is not
+    reused: a route that handed it out would give it to every process on the port and remove the
+    other-OS-user protection ADR-030 section 3 rests on (Assumption 1 in PLAN-027, awaiting
+    ratification).'
+  - 'What the check does and does not stop, to be stated plainly in the ADR-030 amendment. It
+    stops a web page on any non-loopback origin, and a DNS-rebound page: after rebinding the page
+    still runs on the attacker''s host name, so its Origin is the attacker host and is refused. It
+    does not stop a local process, which can send no Origin or any Origin; the file token could not
+    stop one either. It does not stop a page served from another loopback port the owner runs
+    (a different dev server on localhost:3000); design point 2 narrows that.'
+  - 'Design point 2, an optional pin. Plan''s answer: honour an environment variable,
+    D_SYSTEM_WORKBENCH_ORIGIN, read at connect time. When set to an exact origin such as
+    http://localhost:5180, a request that carries an Origin must match it exactly; an absent
+    Origin is still accepted, and unset keeps the loopback-any-port default. The launch commands
+    do not change. Alternative named: leave the variable out, which keeps one rule and one fewer
+    thing to document, at the cost of the other-loopback-port exposure above.'
   - 'Design point 3, when the check applies. Plan''s answer: always under D_SYSTEM_DEMO_TERMINAL=1,
     not only when D_SYSTEM_TERMINAL_API=1. The rehearsed launch sets only the first flag, so a
-    check that needed the second would leave the gap open on exactly the launch that matters.
-    The cost is that every direct websocket client (test/test_demo_terminal.py, scripts such as
-    the audit''s measure-terminal.js) must fetch the token first; the phase adds a test helper.
-    Alternative named: check only under the second flag, which keeps the first-flag launch
-    unchanged and closes nothing for the demo.'
+    check that needed the second would leave the gap open on the launch that matters. Alternative
+    named: check only with the second flag, which closes nothing for the demo. Unlike a token,
+    the check needs no change to any direct client.'
   - 'Design point 4, the refusal. Plan''s answer: accept, then close with a new code,
-    WEBSOCKET_AUTH_CLOSE_CODE = 4004 (4001 to 4003 are taken), and a fixed reason that does not
-    say whether the token was missing or wrong. A close before accept() becomes an HTTP 403 that
-    the browser reports as code 1006 with an empty reason (REQ-012 R21). The panel quotes the
-    reason for code 4004 through connectionRefusalMessage and, because the cause is a stale or
-    missing token, the message says to reload the page. Alternative named: close before accept(),
-    which is simpler and loses the reason.'
-  - 'Design point 5, the fit with ADR-014 decision 4. Decision 4 puts the cap in a registry and
+    WEBSOCKET_ORIGIN_CLOSE_CODE = 4004 (4001 to 4003 are taken), and a fixed reason that quotes
+    no header value. A close before accept() becomes an HTTP 403 that the browser reports as code
+    1006 with an empty reason (REQ-012 R21), so the panel could not say why. Alternative named:
+    close before accept(), which is simpler and loses the reason. demo_terminal.py has three
+    accept() sites (the shell refusal, the cap refusal, the session start); a connection must
+    accept exactly once, so the Origin refusal accepts and closes and returns, and every other
+    path keeps its own single accept(). A pytest covers the success, cap-refusal, shell-refusal
+    and Origin-refusal paths.'
+  - 'Design point 5, the panel. TerminalRegion.tsx opens its socket after an availability check,
+    and its close handler quotes a reason only for code 4001, and for 4003 once phase-wbf-17 has
+    merged. A 4004 close arrives after the socket has opened, so without a change the panel would
+    show the generic closed message. Add 4004 to the codes whose reason is quoted, and add a
+    ts/src/stage/TerminalRegion.test.tsx case with a stub socket that opens and closes with 4004.
+    That test file is created by phase-wbf-17, hence the depends_on edge. No token fetch, no
+    subprotocol and no other change under ts/.'
+  - 'Design point 6, the fit with ADR-014 decision 4. Decision 4 puts the cap in a registry and
     refuses with a close reason; this check adds one more refusal of the same shape ahead of the
-    registry and changes neither the cap, the registry nor "one PTY per websocket". ADR-014 needs
-    one pointer line (as ADR-030 open item 8 added for the API). ADR-030 gets an amendment
-    paragraph, not a new ADR: item 7 resolved, the "websocket gap" statements in section 3 and
-    the Consequences updated, and the revisit trigger noted as met. If the design cannot be stated
-    in one paragraph, stop and report; do not write a new ADR.'
-  - 'Change ts/src/stage/TerminalRegion.tsx to fetch the token once per page load (cache it in
-    module state), open the socket with it, and treat a 4004 close as a refusal that quotes its
-    reason. The token fetch adds an asynchronous step before new WebSocket, so the effect''s
-    disposed guards must cover it. Add ts/src/stage/TerminalRegion.test.tsx cases for the
-    subprotocol, the 4004 message and the flag-off path (no token request, no 404 entry). If
-    phase-wbf-17 has merged, the file exists; extend it. Otherwise create it.'
-  - 'Leave out the HTTP API''s token and its file (ADR-030 sections 3 and 4) unchanged, and
-    leave out per-connection single-use tickets (named in the ADR amendment as the next
-    strengthening if the owner wants replay protection). A launch change in the runbook is not
-    expected; if one is needed, report it rather than widen the deliverables.'
+    registry and changes neither the cap, the registry nor "one PTY per websocket". ADR-014 gets
+    one pointer line. ADR-030 gets an amendment paragraph, not a new ADR: open item 7 closed;
+    fact 4 and the "Limits" bullet in section 3 corrected; the Consequences lines that say the
+    websocket has no authentication updated; and the revisit trigger answered ("both should use
+    one mechanism" is not met by design: the API keeps its token and the websocket uses an
+    Origin check, for the reasons in design point 1). If the design cannot be stated in one
+    paragraph, stop and report; do not write a new ADR.'
+  - 'Four things the Origin design makes unnecessary, recorded in the amendment where each would
+    have applied: a token route, a subprotocol or first-frame transport, a token-fetch failure and
+    stale-token path in the panel, and changes to owner-machine check O6 and measure-terminal.js
+    (both send no Origin and keep working; run measure-terminal.js once to confirm). Test clients
+    that set an Origin header must use a loopback origin.'
+  - Leave the HTTP API, its token and its file (ADR-030 section 3) unchanged. Per-connection
+    single-use tickets are named in the ADR amendment as the next strengthening if the owner wants
+    more than an Origin check. A launch change in the runbook is not expected; if one is needed,
+    report it rather than widen the deliverables.
   acceptance:
-  - REQ-012 R32 holds - a websocket connection without a valid token is closed with code 4004
-    and a reason before any adapter is created or any cap slot is reserved, and a connection
-    with the page-fetched token behaves as before.
-  - The token route answers a loopback peer with the token and a non-loopback peer with 403, and
-    with the flag unset the route and the check do not exist (framework 404).
+  - REQ-012 R32 holds - a websocket connection with a non-loopback or null Origin is closed with
+    code 4004 and a fixed reason before any adapter is created or any cap slot is reserved, and a
+    connection with no Origin or a loopback Origin behaves as before.
+  - The panel shows the 4004 reason, and the same connection is refused with 4004 rather than the
+    cap refusal when the cap is full.
   - ADR-030 carries the amendment paragraph and ADR-014 decision 4 carries the pointer line.
   verification:
   - uv run pytest test/test_demo_terminal.py test/test_demo_terminal_api.py
@@ -18172,18 +18184,18 @@ items:
   - uv run python -m src.governance
   deliverables:
   - src/api/routes/demo_terminal.py
-  - src/api/routes/demo_terminal_api.py
   - test/test_demo_terminal.py
-  - test/test_demo_terminal_api.py
   - ts/src/stage/TerminalRegion.tsx
   - ts/src/stage/TerminalRegion.test.tsx
   - docs/04-decisions/ADR-030-terminal-interaction-api.md
   - docs/04-decisions/ADR-014-workbench-terminal-capability.md
-  next_action: Read terminal_websocket and _run_session in src/api/routes/demo_terminal.py, then
-    write the failing test first - a connection with no subprotocol must close with 4004 and
-    leave SESSIONS, RESERVED and the adapter factory untouched. Run this phase after phase-wbf-17
-    and phase-wbf-12 (all three change the same close handler) and after phase-arch-07 has merged
-    TerminalRegion.tsx.
+  next_action: 'Do not claim this phase until the owner has ratified PLAN-027 Assumption 1 (awaiting
+    ratification): the owner''s words in idea 000669 are "reuses the ADR-030 bearer token (or an
+    Origin check)", and this plan builds the Origin check branch. Then read terminal_websocket and
+    _run_session in src/api/routes/demo_terminal.py and write the failing test first - a connection
+    with Origin http://evil.example must close with 4004 and leave SESSIONS, RESERVED and the
+    adapter factory untouched. Run after phase-wbf-12 and phase-wbf-17, which change the same
+    close handler, and after phase-arch-07 has merged TerminalRegion.tsx.'
 - id: phase-wbf-20
   title: Renumber the HTML Viewer open-in-tab toggle label to rung 7
   plan: doc-workbench-features-defects
@@ -18214,11 +18226,13 @@ items:
     "Open-in-tab link (rung 7)". PLAN-021''s ladder is left as written; it describes the earlier
     demo stage. The runbook''s rung 7 names the HTML Viewer, not the overview panel;
     OverviewRegion carries the same control and the owner named both files, so both are renumbered.'
-  - 'Update every place that quotes the label: the REQ-012 R31 row (the "Open-in-tab link (rung 3)"
-    text), the runbook''s toggle entry at line 256 (which records the mismatch; rewrite it to say
-    the label now matches the runbook''s ladder and keep the note that PLAN-021 numbered the same
-    fallback 3), and the V1 row of docs/00-working/owner-machine-checklist.md section 5 (which says
-    the label "may read differently"). Leave StagePage.css untouched: its "rung-2/rung-3 style"
+  - 'Update every live place that quotes the label: the REQ-012 R31 row (the "Open-in-tab link
+    (rung 3)" text), the runbook''s toggle entry at line 256 (which records the mismatch; rewrite
+    it to say the label now matches the runbook''s ladder and keep the note that PLAN-021
+    numbered the same fallback 3), and docs/00-working/owner-machine-checklist.md section 5,
+    lines 132 to 137 (the sentence that the label "may read differently" and the V1 row''s "(or
+    the renumbered rung)"). Records of the past (session records, GOV-003, PROMPT-018, the
+    generated docs/00-working/ideas.md and _data/ideas.jsonl) keep "rung 3". Leave StagePage.css untouched: its "rung-2/rung-3 style"
     comment describes a shared style, not this label, and phase-arch-07 owns that file.'
   - 'Add a test in ts/src/stage/HtmlViewerRegion.test.tsx that clicks the toggle and expects the
     label "Open-in-tab link (rung 7)" and the "Open page in a new tab" link, and a new
@@ -18226,13 +18240,13 @@ items:
     quotes the label today, so nothing existing needs editing).'
   acceptance:
   - REQ-012 R33 holds - both toggles read "Open-in-tab link (rung 7)" in the open-in-tab state
-    and "Embedded" otherwise, and the label appears nowhere in the repository as "rung 3" outside
-    session records and PLAN-021.
+    and "Embedded" otherwise, and the runbook entry, the checklist section 5 and the REQ-012 R31
+    and R33 text quote the rung 7 label. Nothing under ts/src reads "rung 3".
   - REQ-012 R31 still holds with the renumbered label in the runbook entry and the row text.
   verification:
   - cd ts && npm test
   - cd ts && npm run build
-  - grep -rn "Open-in-tab link (rung" ts/src docs/00-working docs/06-requirements
+  - grep -rn "Open-in-tab link (rung" ts/src docs/00-working/demo-runbook.md docs/00-working/owner-machine-checklist.md docs/06-requirements
   - uv run python -m src.governance
   deliverables:
   - ts/src/stage/HtmlViewerRegion.tsx
@@ -18280,18 +18294,21 @@ items:
     the ADR may mention it only to say it was ruled out. Build nothing.'
   - 'Write the ADR with one recommended option and the alternatives argued against, in the shape
     of ADR-030 (context, facts from the repository that bind the decision, decision, alternatives,
-    consequences, open items, revisit trigger). Mark it proposed and awaiting the owner''s
-    ratification. Any build phase that follows builds on the recommended option only after the
+    consequences, open items, revisit trigger). Give it frontmatter status draft (the governance
+    allowlist has no "proposed") and write "proposed; awaiting the owner''s ratification" in
+    its Status section. Any build phase that follows builds on the recommended option only after the
     owner ratifies it: the owner asked for the decision first.'
   - 'Question 1, server-side session lifetime. What keeps a session alive when its websocket
     closes, and for how long: a grace period after disconnect, an explicit detach message sent
     by the page on a panel or layout switch (so a dropped connection is still reaped as today),
     or no limit until the shell exits. State how the 300 second receive-idle bound
     (D_SYSTEM_DEMO_TERMINAL_IDLE_TIMEOUT_SECONDS) and ADR-030''s inject ceiling apply to a session
-    with no websocket, and who reaps a detached session whose page never returns.'
+    with no websocket, and who reaps a detached session whose page never returns. Also state what ADR-030''s
+    list, inject and read routes do for a session with no websocket attached: whether it is
+    listed, whether an inject reaches it, and whether its ring is readable.'
   - 'Question 2, reattach identity. What a returning page presents to claim a detached session:
     the ADR-014 registry id (today never sent to the browser; ADR-030 fact 1), the ADR-030
-    bearer token, the websocket token from phase-wbf-19 if that has merged, or a per-page secret
+    bearer token, or a per-page secret (the Origin check from phase-wbf-19 carries no secret to reuse)
     issued with the id. State what stops one page claiming another page''s session, and what a
     reload does (the audit finds a reload ends all sessions; decide whether it should now
     reattach).'
@@ -18320,8 +18337,8 @@ items:
     cover.'
   acceptance:
   - REQ-012 R34 holds - the ADR answers questions 1 to 6 with a decision each, names one
-    recommended option, argues the alternatives against, and is marked proposed and awaiting
-    ratification.
+    recommended option, argues the alternatives against, and has frontmatter status draft and
+    a Status section saying proposed, awaiting the owner''s ratification.
   - The ADR states its effect on ADR-014 decision 4, ADR-030 open item 3 and ADR-031 decision 7.
   verification:
   - uv run python -m src.governance

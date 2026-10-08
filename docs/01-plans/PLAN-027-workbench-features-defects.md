@@ -411,13 +411,13 @@ an idea; this amendment turns them into queued phases so the run can build them.
 
 | Group | Ideas | What it covers | Phase |
 |---|---|---|---|
-| `G71` Websocket token | `000669`, `000614` | The demo terminal websocket accepts any connection, so any local process or open web page can start a shell. The owner ruled that it checks a token on connect. The check refuses before a shell starts and before a cap slot is reserved. Closes `ADR-030` open item 7 | `phase-wbf-19` |
+| `G71` Websocket origin | `000669`, `000614` | The demo terminal websocket accepts any connection, so any local process or open web page can start a shell. The owner ruled, in the words of idea `000669`, that it "reuses the ADR-030 bearer token (or an Origin check) on connect". The plan builds the `Origin` check branch, which is **awaiting ratification** (Assumption 1). The check refuses before a shell starts and before a cap slot is reserved. Closes `ADR-030` open item 7 | `phase-wbf-19` |
 | `G72` Rung label | `000670` | The HTML Viewer and overview toggles read "Open-in-tab link (rung 3)"; the runbook's ladder lists that fallback as rung 7. The label becomes rung 7 and the toggle stays visible | `phase-wbf-20` |
 | `G73` Session persistence decision | `000671`, `000651`, `000652`, `000107`, `000087` | Panel and layout switches end terminal sessions (audit findings F1 and F2). The owner ruled they should be preserved, not warned about. A decision record comes first; nothing is built | `phase-wbf-21` |
 
 | Phase | Title | Group | Depends on |
 |---|---|---|---|
-| `phase-wbf-19` | Require a token on the demo terminal websocket before it starts a shell | `G71` | — |
+| `phase-wbf-19` | Refuse a demo terminal websocket from a non-loopback origin before it starts a shell | `G71` | `phase-wbf-17` |
 | `phase-wbf-20` | Renumber the HTML Viewer open-in-tab toggle label to rung 7 | `G72` | `phase-arch-07` |
 | `phase-wbf-21` | Decide how terminal sessions survive panel and layout switches | `G73` | — |
 
@@ -426,12 +426,15 @@ All three are queued, sit at the end of the backlog's phase list and are outside
 The checks that shaped the phases, each made against the code on this branch:
 
 - **`phase-wbf-19`.** `terminal_websocket` checks the session cap first and then the shell name,
-  and has no authentication or `Origin` check, so the token check goes ahead of both. The browser
-  cannot read `~/.d-system`, where `ADR-030` keeps its file token, and a route that handed that
-  token to any loopback caller would remove the protection from other operating-system users
-  that `ADR-030` section 3 relies on. The phase therefore issues a separate websocket token
-  through a route and sends it in the `Sec-WebSocket-Protocol` header, which keeps it out of
-  URLs and logs as `ADR-030` requires. The phase's scope states the five design points and the
+  and has no authentication or `Origin` check, so the check goes ahead of both. The first design
+  was a token fetched from a new route. A gating review measured the repo's Vite proxy in front of
+  `src/main.py`'s CORS policy: the route would be readable by any page on a `localhost` origin
+  (Vite's default CORS answers any localhost origin) and by a DNS-rebound page (`src/main.py`
+  checks no `Host`). A token would therefore add less than it appeared to, and would need a page
+  change, a subprotocol or first-frame transport and a rewrite of the direct websocket tests. The
+  plan builds the `Origin` check instead: it accepts a missing `Origin` (tests, `curl`,
+  `measure-terminal.js`; Node 22's WebSocket sends none) and a loopback host on any port, and
+  refuses the rest with an accept-then-close code 4004. The scope states the design points and the
   alternative to each.
 - **`phase-wbf-20`.** The label's "rung 3" is `PLAN-021`'s four-rung ladder, where the fallback
   is "Embedded overview panel becomes an open-in-tab link". The runbook's own ladder has eight
@@ -449,56 +452,70 @@ The checks that shaped the phases, each made against the code on this branch:
 These are choices the plan made without the owner. Each can be ratified or changed before the
 phase is claimed.
 
-1. **A separate websocket token, not the `ADR-030` file token.** The ruling says the websocket
-   reuses the `ADR-030` token (or an `Origin` check). The plan reads "reuses" as the same
-   mechanism: a bearer token compared in constant time and refused before any state changes. It
-   does not hand the file token to the browser, because the token route would give it to any
-   process that can reach the port, and the file's permissions are what protect it from other
-   users. If the owner wants the literal file token, the cost is that protection.
-2. **The token route and the `Origin` check protect against the same threat.** Either keeps a web
-   page on another origin from starting a shell. Neither stops a local process, which can call the
-   route or set any header. The plan prefers the route because an `Origin` allowlist would have
-   to accept every loopback port (the audit ran the dev server on 5199), while the browser's own
-   CORS enforcement keeps a cross-origin page from reading the route's answer.
+1. **The `Origin` check, not a token.** The ruling says the websocket reuses the `ADR-030` token
+   (or an `Origin` check). The plan takes the `Origin` branch. It does not reuse the `ADR-030`
+   file token: a route that handed that token to the browser would give it to every process that
+   can reach the port, and the file's permissions are what protect it from other users. **Awaiting
+   the owner's ratification;** `phase-wbf-19` says so in its `next_action` and should not be
+   claimed before.
+2. **What the `Origin` check stops and does not.** It stops a web page on a non-loopback origin
+   and a DNS-rebound page, whose `Origin` is the attacker's host name even after the name
+   resolves to `127.0.0.1`. It does not stop a local process, which can send no `Origin` or any
+   `Origin`; the file token could not stop one either. It does not stop a page served from
+   another loopback port the owner runs, unless the owner sets the optional pin
+   `D_SYSTEM_WORKBENCH_ORIGIN`. A token route would not have been stronger: measured, it is
+   readable by any `localhost`-origin page and by a rebound page.
 3. **The check applies whenever `D_SYSTEM_DEMO_TERMINAL=1`, not only with the second flag.** The
-   rehearsed launch sets only the first flag. The cost is that every direct websocket client
-   (the test suite, measurement scripts) must fetch the token.
-4. **Close code 4004 and the subprotocol header** are the plan's choices; the phase may change
-   either if the Vite proxy or the browser forbids it, and records why.
-5. **No `depends_on` edge from `phase-wbf-19` to `phase-arch-07`**, although `phase-arch-07`
-   lists `ts/src/stage/TerminalRegion.tsx` among its deliverables. `phase-wbf-17` has no edge
-   either; a coordinator sequences them. Add the edge if the owner prefers it enforced.
+   rehearsed launch sets only the first flag. No direct client changes, because an absent
+   `Origin` is accepted.
+4. **Close code 4004 and accept-then-close** are plan choices. A close before `accept()` would
+   lose the reason in the browser (`R21`). `TerminalRegion.tsx` therefore stays a deliverable: it
+   quotes a reason only for code 4001 (and 4003 after `phase-wbf-17`), so a 4004 close would show
+   the generic message without a small change.
+5. **`phase-wbf-19` depends on `phase-wbf-17`**, which creates `TerminalRegion.test.tsx` and
+   changes the same close handler. The order `phase-wbf-12`, `phase-wbf-17`, `phase-wbf-19` is
+   otherwise by coordinator, as `phase-wbf-12` has no edge.
 6. **`phase-wbf-19` adds `ADR-014` to its deliverables** for one pointer line under decision 4,
    the same kind of line `ADR-030` open item 8 added. The owner's list named only `ADR-030`. The
-   runbook is left out because the launch commands do not change.
+   runbook, `src/api/__init__.py` and `demo_terminal_api.py` are left out: there is no new route,
+   no shared token helper and no launch change.
 7. **The rung label's authority is the runbook.** The runbook's rung 7 names the HTML Viewer,
    not the overview panel. `OverviewRegion` carries the same control and the owner named both
    files, so both are renumbered.
 8. **`phase-wbf-21` does not edit `ADR-014` or `ADR-030`.** The new record says what those
-   documents should say once the owner ratifies it; the edit follows ratification.
-9. **`phase-wbf-21` has no `depends_on` edge** and builds nothing. A later fix phase builds on
-   the recommended option only after the owner ratifies it; the owner asked for the decision
-   first.
+   documents should say once the owner ratifies it; the edit follows ratification. It has no
+   `depends_on` edge and builds nothing. Its record has frontmatter status `draft`, the governance
+   allowlist having no "proposed", and says "proposed, awaiting ratification" in its Status
+   section. A later fix phase builds on the recommended option only after the owner ratifies it.
+
+The first design's side effects, and why each no longer applies: the Windows check `O6` and the
+audit's `measure-terminal.js` send no `Origin` and keep working (review finding on an undeclared
+break: moot); no subprotocol means no echo requirement on the three `accept()` sites (moot); the
+panel needs no token fetch, so there is no fetch-failure or stale-token path (moot); and the
+tests need no loopback test peer, because no new route checks the peer.
 
 ### Concurrency
 
 `phase-wbf-19` and `phase-wbf-21` share `sys-wb-terminal` with `phase-wbf-17` and `phase-wbf-12`,
-and `phase-wbf-19` shares `ts/src/stage/TerminalRegion.tsx` and the close handler with them. They
-must run serially: `phase-wbf-12`, then `phase-wbf-17`, then `phase-wbf-19`. `phase-wbf-21`
-writes only documents and does not collide on files, but it declares the same systems, so a
-coordinator holding the system locks cannot run it beside them. `phase-wbf-19` also shares
-`src/api/routes/demo_terminal.py` and `src/api/routes/demo_terminal_api.py` with any later
-terminal API change, and `TerminalRegion.tsx` with `phase-arch-07`, which owns it until it
-merges. `phase-wbf-20` waits for `phase-arch-07` through its `depends_on` edge because that phase
-owns `HtmlViewerRegion.tsx`, `OverviewRegion.tsx` and the stage test glob until it merges;
-`phase-wbf-20` shares `sys-wb-viewer` with `phase-wbf-16` and, through
-`HtmlViewerRegion.tsx`, with `phase-wbf-01` and `phase-wbf-02`.
+and `phase-wbf-19` shares `ts/src/stage/TerminalRegion.tsx` and the close handler with them, so
+they run serially: `phase-wbf-12`, then `phase-wbf-17`, then `phase-wbf-19`, the last enforced by
+its `depends_on` edge. `phase-wbf-21` writes only documents, but it declares the same systems, so a
+coordinator holding the system locks cannot run it beside them. `phase-arch-07` (active) lists
+`TerminalRegion.tsx`, and `phase-arch-08` (queued) lists it too; `phase-arch-13` (queued) lists
+`ts/src/stage/` and `docs/06-requirements/`. A coordinator sequences `phase-wbf-19` after
+`phase-arch-07` and `phase-arch-08` have merged, or reconciles the edits. `phase-wbf-20` waits for
+`phase-arch-07` through its `depends_on` edge: that phase owns `HtmlViewerRegion.tsx`,
+`OverviewRegion.tsx` and the stage test glob until it merges. `phase-arch-07` and `phase-arch-13`
+also list `docs/06-requirements/`, and `phase-wbf-20` and `phase-wbf-21` both add to
+`REQ-012`, so these four touch the same governed directory and a coordinator sequences them
+(the edits are in different rows). The phases whose files `phase-wbf-20` would otherwise share
+(`phase-wbf-01`, `phase-wbf-02`, `phase-wbf-16`) are complete.
 
 ### Requirement coverage added
 
 | Requirement | Phases |
 |---|---|
-| R32 The terminal websocket refuses without a valid token, before any shell or cap slot | `phase-wbf-19` |
+| R32 The terminal websocket refuses a non-loopback origin, before any shell or cap slot | `phase-wbf-19` |
 | R33 The open-in-tab toggle label matches the runbook's ladder (rung 7) | `phase-wbf-20` |
 | R34 A decision record settles how sessions survive panel and layout switches | `phase-wbf-21` |
 
