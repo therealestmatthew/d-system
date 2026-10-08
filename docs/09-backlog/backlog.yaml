@@ -9561,6 +9561,22 @@ items:
   deliverables:
   - ts/src/stage/NotesStripRegion.tsx
   - ts/src/stage/NotesStripRegion.test.tsx
+  session: doc-session-rotator-variants
+  completion_evidence:
+  - ts/src/stage/NotesStripRegion.tsx
+  - ts/src/stage/NotesStripRegion.test.tsx
+  - docs/03-sessions/SESS-2026-10-08-14-rotator-variants.md
+  result: 'Long text entries scroll right to left and pause on hover or focus, the timed advance waits for
+    a scroll pass to finish, and image entries come from a directory the notes file names; one rotation is
+    all text or all images (mixing ruling proposed, awaiting the owner''s ratification, pre-approved run,
+    2026-10-08). Fit contract on the notes strip before: pass=12 fail=6, 10 findings, active entry unbounded
+    (441x71 in a 28 px strip); after: pass=14 fail=4, 8 findings, active entry clean, the rest being 000628
+    (dropdown trigger and the strip clip it causes), the tooltip and the file-picker bubble. Playwright on
+    ports 8021/5191: 20 checks pass (scroll, hover and focus pause, 9.35 s pass kept past the 6 s interval,
+    image entry in layouts 1 and 2, mixed file rejected, reduced motion). npm run build ok; governance OK
+    (45 systems, 468 documents, 37 memories, 354 backlog phases); npm test 110 passed; ruff and mypy clean;
+    pytest 1 failed (root uid ignores directory permissions, environmental), 1901 passed. The deliverable
+    needs widening by ts/src/stage/NotesStripRegion.test.tsx.'
   next_action: Design the entry model first, as one union of text and image entries. Both
     variants change the same component, and designing the model twice is what splitting this
     phase would have cost.
