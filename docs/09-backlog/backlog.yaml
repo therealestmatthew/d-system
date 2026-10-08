@@ -8868,7 +8868,7 @@ items:
   - sys-delivery
   owner: repository-owner
   agent: agent-builder-a
-  status: active
+  status: complete
   priority: 2
   session_budget: 1
   depends_on: []
