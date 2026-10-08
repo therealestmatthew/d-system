@@ -17490,7 +17490,7 @@ items:
   - uv run pytest test/test_demo_terminal.py
   - uv run ruff check src/ test/ tools/
   - uv run python -m src.governance
-  - cd ts && npm run build when ts/src/stage/TerminalRegion.tsx changes
+  - cd ts && npm run build
   deliverables:
   - docs/00-working/terminal-unprovoked-drop-diagnosis.md
   - test/test_demo_terminal.py
@@ -17776,7 +17776,7 @@ items:
   - No wording in the entry contradicts ts/src/stage/HtmlViewerRegion.tsx, checked by reading the
     labels and the open-link text in the code.
   verification:
-  - grep -n "Open-in-tab" docs/00-working/demo-runbook.md prints a line inside the HTML Viewer entry
+  - grep -n "Open-in-tab" docs/00-working/demo-runbook.md
   - uv run python -m src.governance
   deliverables:
   - docs/00-working/demo-runbook.md
