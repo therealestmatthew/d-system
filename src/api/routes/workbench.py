@@ -56,7 +56,7 @@ import json
 import os
 import platform
 import subprocess
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Final
 
@@ -166,6 +166,12 @@ class DirectoryEntry(BaseModel):
     name: str
     path: str
     is_dir: bool
+    # The entry's last-modified time on disk (`st_mtime`) as an ISO 8601 UTC string with
+    # millisecond precision and a `Z` suffix, e.g. `2026-10-08T07:15:02.123Z` (REQ-012 R03). It is
+    # `None` only when the file system cannot report it (a dangling symlink, a racing delete).
+    # Optional with a default so a consumer that predates the field keeps reading entries
+    # unchanged (the File Browser, the explorers).
+    modified_at: str | None = None
 
 
 class AbsolutePathResult(BaseModel):
@@ -264,11 +270,22 @@ def _walk_visible_tree(start: Path) -> list[Path]:
     return results
 
 
+def _modified_at(path: Path) -> str | None:
+    """`path`'s mtime as an ISO 8601 UTC string, or `None` when it cannot be read."""
+    try:
+        seconds = path.stat().st_mtime
+    except OSError:
+        return None
+    moment = datetime.fromtimestamp(seconds, tz=UTC)
+    return moment.isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
 def _to_entry(path: Path) -> DirectoryEntry:
     return DirectoryEntry(
         name=path.name,
         path=path.relative_to(REPO_ROOT).as_posix(),
         is_dir=path.is_dir(),
+        modified_at=_modified_at(path),
     )
 
 

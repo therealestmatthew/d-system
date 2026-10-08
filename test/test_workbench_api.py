@@ -24,7 +24,7 @@ import re
 import sys
 import tempfile
 from collections.abc import Callable, Iterator
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -390,6 +390,81 @@ def test_search_text_filter_narrows_by_name(rebuild_app: Callable[..., FastAPI])
     body = response.json()
     assert body, "fixture assumption: at least one prompt filename contains 'workbench'"
     assert all("workbench" in entry["name"].lower() for entry in body)
+
+
+# --- modified time on every entry (REQ-012 R03, R04) -------------------------------------------
+
+
+def _iso_utc(epoch_seconds: float) -> str:
+    return datetime.fromtimestamp(epoch_seconds, tz=UTC).isoformat(timespec="milliseconds").replace(
+        "+00:00", "Z"
+    )
+
+
+@pytest.fixture
+def mtime_probe() -> Iterator[Path]:
+    """A throwaway, non-ignored `.html` file inside the repository, removed afterwards."""
+    directory = Path(tempfile.mkdtemp(prefix="mtime-probe-", dir=REPO_ROOT / "docs"))
+    probe = directory / "probe.html"
+    probe.write_text("<p>probe</p>", encoding="utf-8")
+    try:
+        yield probe
+    finally:
+        probe.unlink(missing_ok=True)
+        directory.rmdir()
+
+
+def test_list_and_search_entries_carry_the_file_mtime_as_iso_utc(
+    rebuild_app: Callable[..., FastAPI], mtime_probe: Path
+) -> None:
+    os.utime(mtime_probe, (1_700_000_000.25, 1_700_000_000.25))
+    relative = mtime_probe.relative_to(REPO_ROOT).as_posix()
+    client = TestClient(rebuild_app(flag="1"))
+
+    parent = mtime_probe.parent.relative_to(REPO_ROOT).as_posix()
+    listed = client.get(WORKBENCH_LIST_PATH, params={"path": parent})
+    searched = client.get(WORKBENCH_SEARCH_PATH, params={"path": parent})
+
+    for response in (listed, searched):
+        assert response.status_code == 200
+        entry = next(e for e in response.json() if e["path"] == relative)
+        assert entry["modified_at"] == "2023-11-14T22:13:20.250Z"
+        assert entry["modified_at"] == _iso_utc(mtime_probe.stat().st_mtime)
+        assert (entry["name"], entry["is_dir"]) == ("probe.html", False)
+
+
+def test_entry_mtime_advances_when_the_file_changes_on_disk(
+    rebuild_app: Callable[..., FastAPI], mtime_probe: Path
+) -> None:
+    relative = mtime_probe.relative_to(REPO_ROOT).as_posix()
+    parent = mtime_probe.parent.relative_to(REPO_ROOT).as_posix()
+    client = TestClient(rebuild_app(flag="1"))
+
+    def listed_mtime() -> str:
+        response = client.get(WORKBENCH_LIST_PATH, params={"path": parent})
+        return str(next(e for e in response.json() if e["path"] == relative)["modified_at"])
+
+    os.utime(mtime_probe, (1_700_000_000, 1_700_000_000))
+    before = listed_mtime()
+    os.utime(mtime_probe, (1_700_000_100, 1_700_000_100))
+    after = listed_mtime()
+    assert (before, after) == ("2023-11-14T22:13:20.000Z", "2023-11-14T22:15:00.000Z")
+
+
+def test_directory_entries_and_the_unchanged_fields_are_still_present(
+    rebuild_app: Callable[..., FastAPI],
+) -> None:
+    client = TestClient(rebuild_app(flag="1"))
+    body = client.get(WORKBENCH_LIST_PATH, params={"path": "."}).json()
+    docs = next(e for e in body if e["path"] == "docs")
+    assert docs["is_dir"] is True and docs["name"] == "docs"
+    assert re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z", docs["modified_at"])
+
+
+def test_an_unreadable_mtime_is_reported_as_null_not_an_error(tmp_path: Path) -> None:
+    dangling = tmp_path / "dangling.html"
+    dangling.symlink_to(tmp_path / "missing.html")
+    assert workbench_module._modified_at(dangling) is None
 
 
 # --- Copy absolute path (ADR-015 consequences, REQ-007 W09) ------------------------------------
