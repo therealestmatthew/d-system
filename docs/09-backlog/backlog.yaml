@@ -9557,8 +9557,12 @@ items:
   - uv run pytest
   - uv run python -m src.governance
   deliverables:
-  - src/api/routes/
-  - test/
+  - src/api/routes/demo_terminal_api.py
+  - src/api/routes/demo_terminal.py
+  - src/api/__init__.py
+  - test/test_demo_terminal.py
+  - test/test_demo_terminal_api.py
+  - docs/00-working/demo-runbook.md
   next_action: Build the broadcast output buffer before either endpoint. Both depend on it, and a
     read endpoint written against the destructive adapter read is the one defect this phase most
     needs to avoid shipping.
