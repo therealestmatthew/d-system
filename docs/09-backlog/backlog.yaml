@@ -9424,7 +9424,8 @@ items:
   - sys-ui
   - sys-api
   owner: repository-owner
-  status: queued
+  agent: agent-builder-b
+  status: active
   priority: 2
   session_budget: 1
   depends_on:
