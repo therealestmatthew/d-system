@@ -9546,6 +9546,7 @@ items:
   - uv run python -m src.governance
   deliverables:
   - ts/src/stage/NotesStripRegion.tsx
+  - ts/src/stage/NotesStripRegion.test.tsx
   next_action: Design the entry model first, as one union of text and image entries. Both
     variants change the same component, and designing the model twice is what splitting this
     phase would have cost.
