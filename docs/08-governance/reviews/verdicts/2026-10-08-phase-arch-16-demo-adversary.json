@@ -1,0 +1,65 @@
+{
+  "verdict_id": "2026-10-08-phase-arch-16-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-arch-16",
+  "reviewed_commit": "33dd9ff509ad9845cae68beed5406f216adb89f2",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet",
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "Audit says Terminal (bash) is the unavailable panel on Windows; the code never refuses it, and the real gap is not listed",
+      "evidence": "audit s4.2 (CMD layout-switch communication) and s8.1 step 3 state bash is the unavailable panel on Windows. TerminalRegion.tsx:205-211 sends no ?shell= for bash; demo_terminal.py _run_session only checks availability when a shell is requested; factory.resolve_shell(None) returns D_SYSTEM_DEMO_SHELL or DEFAULT_WINDOWS_SHELL; no UI code hides the bash panel by platform.",
+      "consequence": "Owner expects an unavailable message and instead gets a Windows shell under a Terminal (bash) label; the matrix treats bash as one shell on all hosts and s7/s9 never record the mislabelled panel, so O1-O5 do not tell the owner to check it.",
+      "minimal_fix": "Replace both sentences with a labelled code-reading statement that the bash panel is not refused on Windows and starts the host default shell; add a s7 finding and a s8 owner check line for it."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Slow first connection attributed to a freshly started backend; it is the first connection of each client process",
+      "evidence": "s6.1 says first connection to a freshly started backend is slower (88/110 ms). Running the appendix script against already-warm backends gave raw_open [75.1,8.6,10.5,...] and raw_first [97,25,41.7,...]; five runs all showed a 75-100 ms open and 88-114 ms first byte on sample 1 only.",
+      "consequence": "With n=20 the script's p95 equals max, so owner O6 results for CMD/PowerShell will carry this artefact and be misread as shell start-up cost.",
+      "minimal_fix": "Attribute the slow sample to the client's first connection, add a discarded warm-up connection or report median only, and fix s6.1 and the O6 look-for text."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "REQ-007 W17 item 4 does not exist",
+      "evidence": "s4.1 re-assignment intent cell cites W17 item 4 as the host-element mechanism; REQ-007 W17 is one row with no numbered items and no host-element text; only draft ADR-031 mentions the per-panel host element.",
+      "consequence": "A reader following the citation finds nothing in the requirement.",
+      "minimal_fix": "Cite ts/src/stage/StagePage.tsx as code reading (and ADR-031 as proposed) instead of W17 item 4."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Section 3 summary table omits intent and communication for CMD/PowerShell in four of five rows",
+      "evidence": "s3 CMD and PowerShell columns: only the layout-switch row says 'Intent and communication: as bash'; rows 2-5 say only 'owner-machine, not run (O2..O5)'. Sections 4.2 and 4.3 are complete.",
+      "consequence": "A reader or check that takes the summary as the matrix sees 8 of 10 Windows cells with survival only.",
+      "minimal_fix": "Repeat the 'Intent and communication: as bash row N' wording in rows 2-5 or state that s4 is the matrix of record."
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "Label discipline: blanket Measured (Linux) header over code-reading facts and two unlabeled Windows assertions",
+      "evidence": "s4.1 communication column is headed Measured, Linux but includes searched-ts/src and tooltip-text facts; s8.3 O8 asserts '(ConPTY repaints on resize)' and O6 'A PowerShell profile can add seconds' with no label or source, against s1 'Every claim carries one label'.",
+      "consequence": "Unlabeled Windows statements sit beside owner instructions, the same class of claim as F01; no Windows figure is claimed as observed, so R24 is not breached.",
+      "minimal_fix": "Header the column Measured, Linux / Code reading and tag individual facts; mark the two Windows sentences expected-not-observed or delete them."
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "title": "Rows/columns order flips in the collapse cell",
+      "evidence": "s4.1 collapse cell writes '88 by 34 stays until expand, then 105 by 40'; s6.3 and s5.1 use rows by columns ('34 by 88', '40 by 105'); reproduced stty size is '34 88'.",
+      "consequence": "The same pty size is quoted in two orders; the owner comparing with mode con or RawUI.WindowSize may swap them.",
+      "minimal_fix": "Write '34 by 88 ... 40 by 105' in the collapse cell."
+    }
+  ],
+  "raw_reply_sha256": "a8983999fb88e518cafa53a13a70a81bebefc75513a64cf0786d7de3044cfceb",
+  "outcomes": []
+}

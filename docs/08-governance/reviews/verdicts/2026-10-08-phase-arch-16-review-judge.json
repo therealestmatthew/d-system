@@ -1,0 +1,57 @@
+{
+  "verdict_id": "2026-10-08-phase-arch-16-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-arch-16",
+  "reviewed_commit": "33dd9ff509ad9845cae68beed5406f216adb89f2",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Note: known test failures in runner gate (root-only unwritable-parent test; load-sensitive control-character flake)",
+      "evidence": "03-verification+gate.txt lines 146-148: 2 failed, 2062 passed, 1 skipped; failures are test_control_characters_reach_the_shell and test_an_unwritable_worktree_parent_is_refused",
+      "consequence": "None for a markdown-only diff; both are pre-identified environment issues",
+      "minimal_fix": "None"
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Section 5.4 state-survival table cites section 4.1 for experiments that are not described there",
+      "evidence": "docs/00-working/terminal-persistence-audit.md section 5.4 table header says 'all from section 4.1's experiments'; no step in 4.1 or 5.1 collapses or drops then switches layout, so the 'kept' entries in the Layout switch column have no recorded steps",
+      "consequence": "A reader cannot trace three table cells to a recorded experiment, and they may be inferred rather than measured",
+      "minimal_fix": "Add the one-line step list for collapse/drop then layout switch, or relabel those cells as inferred from the stable host-element mechanism"
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Cause of the false cap refusals is stated as fact and described inconsistently",
+      "evidence": "Section 6.1 says the slot is free about 2 ms after close; section 6.5 says it is held 'until its deferred close lands'; O10 says 'until the first session's shell is reaped'; F9 says close() does not wait for the child",
+      "consequence": "The mechanism is inferred from the dev versus production contrast (2 of 4 versus 0 of 4) but reads as established; owner may over-trust it when designing the O10 probe",
+      "minimal_fix": "Phrase it as 'consistent with' the StrictMode double mount and use one wording in 6.5 and O10"
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Headline connect and echo figures cannot be regenerated exactly from appendix A",
+      "evidence": "Section 6.1 reports 30 connections per path and 6.2 reports 300 writes at 30 ms; appendix A script runs 20 connects and 200 echoes at 40 ms and measures last-byte-of-startup as well as first byte",
+      "consequence": "Limited reproducibility; disclosed in the text but the owner's O6/O7 numbers will not be like-for-like on sample count",
+      "minimal_fix": "State the parameter differences in one sentence or reproduce the 30/300 variant"
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "Bash Communication column labelled Measured (Linux) but includes code-search claims",
+      "evidence": "Section 4.1 column header; page reload cell relies on 'searched ts/src' for no beforeunload prompt, section 5.6 for no keepalive, and connectionRefusalMessage text, which section 1 defines as Code reading",
+      "consequence": "Minor label looseness; each claim names its basis inline so nothing is misleading",
+      "minimal_fix": "Tag those entries as Code reading in the cell text"
+    }
+  ],
+  "raw_reply_sha256": "01b46f49f37cdd8b6d9b796b343354bbd814fe9746fe388b5b3e3c51ab8ecd46",
+  "outcomes": []
+}

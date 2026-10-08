@@ -9129,14 +9129,16 @@ items:
   completion_evidence:
   - docs/00-working/terminal-persistence-audit.md
   - docs/03-sessions/SESS-2026-10-08-17-terminal-persistence-audit.md
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-arch-16-demo-adversary.json
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-arch-16-review-judge.json
   result: 'Audit written: three-shell by five-event matrix (15 cells, each with survival, intent
     and communication) and the five measurements, bash measured on Linux with commands and numbers
     (development server and production build), CMD and PowerShell survival and measurement cells
-    marked owner-machine, not run, with ten numbered owner checks (O1 to O10) and a result sheet.
-    Twelve findings F1 to F12 (a visible-panel switch and a layout switch with a differing stored
+    marked owner-machine, not run, with eleven numbered owner checks (O1 to O11) and a result sheet.
+    Thirteen findings F1 to F13 (a visible-panel switch and a layout switch with a differing stored
     panel end a shell silently; 300 s idle close with code 1006; development-mode doubled mount
-    refuses a free slot 2 of 4 times). REQ-011 R23 and R24 met as far as Linux evidence allows.
-    Nothing under src/, ts/ or test/ changed. Verification: governance OK (45 systems, 472 documents, 354 backlog phases); full pytest 2063 passed, 1 skipped, 1 failed (test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused, the known environment failure as root, idea 000604); ruff and mypy clean; npm test 108 passed. Awaiting independent review.'
+    refuses a free slot in 2 of 4 and 4 of 8 trials). REQ-011 R23 and R24 met as far as Linux evidence allows.
+    Nothing under src/, ts/ or test/ changed. Verification after the rebase onto 91f33b3: governance OK (45 systems, 475 documents, 354 backlog phases); full pytest 2071 passed, 1 skipped, 1 failed (test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused, the known environment failure as root, idea 000604); ruff and mypy clean; npm test 146 passed. Gating review rejected 33dd9ff (1 major, 5 minor), the review judge passed it; all findings fixed in the second round (see the session record). Awaiting the second gating review.'
 - id: phase-arch-17
   title: Panel maximize and collapse on the slot model
   plan: doc-workbench-architecture-quality

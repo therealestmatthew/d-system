@@ -49,7 +49,7 @@ One working document, [`docs/00-working/terminal-persistence-audit.md`](../00-wo
   "owner-machine, not run" and point to a numbered procedure.
 - The five measurements for bash on Linux, with commands and numbers: connect latency, echo latency,
   resize behavior, scrollback handling, behavior at the six-session cap.
-- Twelve findings (F1 to F12), an explicit list of ten owner-machine checks (O1 to O10) with what to
+- Thirteen findings (F1 to F13), an explicit list of eleven owner-machine checks (O1 to O11) with what to
   do and what to look for and a result sheet, and a list of what was not covered.
 - The standalone measurement script and the in-page recorder, so the numbers can be reproduced.
 
@@ -100,6 +100,43 @@ differs from the rendered catalog". That was the stale catalog; it passed after
 `uv run python -m src.governance --catalog`. An earlier run with `-x` stopped at the known failure
 after 1555 passed and was not a full run.
 
+## Fix round after the gating review
+
+The gating demo-adversary rejected `33dd9ff` (1 major, 5 minor) and the review-judge passed it (5
+minor); both verdicts are in `docs/08-governance/reviews/verdicts/` unchanged. The audit edits are
+one commit (`Address the phase-arch-16 gating review in the audit`); this record and the verdict
+files are another. One line per finding:
+
+- **Adversary F01 (major), fixed.** The audit said Terminal (bash) is the unavailable panel on
+  Windows. Code reading shows otherwise: `TerminalRegion.tsx` lines 210-211 send no `?shell=` for
+  bash, `_run_session` checks availability only when a shell is requested (line 465),
+  `resolve_shell(None)` returns the `D_SYSTEM_DEMO_SHELL` override or `cmd`, and no UI hides the
+  panel by platform. Both sentences (sections 4.2 and 8.1) are now labelled code reading, with new
+  finding F13 and owner check O11. I verified the reading against the source; it is not observed on
+  Windows.
+- **Adversary F02, fixed.** The slow first connection (88 and 110 ms) is re-attributed to the client
+  process's first connection (the headline runs followed an HTTP request that had warmed the
+  client). The appendix script discards one warm-up connection; I re-ran it (open 4.7 ms median,
+  first byte 21.0 ms, no outlier at sample 1) and fixed the O6 look-for text.
+- **Adversary F03, fixed.** "W17 item 4" replaced by a code-reading citation of `StagePage.tsx` and
+  the proposed `ADR-031`.
+- **Adversary F04, fixed.** Rows 2 to 5 of the section 3 summary now repeat the intent and
+  communication wording, and the summary states that section 4 is the matrix of record.
+- **Adversary F05 and judge F05, fixed.** The section 4.1 communication column is headed
+  "Measured, Linux, except entries tagged Code reading" and the code-reading entries are tagged. The
+  Windows statements in O6, O7 and O8 are marked expected, not observed.
+- **Adversary F06, fixed.** The collapse cell reads "34 by 88 ... 40 by 105".
+- **Judge F02, fixed by running the experiment.** The state-survival table (section 5.4) had cells
+  that no recorded step supported. I ran the missing checks (tab count over a layout switch, a
+  reload and a panel round trip; dropped state over a panel round trip) and added the step list.
+- **Judge F03, fixed.** The false cap refusals are stated as consistent with the `StrictMode` double
+  mount, inferred and not traced, in one wording in 6.5 and O10. I re-ran the five-live trial: 4 of
+  8 refused, after 2 of 4 earlier; the reviewer saw 3 of 4. The audit says the rate varies.
+- **Judge F04, fixed.** The appendix script now uses the headline parameters (30 connections, 300
+  echoes 30 ms apart) after a discarded warm-up, and the text states the two remaining differences.
+- **Judge F01, no change.** It notes the known failures in the review's own gate run (the root-only
+  test and a load-sensitive control-character test). The first is recorded below.
+
 ## Acceptance
 
 - **`REQ-011` R23 (three-shell by five-event matrix with survival, intent and communication in every
@@ -139,7 +176,7 @@ after 1555 passed and was not a full run.
 ## Unresolved
 
 - D1 to D5 above.
-- The twelve findings are not recorded as ideas by this session; the Session Manager's final report
+- The thirteen findings are not recorded as ideas by this session; the Session Manager's final report
   carries them as `IDEA` lines for the idea log.
 - The audit's Playwright scripts are not committed (the phase's only deliverable is the document).
   A committed regression test for the matrix is an idea, not part of this phase.
@@ -147,3 +184,16 @@ after 1555 passed and was not a full run.
 ## Review
 
 No independent review has run on this record. Review is dispatched by the Session Manager.
+
+## Gate results after the fix round and the rebase onto `91f33b3`
+
+| Command | Result |
+|---|---|
+| `uv run python -m src.governance` | `Governance OK: 45 systems, 475 documents, 37 memories, 354 backlog phases` |
+| `uv run pytest` | `1 failed, 2071 passed, 1 skipped, 1 warning in 376.94s`; the one failure is the known root-only `test/test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused` (idea `000604`), recorded and not retried. The control-character flake did not occur in this run. |
+| `uv run ruff check src/ test/ tools/` | `All checks passed!` |
+| `uv run mypy src/` | `Success: no issues found in 52 source files` |
+| `cd ts && npm test` | `Tests  146 passed (146)` |
+
+The catalog conflict in the rebase was resolved by regeneration only. Servers started for the fix
+round (backend 8029, frontend 5199) were stopped by pid.
