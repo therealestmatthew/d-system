@@ -1,0 +1,26 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-18-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-18",
+  "reviewed_commit": "725cd562fc1963633d3ffd4c792fb2b3fd1a0554",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Placeholder list omits the no-tabs and still-locating messages",
+      "evidence": "docs/00-working/demo-runbook.md:256 lists four placeholder states; ts/src/stage/HtmlViewerRegion.tsx:452-454 also renders 'No HTML Viewer tabs...' and 'Locating the generated overview page\u2026'",
+      "consequence": "The runbook sentence is true for the states it names; a presenter seeing the unlisted messages in a fresh tab finds no mention. No contradiction with the code.",
+      "minimal_fix": "Optionally add 'and the no-tabs and still-locating messages' to the list."
+    }
+  ],
+  "raw_reply_sha256": "07478d1c957015d073f725c70bcae64448433fc5026c488112fdb999d3f0f537",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager (subagent run, 2026-10-08). Brief: phase entry from dev's backlog.yaml (after the verification entry was corrected to a pure command on the trunk at 327ac0d), range 5dc1211..725cd56, diff with the session record and backlog bookkeeping excluded, scratch clone at the reviewed commit. No builder-written input."
+}
