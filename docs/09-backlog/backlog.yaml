@@ -9332,6 +9332,16 @@ items:
   next_action: Allocate the ADR code with uv run python -m src.governance --next-code adr, then
     settle storage first - the reference model and the path-validity rule are both phrased
     against it.
+  session: doc-session-bookmark-category-decision
+  completion_evidence:
+  - docs/04-decisions/ADR-029-bookmark-categories-and-batch-bridge.md
+  - docs/03-sessions/SESS-2026-10-08-01-bookmark-category-decision.md
+  result: 'ADR-029 written, proposed and awaiting the owner''s ratification (pre-approved run, 2026-10-08).
+    It decides storage (data-root JSON, one file per category), reference (immutable category_id),
+    path validity (repository-relative, validated on write, never pruned), the six bookmark routes
+    under the ADR-015 gate, the consuming surfaces, and the batch bridge contract with best-effort
+    partial delivery. uv run python -m src.governance printed Governance OK: 45 systems, 457 documents,
+    37 memories, 347 backlog phases (exit 0). Nothing was built.'
 - id: phase-wbf-04
   title: Extend the panel bridge to batch, multi-target actions
   plan: doc-workbench-features-defects
