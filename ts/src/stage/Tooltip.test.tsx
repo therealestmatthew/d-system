@@ -39,6 +39,11 @@ function mockGeometry(trigger: { top: number; bottom: number; left: number }, bu
   vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(bubble.w)
 }
 
+// The bridge element carries the position; the bubble inside it carries the height limit.
+function bridgeOf(bubble: HTMLElement): HTMLElement {
+  return bubble.parentElement as HTMLElement
+}
+
 function renderTooltip() {
   render(
     <section className="stage-region" style={{ overflow: 'hidden' }}>
@@ -54,7 +59,7 @@ describe('Tooltip placement', () => {
     const trigger = renderTooltip()
     fireEvent.mouseEnter(trigger)
     const bubble = screen.getByRole('tooltip')
-    expect(bubble.parentElement).toBe(document.body)
+    expect(bridgeOf(bubble).parentElement).toBe(document.body)
     expect(bubble.closest('.stage-region')).toBeNull()
   })
 
@@ -62,9 +67,11 @@ describe('Tooltip placement', () => {
     mockGeometry({ top: 85, bottom: 103, left: 754 })
     fireEvent.mouseEnter(renderTooltip())
     const bubble = screen.getByRole('tooltip')
-    expect(bubble.style.top).toBe('111px')
-    expect(bubble.style.bottom).toBe('')
-    expect(bubble.style.left).toBe('754px')
+    // The bridge touches the trigger (bottom 103); its 8px padding is the visible gap (CSS).
+    expect(bridgeOf(bubble).style.top).toBe('103px')
+    expect(bridgeOf(bubble).style.bottom).toBe('')
+    expect(bridgeOf(bubble).style.left).toBe('754px')
+    expect(bridgeOf(bubble).className).not.toContain('--above')
     expect(parseFloat(bubble.style.maxHeight)).toBeGreaterThanOrEqual(113)
   })
 
@@ -72,27 +79,28 @@ describe('Tooltip placement', () => {
     mockGeometry({ top: 640, bottom: 658, left: 400 })
     fireEvent.mouseEnter(renderTooltip())
     const bubble = screen.getByRole('tooltip')
-    expect(bubble.style.bottom).toBe(`${VH - 640 + 8}px`)
-    expect(bubble.style.top).toBe('')
+    expect(bridgeOf(bubble).style.bottom).toBe(`${VH - 640}px`)
+    expect(bridgeOf(bubble).style.top).toBe('')
+    expect(bridgeOf(bubble).className).toContain('stage-tooltip__bridge--above')
   })
 
   it('shifts the bubble left so its right edge stays inside the viewport', () => {
     mockGeometry({ top: 85, bottom: 103, left: 1250 })
     fireEvent.mouseEnter(renderTooltip())
-    expect(screen.getByRole('tooltip').style.left).toBe(`${VW - 8 - 240}px`)
+    expect(bridgeOf(screen.getByRole('tooltip')).style.left).toBe(`${VW - 8 - 240}px`)
   })
 
   it('keeps the bubble off the left edge', () => {
     mockGeometry({ top: 85, bottom: 103, left: 2 })
     fireEvent.mouseEnter(renderTooltip())
-    expect(screen.getByRole('tooltip').style.left).toBe('8px')
+    expect(bridgeOf(screen.getByRole('tooltip')).style.left).toBe('8px')
   })
 
   it('limits the height to the room on the chosen side when the text is taller than the room', () => {
     mockGeometry({ top: 300, bottom: 318, left: 400 }, { w: 240, h: 900 })
     fireEvent.mouseEnter(renderTooltip())
     const bubble = screen.getByRole('tooltip')
-    const room = bubble.style.top ? VH - 318 - 16 : 300 - 16
+    const room = bridgeOf(bubble).style.top ? VH - 318 - 16 : 300 - 16
     expect(parseFloat(bubble.style.maxHeight)).toBeLessThanOrEqual(room)
     expect(parseFloat(bubble.style.maxHeight)).toBeLessThanOrEqual(0.6 * VH)
   })
@@ -102,7 +110,49 @@ describe('Tooltip placement', () => {
     fireEvent.mouseEnter(renderTooltip())
     vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(600)
     fireEvent(window, new Event('resize'))
-    expect(screen.getByRole('tooltip').style.left).toBe(`${600 - 8 - 240}px`)
+    expect(bridgeOf(screen.getByRole('tooltip')).style.left).toBe(`${600 - 8 - 240}px`)
+  })
+})
+
+describe('Tooltip scrolling when the viewport is short', () => {
+  // jsdom has no scrolling, so scrollTop is backed by a variable that behaves as a browser does:
+  // reading the height while the bubble's maxHeight is lifted for measurement clamps it to 0.
+  function backScrollTop(bubble: HTMLElement) {
+    let value = 0
+    Object.defineProperty(bubble, 'scrollTop', {
+      configurable: true,
+      get: () => value,
+      set: (next: number) => {
+        value = next
+      },
+    })
+    Object.defineProperty(bubble, 'offsetHeight', {
+      configurable: true,
+      get: () => {
+        if (bubble.style.maxHeight === 'none') value = 0
+        return 900
+      },
+    })
+  }
+
+  it('keeps the bubble scroll position when the bubble itself scrolls', () => {
+    mockGeometry({ top: 85, bottom: 103, left: 754 }, { w: 240, h: 900 })
+    fireEvent.mouseEnter(renderTooltip())
+    const bubble = screen.getByRole('tooltip')
+    backScrollTop(bubble)
+    bubble.scrollTop = 40
+    fireEvent.scroll(bubble)
+    expect(bubble.scrollTop).toBe(40)
+  })
+
+  it('keeps the bubble scroll position when the page places it again', () => {
+    mockGeometry({ top: 85, bottom: 103, left: 754 }, { w: 240, h: 900 })
+    fireEvent.mouseEnter(renderTooltip())
+    const bubble = screen.getByRole('tooltip')
+    backScrollTop(bubble)
+    bubble.scrollTop = 40
+    fireEvent(window, new Event('resize'))
+    expect(bubble.scrollTop).toBe(40)
   })
 })
 
@@ -124,15 +174,20 @@ describe('Tooltip hover collapse (REQ-006 R03)', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
 
-  it('stays open while the pointer is over the portaled bubble, then collapses on leaving it', () => {
+  it('stays open while the pointer crosses the bridge onto the bubble, then collapses on leaving', () => {
     mockGeometry({ top: 85, bottom: 103, left: 754 })
     const trigger = renderTooltip()
     const wrapper = trigger.parentElement as HTMLElement
     fireEvent.mouseEnter(wrapper)
     const bubble = screen.getByRole('tooltip')
-    // React sees the bubble as inside the wrapper, so moving onto it is not a leave.
-    fireEvent.mouseOut(trigger, { relatedTarget: bubble })
-    fireEvent.mouseOver(bubble, { relatedTarget: trigger })
+    const bridge = bridgeOf(bubble)
+    // The bridge touches the trigger and its padding spans the gap to the visible bubble, so the
+    // pointer goes trigger -> bridge -> bubble without crossing outside the tooltip. React sees the
+    // portaled bridge as inside the wrapper, so none of these moves is a leave.
+    fireEvent.mouseOut(trigger, { relatedTarget: bridge })
+    fireEvent.mouseOver(bridge, { relatedTarget: trigger })
+    fireEvent.mouseOut(bridge, { relatedTarget: bubble })
+    fireEvent.mouseOver(bubble, { relatedTarget: bridge })
     expect(screen.getByRole('tooltip')).toBeTruthy()
     fireEvent.mouseOut(bubble, { relatedTarget: document.body })
     expect(screen.queryByRole('tooltip')).toBeNull()

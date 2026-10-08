@@ -1350,12 +1350,25 @@ body {
 
 /* Portaled to document.body and placed in JS (`Tooltip.tsx`, idea 000130): inside .stage-region,
    which sets overflow hidden, the bubble was cut off by a strip only a few lines high. `fixed`
-   is a fallback only; the component sets left, top or bottom and maxHeight from the trigger's
-   live box and the viewport. The body scrolls only when the viewport leaves less room than the
-   text needs. */
-.stage-tooltip__bubble {
+   is a fallback only; the component sets left, and top or bottom, on the bridge and maxHeight on
+   the bubble, from the trigger's live box and the viewport. The bubble scrolls only when the
+   viewport leaves less room than the text needs. */
+.stage-tooltip__bridge {
   position: fixed;
   z-index: 1000;
+  /* Transparent: spans the 8px gap between the trigger and the visible bubble, so the pointer
+     stays inside the tooltip's hover region while it crosses (keep equal to VIEWPORT_MARGIN in
+     Tooltip.tsx). */
+  padding-top: 8px;
+}
+
+.stage-tooltip__bridge--above {
+  padding-top: 0;
+  padding-bottom: 8px;
+}
+
+.stage-tooltip__bubble {
+  display: block;
   overflow-y: auto;
   width: 15rem;
   max-width: 40vw;
