@@ -7,7 +7,7 @@ kind: requirement
 status: draft
 owner: repository-owner
 created: '2026-09-14'
-updated: '2026-09-14'
+updated: '2026-10-08'
 systems: [sys-ui, sys-demo-stage, sys-api]
 depends_on: [doc-workbench-requirements, doc-workbench-terminal-decision, doc-workbench-api-decision]
 ---
@@ -82,6 +82,34 @@ settle.
 | R21 | A global-cap refusal reaches the browser as a structured close frame carrying a quotable reason, not as `CloseEvent` code 1006 with an empty reason, and the panel displays that reason. | Fill the cap, attempt one more connection, and read the `CloseEvent` in the browser. Confirm the code and reason are the structured ones and that the panel quotes the reason rather than a generic message. The current code closes before `accept()` (line 288), which uvicorn converts to an HTTP 403 handshake rejection. |
 | R22 | The interaction between the `D_SYSTEM_DEMO_SHELL` operator override and a client's per-session shell selection is no longer silent: it is either documented in the demo terminal OPS document, or changed so the override applies only when no explicit shell is requested. The choice is stated with its reason. | Set the override, request `shell=bash`, and confirm the observed behavior matches what the document says happens. A behavior the document does not describe is the defect, whichever behavior was chosen. |
 | R23 | With `D_SYSTEM_DEMO_TERMINAL` unset, loading the workbench produces no 404 console entries, and the existing correct degradation is unchanged — disabled dropdowns, the absent-terminal message, no uncaught exceptions. | Load with the flag unset and count 404 entries in the browser console; four were measured in `phase-wb-03`, and the target is zero. Confirm the three degradation behaviors still hold, so silencing the probes did not silence the feature. |
+| R24 | An unprovoked drop of a terminal session has a stated cause found by reproduction. A diagnosis note says, for each candidate cause, which side closed the socket, with what close code and reason, after how long, whether the shell process survived, and whether the panel opened a second session or only showed its closed message. A cause that could not be reproduced is stated as such, with each candidate ruled out and the measurement that ruled it out. A test in the suite exercises the closing path found. | Read the note for the five facts per candidate. Run `uv run pytest test/test_demo_terminal.py` and confirm the new test fails against the behaviour the note blames (or, where the diagnosis found no fault, that it pins the ruled-out behaviour). A cause asserted without a reproduction is the guess `000246` says the diagnosis exists to avoid. |
+| R25 | The HTML Viewer's file selector shows at least eight entries at once, in a popup that opens on the side with more room and scrolls inside for a longer list. The shared popover no longer applies a fixed 120 px height floor that exceeds the room on its chosen side, and its dismiss control stays inside the viewport. | In a directory with more than twenty compatible files, open the selector at 1280x720 and 1024x768 in both layouts and count the fully visible entries: eight or more. Scroll the list to its end. Confirm the dismiss control is on screen (`REQ-006` R03). Two entries visible is the defect `000108` reported. |
+| R26 | Every consumer of the shared popover is accounted for in an audit note that gives its measured bubble height at 1280x720 in both layouts and an outcome: content fully shown, fixed by the shared change, or a recorded reason it cannot be. | Run `grep -rl "Popover" ts/src` and compare the consumers with the note's rows. A consumer missing from the note is a failure, which is the sibling bug `000117` warned would otherwise resurface as a fresh report. |
+| R27 | Hovering the `?` tooltip in the notes strip shows the whole tooltip text inside the viewport rather than cut off at the strip's bottom edge, and the tooltip still collapses when the pointer leaves it (`REQ-006` R03). The same holds for every other tooltip consumer (the terminal panel and the overview panel). | At 1280x720 and 1024x768 in both layouts, hover each tooltip trigger and compare the bubble's bounding box with the viewport and its text height with its scroll height. Move the pointer away and confirm the bubble is gone. Confirm `REQ-006` R02 zero page scroll still holds. |
+| R28 | When a folder's listing fails to load after the user has browsed to it from another folder, the File Browser shows its could-not-search message, not "Loading…", and a later successful browse replaces the message. While a listing is pending, the panel still shows "Loading…" and builds no tree from another folder's entries. | In a vitest test, answer the first folder's request with a list and the second's with a server error, browse to the second, and expect the alert message. Run a second case where the second request is still pending and expect "Loading…" and no entries from the first folder. |
+| R29 | With `D_SYSTEM_DEMO_TERMINAL` unset in the frontend process, an HTML Viewer tab holding a persisted file selection shows the absent-page message and does not frame the application shell. With the flag set, the same selection renders as before for `.html`, `.md` and image files. | Run the dev server on a free port with the flag unset, store a viewer tab naming an existing file, load the page, and read the panel: absent-page text and no iframe loading the app's `index.html`. Repeat with the flag set and confirm the file renders. A panel reading "ready" over the app shell is the defect `000555` records. |
+| R30 | A terminal session that fails to start (the backend accepts, then closes with the startup-failure code and its reason) shows that reason in the panel. A session that ran and was closed by the idle bound or by the shell exiting still shows the generic closed message. | In a vitest test, use a stub socket that opens and closes with the startup-failure code and reason, and expect the reason on screen; repeat with an ordinary close and expect the generic message. Run `uv run pytest test/test_demo_terminal.py` to confirm the backend half of `000573` still holds. |
+| R31 | The demo runbook's HTML Viewer entry names the header toggle by both of its labels ("Embedded" and "Open-in-tab link (rung 3)"), says what each state shows, says how to switch back, and states which descope-ladder rung the control is. No wording contradicts the control's behaviour in `HtmlViewerRegion.tsx`. | Read the entry beside `ts/src/stage/HtmlViewerRegion.tsx` and click the toggle in the running viewer; confirm each statement matches what appears. A presenter who clicks the control mid-demo must be able to explain and reverse it from the script (`000105`). |
+
+## Amendment, 2026-10-08: seven phases for uncovered defects
+
+The owner decided on 2026-10-08 to amend the features plan with phases for the workbench defect
+ideas that no phase covered, so they can be built in the same run. Rows `R24` to `R31` cover them;
+each maps to one new phase in [`PLAN-027`](../01-plans/PLAN-027-workbench-features-defects.md)'s
+*Amendment* section. The sixteen ideas this document was written for are unchanged.
+
+The scan found eleven candidate ideas. Four were checked against the code on this branch and
+dropped or narrowed, because the defect no longer reproduces:
+
+| Idea | Finding | Where verified |
+|---|---|---|
+| `000556` | Fixed. The Idea Explorer's status list holds all nine schema statuses, and a test compares it with the schema enum | `ts/src/stage/IdeaExplorerRegion.tsx:23-33`; `test/test_workbench_api.py:555` |
+| `000516` | Fixed. The queue precedence map holds all nine statuses, including `set_aside`, and a test compares it with the schema enum | `src/api/routes/workbench.py:507-517`; `test/test_workbench_api.py:550` |
+| `000463` | Fixed. The workbench ranking is the `000516` row above, and the two consumers outside the workbench now read the status list from the schema | `tools/overview_metrics.py:47`; `src/orchestrator/state.py:72` |
+| `000573` | Narrowed. The backend half is fixed. The panel's missing reason is `R30` | `src/api/routes/demo_terminal.py:354-366`; `ts/src/stage/TerminalRegion.tsx:243-250` |
+
+No row covers the three fixed ideas. They remain `triaged` in the log; closing them is the idea
+lifecycle's work, not this document's.
 
 ## Out of scope
 
@@ -92,7 +120,7 @@ settle.
 
 ## Traceability
 
-Every row maps to at least one phase, and every `phase-wbf-*` phase carries at least one row. The
+Every row maps to at least one phase, and every `phase-wbf-*` implementation phase carries at least one row. The
 mapping table lives in
 [`PLAN-027`](../01-plans/PLAN-027-workbench-features-defects.md)'s *Requirement coverage* section
 rather than here, so the phase list and its coverage stay in one document.

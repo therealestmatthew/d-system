@@ -7,7 +7,7 @@ kind: plan
 status: draft
 owner: repository-owner
 created: '2026-09-14'
-updated: '2026-09-14'
+updated: '2026-10-08'
 systems: [sys-ui, sys-demo-stage, sys-api]
 depends_on: [doc-workbench-features-defects-requirements, doc-workbench-requirements, doc-workbench-terminal-decision, doc-workbench-api-decision]
 ---
@@ -24,6 +24,10 @@ shippable.
 It runs behind `P10` on the owner's ruling of 2026-09-14, so that `G40`'s vocabulary is settled
 before any work here renames anything. The plan codes were already permanent by then, which is why
 `PLAN-027` sits before `PLAN-028` while running after it; `next_up` is the authority on order.
+
+> **Amended 2026-10-08.** Seven phases, `phase-wbf-12` to `phase-wbf-18`, were added for workbench
+> defect ideas that no phase covered. The counts below describe the plan as first written; the
+> *Amendment, 2026-10-08* section gives the additions.
 
 **16 ideas across 9 fine groups**, from the accepted partition of 2026-09-13. Six of the sixteen were
 already delivered when this plan was written. This plan turns the remaining ten into **10 phases**
@@ -295,6 +299,102 @@ is outside this property for the reason given above.
 | R21 A cap refusal reaches the browser as a structured close | `phase-wbf-09` |
 | R22 The shell override's interaction is documented or reconciled | `phase-wbf-09` |
 | R23 Flag-off produces no 404 console entries | `phase-wbf-10` |
+
+## Amendment, 2026-10-08: phases for the uncovered defect ideas
+
+### What was added and why
+
+A scan of the idea log on 2026-10-08 found open workbench ideas that no phase covered. Several
+were raised after this plan was written (the unprovoked terminal drop on 2026-09-15, the review
+follow-ups of early October); others were recorded earlier and missed the partition. **The owner
+decided on 2026-10-08 to amend this plan with phases for the uncovered defect ideas, so they can be
+built in the same run.** The amendment adds `G57` to `G63`, seven phases and eight requirement rows
+(`R24` to `R31`, in [REQ-012](../06-requirements/REQ-012-workbench-features-defects.md)).
+
+The amendment covers defects only. Five uncovered ideas that are not defects (`000360`, `000122`,
+`000123`, `000569`, `000583`) are not planned here.
+
+Each defect was checked against the code on this branch before a phase was written. Three ideas no
+longer reproduce and get no phase, and one is narrower than its text:
+
+| Idea | Outcome |
+|---|---|
+| `000556` (Idea Explorer status filter) | Dropped: fixed. `IdeaExplorerRegion.tsx:23-33` lists all nine schema statuses, and a test compares the list with the schema enum |
+| `000516` (queue precedence map and the set-aside status) | Dropped: fixed. `src/api/routes/workbench.py:507-517` ranks all nine statuses, and a test compares the map with the schema enum |
+| `000463` (consumers that hard-code old statuses) | Dropped: fixed. The workbench ranking is the `000516` case; `tools/overview_metrics.py:47` and `src/orchestrator/state.py:72` now read the list from the schema, so the two consumers outside the workbench share the same fix and are done too |
+| `000573` (close the adapter and socket on startup failure) | Narrowed: the backend half is fixed (`src/api/routes/demo_terminal.py:354-366`); `phase-wbf-17` covers only the panel not showing the reason |
+
+The suggested grouping of the idea-status vocabulary defects (`000556`, `000516`, `000463`) into one
+phase therefore disappears. The other grouping changed in one place: `000130` (the rotator help
+tooltip) is **not** grouped with `000108` and `000117`. Those two are the shared popover's height
+floor in `Popover.tsx`; `000130` guessed it was another popover consumer, but the `?` is
+`Tooltip.tsx`, a different component clipped by a different mechanism (`.stage-region` sets
+`overflow: hidden`, `StagePage.css:97`), so it gets `phase-wbf-14` with its own files.
+
+### Phases and groups added
+
+| Group | Ideas | What it covers | Phase |
+|---|---|---|---|
+| `G57` Terminal unprovoked drop | `000246` | The bash panel dropped its connection and restarted with no trigger, and the owner ran a live demo outside the workbench. Diagnosis is the deliverable; the leading candidate is the 300 s receive-idle bound, which shell output does not reset | `phase-wbf-12` |
+| `G58` Popover height floor | `000108`, `000117` | The HTML Viewer file selector shows about two entries because the shared popover opens upward whenever 120 px are free above it. Fix the shared component and audit its nine consumers | `phase-wbf-13` |
+| `G59` Tooltip clipping | `000130` | The notes strip `?` tooltip is cut off at the panel bottom. The font size and text capacity half of the idea is left to the owner | `phase-wbf-14` |
+| `G60` File Browser error | `000594` | A failed folder listing shows "Loading…" forever because the folder-mismatch test runs before the error test | `phase-wbf-15` |
+| `G61` Viewer page check | `000555` | With the file route absent, the dev server's fallback answers the existence check and the viewer frames the app shell | `phase-wbf-16` |
+| `G62` Startup failure message | `000573` | The backend closes a failed session start with code 4003 and a reason; the panel does not show it | `phase-wbf-17` |
+| `G63` Runbook toggle | `000105` | The runbook does not describe the viewer header's Embedded and Open-in-tab toggle | `phase-wbf-18` |
+
+| Phase | Title | Group | Depends on |
+|---|---|---|---|
+| `phase-wbf-12` | Diagnose the terminal panel's unprovoked drop and restart | `G57` | — |
+| `phase-wbf-13` | Open popovers toward the side with room so the file selector shows its list | `G58` | — |
+| `phase-wbf-14` | Stop the notes strip tooltip being cut off at the panel bottom | `G59` | — |
+| `phase-wbf-15` | Show the File Browser error when a folder listing fails after a folder change | `G60` | — |
+| `phase-wbf-16` | Report a missing HTML Viewer page when the file route is absent | `G61` | — |
+| `phase-wbf-17` | Show the reason in the terminal panel when a session fails to start | `G62` | — |
+| `phase-wbf-18` | Document the HTML Viewer Embedded and Open-in-tab toggle in the runbook | `G63` | — |
+
+None carries a `depends_on` edge. Their rows name the panels by product name and rename no slot,
+panel, region or layout identifier, so the vocabulary rule in *Sequencing against `P10`* does not
+apply. As before, `phase-arch-02` may rename files these phases edit; that is a file-level conflict
+for a coordinator to sequence.
+
+All seven are queued and sit at the end of the backlog's phase list, outside `next_up`.
+
+### Assumptions the amendment makes
+
+- `phase-wbf-12` is a diagnosis phase. Its deliverable is a note under `docs/00-working/` and a
+  test; it fixes the cause only when the cause is found and the change is a few lines.
+- `phase-wbf-13` leaves out a user-resizable popup. Idea `000108` calls it worth considering, not
+  required.
+- `phase-wbf-14` leaves the notes strip's font size and text capacity unchanged. Idea `000130`
+  asks to reconsider them; that is a design decision for the owner, and `phase-wbf-06` already
+  changes how the strip handles long entries.
+- `phase-wbf-18` documents the toggle and does not hide it behind the demo flag, the other option
+  idea `000105` offered. The control's "rung 3" label comes from `PLAN-021`'s ladder; the runbook's
+  own ladder lists the same fallback as rung 7. The phase records the mismatch and changes neither.
+
+### Concurrency
+
+The new phases share systems, so some cannot be active together. `phase-wbf-12` collides with
+`phase-wbf-17` (both declare `sys-wb-terminal`) and with `phase-wbf-18` (both declare
+`sys-demo-stage`); `phase-wbf-13` and `phase-wbf-14` share `sys-wb-shared`, `sys-wb-styles` and
+`StagePage.css`; `phase-wbf-16` shares `sys-wb-viewer` with `phase-wbf-01` and `phase-wbf-02`.
+`phase-wbf-15` shares nothing with the other new phases.
+
+### Requirement coverage added
+
+| Requirement | Phases |
+|---|---|
+| R24 An unprovoked terminal drop has a stated cause found by reproduction | `phase-wbf-12` |
+| R25 The file selector shows at least eight entries and opens toward the side with room | `phase-wbf-13` |
+| R26 Every popover consumer is accounted for in an audit | `phase-wbf-13` |
+| R27 The tooltip shows whole inside the viewport and still collapses | `phase-wbf-14` |
+| R28 A failed folder listing shows its error, not Loading | `phase-wbf-15` |
+| R29 With the file route absent, the viewer reports the page missing | `phase-wbf-16` |
+| R30 A startup failure's reason reaches the panel | `phase-wbf-17` |
+| R31 The runbook documents the viewer toggle | `phase-wbf-18` |
+
+Every new row maps to one phase and every new phase carries at least one row.
 
 ## Key references
 

@@ -17389,3 +17389,332 @@ items:
     The owner has not yet chosen between options A, B and C.
   resume_when: The owner selects option A at ARCH-012's owner decision gate and phase-bnd-08 is complete.
     Review the scope against current dev before releasing it.
+- id: phase-wbf-12
+  title: Diagnose the terminal panel's unprovoked drop and restart
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  ideas:
+  - '000246'
+  systems:
+  - sys-api
+  - sys-demo-stage
+  - sys-wb-terminal
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Find out what closes the terminal socket when no user action provoked it (idea 000246: the
+    owner saw the bash panel drop and restart before a live demo and ran the demo outside the
+    workbench). The diagnosis is the deliverable; a fix proposed before the cause is known is a
+    guess.'
+  - 'Reproduce, or rule out with a measurement, each candidate: the backend idle bound
+    (src/api/routes/demo_terminal.py:377 breaks the receive loop after
+    DEFAULT_IDLE_TIMEOUT_SECONDS = 300 with no client frame, and the panel sends frames only for
+    keystrokes and resizes, so shell output alone does not reset it); the six-session cap; an
+    exception in the output pump; the shell exiting; and the effect cleanup in
+    ts/src/stage/TerminalRegion.tsx that closes and reopens a socket on a remount.'
+  - 'For each candidate record which side closed the socket, with what close code and reason, after
+    how long, whether the shell process survived, and whether the panel opened a second session or
+    only showed its closed message (TerminalRegion.tsx:341).'
+  - 'Add a test to test/test_demo_terminal.py that exercises the closing path found. Apply a fix
+    only when the cause is found and the change is a few lines in demo_terminal.py or
+    TerminalRegion.tsx; otherwise record the proposed fix in the note and stop.'
+  - Leave the provoked transitions (layout switch, panel switch, reload) to phase-arch-16's audit
+    and the cap race and close reason to phase-wbf-09, which is complete.
+  acceptance:
+  - REQ-012 R24 holds - the note names the cause with the reproduction that shows it, or states
+    that it could not be reproduced and lists each candidate ruled out with the measurement that
+    ruled it out.
+  - REQ-012 R24 holds on its test half - a test in test/test_demo_terminal.py exercises the
+    closing path found (or pins the ruled-out behaviour), and uv run pytest test/test_demo_terminal.py
+    passes.
+  verification:
+  - uv run pytest test/test_demo_terminal.py
+  - uv run ruff check src/ test/ tools/
+  - uv run python -m src.governance
+  - cd ts && npm run build when ts/src/stage/TerminalRegion.tsx changes
+  deliverables:
+  - docs/00-working/terminal-unprovoked-drop-diagnosis.md
+  - test/test_demo_terminal.py
+  - src/api/routes/demo_terminal.py
+  - ts/src/stage/TerminalRegion.tsx
+  next_action: Test the idle bound first, because it is the one candidate the code reading already
+    supports. Start the backend with D_SYSTEM_DEMO_TERMINAL=1 and
+    D_SYSTEM_DEMO_TERMINAL_IDLE_TIMEOUT_SECONDS=2, open a session, run a command that prints for
+    several seconds without any keystroke, and read the close code and reason the client receives.
+    CMD and PowerShell on the owner's Windows machine are owner-machine checks; mark them not run.
+- id: phase-wbf-13
+  title: Open popovers toward the side with room so the file selector shows its list
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  ideas:
+  - '000108'
+  - '000117'
+  systems:
+  - sys-wb-shared
+  - sys-wb-styles
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Fix the HTML Viewer file selector showing about two entries (idea 000108) in the shared
+    popover, not in the viewer (idea 000117). By code reading, ts/src/stage/Popover.tsx opens
+    upward whenever the space above reaches MIN_BUBBLE_HEIGHT_PX = 120 (line 90) and then limits
+    the bubble to that space, with the same 120 px as a floor on maxHeight (line 93). A selector in
+    a header with 120 to 250 px above it therefore opens upward into a short bubble while far more
+    room is below. Measure it before changing anything.'
+  - Choose the opening side from the room each side has for the bubble, not from a fixed 120 px
+    threshold, and keep the dismiss control inside the viewport. The body already scrolls
+    (.stage-popover__body), so a longer list scrolls inside the bubble.
+  - Make the file selector's list show at least eight entries where the viewport has room for them.
+    Its own cap is max-height 14rem at ts/src/stage/StagePage.css:755; change it only if the
+    measurement shows it limits the count.
+  - 'Audit all nine consumers of the popover (HtmlViewerRegion, InjectionDropdowns, TerminalMenu,
+    TerminalRegion, NotesStripRegion, DirectoryPickerDialog and CommandPanel in ts/src/stage;
+    LayoutConfigDialog and Slot in ts/src/workbench) and record each one''s visible height and
+    outcome in docs/00-working/popover-consumer-audit.md. Fix only what the shared component
+    causes; list a consumer-specific problem in the note.'
+  - 'Leave out a user-resizable popup: idea 000108 calls it worth considering, not required.'
+  acceptance:
+  - REQ-012 R25 holds - at 1280x720 and 1024x768 in both layouts the file selector shows at least
+    eight entries from a directory with more than twenty, scrolls inside the popup for the rest,
+    and its dismiss control stays on screen.
+  - REQ-012 R26 holds - the audit note lists every consumer found by grep, each with its measured
+    visible height and an outcome.
+  verification:
+  - cd ts && npm test
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - 'Playwright measurement of the file selector at 1280x720 and 1024x768 in both layouts, counting fully visible .stage-html-viewer__file-option elements: at least 8 (REQ-012 R25)'
+  deliverables:
+  - ts/src/stage/Popover.tsx
+  - ts/src/stage/Popover.test.tsx
+  - ts/src/stage/StagePage.css
+  - docs/00-working/popover-consumer-audit.md
+  next_action: Before editing, open the file selector in the running workbench at 1280x720 and
+    record which side it opens on, its bubble height and how many entries show, so the change is
+    measured against a baseline. Then list the consumers with grep -rln "Popover" ts/src and check
+    the count against the nine named here.
+- id: phase-wbf-14
+  title: Stop the notes strip tooltip being cut off at the panel bottom
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  ideas:
+  - '000130'
+  systems:
+  - sys-wb-shared
+  - sys-wb-styles
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Fix the rotator help tooltip being cut off at the bottom of its panel (idea 000130). The idea
+    guessed this was another consumer of the shared popover; by code reading it is not. The `?`
+    is ts/src/stage/Tooltip.tsx, whose bubble is position absolute at top 130%
+    (ts/src/stage/StagePage.css:1194) inside .stage-region, which sets overflow hidden
+    (StagePage.css:97), and the notes strip is only a few lines high. Confirm this by measuring
+    before changing anything.'
+  - 'Render the tooltip bubble outside the clipping ancestor, anchored to the trigger and clamped
+    to the viewport as ts/src/stage/Popover.tsx already does with a portal, keeping the hover and
+    focus open and the pointer-leave collapse of REQ-006 R03. It has three consumers
+    (NotesStripRegion, TerminalRegion and OverviewRegion); all three get the fix.'
+  - Leave the notes strip's font size and text capacity unchanged. The idea asks for them to be
+    reconsidered, which is a design decision for the owner, and phase-wbf-06 already changes how
+    the strip handles long entries. Record the open question in the session record.
+  acceptance:
+  - REQ-012 R27 holds - hovering the `?` in the notes strip, the terminal panel and the overview
+    panel shows the whole tooltip inside the viewport at 1280x720 and 1024x768 in both layouts.
+  - REQ-012 R27 holds on collapse - moving the pointer off the trigger and bubble removes the
+    tooltip, and REQ-006 R02 zero page scroll still holds.
+  verification:
+  - cd ts && npm test
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - 'Playwright hover on each tooltip trigger at 1280x720 and 1024x768 in both layouts: bubble bounding box inside the viewport and its text fully visible (REQ-012 R27)'
+  deliverables:
+  - ts/src/stage/Tooltip.tsx
+  - ts/src/stage/Tooltip.test.tsx
+  - ts/src/stage/StagePage.css
+  next_action: Hover the notes strip's `?` in the running workbench at 1280x720 and record the
+    bubble's bounding box against the strip's, to confirm the clipping comes from the region's
+    overflow hidden and not from the shared popover. If the measurement says otherwise, stop and
+    report before editing.
+- id: phase-wbf-15
+  title: Show the File Browser error when a folder listing fails after a folder change
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  ideas:
+  - '000594'
+  systems:
+  - sys-wb-explorers
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Fix the File Browser showing "Loading…" forever when a folder fetch fails after the user
+    browses to a new folder (idea 000594). ts/src/stage/FileBrowserRegion.tsx:574 renders the
+    loading message when entriesFolder !== contextFolder before it tests loadState === ''error''
+    at line 576. A failed fetch never advances entriesFolder, so the error branch is unreachable
+    after a folder change.'
+  - Test the error state before the folder-mismatch test, and keep the stale-render protection the
+    mismatch test exists for (buildTree at line 351 still receives no entries from another
+    folder).
+  - 'Add a vitest test that fails on the current order: a fetch that succeeds for the first
+    folder and fails for the second, then a browse to the second.'
+  acceptance:
+  - REQ-012 R28 holds - after browsing to a folder whose listing fails, the panel shows the
+    could-not-search message with role alert, not Loading, and a later successful browse replaces
+    it.
+  - The stale-render case still holds - while a folder's listing is pending the panel shows
+    Loading and builds no tree from the previous folder's entries.
+  verification:
+  - cd ts && npm test
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/FileBrowserRegion.tsx
+  - ts/src/stage/FileBrowserRegion.test.tsx
+  next_action: Write the failing test first (success for the root folder, status 500 for the
+    second folder, then browse to it) and confirm it shows Loading before changing the render
+    order.
+- id: phase-wbf-16
+  title: Report a missing HTML Viewer page when the file route is absent
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  ideas:
+  - '000555'
+  systems:
+  - sys-wb-viewer
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Fix the HTML Viewer''s page-exists check being fooled by the dev server''s fallback (idea
+    000555). ts/src/stage/HtmlViewerRegion.tsx:252 sends a HEAD to /workbench-file/<file> and
+    treats any ok response as ready. ts/vite.config.ts:472 registers that route only when
+    D_SYSTEM_DEMO_TERMINAL is 1 in the frontend process, so with it unset the fallback answers
+    200 with the app shell, the viewer reports ready and frames the shell. The idea cited line
+    268; the check is at line 252.'
+  - 'Make the check accept only a response that came from the file route. A header the route sets
+    on every file response (Content-Security-Policy: sandbox, ts/vite.config.ts:264) is the
+    candidate discriminator; state the choice and its reason. Do not edit ts/vite.config.ts; if
+    the discriminator needs a change there, stop and report.'
+  - 'Leave OverviewRegion.tsx:64 alone: it probes the generated-overview route, which is always
+    registered.'
+  acceptance:
+  - REQ-012 R29 holds - with the flag unset in the frontend process, a viewer tab holding a
+    persisted selection shows the absent-page message and does not frame the app shell.
+  - REQ-012 R29 holds with the flag set - the same selection still renders, and the .html, .md
+    and image cases are unchanged.
+  verification:
+  - cd ts && npm test
+  - cd ts && npm run build
+  - uv run python -m src.governance
+  - 'Dev server on a free port with D_SYSTEM_DEMO_TERMINAL unset in the frontend process and a stored viewer tab naming an existing file: the panel text is the absent-page message and no iframe loads index.html; repeat with the flag set (REQ-012 R29)'
+  deliverables:
+  - ts/src/stage/HtmlViewerRegion.tsx
+  - ts/src/stage/HtmlViewerRegion.test.tsx
+  next_action: Reproduce first - start the frontend with the flag unset, store a viewer tab naming
+    an existing file under the key the viewer persists to, load the page and confirm the iframe
+    frames the app shell. Then check that a HEAD to a real file carries the sandbox header and a
+    HEAD answered by the fallback does not.
+- id: phase-wbf-17
+  title: Show the reason in the terminal panel when a session fails to start
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  ideas:
+  - '000573'
+  systems:
+  - sys-wb-terminal
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Finish idea 000573. Its backend half is already fixed: src/api/routes/demo_terminal.py:354-366
+    closes the adapter and the socket when create_adapter() or adapter.start() raises after
+    accept(), with close code 4003 and the reason "The terminal session failed to start". What is
+    left is the panel: ts/src/stage/TerminalRegion.tsx:243-250 quotes a close reason only when the
+    socket never opened or the code is 4001, so a 4003 close shows the generic "Terminal
+    connection closed. Reload the page to reconnect."'
+  - 'Make the panel quote the backend''s reason for a startup failure, using the existing
+    refusal message path (connectionRefusalMessage), and keep the generic message for a session
+    that ran and ended.'
+  - 'Add a vitest test with a stub WebSocket that opens and then closes with code 4003 and the
+    backend''s reason, and expect that reason on screen.'
+  - Leave out the Windows ConPTY adapter after a failed spawn. It is an owner-machine check;
+    mark it not run.
+  acceptance:
+  - REQ-012 R30 holds - a session closed with the startup-failure code shows the backend's
+    reason in the panel, and a session that ran and was closed by the idle bound or the shell
+    exiting still shows the generic closed message.
+  - REQ-012 R30 holds on the backend half - uv run pytest test/test_demo_terminal.py passes with
+    the startup-failure tests unchanged.
+  verification:
+  - cd ts && npm test
+  - cd ts && npm run build
+  - uv run pytest test/test_demo_terminal.py
+  - uv run python -m src.governance
+  deliverables:
+  - ts/src/stage/TerminalRegion.tsx
+  - ts/src/stage/TerminalRegion.test.tsx
+  next_action: Read STARTUP_FAILURE_CLOSE_CODE and its reason in src/api/routes/demo_terminal.py
+    and the close handler in TerminalRegion.tsx, then write the failing stub-socket test before
+    changing the handler. If phase-wbf-12 is also queued, run it first - both may change the same
+    close handler.
+- id: phase-wbf-18
+  title: Document the HTML Viewer Embedded and Open-in-tab toggle in the runbook
+  plan: doc-workbench-features-defects
+  sources:
+  - doc-workbench-features-defects-requirements
+  ideas:
+  - '000105'
+  systems:
+  - sys-demo-stage
+  owner: repository-owner
+  status: queued
+  priority: 4
+  session_budget: 1
+  depends_on: []
+  scope:
+  - 'Add the HTML Viewer header toggle to the runbook''s HTML Viewer entry in
+    docs/00-working/demo-runbook.md (idea 000105). The entry at line 254 lists the refresh
+    button, the file dropdown and the directory button but not the toggle at
+    ts/src/stage/HtmlViewerRegion.tsx:398-405, which switches between "Embedded" and "Open-in-tab
+    link (rung 3)". A presenter who clicks it mid-demo cannot explain or reverse it from the
+    script.'
+  - 'Say what each state shows (the iframe, or an "Open page in a new tab" link), how to switch
+    back, and how it relates to the descope ladder. The control''s label says rung 3, which is
+    the ladder in PLAN-021; the runbook''s own ladder lists the same fallback as rung 7 (line
+    17). Record the mismatch in the runbook entry and the session record.'
+  - 'Document the control; do not hide it behind the demo flag and do not change its label. That
+    choice, which the idea offered as the alternative, stays with the owner.'
+  acceptance:
+  - REQ-012 R31 holds - the runbook entry names the toggle by both labels, says what each state
+    shows and how to reverse it, and states which ladder rung it is.
+  - No wording in the entry contradicts ts/src/stage/HtmlViewerRegion.tsx, checked by reading the
+    labels and the open-link text in the code.
+  verification:
+  - grep -n "Open-in-tab" docs/00-working/demo-runbook.md prints a line inside the HTML Viewer entry
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/demo-runbook.md
+  next_action: Read the runbook's HTML Viewer entry and the toggle's code, then add the entry. If
+    phase-wbf-01 has changed the header since 2026-10-08, re-read the header before writing.
