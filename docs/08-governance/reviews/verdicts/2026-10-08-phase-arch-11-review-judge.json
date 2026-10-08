@@ -1,0 +1,42 @@
+{
+  "verdict_id": "2026-10-08-phase-arch-11-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-arch-11",
+  "reviewed_commit": "051fedf4f270c02993f7680582acac7a14992664",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Unrelated pytest failure under root runner",
+      "evidence": "04-gate.txt lines 79-100: test_an_unwritable_worktree_parent_is_refused DID NOT RAISE Refused; chmod 0o500 has no effect for root (pytest tmp path /tmp/pytest-of-root); diff is a single markdown file",
+      "consequence": "Manifest result reads failed although the phase verification (src.governance) passed; the failure is not attributable to this diff",
+      "minimal_fix": "None for this phase; separately skip that test when running as root"
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Section 5.2 and the closing 'Facts the build can rely on' paragraph read as direction",
+      "evidence": "Note section 5.2 bullet 'Signal the group when the process has children' and the paragraph after the section 9 table",
+      "consequence": "Could be read as decided requirements for phase-arch-12, although 5.3 and the framing say the policy is not chosen",
+      "minimal_fix": "Retitle 5.2 as recorded practices, not decisions"
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Section 3.1 counts a standing rule as a recorded event",
+      "evidence": "Section 3.1 lead-in says three recorded events; the third table row is a standing rule, undated",
+      "consequence": "Cosmetic overstatement",
+      "minimal_fix": "Say two recorded events and the standing rule they produced"
+    }
+  ],
+  "raw_reply_sha256": "32a2de40db8fae931e74d603c73505adada46f2b8db444c03fea46951501393d",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), same brief as the gating reviewer plus the runner manifest; no checkout. Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}
