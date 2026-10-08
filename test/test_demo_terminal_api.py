@@ -1632,11 +1632,13 @@ def test_teardown_waits_for_an_inflight_inject_before_closing_the_adapter(
             original_close()
 
         monkeypatch.setattr(adapter, "close", _recording_close)
-        client.portal.call(output.write_lock.acquire)  # type: ignore[union-attr]
+        portal = client.portal
+        assert portal is not None
+        portal.call(output.write_lock.acquire)
         websocket.close()
         time.sleep(0.8)
         assert not closed.is_set(), "the adapter was closed while a write was in flight"
-        client.portal.call(output.write_lock.release)  # type: ignore[union-attr]
+        portal.call(output.write_lock.release)
         assert closed.wait(5.0)
     assert wait_until(lambda: not module.SESSIONS)
 
