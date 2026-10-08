@@ -1348,11 +1348,15 @@ body {
   padding: 0;
 }
 
+/* Portaled to document.body and placed in JS (`Tooltip.tsx`, idea 000130): inside .stage-region,
+   which sets overflow hidden, the bubble was cut off by a strip only a few lines high. `fixed`
+   is a fallback only; the component sets left, top or bottom and maxHeight from the trigger's
+   live box and the viewport. The body scrolls only when the viewport leaves less room than the
+   text needs. */
 .stage-tooltip__bubble {
-  position: absolute;
-  top: 130%;
-  left: 0;
-  z-index: 20;
+  position: fixed;
+  z-index: 1000;
+  overflow-y: auto;
   width: 15rem;
   max-width: 40vw;
   padding: 0.5rem 0.6rem;
