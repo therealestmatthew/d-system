@@ -461,10 +461,54 @@ def test_directory_entries_and_the_unchanged_fields_are_still_present(
     assert re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z", docs["modified_at"])
 
 
+def test_an_out_of_range_mtime_is_null_and_the_listing_still_answers(
+    rebuild_app: Callable[..., FastAPI], mtime_probe: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    real_lstat = Path.lstat
+
+    def lstat_with_far_future_mtime(self: Path) -> os.stat_result:
+        result = real_lstat(self)
+        if self == mtime_probe:
+            fields = list(result)
+            fields[8] = 2**40  # st_mtime as an int: a year far beyond datetime's range
+            return os.stat_result(fields)
+        return result
+
+    monkeypatch.setattr(Path, "lstat", lstat_with_far_future_mtime)
+    parent = mtime_probe.parent.relative_to(REPO_ROOT).as_posix()
+    client = TestClient(rebuild_app(flag="1"))
+    for route in (WORKBENCH_LIST_PATH, WORKBENCH_SEARCH_PATH):
+        response = client.get(route, params={"path": parent})
+        assert response.status_code == 200
+        assert [e["modified_at"] for e in response.json() if e["name"] == "probe.html"] == [None]
+
+
+def test_a_symlink_reports_its_own_mtime_not_its_outside_target(
+    rebuild_app: Callable[..., FastAPI], mtime_probe: Path, tmp_path: Path
+) -> None:
+    outside = tmp_path / "outside.html"
+    outside.write_text("<p>outside</p>", encoding="utf-8")
+    os.utime(outside, (1_000_000_000, 1_000_000_000))  # 2001-09-09, the target's time
+    link = mtime_probe.parent / "link.html"
+    link.symlink_to(outside)
+    os.utime(link, (1_700_000_000, 1_700_000_000), follow_symlinks=False)
+    parent = mtime_probe.parent.relative_to(REPO_ROOT).as_posix()
+    try:
+        client = TestClient(rebuild_app(flag="1"))
+        entries = client.get(WORKBENCH_LIST_PATH, params={"path": parent}).json()
+        link_entry = next(e for e in entries if e["name"] == "link.html")
+        assert link_entry["modified_at"] == "2023-11-14T22:13:20.000Z"
+        assert "2001-09-09" not in str(link_entry["modified_at"])
+    finally:
+        link.unlink(missing_ok=True)
+
+
 def test_an_unreadable_mtime_is_reported_as_null_not_an_error(tmp_path: Path) -> None:
+    assert workbench_module._modified_at(tmp_path / "removed-between-listing-and-stat.html") is None
     dangling = tmp_path / "dangling.html"
     dangling.symlink_to(tmp_path / "missing.html")
-    assert workbench_module._modified_at(dangling) is None
+    # A dangling link still has its own mtime; lstat never looks at the missing target.
+    assert workbench_module._modified_at(dangling) is not None
 
 
 # --- Copy absolute path (ADR-015 consequences, REQ-007 W09) ------------------------------------

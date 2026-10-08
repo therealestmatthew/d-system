@@ -268,6 +268,9 @@ export default function HtmlViewerRegion() {
       isCompatible: isViewerCompatible,
     })
     if (plan.assignments.length === 0) return plan.receipt
+    // No refresh-token bump is needed here, unlike `openInTab`: the plan only fills an empty tab
+    // (pageKey goes from null to the file) or a new tab (a new id), and never replaces a tab that
+    // holds a page, so a delivered file always starts a fresh read of its mtime.
     nextTabIdRef.current += plan.assignments.filter((assignment) => assignment.newTab).length
     const apply = (previous: ViewerTab[]): ViewerTab[] => {
       const next = [...previous]
@@ -420,6 +423,10 @@ export default function HtmlViewerRegion() {
     const handle: ViewerBridgeHandle = {
       tabs: tabs.map((tab, index) => ({ id: tab.id, label: `Tab ${index + 1}` })),
       openInTab: (tabId, path) => {
+        // Same as the dropdown: opening the file a tab already shows re-reads it (REQ-012 R04).
+        if (tabsRef.current.find((tab) => tab.id === tabId)?.selectedFile === path) {
+          setRefreshToken((value) => value + 1)
+        }
         updateTab(tabId, { selectedFile: path })
         setActiveTabId(tabId)
       },
@@ -474,7 +481,11 @@ export default function HtmlViewerRegion() {
             className="stage-html-viewer__modified"
             role="status"
             data-testid="html-viewer-modified"
-            title={modifiedState === 'known' ? `Last modified ${modifiedAt} (UTC)` : undefined}
+            title={
+              modifiedState === 'known' && modifiedAt !== null
+                ? `Last modified ${formatModified(modifiedAt)} (your local time); ${modifiedAt} UTC`
+                : undefined
+            }
             style={{ fontSize: '0.75rem', whiteSpace: 'nowrap', color: '#4a5568' }}
           >
             {modifiedState === 'known' && modifiedAt !== null

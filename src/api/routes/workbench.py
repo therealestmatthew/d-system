@@ -271,13 +271,17 @@ def _walk_visible_tree(start: Path) -> list[Path]:
 
 
 def _modified_at(path: Path) -> str | None:
-    """`path`'s mtime as an ISO 8601 UTC string, or `None` when it cannot be read."""
+    """`path`'s own mtime as an ISO 8601 UTC string, or `None` when it cannot be reported.
+
+    Uses `lstat`, so a symlink reports the link's mtime and never the mtime of a target that may lie
+    outside the repository (ADR-015 rule 2). A time the platform can store but a datetime cannot
+    hold (a corrupt or far-future mtime) is `None` as well, so one such file cannot fail a listing.
+    """
     try:
-        seconds = path.stat().st_mtime
-    except OSError:
+        moment = datetime.fromtimestamp(path.lstat().st_mtime, tz=UTC)
+        return moment.isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    except (OSError, OverflowError, ValueError):
         return None
-    moment = datetime.fromtimestamp(seconds, tz=UTC)
-    return moment.isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
 def _to_entry(path: Path) -> DirectoryEntry:

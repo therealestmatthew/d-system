@@ -224,4 +224,69 @@ describe('HtmlViewerRegion last-modified badge', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Refresh the current page' }))
     await waitFor(() => expect(badge().textContent).toBe(`Modified ${localStamp('2026-03-06T00:00:01.000Z')}`))
   })
+
+  it('reads the time again when the file browser opens the displayed file in its own tab (R04)', async () => {
+    const mtimes: Record<string, string | null> = { '_public/a.html': '2026-03-01T10:00:00.000Z' }
+    stubBackendWithMtimes(mtimes)
+    await viewerHoldingSelection('_public/a.html')
+    await waitFor(() => expect(badge().textContent).toBe(`Modified ${localStamp('2026-03-01T10:00:00.000Z')}`))
+    const tabId = viewerBridge.get()?.tabs[0].id ?? -1
+
+    mtimes['_public/a.html'] = '2026-03-07T12:00:00.000Z'
+    act(() => {
+      viewerBridge.get()?.openInTab(tabId, '_public/a.html')
+    })
+    await waitFor(() => expect(badge().textContent).toBe(`Modified ${localStamp('2026-03-07T12:00:00.000Z')}`))
+  })
+
+  it('reads the time of a file opened by a batch even when another tab already shows it (R04)', async () => {
+    const mtimes: Record<string, string | null> = { '_public/a.html': '2026-03-01T10:00:00.000Z' }
+    stubBackendWithMtimes(mtimes)
+    await viewerHoldingSelection('_public/a.html')
+    await waitFor(() => expect(badge().textContent).toBe(`Modified ${localStamp('2026-03-01T10:00:00.000Z')}`))
+
+    mtimes['_public/a.html'] = '2026-03-08T08:00:00.000Z'
+    act(() => {
+      viewerBridge.get()?.openFiles?.(['_public/a.html'])
+    })
+    expect(screen.getAllByRole('tab')).toHaveLength(2)
+    await waitFor(() => expect(badge().textContent).toBe(`Modified ${localStamp('2026-03-08T08:00:00.000Z')}`))
+  })
+
+  it('shows a pending badge, never the previous file time, while the read is outstanding', async () => {
+    const mtimes = {
+      '_public/a.html': '2026-03-01T10:00:00.000Z',
+      '_public/b.html': '2026-03-02T11:30:45.000Z',
+    }
+    stubBackendWithMtimes(mtimes)
+    const realFetch = globalThis.fetch
+    let releaseListForB: () => void = () => {}
+    const gate = new Promise<void>((resolve) => {
+      releaseListForB = resolve
+    })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input)
+        if (url.includes('/workbench/list') && url.includes('q=b.html')) await gate
+        return realFetch(input, init)
+      }),
+    )
+    render(<HtmlViewerRegion />)
+    await screen.findByText('Select a file from the dropdown above, or a directory to search.')
+    act(() => {
+      viewerBridge.get()?.openFiles?.(['_public/a.html', '_public/b.html'])
+    })
+    await waitFor(() => expect(badge().textContent).toBe(`Modified ${localStamp(mtimes['_public/a.html'])}`))
+    fireEvent.click(screen.getByRole('tab', { name: 'Tab 2' }))
+    await waitFor(() => expect(badge().textContent).toBe('Modified …'))
+    releaseListForB()
+    await waitFor(() => expect(badge().textContent).toBe(`Modified ${localStamp(mtimes['_public/b.html'])}`))
+  })
+
+  it('says in the title that the visible time is local time', async () => {
+    stubBackendWithMtimes({ '_public/a.html': '2026-03-01T10:00:00.000Z' })
+    await viewerHoldingSelection('_public/a.html')
+    await waitFor(() => expect(badge().getAttribute('title')).toContain('your local time'))
+  })
 })
