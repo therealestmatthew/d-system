@@ -8777,8 +8777,15 @@ items:
   systems:
   - sys-wb-layout
   - sys-wb-styles
+  - sys-demo-stage
+  - sys-wb-terminal
+  - sys-wb-notes
+  - sys-wb-explorers
+  - sys-wb-viewer
+  - sys-ui
   owner: repository-owner
-  status: queued
+  agent: agent-builder-a
+  status: active
   priority: 2
   session_budget: 1
   depends_on:
@@ -8801,9 +8808,28 @@ items:
   deliverables:
   - ts/src/workbench/
   - ts/src/stage/StagePage.css
+  - ts/src/stage/StagePage.tsx
+  - ts/src/stage/TerminalRegion.tsx
+  - ts/src/stage/HtmlViewerRegion.tsx
+  - ts/src/stage/OverviewRegion.tsx
+  - ts/src/stage/FileBrowserRegion.tsx
+  - ts/src/stage/explorer/ExplorerRegion.tsx
+  - ts/src/stage/NotesStripRegion.tsx
+  - ts/src/stage/*.test.tsx
+  - ts/src/stage/explorer/*.test.tsx
+  - ts/vite.config.ts
+  - _data/workbench/
+  - schemas/workbench-layout.schema.json
+  - schemas/workbench-slot-schemas.schema.json
+  - schemas/workbench-panel-elements.schema.json
+  - test/test_workbench_layout_schema.py
+  - test/test_workbench_fit_contracts.py
+  - test/test_workbench_slot_matcher.py
+  - src/workbench/
   - docs/06-requirements/
   next_action: Assert the one-header count as a test before changing the rendering, so idea
-    000101's defect is reproduced by the check first.
+    000101's defect is reproduced by the check first. Deliverables widened at claim time per
+    ADR-031's "What each downstream phase builds" row (owner ruling 2026-10-08).
 - id: phase-arch-08
   title: Multi-instance panel identity across layout, storage, registry and sessions
   plan: doc-workbench-architecture-quality
