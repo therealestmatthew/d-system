@@ -57,6 +57,14 @@ function buildSearchUrl(directory: string): string {
   return `${SEARCH_URL}?${params.toString()}`
 }
 
+/** The URL a tab's file is opened at outside the workbench: the same `/workbench-file/` URL the
+ * "Open page in a new tab" link uses, so the route renders markdown and wraps images there exactly
+ * as it does for the panel's iframe (idea 000119's route-side ruling), with the route's
+ * `Content-Security-Policy: sandbox` applying to the top-level navigation (REQ-012 R02). */
+function fileHref(path: string | null): string | null {
+  return path ? `${WORKBENCH_FILE_PREFIX}${path}` : null
+}
+
 function makeEmptyTab(id: number): ViewerTab {
   return { id, directory: null, searchText: '', selectedFile: null }
 }
@@ -371,7 +379,14 @@ export default function HtmlViewerRegion() {
   const embedSrc = activeTab?.selectedFile
     ? `${WORKBENCH_FILE_PREFIX}${activeTab.selectedFile}?v=${refreshToken}`
     : null
-  const openTabHref = activeTab?.selectedFile ? `${WORKBENCH_FILE_PREFIX}${activeTab.selectedFile}` : null
+  const openTabHref = fileHref(activeTab?.selectedFile ?? null)
+
+  // REQ-012 R01: opens the given tab's own file (not necessarily the active tab's) in a new
+  // browser tab. A tab with no file selected has nothing to open and does nothing.
+  const openTabInBrowser = (tab: ViewerTab) => {
+    const href = fileHref(tab.selectedFile)
+    if (href !== null) window.open(href, '_blank', 'noopener,noreferrer')
+  }
 
   return (
     <section className="stage-region stage-region--html-viewer" aria-label="HTML Viewer">
@@ -467,6 +482,18 @@ export default function HtmlViewerRegion() {
                 aria-selected={tab.id === activeTabId}
                 className="stage-html-viewer__tab-select"
                 onClick={() => setActiveTabId(tab.id)}
+                // Double-click opens this tab's file in a new browser tab (REQ-012 R01). The two
+                // clicks still select the tab first, which is harmless. Keyboard equivalent:
+                // Shift+Enter or Shift+Space on the focused tab. Plain Enter/Space keep selecting.
+                onDoubleClick={() => openTabInBrowser(tab)}
+                onKeyDown={(event) => {
+                  if (event.shiftKey && (event.key === 'Enter' || event.key === ' ')) {
+                    event.preventDefault()
+                    openTabInBrowser(tab)
+                  }
+                }}
+                aria-keyshortcuts="Shift+Enter Shift+Space"
+                title="Double-click, or press Shift+Enter, to open this tab's file in a new browser tab"
               >
                 Tab {index + 1}
               </button>
