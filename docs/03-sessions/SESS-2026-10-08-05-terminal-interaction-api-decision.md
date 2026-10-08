@@ -32,15 +32,15 @@ in `REQ-012` `R15`:
   `D_SYSTEM_DEMO_TERMINAL=1`. Additive, so no rehearsed launch command changes.
 - **Binding:** loopback only, using the existing launch-time check, plus a per-request peer
   address check.
-- **Authentication:** a bearer token on every route, generated at startup into the gitignored
-  `data/terminal-api-token`. The record states what an unauthenticated loopback inject allows and
+- **Authentication:** a bearer token on every route, generated at startup into a file in the
+  owner's profile directory, outside the repository (`~/.d-system/terminal-api/<key>.token`). The record states what an unauthenticated loopback inject allows and
   what the token does not cover.
 - **Session identity:** the `ADR-014` registry id, discovered by a list route, never chosen by the
   caller; an unknown id is refused, never created.
 - **Output buffering:** the pump becomes the only adapter reader and appends to a 256 KiB byte
   ring per session; HTTP reads are offset-based and non-destructive.
-- **Sessions outliving the websocket:** no. `ADR-014` decision 4 stands; HTTP activity extends the
-  idle bound.
+- **Sessions outliving the websocket:** no. `ADR-014` decision 4 stands; an accepted inject extends
+  the idle bound up to a ceiling, a read never does.
 
 It states what `ADR-014` already owns (`R16`) in a table and proposes no second registry. It gives
 `phase-wbf-08` three routes with request and response shapes, the error codes, and the "routes
@@ -72,18 +72,20 @@ matter is `status: draft`. `phase-wbf-08` builds against it.
    names a path.
 2. The numbers (256 KiB buffer, 4096 byte input limit, 64 KiB default and 256 KiB maximum read,
    10 second maximum wait) are recommendations. None is in the source ideas or requirement.
-3. Token file at `data/terminal-api-token`: `data/` is gitignored and exists in each worktree. The
-   location is a recommendation.
+3. Token file location (`~/.d-system/terminal-api/<key>.token`, keyed by a hash of the repository
+   root) is a recommendation, changed from `data/` after review finding F03.
 4. The websocket route has no authentication or `Origin` check. This is from reading
    `demo_terminal.py`, not from running a test against it.
 5. The ConPTY and Windows file-mode checks are owner-machine, not run.
 
 ## Awaiting ratification
 
-The eight items under "Open items for the owner" in the ADR: the second flag; the bearer token; no
-detach or reattach; HTTP activity extending the idle bound; documentation scope of
+The ten items under "Open items for the owner" in the ADR: the second flag; the bearer token; no
+detach or reattach; an accepted inject extending the idle bound up to a one hour ceiling; documentation scope of
 `phase-wbf-08`; buffer depth and input limit; the unauthenticated websocket (a separate decision);
-and the pointers to add on ratification (`ADR-014`, idea `000087`).
+the pointers to add on ratification (`ADR-014`, idea `000087`); the token file location; and
+that the second flag also switches output capture on. The review fixes below are the Session
+Manager's choices under the owner's pre-approval and are awaiting ratification too.
 
 ## Unresolved
 
@@ -91,3 +93,29 @@ and the pointers to add on ratification (`ADR-014`, idea `000087`).
   module needs `src/api/__init__.py`, which is outside both. Not edited here; the entry needs
   widening before it is claimed.
 - The websocket route's missing authentication (item 7 in the ADR) is not decided here.
+
+## Review
+
+The gating review (demo-adversary) passed `f07cad0` with four major and three minor findings. The
+verdict record is
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-07-demo-adversary.json`, copied unchanged.
+Each finding is fixed in `ADR-030`:
+
+- F01 (major): reads never extend the idle bound; an accepted inject extends it only up to
+  `TERMINAL_API_INJECT_CEILING_SECONDS` (3600) since the last websocket frame. Open item 4 states
+  the trade.
+- F02 (major): inject reads the raw body behind the auth dependency and validates by hand, query
+  parameters are parsed by hand, every error uses the shared shape, and the precedence is 403, 401,
+  404, 415, 413, 422, 409.
+- F03 (major): the env-var rejection now names the real differences between a file and a variable;
+  the token file moves outside the repository to the owner's profile directory (open item 9).
+- F04 (major): atomic creation (unlink, `O_CREAT|O_EXCL|O_NOFOLLOW`, `0o600`), an absolute path
+  derived from the repository root and logged in full, a path parameter for tests, a single-process
+  note, and Windows protection marked unverified.
+- F05 (minor): the output record and the idle changes exist only when the second flag is set (open
+  item 10).
+- F06 (minor): stall coupling documented, pump drains to EOF after exit (capture on only),
+  `OSError` on write maps to 409 `session_ended`, a dedicated write executor, and the lock's limit
+  to HTTP requests stated.
+- F07 (minor): a validation table (raw body limit, parameter bounds, session id 404-not-422, peer
+  edge cases), the long-poll wake mechanism, and `after` landing mid-sequence.

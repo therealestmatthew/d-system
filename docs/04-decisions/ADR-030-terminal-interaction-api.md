@@ -22,6 +22,13 @@ gates `phase-wbf-08` (build the flag-gated terminal inject and read API), which 
 recommendation below, so a different ruling changes that phase's scope. The ratification points are
 collected in "Open items for the owner" at the end. Nothing is built by this record.
 
+The gating review of this record (`phase-wbf-07`, verdict
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-07-demo-adversary.json`) passed with four
+major and three minor findings. Each is fixed below. The fixes pick the safer option in each case;
+they are the Session Manager's choices under the owner's pre-approval and are **awaiting the
+owner's ratification** with the rest of the record (open items 4, 9 and 10 carry the ones that
+change what the owner is asked to approve).
+
 ## Context
 
 Idea `000087` (terminal interaction API for driving demo shell sessions from outside the stage
@@ -82,7 +89,12 @@ that a shell capability beyond its stated scope starts from its own decision rec
 6. **The workbench routes and the terminal routes use different prefixes.** The terminal router is
    mounted at `/api/v1/demo/terminal`; the workbench routes at `/api/v1/workbench`. `ADR-015`
    scopes its read-only rule (rule 4) to the workbench routes.
-7. **`data/` is gitignored** (`.gitignore`), so a file written there is never tracked.
+7. **Every shell starts in the server's working directory.** `create_adapter(shell, cwd=None)` in
+   `src/demo/factory.py` is called without a `cwd` (`demo_terminal.py`), so a session's shell
+   starts where the server was launched, normally the repository root. Anything under that tree,
+   including the gitignored `data/`, can be read with `cat` from inside any session, and so by an
+   agent such as `claude` running in one. A file elsewhere on disk is still readable by a shell
+   that runs as the owner; only its discoverability differs.
 
 Vocabulary follows `brain/concepts/terms-workbench-ui.md`: a slot is the container and a panel is
 its content. This record names no slot by identifier. "The terminal panel" is the content the stage
@@ -122,7 +134,7 @@ variable on the launches that want the API.
 3. No setting widens this. Binding beyond loopback starts from a new decision record, as `ADR-014`
    and `ADR-015` state.
 
-### 3. Authentication: a bearer token on every route, read from a file in `data/`
+### 3. Authentication: a bearer token on every route, read from a file outside the repository
 
 **What an unauthenticated loopback inject allows, stated plainly.** Loopback is reachable by every
 process on the machine, not only the owner's. With no authentication, any such process, and any web
@@ -155,12 +167,36 @@ Two facts reduce this and two limit the reduction.
 
 **Decision: every route requires `Authorization: Bearer <token>`.**
 
-- The token is `secrets.token_urlsafe(32)`, generated when the API module is imported and written to
-  `data/terminal-api-token` (the directory is gitignored; the module creates it if absent) with file
-  mode `0600` on POSIX. The file is rewritten on each server start, so a token is valid for one
-  server run. The path is logged at startup; the token never is.
-- If the token cannot be generated or written, the module raises at import, the same way a
-  non-loopback bind does, so the application does not start with the API mounted and unprotected.
+- The token is `secrets.token_urlsafe(32)`, generated when the API module is imported. That module
+  is imported only when both flags are set, so a launch with either flag unset never generates or
+  writes a token.
+- **Location.** The file is `~/.d-system/terminal-api/<key>.token`, where `<key>` is the first 16
+  hex characters of the SHA-256 of the absolute repository root path. On Windows `~` is the user
+  profile directory. The directory is created with mode `0700` (POSIX), and on POSIX the module
+  refuses to continue if it is a symlink or not owned by the current user. The key keeps two
+  checkouts or worktrees from overwriting each other's token. The path is derived in one function,
+  `token_file_path(repo_root)`, that takes the repository root as a parameter, so tests pass a
+  temporary directory and never touch a real token. The **absolute path is logged in full at
+  startup**; the token never is. A caller reads the path from that log line.
+- **Why there and not under the repository.** Shells start in the repository (fact 7), so a file
+  under it is the first thing `ls`, `grep -r` or an agent exploring the working tree finds. A file
+  in the owner's profile directory is not in any session's working tree, is not touched by
+  `git clean`, and on Windows sits under the profile whose default permissions exclude other users,
+  which a repository checked out in an arbitrary folder does not guarantee. This is a discoverability
+  and permissions gain, not a barrier: a shell that runs as the owner can read the file if it knows
+  the path (see "What the token does not do").
+- **Atomic creation.** On each start the module removes any existing file at that path, then
+  creates it with `os.open(path, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW, 0o600)` (`O_NOFOLLOW`
+  where the platform defines it) and writes the token through that descriptor. Opening an existing
+  file for writing keeps its old mode, and chmod after creation leaves a window at the umask mode,
+  so neither is acceptable. A symlink planted at the path cannot redirect the write.
+- **One process.** The token belongs to one server process. `uvicorn --reload` and `--workers N`
+  import the module once per process, each rewrites the file, the last writer wins, and the other
+  processes then reject the file's token. The API is supported for a single-process launch, which
+  is what every documented launch command is; the ADR does not make multi-process launches work.
+- **Fail closed.** If the token cannot be generated or written, the module raises at import, the
+  same way a non-loopback bind does, so the application does not start with the API mounted and
+  unprotected. Only a launch with both flags set can be affected.
 - Comparison uses `hmac.compare_digest`. A missing, malformed or wrong token returns `401` with
   error code `unauthorized` and no other hint. Authentication is checked **before** the session
   lookup, so an unauthenticated caller cannot learn whether a session id exists.
@@ -170,13 +206,19 @@ Two facts reduce this and two limit the reduction.
   web page on another origin cannot send an authenticated request. The inject route additionally
   requires `Content-Type: application/json` (`415` otherwise), so even a request that skipped
   authentication could not be a browser "simple request".
-- There is no environment-variable form of the token. A token in the server's environment would be
-  inherited by every shell the terminal starts.
+- There is no environment-variable form of the token. The reason is narrow: a variable set in the
+  server's environment appears in the environment of every child process the server starts,
+  including every shell, without anyone reading a file, and is visible in process listings on
+  some platforms. It is not that a file is out of a shell's reach (see below).
 
-What the token does not do: it does not stop a process that can read `data/terminal-api-token`.
-That is a process running as the owner, which can already run anything the owner can (see
-"Limits"). On Windows, the file-mode restriction is best-effort and the check is
-owner-machine, not run.
+What the token does not do: it does not stop a process that can read the token file. A shell
+started by the terminal runs as the owner and can read any file the owner can, so an agent in a
+session that learns the path can drive other sessions. That is a process running as the owner,
+which can already run anything the owner can (see "Limits"). What the token does stop is other OS
+users, web pages on other origins, and anything that can reach the port but cannot read the owner's
+profile directory. **On Windows, the protection from other local users rests on the profile
+directory's default permissions plus the `0700`/`0600` modes, which have no effect there. It is
+unverified: owner-machine, not run.**
 
 ### 4. Session identity: the `ADR-014` id, discovered by a list route, never chosen by the caller
 
@@ -210,8 +252,23 @@ buffer, never the adapter (`R18`).**
   block in `terminal_websocket`). Membership and the cap remain `SESSIONS` and `RESERVED`; the
   record is not consulted for either. `phase-wbf-08` may realise this as a sibling mapping or as
   a richer value in `SESSIONS`, provided exactly one structure decides whether a session exists.
-- The record also holds the shell name requested (or none), the creation time, and a
-  last-activity time used by section 6.
+- The record also holds the shell name requested (or none), the creation time, the time of the
+  last accepted inject, the time of the last websocket frame, and a wake signal for long-poll
+  waiters (see the validation table).
+- **The record exists only when the second flag is set.** The API module, when mounted, switches
+  capture on in `demo_terminal.py` (a module-level setting such as `OUTPUT_CAPTURE_ENABLED`, read
+  by the pump and the idle loop). With it off, which is every launch under the first flag alone, no
+  record is created, nothing is buffered, and the pump and the idle loop behave exactly as they do
+  today.
+- **Known coupling.** The pump awaits `websocket.send_bytes` between reads. A browser that stops
+  consuming (a hidden or stalled tab) backs up that send, the pump stops reading, and the buffer
+  stops filling while the shell keeps writing. An HTTP reader's liveness therefore depends on the
+  browser consuming. This record accepts that and does not decouple the buffer from the send.
+- **Draining after exit.** The pump loop runs while `adapter.alive`, and the POSIX adapter's `read`
+  returns `b""` when the process has exited, so the last bytes written before exit can be left
+  unread. With capture on, after the shell exits the pump keeps reading until `read` returns empty
+  and appends and sends that tail, so the tail the ADR promises readers (section 6) is complete.
+  With capture off the pump is unchanged.
 
 ### 6. Whether sessions outlive their websocket: no
 
@@ -224,27 +281,58 @@ no detach, no reattach, and no grace period.
 - When the shell exits while the websocket is still open, the session stays in `SESSIONS`.
   The read route returns the retained output with `"alive": false`, and the inject route returns
   `409` with error code `session_ended`.
-- **HTTP activity keeps the idle bound honest.** An accepted inject and a read both update the
-  session's last-activity time. When the websocket receive times out, the route checks the
-  last-activity time and keeps waiting if HTTP activity occurred inside the idle window. Without
-  this, a script driving a session under an idle tab would lose it after 300 seconds (fact 3). The
-  websocket still has to be open; the bound only decides when a silent session is reaped.
+- **An accepted inject extends the idle bound, up to a ceiling; a read never does.** The idle bound
+  exists to reap a shell whose peer vanished without a close frame, and such a websocket looks open
+  (`demo_terminal.py`, D06-A finding 2), so "the websocket is open" cannot be the test. A read
+  therefore does not extend it: a poller of `GET .../output?wait=10` would otherwise keep a
+  dead-peer shell and its cap slot alive indefinitely, and six of those lock out every new
+  terminal. An accepted inject records the time. When the websocket receive times out, the route
+  keeps waiting if an inject was accepted inside the idle window **and** less than
+  `TERMINAL_API_INJECT_CEILING_SECONDS` (3600) has passed since the last websocket frame (or since
+  the session started, if none). After the ceiling the next timeout reaps the session as today.
+  So a script that injects every few minutes under an idle tab keeps its session for at most an
+  hour, and a dead-peer shell is held for at most that hour past its last frame.
+- **What this costs the script.** A session that is only read, or that is injected once and then
+  left running a long command, is reaped 300 seconds after the last websocket frame or accepted
+  inject (`D_SYSTEM_DEMO_TERMINAL_IDLE_TIMEOUT_SECONDS` is the knob). A job longer than that needs
+  a keystroke in the panel, a further inject, or a larger value of the variable.
+- The extension is active only when the second flag is set (see "Absence with the flag unset").
 
 ### The contract `phase-wbf-08` builds
 
 All routes are under the existing terminal prefix, `/api/v1/demo/terminal`, in a new module
 `src/api/routes/demo_terminal_api.py` mounted from `src/api/__init__.py` inside the existing flag
-block and behind the second flag. All routes check, in order: peer address, bearer token, then the
-request. Errors share one shape:
+block and behind the second flag. Errors share one shape:
 
 ```json
 { "error": { "code": "unknown_session", "message": "No live terminal session has that id" } }
 ```
 
 Codes and statuses: `forbidden_peer` 403, `unauthorized` 401, `unknown_session` 404,
-`session_ended` 409, `invalid_request` 422 (malformed body or query), `payload_too_large` 413,
-`unsupported_media_type` 415. A route that does not exist (a flag unset) returns the framework
+`unsupported_media_type` 415, `payload_too_large` 413, `invalid_request` 422 (malformed body or
+query), `session_ended` 409. A route that does not exist (a flag unset) returns the framework
 default `404` with a `detail` body, which is how a caller tells "flag off" from "unknown session".
+A wrong method on a mounted route returns the framework's own `405`.
+
+**Precedence.** Every request is checked in this order and the first failure answers:
+**403, 401, 404, 415, 413, 422, 409** (peer, token, session lookup, content type, size, shape of
+the request, state of the session). An unauthenticated caller therefore gets 401 whatever the body
+holds, and learns nothing about session ids.
+
+**How to build it so the order and the shape hold.** FastAPI validates a Pydantic body or typed
+query parameter before a handler runs and answers a failure with its own 422 and a
+`{"detail": [...]}` body, and never emits 415. Built that way, a malformed body without a token
+would answer 422 instead of 401. Replacing that with an app-wide `RequestValidationError` handler
+would change every route and is outside `phase-wbf-08`'s deliverables. So the routes do not use
+framework validation:
+
+- one dependency, applied to all three routes, checks the peer and then the token and raises the
+  shared-shape error (a small exception class with a handler registered on the API router, or a
+  response returned directly);
+- `POST .../input` takes the `Request`, checks the content type, reads the raw body with
+  `request.stream()` under the size limit below, and parses and validates the JSON by hand;
+- the query parameters of `GET .../output` are read from `request.query_params` and validated by
+  hand.
 
 **`GET /sessions`**
 
@@ -278,10 +366,17 @@ Request, `Content-Type: application/json`:
   characters in
   `input` (for example `\u0003` for Ctrl-C) reach the shell.
 - The encoded `input` plus the optional `\r` may not exceed **4096 bytes** (`413 payload_too_large`).
-  A longer injection is several requests.
-- The write runs off the event loop (`run_in_executor`), because `adapter.write()` is a blocking
-  `os.write` on the PTY, and is serialised per session with an `asyncio.Lock` so two requests do not
-  interleave their bytes.
+  A longer injection is several requests. The raw request body limit is separate and is in the
+  validation table.
+- The write runs off the event loop, because `adapter.write()` is a blocking `os.write` on the PTY.
+  It runs on a **dedicated** `ThreadPoolExecutor`, not the default executor, because the pump uses
+  the default executor for every read and a blocked write must not starve it. It is serialised per
+  session with an `asyncio.Lock` so two HTTP requests do not interleave their bytes. **The lock
+  covers HTTP requests only.** The websocket path still calls `adapter.write()` directly, so a
+  keystroke from the browser can land between two HTTP injects; this record does not claim
+  otherwise.
+- An `OSError` raised by `adapter.write()` (a shell that exits between the `alive` check and the
+  write) is answered `409 session_ended`, not a 500.
 
 Response `200`:
 
@@ -330,19 +425,56 @@ Response `200`:
 - An unknown id is `404 unknown_session`. A session whose shell has exited still answers `200`
   with `"alive": false` until its websocket closes.
 
+### Validation rules `phase-wbf-08` implements
+
+| Input | Rule | Result |
+|---|---|---|
+| Peer address | `request.client` is `None`, or its host is not loopback. Loopback is decided with the `ipaddress` module: `is_loopback`, or an IPv4-mapped IPv6 address (`::ffff:127.0.0.1`) whose mapped IPv4 is loopback. The string `localhost` is not accepted as a peer. | 403 `forbidden_peer` |
+| `Authorization` | Scheme `Bearer` (case-insensitive) and a token equal to the file's, by `hmac.compare_digest`. Anything else, including a missing header. | 401 `unauthorized` |
+| `session_id` (path) | Treated as an opaque string. Anything that is not 32 lowercase hex characters, or is not in `SESSIONS`, gets the same answer, so probing the format reveals nothing. | 404 `unknown_session` (never 422) |
+| `Content-Type` (input) | Must be `application/json`, parameters such as `charset` allowed. | 415 `unsupported_media_type` |
+| Raw body (input) | At most **16384 bytes**. A `Content-Length` above it is refused before reading; otherwise the body is read in chunks and refused when it passes the limit. This is decided before the JSON is parsed. | 413 `payload_too_large` |
+| Decoded `input` (input) | UTF-8 encoded `input` plus the optional `\r` is at most 4096 bytes. | 413 `payload_too_large` |
+| Body shape (input) | A JSON object with a required string `input` and an optional boolean `submit`. An empty `input` with `submit` false, a non-string `input`, a non-boolean `submit`, an unknown key, or invalid JSON. | 422 `invalid_request` |
+| `after` (output) | Decimal digits only, so at least 0. Above `total`. Not an integer. | 422 `invalid_request` |
+| `after` below `start` | Not an error: reading starts at `start`, `from` is `start`, `truncated` is `true`. | 200 |
+| `limit` (output) | Integer from 1 to 262144, default 65536. Zero, negative, larger or not an integer. | 422 `invalid_request` |
+| `wait` (output) | Finite number from 0 to 10, default 0. Negative, larger, `nan`, `inf` or not a number. | 422 `invalid_request` |
+| Other query parameters | A repeated `after`, `limit` or `wait` is refused; a parameter this record does not name is ignored. | 422 / ignored |
+| Session state | The shell has exited (`alive` false) when an inject is validated, or the write raises `OSError`. | 409 `session_ended` |
+
+**Long-poll wake mechanism.** Each session record holds an `asyncio.Condition`. The pump calls
+`notify_all` after every append and when it ends, and `terminal_websocket`'s `finally` marks the
+record ended and notifies before the record is removed. A waiting read holds its request on
+`Condition.wait_for` bounded by `wait` and, when woken, re-reads the buffer. A read woken because
+the session ended returns `200` with whatever the buffer held, empty `text`, and `"alive": false`;
+the next call is `404 unknown_session`. This is single-loop code and needs no further lock.
+
+**`after` inside a multi-byte sequence.** `after` is a byte offset and may point into the middle of
+a UTF-8 sequence, either because the caller chose it or because the ring dropped the sequence's
+first bytes. `data_base64` is always the exact bytes from `from`. `text` drops up to three leading
+continuation bytes (`0b10xxxxxx`) before decoding, so it never begins with a replacement character
+caused by the cut. `from` and `next` are not adjusted by that.
+
 ### Absence with the flag unset (`R19`)
 
 With `D_SYSTEM_TERMINAL_API` unset, or `D_SYSTEM_DEMO_TERMINAL` unset, `demo_terminal_api` is never
 imported and none of the three routes is registered, so each returns the framework `404`. No handler
 runs, so no registry is read or written, no buffer is created, and the token file is not created.
-The buffer and last-activity record on the websocket side are part of the terminal route, which
-exists only under the first flag; with the second flag unset they exist but no route reads them.
+Capture is switched on only when the API module is mounted (section 5), so under the first flag
+alone the websocket route creates no output record, buffers nothing, and runs the idle loop it
+runs today; a rehearsed launch retains no shell output in memory for an API that is off.
 
 ### What `phase-wbf-08` must also do
 
 - **Test client address.** The per-request peer check rejects Starlette's default `TestClient`
   peer (`testclient`). The tests construct it with a loopback `client=("127.0.0.1", 50000)` and
   add one case with a non-loopback peer that expects `403 forbidden_peer`.
+- **Token file in tests.** Tests pass a temporary directory to `token_file_path` (or to the
+  function that writes the token), so no test touches the real token of a running server. One test
+  starts with a pre-existing file at mode `0644` and with a symlink at the path and asserts the
+  new file is a regular file at `0600`. The mode assertions are POSIX; Windows is owner-machine,
+  not run.
 - **Deliverables.** Its entry lists `src/api/routes/` and `test/`. Mounting the module needs a
   change to `src/api/__init__.py`, which is outside both, so the entry must also name that file
   before the phase is claimed. Documenting the second flag and the token path for operators (the
@@ -353,7 +485,11 @@ exists only under the first flag; with the second flag unset they exist but no r
   unchanged. `R18`: attach a websocket client, read over HTTP while output flows, and assert the
   websocket client received every byte the buffer holds. `R19`: with each flag unset, every route
   is `404` and `SESSIONS`, `RESERVED` and the buffer mapping are unchanged. Authentication: no
-  header, wrong token and a right token on each route, and the `401` precedes the `404`.
+  header, wrong token and a right token on each route; malformed JSON, wrong content type and an
+  oversized body without a token all answer `401`; the order 403, 401, 404, 415, 413, 422, 409 is
+  asserted with one request per adjacent pair; every error body has the shared shape. Idle bound:
+  a read does not extend it, an accepted inject does, and the ceiling reaps. With the second flag
+  unset, the pump appends nothing and no output record exists.
 
 ## Alternatives considered
 
@@ -388,9 +524,18 @@ the only control. It stops a browser page on another origin, but any local proce
 header it likes, so it adds nothing against the local-process case. A token also stops the browser
 case, so the allowlist would be redundant.
 
-**A token supplied by the owner in an environment variable.** Rejected. The server's environment is
-inherited by every shell it starts, so the token would be readable from inside the sessions it
-protects. A generated token in a file that only the caller reads avoids that, and needs no setup.
+**A token supplied by the owner in an environment variable.** Rejected, on narrower grounds than
+"unreadable from the sessions". A file and an environment variable are equally readable from a
+shell the terminal starts: `printenv` finds one, `cat` of a known path finds the other. The file
+wins only on three points. A variable is inherited by every child process the server starts, not
+only shells, and is visible in process listings on some platforms; a file is not. A file can carry
+a mode that excludes other users; a variable cannot. And a generated file needs no setup from the
+owner. These are real but modest, and the ADR does not claim more for them.
+
+**A token file under the repository, such as `data/`.** Rejected. It is gitignored, but every shell
+starts in the repository (fact 7), so it sits in the working tree a session explores, and its
+permissions depend on wherever the checkout was made. The profile directory in section 3 is outside
+every session's working tree.
 
 **A per-session capability returned when the websocket opens.** Rejected for now. It would put a
 secret in a websocket frame the terminal panel must read and show to a script, which needs changes
@@ -476,9 +621,10 @@ Each of the following would be a new capability and starts from its own decision
   the token file, the pump change, the idle-clock change, and tests for `R17`, `R18`, `R19` and
   authentication. It changes `demo_terminal.py` (the pump and the idle loop), adds one module, and
   needs `src/api/__init__.py` added to its deliverables.
-- The websocket route's behaviour for a browser is unchanged. The one change on the browser's path
-  is that the pump copies each chunk into the buffer before sending it. The browser's idle bound
-  can now be extended by HTTP activity, never shortened.
+- The websocket route's behaviour for a browser is unchanged under the first flag alone. With both
+  flags set, the pump copies each chunk into the buffer before sending it, drains the tail after
+  the shell exits, and an accepted inject can extend the idle bound up to the ceiling; the bound is
+  never shortened.
 - `ADR-014` is extended, not superseded: its decisions 1 to 5 stand. `ADR-015` is not extended: its
   rule 4 applies to the workbench routes, and this API lives under the terminal prefix. This record
   is nevertheless the "new decision record" that `ADR-014` and `ADR-015` require before a route that
@@ -490,8 +636,10 @@ Each of the following would be a new capability and starts from its own decision
 - The first flag's exposure is unchanged by this record. The websocket still has no
   authentication, and the token on this API does not make the terminal safe against a local process
   (open item 7).
-- Output retained for reading is held in server memory only, up to 256 KiB per session, and is gone
-  when the session ends or the server stops.
+- Output retained for reading is held in server memory only, up to 256 KiB per session, only when
+  the second flag is set, and is gone when the session ends or the server stops.
+- The token is a file in the owner's profile directory, outside the repository. A caller needs the
+  path from the startup log; nothing in the repository holds it.
 
 ## Open items for the owner
 
@@ -500,14 +648,19 @@ These are the points the owner is asked to ratify or change.
 1. **A second flag, `D_SYSTEM_TERMINAL_API=1`, required in addition to the first.** The
    alternative is the existing flag alone, which needs no new variable and exposes the API on every
    demo launch.
-2. **A bearer token from a generated file in `data/`, on every route.** The alternative is no
-   authentication on loopback. The owner should say whether the token's inconvenience (a caller
-   reads one file) is acceptable for the safety it buys.
+2. **A bearer token from a generated file, on every route.** The alternative is no authentication
+   on loopback. The owner should say whether the token's inconvenience (a caller reads one file) is
+   acceptable for the safety it buys. The token does not hide the file from a shell running as the
+   owner (section 3).
 3. **No detach or reattach; sessions end with their websocket.** This keeps `ADR-014` decision 4 as
    it is. A ruling for detach is a separate, larger decision.
-4. **HTTP inject and read extend the idle bound; the session ends when the websocket does.** The
-   alternative is to leave the bound on websocket frames only, which reaps a script-driven session
-   under an idle tab after 300 seconds.
+4. **An accepted inject extends the idle bound, up to a one hour ceiling since the last websocket
+   frame (`TERMINAL_API_INJECT_CEILING_SECONDS`); a read never does.** The trade: a script that
+   only reads, or that injects one long command, is reaped 300 seconds after its last inject, and
+   the owner gets back the guarantee that a dead-peer shell cannot hold a cap slot for more than an
+   hour. The alternatives are no extension at all (a script-driven session under an idle tab is
+   reaped at 300 seconds, the safest) and an extension by reads as well (a poller then keeps a
+   dead-peer shell and its slot alive indefinitely, which this record rejects).
 5. **Scope of `phase-wbf-08`'s documentation.** The record leaves open whether the second flag and
    the token path are documented in the demo runbook inside that phase or in a later one.
 6. **Buffer depth of 256 KiB per session** and the 4096 byte input limit. Both are constants a
@@ -521,6 +674,15 @@ These are the points the owner is asked to ratify or change.
    annotate idea `000087` so its remaining scope reads as delivered by this record and
    `phase-wbf-08`. The Session Manager's Ideation lane does the annotation; this phase records no
    ideas.
+9. **Where the token file lives:** `~/.d-system/terminal-api/<key>.token`, outside the repository,
+   keyed by a hash of the repository root. The alternatives are under `data/` (rejected: inside every
+   shell's working tree) and a path the owner configures (more setup, and a second thing to
+   document). The owner may prefer another location, or to start shells in a working directory other
+   than the repository root, which would change fact 7.
+10. **The second flag also switches output capture on.** Under the first flag alone nothing is
+    buffered and nothing in the websocket route changes. The alternative, capture always on, was
+    rejected because it retains up to 256 KiB of raw shell output per session on every demo launch
+    for an API that is off.
 
 ## Revisit trigger
 

@@ -9525,8 +9525,8 @@ items:
   - docs/03-sessions/SESS-2026-10-08-05-terminal-interaction-api-decision.md
   result: 'ADR-030 written, proposed and awaiting the owner''s ratification (pre-approved run, 2026-10-08).
     It decides all six REQ-012 R15 questions: a second flag D_SYSTEM_TERMINAL_API=1 required with the
-    existing one, loopback binding checked at launch and per request, a bearer token from a gitignored
-    file in data/, the ADR-014 registry id discovered by a list route, a 256 KiB per-session byte buffer
+    existing one, loopback binding checked at launch and per request, a bearer token from a file
+    outside the repository, the ADR-014 registry id discovered by a list route, a 256 KiB per-session byte buffer
     fed by the pump, and no detach (sessions end with their websocket). It states what ADR-014 owns
     (R16) and gives phase-wbf-08 three routes, response shapes and the routes-absent rule.
     uv run python -m src.governance printed Governance OK: 45 systems, 460 documents, 37 memories,
