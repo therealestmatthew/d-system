@@ -25713,3 +25713,156 @@ Raised by Session 2 - Builder B (phase-wbf-03, ADR-029) during the 2026-10-08 wo
 The second half of idea 000130 (rethink the rotator font size) has no owner ruling and no phase; phase-wbf-14 fixes only the tooltip cutoff. Needs a ruling and should be sequenced with phase-wbf-06.
 
 Raised by Prompt Planner (plan amendment for phase-wbf-12..18) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000614 · Decide whether the demo terminal websocket needs a token or an Origin check.
+
+**Created 2026-10-08T04:28:32+00:00 · Status: `open`**
+
+The websocket route in src/api/routes/demo_terminal.py has no authentication and no Origin check (read from the code, not reproduced), so any local process or any web page the owner has open can start a shell. ADR-014 owns the route; ADR-030 lists this as its open item 7.
+Raised by Session 1 - Builder A (phase-wbf-07, ADR-030) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000615 · Share one helper for reading feature flags in src/api/__init__.py.
+
+**Created 2026-10-08T04:28:35+00:00 · Status: `open`**
+
+The terminal routes are gated by an inline os.environ check; ADR-030's second flag D_SYSTEM_TERMINAL_API is a second copy of that pattern. One helper would make the gates uniform and testable.
+Raised by Session 1 - Builder A (phase-wbf-07, ADR-030) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000616 · Mark input injected through the HTTP terminal API in the panel.
+
+**Created 2026-10-08T04:28:35+00:00 · Status: `open`**
+
+The terminal panel marks nothing as externally injected; the injection dropdowns and the terminal bridge could show when input came from the HTTP API rather than the keyboard.
+Raised by Session 1 - Builder A (phase-wbf-07, ADR-030) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000617 · Route the File Browser's single-file "Open in HTML Viewer" through deliverBatch.
+
+**Created 2026-10-08T04:28:35+00:00 · Status: `open`**
+
+With one path, single and batch opens would share one accounting path and one receipt shape (ts/src/stage/FileBrowserRegion.tsx, panelBridge.deliverBatch).
+Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000618 · Playwright coverage for the viewer-absent and flag-unset bookmark states.
+
+**Created 2026-10-08T04:28:35+00:00 · Status: `open`**
+
+phase-wbf-05's Playwright pass covered the main flows; the layout-without-viewer state and the flag-unset state are covered only by vitest and pytest. A small e2e script for a layout without the viewer would close that.
+Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000619 · Decide whether sandboxed viewer pages may run scripts.
+
+**Created 2026-10-08T04:28:36+00:00 · Status: `open`**
+
+The HTML Viewer iframe uses sandbox="", which blocks scripts in _public/d-system-architecture.html and logs a console error each time it opens. Decide whether such pages should render with scripts or be excluded from the viewer.
+Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000620 · Shared fixture for reloading flag-gated workbench route modules in tests.
+
+**Created 2026-10-08T04:28:36+00:00 · Status: `open`**
+
+test_workbench_api.py's _uncache_workbench_modules does not know about workbench_bookmarks; each test file copies the reload pattern. A shared fixture would stop the copying.
+Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000621 · Add the "extended by ADR-029" pointers on ratification.
+
+**Created 2026-10-08T04:28:36+00:00 · Status: `open`**
+
+ADR-015 rule 4 ("read-only") and the data_root() docstring in src/db/source_validation.py need a pointer to ADR-029 once it is ratified (ADR-029 open item 7); the bookmark routes are the first workbench write routes and the first workbench data honouring the data root.
+Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000622 · Ignore bookmark temp files and record the shared-data-root limit.
+
+**Created 2026-10-08T04:28:36+00:00 · Status: `open`**
+
+Add _data/workbench/bookmarks/.*.tmp to .gitignore (a hard kill between mkstemp and os.replace leaves one in a tracked directory), and note in ADR-029 that one data root shared by several backends is unsupported because the write lock is per process.
+Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000623 · workbench.py's _git_ignored_paths fails open on git errors.
+
+**Created 2026-10-08T04:28:37+00:00 · Status: `open`**
+
+git check-ignore exits 128 on a path through a symlinked directory ("beyond a symbolic link") and the helper reads the empty output as "nothing ignored". The list, search, reveal and Vite file routes share that gap and should treat an exit code other than 0 or 1 as ignored (fail closed). phase-wbf-05 fixed only its own module.
+Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000624 · Stop reading oversized request bodies early on the workbench write routes.
+
+**Created 2026-10-08T04:28:37+00:00 · Status: `open`**
+
+The 64 KB limit added in phase-wbf-05 refuses after FastAPI has read the whole body; a streaming limit needs middleware.
+Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000625 · Terminal panel header overflows and is clipped in a narrow slot.
+
+**Created 2026-10-08T04:28:37+00:00 · Status: `open`**
+
+The injection dropdowns measure 410 px (437 px for PowerShell) in a 393 px box in the primary slot, down to 307 px, at 1280x720 and 1024x768 in layouts 1 and 2; .stage-region__header has no flex-wrap and .stage-region is overflow hidden.
+Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000626 · HTML Viewer header controls overflow their panel in layout 2 at 1024x768.
+
+**Created 2026-10-08T04:28:37+00:00 · Status: `open`**
+
+377 px of controls in a 307 px box in layout 2's primary slot; phase-wbf-02 will add a badge to that header and should account for it.
+Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000627 · File Browser header controls overflow their panel in layout 2 at 1024x768.
+
+**Created 2026-10-08T04:28:38+00:00 · Status: `open`**
+
+349 px of controls in a 307 px box in layout 2's explorer slot.
+Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000628 · Notes strip dropdown trigger overruns the strip's bottom edge.
+
+**Created 2026-10-08T04:28:38+00:00 · Status: `open`**
+
+By 1 to 6 px in layout 1 at 1280x720, 1366x768 and 1024x768.
+Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000629 · Run the REQ-037 live fit check as a gate.
+
+**Created 2026-10-08T04:28:38+00:00 · Status: `open`**
+
+Needs a decision on adding Playwright to the Python dev dependencies in pyproject.toml and a fixture that starts the API and Vite servers on free ports; until then the live half of test/test_workbench_fit_contracts.py is a command, not a pytest gate, and exits 1 on the stock workbench because the defects it finds are real.
+Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000630 · xterm 6 moved scrolling to a virtual scrollbar.
+
+**Created 2026-10-08T04:28:38+00:00 · Status: `open`**
+
+The .xterm-viewport overflow: scroll rule in the terminal CSS no longer scrolls anything; worth a look when the terminal CSS is next touched.
+Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
