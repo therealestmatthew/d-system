@@ -1,0 +1,66 @@
+{
+  "verdict_id": "2026-10-08-phase-arch-11-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-arch-11",
+  "reviewed_commit": "051fedf4f270c02993f7680582acac7a14992664",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Port-8000 section asserts the owner's incident is three events without support for the identity",
+      "evidence": "Note 3.1 intro equates 000142's 'port-8000 conflict noted mid-session during the workbench builds' with three events; 000142 was created 2026-09-11T23:09, one row predates it as a demo rehearsal and one postdates it; the 09-11 record the triage annotation names is cited only in 3.2; SESS-2026-09-10-04 and SESS-2026-09-11-05 are listed as port-8000 sources but not used in the body.",
+      "consequence": "R17 is met by citation, but the claim that these are the event the owner meant is stated as fact; the 09-11 workbench-build occurrence may be unrepresented.",
+      "minimal_fix": "Say these are the recorded collisions found and that which one 000142 means is not established, or cite the 09-11 record in 3.1."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "'Anchored pattern' offered as a fix for self-matching pgrep is not one",
+      "evidence": "Note 5.2 lists `node.*vite --port 5180` as an anchored pattern. Run: bash -c 'echo \"pat: $(pgrep -f \"node.*vite --port 5180\" ...) self=$$\"' printed 'pat: 14755 14761 14763  self=14761', so it matches the invoking shell's own pid.",
+      "consequence": "phase-arch-12 may treat it as a safe selector for a kill; head -1 takes the lowest pid, not the right one.",
+      "minimal_fix": "Drop it from the list or state that only exact argv comparison is safe and head -1 suits reads only."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Wrong cross-reference to the command list",
+      "evidence": "'How to read the evidence' says 'Section 9 lists the commands'; section 9 is the question table, the recipe is section 10.",
+      "consequence": "A reader following the pointer lands on the wrong section.",
+      "minimal_fix": "Change to Section 10."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Sources table lists records and an idea never used in the body",
+      "evidence": "SESS-2026-09-10-04, SESS-2026-09-11-05 and idea 000144 each appear once, in the Sources table only.",
+      "consequence": "Provenance overstates what was used; the findings the table credits to them cannot be checked in the text.",
+      "minimal_fix": "Cite them in the body with what they show, or remove them from the table."
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "000099 framed as the best account of PTY reaping though it shows an environmental shell-exit stall",
+      "evidence": "Note 3.3 intro says the investigation is 'the best account of how a PTY child fails to be reaped on time'; the 000099 coordinator finding and 000129 body attribute the failure to the pyenv shim lock stalling shell exit, with posix.py cleared; the note later concedes reaping was never part of it.",
+      "consequence": "Opening sentence can mislead phase-arch-12 into treating 000099 as reaping evidence; the facts are otherwise stated correctly.",
+      "minimal_fix": "Reword the intro to say a shell failed to exit in time for an environmental reason and that reaping proper is covered in 4.4."
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "title": "Section 7 leans toward a position on the kill-action tension",
+      "evidence": "Point 2 names a candidate repo-bounded boundary; point 6 ends 'The tension is therefore about the documented posture ... not about the capability being new to the host'; Q1 and Q6 repeat the cwd/argv signals.",
+      "consequence": "Nothing is decided and the section says so, but these sentences nudge phase-arch-12's own ADR toward permit-scoped-to-repo.",
+      "minimal_fix": "Present the boundary as one of several unranked candidates or cut point 6's closing sentence."
+    }
+  ],
+  "raw_reply_sha256": "4795d33ba4364018890310d93753a0c2a2454b3772d7cc76e232495fb556679e",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager (subagent run, 2026-10-08). Brief: phase entry from dev's backlog.yaml, range fc7e42f..051fedf, diff with the session record and backlog bookkeeping excluded, scratch clone at the reviewed commit. The runner manifest was still being produced when the adversary ran; it ran the verification itself. No builder-written input."
+}
