@@ -1,0 +1,58 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-07-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-07",
+  "reviewed_commit": "f07cad04caebc10cb66ce5e8770c1c8f6d3c73bd",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "ADR is draft/proposed while REQ-012 R15 wording asks for an accepted ADR",
+      "evidence": "ADR-030 frontmatter status: draft and Status section 'awaiting the owner's ratification'; REQ-012 line 76 'An accepted ADR covers...'",
+      "consequence": "The phase acceptance (a decision on each of six questions) is met, but the requirement is satisfied in full only after owner acceptance; phase-wbf-08 builds on an unratified record",
+      "minimal_fix": "No change to the ADR; hold phase-wbf-08 until the owner ratifies"
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Env-var token rejection rationale does not distinguish the file token",
+      "evidence": "ADR section 3 and alternatives: env token rejected because shells inherit it, yet a shell running as the owner can read data/terminal-api-token; the ADR itself concedes an owner-run process can read the file",
+      "consequence": "The stated reason for the file over the env var overclaims; the real difference is passive inheritance only",
+      "minimal_fix": "Reword the alternative to say the file avoids inheritance but not deliberate reads by a shell running as the owner"
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "R19 paragraph contradicts itself about whether the buffer exists",
+      "evidence": "'no buffer is created' followed by 'The buffer and last-activity record on the websocket side... exist but no route reads them'",
+      "consequence": "Ambiguous meaning of the R19 test 'buffer mapping unchanged'; the buffer costs memory under the first flag alone",
+      "minimal_fix": "State that the websocket-side buffer exists whenever the first flag is set, and that R19 checks only that a request to an absent route changes nothing"
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Route contract leaves edge cases to the builder",
+      "evidence": "415 vs 401 ordering unspecified; peer check accepts only 127.0.0.1 and ::1 (not ::ffff:127.0.0.1); read updates last-activity so a poller holds a session slot indefinitely",
+      "consequence": "phase-wbf-08 must decide these without guidance",
+      "minimal_fix": "Add one line each: check order peer, token, content type; address normalisation; note the slot-holding consequence"
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "Catalog entry for ADR-030 not visible in the supplied diff",
+      "evidence": "Brief says the diff includes the catalog; the diff contains only the ADR; readable checkout's catalog.md lists only ADR-029 and is not at the reviewed commit",
+      "consequence": "Cannot confirm the catalog entry; governance exit 0 at the reviewed commit is indirect support",
+      "minimal_fix": "Confirm catalog regeneration is in the commit range"
+    }
+  ],
+  "raw_reply_sha256": "3afb50a437fae95ff1f359dc356e8f9b80e533dafcfdbcbaad19bff73adeab44",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), same brief as the gating reviewer plus the runner manifest; no checkout. Its F02, F03 and F04 coincide with the gating reviewer's F03, F05, F02/F07, which the builder fixed before this record was written; F05 is a brief artefact (the coordinator's brief excludes catalog.md from the diff by design; the catalog is in the range). Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}
