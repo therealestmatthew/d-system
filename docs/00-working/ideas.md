@@ -4802,7 +4802,7 @@ Unresolved: whether sessions should outlive their websocket (detach/reattach), h
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-workbench-planner (2026-09-10T17:28:57-04:00): Narrowed by the workbench planning session (2026-09-10): the session-registry half — a backend registry bounding the four-session cap with per-session allowlisted shell selection — is adopted into the workbench terminal capability decision (ADR-014, built by phase-wb-01, PLAN-022). The idea's remaining open scope is the outside-the-page inject/read HTTP API (detach/reattach, output buffering), which still starts from its own decision record.
 - **finding** by agent-idea-triage (2026-09-11T10:15:59-04:00): ## Scope Partially Delivered; Remaining Work Explicitly Parked
@@ -4822,12 +4822,14 @@ The idea's registry requirement is satisfied. The inject/read API, detach/reatta
 
 **Existing link:**
 000087 already relates_to 000070 (Build a demo of the idea system), recording the connection for training-session demo context.
+- **finding** by agent-ideation (2026-10-08T09:01:52+00:00): ADR-030 (phase-wbf-07) and phase-wbf-08 deliver the outside-the-page inject/read HTTP API and output buffering half of this idea; detach/reattach stays parked and is reopened by the owner's 2026-10-08 ruling (idea 000671). Ratified by the owner 2026-10-08 (ADR-030 open item 8).
 
 </details>
 
 **Links**
 
 - relates_to → `000070`
+- relates_to ← `000671`
 
 ---
 
@@ -5446,7 +5448,7 @@ PROPOSED LINK: 000101 --relates_to--> 000134 (000134's audit would encompass thi
 
 ## 000102 · Rehearsal idea from demo-validator-web dry-run
 
-**Created 2026-09-11T04:10:22-04:00 · Status: `reviewing` · revisited 1×**
+**Created 2026-09-11T04:10:22-04:00 · Status: `delivered` · revisited 1×**
 
 Recorded during the 2026-09-11 phase-wb-07 rehearsal (demo-validator-web agent pass). [Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.] Suggestion used for timing the /idea step of the live-segment runbook: add a small "last refreshed" timestamp badge to the HTML Viewer's header so a presenter can show the overview is current without opening dev tools.
 
@@ -25731,11 +25733,16 @@ Raised by Session 1 - Builder A (phase-wbf-07, ADR-030) during the 2026-10-08 wo
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-10-08T05:54:51+00:00): Raised again by Session 1 - Builder A (phase-wbf-08) during the 2026-10-08 workbench run: the terminal websocket route still has no authentication (ADR-030 open item 7). A per-session or token check there would close the gap that the new token does not.
+- **finding** by agent-ideation (2026-10-08T09:01:51+00:00): Owner ruling 2026-10-08: queue a defect phase that reuses the ADR-030 token on the websocket on connect; recorded as idea 000669.
 
 </details>
+
+**Links**
+
+- relates_to ← `000669`
 
 ---
 
@@ -25976,9 +25983,10 @@ Raised by Session 2 - Builder B (phase-wbf-13) during the 2026-10-08 workbench r
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-10-08T05:54:51+00:00): Overlaps 000626 (HTML Viewer header controls overflow their panel in layout 2 at 1024x768). Recorded as given and left for triage.
+- **finding** by agent-ideation (2026-10-08T09:01:52+00:00): phase-wbf-02 measured the HTML Viewer header at layout 2, 1024x768: it still needs 324 px in a 307 px box after the last-modified badge; wrapping the controls group breaks the 60 px page-area floor, so the real fix is a shorter or collapsing control set.
 
 </details>
 
@@ -26108,6 +26116,10 @@ Raised by Batch Runner (phase-wbf-14) during the 2026-10-08 workbench run.
 The slot-header panel switcher silently ends every session of the panel it hides (3 tabs to 0 observed); no warning, and the region tooltip's "switching ... never ends a session" reads as covering it.
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
 
+**Links**
+
+- relates_to ← `000671`
+
 ---
 
 ## 000652 · A layout switch can end a shell silently and bypasses the re-assignment dialog's confirmation.
@@ -26120,6 +26132,7 @@ Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
 **Links**
 
 - relates_to → `000107`
+- relates_to ← `000671`
 
 ---
 
@@ -26214,3 +26227,93 @@ Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
 
 Turn the audit's Playwright event matrix and connect/echo/resize/cap measurements into a committed regression test; re-run the matrix after phase-arch-08 changes panel identity.
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+---
+
+## 000663 · Windows: the Terminal (bash) panel is expected to start cmd with no message
+
+**Created 2026-10-08T09:01:44+00:00 · Status: `open`**
+
+(phase-arch-16 fix round, audit finding F13, owner check O11) On Windows the panel labelled Terminal (bash) is expected, from code reading, to start cmd (or the D_SYSTEM_DEMO_SHELL override) with no message, because the bash session sends no ?shell= parameter and the platform route's per-shell availability is not used to hide the panel. Source: docs/00-working/terminal-persistence-audit.md.
+
+---
+
+## 000664 · Requirement row for re-selecting the file already shown in the HTML Viewer
+
+**Created 2026-10-08T09:01:45+00:00 · Status: `open`**
+
+(phase-wbf-02) Re-selecting the file already shown in the HTML Viewer used to do nothing (no reload, no re-check); it is now behaviour covered only by a unit test and is worth stating as a requirement row in REQ-012.
+
+---
+
+## 000665 · HTML Viewer file dropdown never refreshes until the directory changes
+
+**Created 2026-10-08T09:01:45+00:00 · Status: `open`**
+
+(phase-wbf-02) The HTML Viewer file dropdown list is fetched once per tab and directory, so a file regenerated or newly created after load never appears until the directory changes; it needs a refresh path.
+
+---
+
+## 000666 · Dev-server ports are not exclusive across worktrees
+
+**Created 2026-10-08T09:01:45+00:00 · Status: `open`**
+
+(phase-wbf-02) Dev-server ports are not exclusive across worktrees: another worktree's uvicorn already held the API port assigned to this phase (8033); dispatches should check that ports are free or allocate them from a ledger.
+
+---
+
+## 000667 · REQ-037 fit-contract script seeds no selected file, so header content is never measured
+
+**Created 2026-10-08T09:01:45+00:00 · Status: `open`**
+
+(phase-wbf-02 fix round) The REQ-037 fit-contract script seeds selected_file null, so no live check measures any panel with a file shown; seed a selected file for the HTML Viewer cells so features that add header content (like the last-modified badge) are measured.
+
+---
+
+## 000668 · Notes strip help trigger is unreachable at 1280x260 in layout 1
+
+**Created 2026-10-08T09:01:46+00:00 · Status: `open`**
+
+(phase-wbf-14 fix round) At 1280x260 in layout 1 the notes strip "?" help trigger is covered by the slot header (Playwright hover intercepted by section[aria-label=Notes] and its h2), so the help tooltip is unreachable at very short viewport heights.
+
+---
+
+## 000669 · Defect phase: demo terminal websocket checks the ADR-030 token on connect
+
+**Created 2026-10-08T09:01:46+00:00 · Status: `open`**
+
+Add a defect phase to the workbench features and defects plan (PLAN-027 / REQ-012): the demo terminal websocket reuses the ADR-030 bearer token (or an Origin check) on connect, closing ADR-030 open item 7. The owner ruled this on 2026-10-08. ADR-014 owns the route.
+
+**Links**
+
+- relates_to → `000614`
+
+---
+
+## 000670 · Renumber the HTML Viewer open-in-tab toggle label from rung 3 to rung 7
+
+**Created 2026-10-08T09:01:46+00:00 · Status: `open`**
+
+Renumber the HTML Viewer "Open-in-tab link (rung 3)" toggle label (ts/src/stage/HtmlViewerRegion.tsx and OverviewRegion.tsx) to rung 7 so it matches the demo runbook's ladder; keep the toggle visible. Owner ruling 2026-10-08, follow-up to phase-wbf-18. Touches ts/, so a small phase.
+
+---
+
+## 000671 · Preserve terminal sessions across panel and layout switches instead of warning
+
+**Created 2026-10-08T09:01:46+00:00 · Status: `open`**
+
+Preserve terminal sessions across visible-panel and layout switches (detach and reattach) instead of warning before ending them. Owner ruling 2026-10-08 on audit judgment D1. This reopens ADR-014 decision 4 and ADR-030 open item 3 (no detach); a decision phase (an ADR) comes before any fix phase; warn-and-confirm is not to be built.
+
+**Links**
+
+- relates_to → `000651`
+- relates_to → `000652`
+- relates_to → `000087`
+
+---
+
+## 000672 · Owner-machine checklist for the Windows and owner-machine checks from the 2026-10-08 run
+
+**Created 2026-10-08T09:01:47+00:00 · Status: `open`**
+
+Write one owner-machine checklist document under docs/00-working/ (ungoverned, ADR-010) that collects every Windows / owner-machine check raised by the 2026-10-08 run, each with its source phase, what to do, what to look for and a result column: the Windows secondary-slot default and the pre-migration browser profile (phase-arch-02), ConPTY and the token file mode (ADR-030), bookmark routes on Windows paths (ADR-029, phase-wbf-05), CMD and PowerShell fit (REQ-037), the R31 viewer-toggle click (phase-wbf-18), audit checks O1..O11 (phase-arch-16). Owner ruling 2026-10-08.
