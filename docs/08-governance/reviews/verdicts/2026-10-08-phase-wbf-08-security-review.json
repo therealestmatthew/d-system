@@ -1,0 +1,74 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-08-security-review",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-08",
+  "reviewed_commit": "e39d74c19519def80bbbb2e4ebb152d2872a7a28",
+  "reviewer": {
+    "type": "security-review",
+    "definition_sha256": "99458416a8b582443baea7fa4341741cf80f8a56cd486e0d03ff3ad51c8ad689"
+  },
+  "model": "sonnet (general-purpose subagent running the coordinator's security review)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "Blocked PTY write has no deadline: hung inject requests, leaked executor thread, orphan shell after session close, shutdown hang",
+      "evidence": "src/api/routes/demo_terminal_api.py:404-414 awaits run_in_executor(adapter.write) under write_lock with no timeout; src/demo/posix.py:54 is a blocking os.write; executor is 6 non-daemon threads (line 327). Reproduced: with a foreground sleep not reading, the 4th and 5th 4000-byte injects never returned, stayed pending 12 s after the websocket closed and the sleep ended, and the session's bash survived as an orphan; the process hung at exit.",
+      "consequence": "A token holder (including an honest script injecting multi-line text during a long command) gets uncancellable hung requests; each stuck session pins an executor thread, and six pinned threads queue every inject on every session until restart; the shell outlives its session; uvicorn shutdown hangs.",
+      "minimal_fix": "Bound the write: non-blocking master fd with a select-based deadline in the write path, raise OSError on deadline (handler returns 409), report actual bytes written, and wrap the executor await in asyncio.wait_for."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Threaded write can race adapter.close() onto a reused fd number",
+      "evidence": "demo_terminal_api.py:410 writes on an executor thread; posix.py:54 reads _master_fd then os.write; demo_terminal.py:530-531 closes on the loop thread (posix.py:81-83). Reasoned from code, not reproduced.",
+      "consequence": "In a microsecond window injected bytes could land in another session's PTY or a socket; needs the token.",
+      "minimal_fix": "Take output.write_lock (bounded by the F01 fix) before adapter.close() in _run_session's finally, or use a closing flag the writer checks."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Body read has no deadline and ClientDisconnect is unhandled",
+      "evidence": "demo_terminal_api.py:352; live server: a POST with Content-Length 100 and 1 byte sent held the connection with no reply for 6 s, and a disconnect logged a 500 with a ClientDisconnect traceback (no secrets in it). Token is checked first.",
+      "consequence": "An authenticated caller can hold connections open and fill the log.",
+      "minimal_fix": "Catch ClientDisconnect in _read_limited_body and wrap the read in asyncio.wait_for(..., 10) mapped to an existing error code."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Only the leaf token directory is lstat/uid-checked; ~/.d-system is not",
+      "evidence": "demo_terminal_api.py:153-157 mkdir both levels, checks at 160-169 only on the leaf. Ran: parent 0755 accepted, parent symlink followed, parent 0777 owned by uid 65534 accepted; leaf foreign owner and leaf symlink refused. File stays 0600 in a 0700 leaf.",
+      "consequence": "No direct token leak; with a foreign-owned or writable parent its owner could swap the leaf directory so callers read a token the server does not hold (API denial of service).",
+      "minimal_fix": "Apply the lstat, symlink and uid check to directory.parent as well, or create both levels with O_DIRECTORY|O_NOFOLLOW and dir_fd."
+    },
+    {
+      "id": "F05",
+      "severity": "major",
+      "title": "Pre-existing: websocket accepts any Origin/Host, so a hostile page gets an owner shell and can read the token file",
+      "evidence": "demo_terminal.py:419-454 has no Origin or Host check; live server accepted a websocket with Origin http://evil.example and Host evil.example:8019 and the shell listed ~/.d-system. The new routes themselves resisted evil-origin calls (preflight 400, no ACAO, 401 without token). Unchanged by this diff; ADR-030 fact 4 and open item 7.",
+      "consequence": "The token is not a boundary against a hostile web page while the websocket stays open; the diff's increment is access to other sessions' output and agents, on top of a shell the page already has.",
+      "minimal_fix": "Separate decision (ADR-030 item 7): Origin allowlist and/or the same token on the websocket, plus TrustedHostMiddleware against DNS rebinding."
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "title": "Tests miss several dangerous paths",
+      "evidence": "No test for a blocked write/hung inject, stalled or disconnected body, chunked body without Content-Length, concurrent injects, foreign Origin/Host, X-Forwarded-For, token absent from shell env, or parent-directory cases; F01 and F03 pass all 167 tests.",
+      "consequence": "Regressions or the existing defects in F01 and F03 go unnoticed.",
+      "minimal_fix": "Add one test per item; the F01 reproduction (sleep running, three 4 KiB injects with CRs, assert the third answers within the deadline and the shell dies with the session) is a template."
+    },
+    {
+      "id": "F07",
+      "severity": "minor",
+      "title": "Dead pump leaves a session reading alive that still accepts injects (reasoned, not reproduced)",
+      "evidence": "demo_terminal.py pump: a failed send_bytes ends the pump and sets pump_done; _stream_alive (demo_terminal_api.py:278-280) stays true while adapter.alive; the websocket loop continues until idle timeout.",
+      "consequence": "Readers see no new output while alive is true, injects are accepted and extend the idle bound up to the ceiling, and an undrained PTY can block the shell (a trigger for F01).",
+      "minimal_fix": "When the pump exits other than by shell exit, set output.ended (or a pump_failed flag) so _stream_alive is false and inject returns 409."
+    }
+  ],
+  "raw_reply_sha256": "aacb376e401d7c337f819720f1409168dcc2106c40880d51291add5cbc2f7245",
+  "outcomes": [],
+  "notes": "Diff-time security review required by GOV-017 (the diff adds HTTP inject/read routes over live shells). Performed by hand in the scratch clone against a real uvicorn on 127.0.0.1:8019 under a temporary HOME; the built-in /security-review skill was not used (it failed to load against a scratch checkout earlier in this run). definition_sha256 is the sha256 of the output of claude --version (2.1.293 (Claude Code)), per GOV-017 and idea 000589. F05 is a pre-existing websocket gap outside this range (ADR-030 open item 7, idea 000614) and does not count toward the verdict. The reviewer disclosed running pkill sleep on the shared machine during cleanup. Dispatched and briefed by the Session Manager; no builder-written input."
+}

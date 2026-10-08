@@ -1,0 +1,50 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-08-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-08",
+  "reviewed_commit": "e39d74c19519def80bbbb2e4ebb152d2872a7a28",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Importing the app with both flags exported rotates the live server's token",
+      "evidence": "HOME=$X D_SYSTEM_DEMO_TERMINAL=1 D_SYSTEM_TERMINAL_API=1 uv run pytest test/test_demo_terminal_api.py --co collected 111 tests and left $X/.d-system/terminal-api/0ebf5af3d99a3805.token; the test modules import src.api/src.main at module level before the build fixture sets a temporary HOME",
+      "consequence": "Running the suite or importing src.main in a shell that exports both flags overwrites the token file of a running server for the same checkout, which then answers 401 for the file's token",
+      "minimal_fix": "Clear D_SYSTEM_TERMINAL_API and set a temporary HOME before the module-level imports (conftest.py), or document that the flags must not be exported"
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Tests do not pin the post-exit drain, append-before-send, or the frame reset of the ceiling",
+      "evidence": "Mutations: drain loop replaced by 'while False' -> 167 passed; send before append in the pump -> 167 passed; 'output.last_frame = time.monotonic()' replaced by pass -> 167 passed",
+      "consequence": "A regression in any of the three ADR-030 behaviours would not be caught",
+      "minimal_fix": "Add a websocket-level test that a frame resets the ceiling clock, one that checks ring content when the send raises, and one that holds the pump while the shell exits"
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "New mypy unused-ignore error in test_demo_terminal_api.py",
+      "evidence": "mypy: test/test_demo_terminal_api.py:845: error: Unused \"type: ignore\" comment [unused-ignore]; CI runs mypy src/ only, which passes",
+      "consequence": "Type check of the test file is not clean; CI gate unaffected",
+      "minimal_fix": "Remove the type: ignore[arg-type] comment at line 845"
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "wait and after grammar narrower than the ADR validation table",
+      "evidence": "Live: wait=.5, wait=1e1, wait=+1 return 422; after longer than 18 digits is refused",
+      "consequence": "A client sending an otherwise valid finite number in those forms is refused",
+      "minimal_fix": "Parse with float() plus isfinite and range checks, or document the narrower grammar in the ADR"
+    }
+  ],
+  "raw_reply_sha256": "63cb0e4a4fb62d5f0f4bfbce9249d873791542cd6422ffdf3628414968eac08a",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager (subagent run, 2026-10-08). Brief: phase entry from dev's backlog.yaml (deliverables named on the trunk at 6ba10a0), range 211ee2e..e39d74c, diff with the session record and backlog bookkeeping excluded, scratch clone at the reviewed commit. The adversary reached its turn limit and delivered from what it had established; its 'Not covered' list names the items it did not reach. A diff-time security review (GOV-017) was run beside it and recorded separately. No builder-written input."
+}

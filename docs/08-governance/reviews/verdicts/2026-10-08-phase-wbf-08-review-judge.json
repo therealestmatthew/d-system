@@ -1,0 +1,50 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-08-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-08",
+  "reviewed_commit": "e39d74c19519def80bbbb2e4ebb152d2872a7a28",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Full pytest run exited 1 on an unrelated root-sensitive test",
+      "evidence": "04-verification+gate.txt: 1 failed, 1961 passed; test/test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused DID NOT RAISE Refused (chmod 0o500 does not block root). The diff does not touch that test or tools/.",
+      "consequence": "The full-suite verification is not green as run; the cause appears environmental (root runner, inferred). A clean baseline could not be confirmed because the judge cannot run commands.",
+      "minimal_fix": "Skip that test when os.geteuid() == 0, or run the gate as a non-root user; no change to phase-wbf-08."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Narrow verification command omits the API test file carrying R17 and R18 evidence",
+      "evidence": "Backlog verification lists only `uv run pytest test/test_demo_terminal.py` (56 tests). test/test_demo_terminal_api.py holds the R17, R18 and auth tests and ran only in the full run.",
+      "consequence": "The narrow command passes without exercising the API; the evidence for R17 and R18 rests on the full run, which carries F01.",
+      "minimal_fix": "Add test/test_demo_terminal_api.py to the phase's verification entry."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "A terminated pump with a live shell is reported alive and still accepts injects",
+      "evidence": "demo_terminal_api.py _stream_alive = not ended and (adapter.alive or not pump_done); demo_terminal.py pump finally sets pump_done=True on a send failure, while ended is set only when _run_session unwinds.",
+      "consequence": "After an abrupt peer loss, until the idle timeout (up to the one-hour inject ceiling), injects return 200 but their output is never captured, alive stays true, and long polls wait out the full wait.",
+      "minimal_fix": "Define alive as `not output.ended and not output.pump_done`."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Token directory safety checks cover only the leaf directory, not ~/.d-system",
+      "evidence": "_prepare_token_directory: os.mkdir tolerates an existing parent; os.lstat symlink and ownership checks are applied to `directory` only.",
+      "consequence": "A symlinked or foreign-owned ~/.d-system is not detected. Exploitable only by someone who can already write to the owner's home. Within the ADR-030 text.",
+      "minimal_fix": "Apply the same lstat checks to directory.parent."
+    }
+  ],
+  "raw_reply_sha256": "15d5f2bccb5c6f1d15ccc364b3165250bdd0c469067b601ba2245a3801fac32d",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), same brief as the gating reviewer plus the runner manifest; no checkout. Its F03 and F04 are carried to the builder's fix round; F02 is applied by the coordinator on the trunk (the verification entry gains the API test file). Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}
