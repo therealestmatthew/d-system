@@ -34,8 +34,11 @@ mapped to a rule below:
    own `overflow: hidden`;
 4. the popover height floor (idea `000117`): `Popover.tsx` opens upward into a 142 px bubble while
    hundreds of pixels are free below, leaving a file selector with about two visible entries;
-5. the ~98 px chrome offset: slot header, panel header and tab bar sit between the slot body and
-   the content, so "content height equals slot height" fails on a correct panel.
+5. the ~98 px chrome offset: a slot header, a panel header and a tab bar sat between the slot body
+   and the content, so "content height equals slot height" fails on a correct panel. Since
+   `ADR-031` a panel draws no header (the slot's one top bar is outside the slot body), which
+   removes one band of that chrome. The panel's own tab bar and the rest remain, and every non-root
+   `fill` row is still anchored on the panel box.
 
 In scope: the nine panel types registered in `ts/src/workbench/panelRegistry.tsx`, and the three
 floating surfaces (popover, tooltip, file-tree context menu). Out of scope: fixing any defect the
@@ -63,6 +66,16 @@ not applicable and never as a pass.
 | `truncate` | Cut text with an ellipsis: `text-overflow: ellipsis` with `white-space: nowrap`. No shipped panel declares this today; it is in the vocabulary so the first panel that truncates declares it rather than clipping. |
 | `visible` | Be at least 16x16 px and lie wholly inside the panel box. |
 
+**Bar regions.** A panel does not draw its slot's top bar (`ADR-031`, `REQ-011` R13): it supplies
+bar elements (`help`, `action`, `choice`, `toggle`, `status`) that the slot's frame places in its
+own sub-slots, outside the panel box. A row whose selector names a sub-slot (`.stage-slot__help`,
+`.stage-slot__controls`) is a **bar region**. The live check looks for it in the slot frame that
+holds the panel instead of inside the panel box, and judges its bounds against the frame's box
+instead of the panel box: a `wrap` bar region must hold its content within its own width and not
+be taller than, or end below, the frame; a `visible` bar region must lie wholly inside the frame.
+Every other mode keeps its meaning. Everywhere else in this document, "panel box" still means the
+panel's own root.
+
 Two rules apply to every panel without a row. **Page scroll:** the document is never larger than
 the viewport (`REQ-006` R02). **Silent clip:** no element inside the panel may have `overflow`
 hidden or clip while its content is larger than its box, unless it is inside a region declared as a
@@ -83,9 +96,9 @@ viewport and the room on its larger side (less 2 px), so it does not open short 
 |---|---|---|
 | C01 | Every panel type registered in `panelRegistry.tsx` has at least one row in the panel contract table, and no row names an unregistered type. | `uv run pytest test/test_workbench_fit_contracts.py`: `test_every_registered_panel_type_has_a_contract` and `test_no_contract_row_names_an_unregistered_panel` pass. Nine types are registered on 2026-10-08. |
 | C02 | A panel type registered without a contract row fails the check, and the failure names the type. | `test_undeclared_panel_fails_and_is_named` registers a fake type in a copy of the registry source, reads it back through the same discovery the live check uses, and removes a real type's rows from the table; each must raise `AssertionError` naming the type. |
-| C03 | Discovery of registered types cannot pass vacuously. The parse is cross-checked: key count equals the `displayName:` count and the `Component:` count in the same block; every line at the literal's own indent opens a `key: {` entry, so a spread or a factory call is refused; nothing else in the file assigns to `PANEL_REGISTRY` (subscript or property assignment, `Object.assign`, `defineProperty`); every layout panel id is registered; and every registered id appears in a layout file (otherwise the live check could never render it). | `test_registry_discovery_cannot_pass_vacuously`, `test_registry_parser_sees_added_and_removed_types` (adds, removes and obscures a key) and `test_registry_registration_the_parse_cannot_see_is_refused` (the factory-call, spread, subscript, `Object.assign` and property-assignment probes, each of which must fail). |
+| C03 | Discovery of registered types cannot pass vacuously. The parse is cross-checked: key count equals the `displayName:` count and the `Component:` count in the same block; every line at the literal's own indent opens a `key: {` entry, so a spread or a factory call is refused; nothing else in the file assigns to `PANEL_REGISTRY` (subscript or property assignment, `Object.assign`, `defineProperty`); every layout panel id is registered; and every registered id appears in a layout file (otherwise the live check could never render it). A registry entry also carries `elements:`, a reference to its entry in `_data/workbench/panel-elements.json` (`ADR-031`); the parse counts only `displayName:` and `Component:`, so `elements:` does not disturb it. | `test_registry_discovery_cannot_pass_vacuously`, `test_registry_parser_sees_added_and_removed_types` (adds, removes and obscures a key) and `test_registry_registration_the_parse_cannot_see_is_refused` (the factory-call, spread, subscript, `Object.assign` and property-assignment probes, each of which must fail). |
 | C04 | Every panel type declares how it fills its slot: a `:root` row with mode `fill`. | `test_every_panel_declares_how_it_fills_its_slot`, which iterates the registry, so a type with no rows at all fails it too. |
-| C05 | Each contract region is asserted in a real browser, for every layout, every registered panel type, every slot the layout makes it eligible for, at 1280x720, 1366x768, 1920x1080 and 1024x768. The run exits non-zero on any violation, on a panel never rendered, on a scroll region that was present but never given content to scroll, and on a surface kind never opened. | `uv run python test/test_workbench_fit_contracts.py --live <url>` against a running workbench. The matrix is read from `_data/workbench/layouts/*.json`; `test_live_matrix_covers_every_registered_panel_in_every_eligible_slot` asserts it. |
+| C05 | Each contract region is asserted in a real browser, for every layout, every registered panel type, every slot the layout makes it eligible for, at 1280x720, 1366x768, 1920x1080 and 1024x768. The run exits non-zero on any violation, on a panel never rendered, on a scroll region that was present but never given content to scroll, and on a surface kind never opened. | `uv run python test/test_workbench_fit_contracts.py --live <url>` against a running workbench. The matrix is each layout's panels crossed with the slots each panel is structurally eligible for (the Python matcher `src/workbench/slot_matcher.py` over `panel-elements.json` and `slot-schemas.json`, `REQ-011` R12), not a list in the layout files; `test_live_matrix_covers_every_registered_panel_in_every_eligible_slot` asserts it. |
 | C06 | A panel given content that violates its own contract fails. | `--self-test` is differential. It judges every candidate cell unbroken, then injects one violation per panel (a scroller loses its overflow, a fill region collapses, a marquee, visible or frame region is pushed out of its panel) into a cell and region that passed unbroken, and counts it caught only when the judge reports a finding on that region. A panel whose every breakable region already fails unbroken is printed as `UNPROVEN` by name and fails the run, never as caught. The judge itself is unit-tested against synthetic measurements of each of the five instances, the notes-strip bounded-clip probe and its legal variants. |
 | C07 | The notes strip declares vertical scroll, horizontal scroll and a bounded marquee as alternatives for a long entry, so the rotator variants of `phase-wbf-06` (`REQ-012` R12) are conformant, not violations. | `test_notes_strip_declares_vertical_and_horizontal_scroll_as_alternatives`, `test_a_legal_horizontal_scroll_still_passes`, `test_a_legal_animated_marquee_passes` and `test_notes_strip_marquee_variant_is_declared_and_bounded` keep the variants legal; `test_bounded_clip_with_no_way_to_read_it_fails`, `test_horizontal_scroller_that_clips_vertically_fails` and `test_a_marquee_that_does_not_move_fails` keep a plain clip from passing as one of them. |
 | C08 | Every selector in either table names a CSS class that exists in `ts/src` as a whole token in a `className` string literal (comments excluded), so a renamed class fails statically rather than leaving a stale row. A longer class that merely contains it, such as `stage-file-browser__tree-item` for `stage-file-browser__tree`, does not count. | `test_contract_selectors_name_classes_that_exist_in_source`, and `test_renaming_a_class_in_source_is_detected`, which renames the File Browser tree class in a copy of the source text and requires the row to be reported stale. `.xterm`, `.xterm-viewport`, `.scrollbar` and `.vertical` are library classes and are exempt by name. |
@@ -99,46 +112,46 @@ Each row is one region of one panel type. The first table under this heading is 
 | Panel type | Region | Selector | Mode | Basis |
 |---|---|---|---|---|
 | `terminal` | Panel box | `:root` | `fill` | The panel fills its slot body (`REQ-007` W15; instance 1) |
-| `terminal` | Header controls | `.stage-region__header` | `wrap` | The injection dropdowns and menu reflow or wrap, never run past the panel edge |
+| `terminal` | Bar controls | `.stage-slot__controls` | `wrap` | The injection dropdowns and menu, which sit in the slot's top bar, reflow or wrap and never run past the slot edge (bar region) |
 | `terminal` | Session tabs | `.stage-terminal-tabbar` | `scroll-x optional` | Many tabs reveal by horizontal scroll (REQ-007 tab-bar rule) |
 | `terminal` | Terminal screen | `.xterm` | `fill(min-h=68) optional` | Present only where the shell is available on the host |
 | `terminal` | Scrollback | `.xterm .scrollbar.vertical` | `scrollbar optional` | Output longer than the screen scrolls inside the terminal. xterm 6 scrolls through its own virtual scrollbar, so the native `.xterm-viewport` is not the scroller |
 | `terminal-cmd` | Panel box | `:root` | `fill` | The panel fills its slot body (`REQ-007` W15; instance 1) |
-| `terminal-cmd` | Header controls | `.stage-region__header` | `wrap` | The injection dropdowns and menu reflow or wrap, never run past the panel edge |
+| `terminal-cmd` | Bar controls | `.stage-slot__controls` | `wrap` | The injection dropdowns and menu, which sit in the slot's top bar, reflow or wrap and never run past the slot edge (bar region) |
 | `terminal-cmd` | Session tabs | `.stage-terminal-tabbar` | `scroll-x optional` | Many tabs reveal by horizontal scroll (REQ-007 tab-bar rule) |
 | `terminal-cmd` | Terminal screen | `.xterm` | `fill(min-h=68) optional` | Present only where the shell is available on the host |
 | `terminal-cmd` | Scrollback | `.xterm .scrollbar.vertical` | `scrollbar optional` | Output longer than the screen scrolls inside the terminal. xterm 6 scrolls through its own virtual scrollbar, so the native `.xterm-viewport` is not the scroller |
 | `terminal-powershell` | Panel box | `:root` | `fill` | The panel fills its slot body (`REQ-007` W15; instance 1) |
-| `terminal-powershell` | Header controls | `.stage-region__header` | `wrap` | The injection dropdowns and menu reflow or wrap, never run past the panel edge |
+| `terminal-powershell` | Bar controls | `.stage-slot__controls` | `wrap` | The injection dropdowns and menu, which sit in the slot's top bar, reflow or wrap and never run past the slot edge (bar region) |
 | `terminal-powershell` | Session tabs | `.stage-terminal-tabbar` | `scroll-x optional` | Many tabs reveal by horizontal scroll (REQ-007 tab-bar rule) |
 | `terminal-powershell` | Terminal screen | `.xterm` | `fill(min-h=68) optional` | Present only where the shell is available on the host |
 | `terminal-powershell` | Scrollback | `.xterm .scrollbar.vertical` | `scrollbar optional` | Output longer than the screen scrolls inside the terminal. xterm 6 scrolls through its own virtual scrollbar, so the native `.xterm-viewport` is not the scroller |
 | `notes-strip` | Panel box | `:root` | `fill` | The strip fills its slot body |
 | `notes-strip` | Active entry | `.stage-notes-strip__current` | `scroll-y or scroll-x or marquee` | A long entry scrolls vertically (shipped) or horizontally (the rotator variant), never clips |
-| `notes-strip` | Controls dropdown | `.stage-popover__trigger` | `visible` | The only control stays reachable |
-| `notes-strip` | Help tooltip trigger | `.stage-tooltip__trigger` | `visible` | The `?` stays reachable |
+| `notes-strip` | Controls dropdown | `.stage-slot__controls .stage-popover__trigger` | `visible` | The only control, in the slot's top bar, stays inside the slot frame and reachable (bar region) |
+| `notes-strip` | Help tooltip trigger | `.stage-slot__help .stage-tooltip__trigger` | `visible` | The `?`, in the slot's top bar, stays inside the slot frame and reachable (bar region) |
 | `html-viewer` | Panel box | `:root` | `fill` | The viewer fills its slot body |
-| `html-viewer` | Header controls | `.stage-region__header` | `wrap` | Refresh, file selector, directory and mode controls reflow |
+| `html-viewer` | Bar controls | `.stage-slot__controls` | `wrap` | The last-modified badge, refresh, file selector, directory and mode controls, in the slot's top bar, reflow (bar region) |
 | `html-viewer` | Tabs | `.stage-html-viewer__tabbar` | `scroll-x` | Many tabs reveal by horizontal scroll |
 | `html-viewer` | Page area | `.stage-html-viewer__content` | `fill(min-h=60)` | The page area is never collapsed to a sliver |
 | `html-viewer` | Embedded page | `.stage-overview__iframe` | `frame(min-h=60) optional` | The embedded document scrolls itself; present once a page is chosen |
 | `overview` | Panel box | `:root` | `fill` | The panel fills its slot body |
-| `overview` | Header controls | `.stage-region__header` | `wrap` | Title, help and toggle reflow |
+| `overview` | Bar controls | `.stage-slot__controls` | `wrap` | The embed toggle, in the slot's top bar, reflows (bar region) |
 | `overview` | Embedded page | `.stage-overview__iframe` | `frame(min-h=60) optional` | The embedded document scrolls itself; present once the page is generated |
 | `file-browser` | Panel box | `:root` | `fill` | The browser fills its slot body |
-| `file-browser` | Header controls | `.stage-region__header` | `wrap` | Preset and directory controls reflow |
+| `file-browser` | Bar controls | `.stage-slot__controls` | `wrap` | Preset and directory controls, in the slot's top bar, reflow (bar region) |
 | `file-browser` | Filters | `.stage-file-browser__filters` | `wrap` | Search and type filter reflow |
 | `file-browser` | Tree | `.stage-file-browser__tree` | `fill(min-h=48)` | At least two entries stay visible |
 | `file-browser` | Tree | `.stage-file-browser__tree` | `scroll-y` | A deep tree scrolls inside the panel (REQ-007 W18) |
 | `file-browser` | Tree | `.stage-file-browser__tree` | `scroll-x` | A long name scrolls rather than clips |
 | `idea-explorer` | Panel box | `:root` | `fill` | The explorer fills its slot body |
-| `idea-explorer` | Header controls | `.stage-region__header` | `wrap` | View toggle reflows |
+| `idea-explorer` | Bar controls | `.stage-slot__controls` | `wrap` | The view toggle, in the slot's top bar, reflows (bar region) |
 | `idea-explorer` | Filters | `.stage-explorer__filters` | `wrap` | Search and status filter reflow |
 | `idea-explorer` | Table | `.stage-explorer__table-wrap` | `fill(min-h=80)` | The header row and two entries stay visible |
 | `idea-explorer` | Table | `.stage-explorer__table-wrap` | `scroll-y` | Rows beyond the box scroll inside it |
 | `idea-explorer` | Table | `.stage-explorer__table-wrap` | `scroll-x` | Columns beyond the box scroll inside it |
 | `backlog-explorer` | Panel box | `:root` | `fill` | The explorer fills its slot body |
-| `backlog-explorer` | Header controls | `.stage-region__header` | `wrap` | View toggle reflows |
+| `backlog-explorer` | Bar controls | `.stage-slot__controls` | `wrap` | The view toggle, in the slot's top bar, reflows (bar region) |
 | `backlog-explorer` | Filters | `.stage-explorer__filters` | `wrap` | Search and status filter reflow |
 | `backlog-explorer` | Table | `.stage-explorer__table-wrap` | `fill(min-h=80)` | The header row and two entries stay visible |
 | `backlog-explorer` | Table | `.stage-explorer__table-wrap` | `scroll-y` | Rows beyond the box scroll inside it |
@@ -166,7 +179,7 @@ A floating surface is drawn outside its trigger's box and is measured only while
 | 2 | File Browser clip (`REQ-007` W18) | `.stage-file-browser__tree` `scroll-y`, `scroll-x`, `fill(min-h=48)` | `test_judge_flags_the_file_browser_clip_w18` | Not reproduced. The tree scrolls inside its box in all 8 cells, and its content exceeded the box in each, so the rule was exercised. |
 | 3 | Rotator tooltip cutoff (`000130`, `phase-wbf-14`) | tooltip `not-clipped` | `test_tooltip_judge_flags_the_rotator_cutoff_000130` | **Reproduced** in layout 1 at all four sizes: the 240x113 bubble is cut by the 28-32 px notes strip. Layout 2's strip is 220-350 px high and does not clip it. |
 | 4 | Popover height floor (`000117`, `phase-wbf-13`) | popover `not-starved`, `in-viewport`, `dismiss-visible` | `test_popover_judge_flags_the_height_floor_000117` | **Reproduced** in layout 1 at all four sizes: the HTML Viewer file selector, given a directory of 140 files, opens a 149-191 px bubble when it needs 305 px and 529-846 px is free on the larger side. The dismiss control and viewport rules held. |
-| 5 | The ~98 px chrome offset | every non-root `fill` is anchored on the panel box, not the slot body | `test_chrome_offset_does_not_make_a_correct_panel_fail` | By construction. The fixture carries a 98 px gap between slot body and xterm and conforms; a slot-height proxy would fail it. |
+| 5 | The ~98 px chrome offset (smaller since `ADR-031` removed the panel header) | every non-root `fill` is anchored on the panel box, not the slot body | `test_chrome_offset_does_not_make_a_correct_panel_fail` | By construction. The fixture carries a 98 px gap between slot body and xterm and conforms; a slot-height proxy would fail it. |
 
 ## How panel types are discovered
 
@@ -209,8 +222,8 @@ floating-surface measurements (108 popovers, 16 tooltips, 8 context menus). Rule
 failed 35. The run exits 1. Instances 3 and 4 above are the two floating-surface violations, and the
 notes strip's unbounded entry is the defect `phase-wbf-06` addresses. The other four rows below match
 no queued phase's title or scope in `backlog.yaml`, so they are listed for the owner to schedule
-rather than fixed here. `phase-wbf-02` will add a last-modified badge to the HTML Viewer header,
-which the header's `wrap` row will measure.
+rather than fixed here. `phase-wbf-02` added a last-modified badge to the HTML Viewer, which is now a `status` bar element
+that the `Bar controls` `wrap` row measures.
 
 | Finding | Where | Measured |
 |---|---|---|
@@ -222,6 +235,21 @@ which the header's `wrap` row will measure.
 
 Each `wrap` finding is accompanied by a `silent-clip` finding on the panel root, which is the same
 defect seen from the other side: the root's `overflow: hidden` is hiding the controls.
+
+**Re-baselined by `phase-arch-07`.** The three header `wrap` findings above were measured on
+2026-10-08 against `.stage-region__header`, a header each panel drew. That header no longer exists:
+the slot's one top bar holds the panel's controls, the bar wraps (`flex-wrap`), and the row is now
+`Bar controls` (`.stage-slot__controls`), measured against the slot frame. The numbers in those
+three rows describe the old header and are kept as the record of what was measured then.
+
+`phase-arch-07` re-ran the live check at the two sizes `--quick` keeps (1280x720 and 1024x768),
+on the workbench with that phase's change and the fixes `phase-wbf-06`, `-13` and `-14` landed
+before it: 52 panel cells (both layouts, every panel in every slot the matcher makes it eligible
+for, which is 26 panel-slot pairs because Overview is now eligible for the secondary slot as well),
+66 floating-surface measurements (54 popovers, 8 tooltips, 4 context menus). Rules passed 260 and
+failed 0; the run printed `0 finding(s)` and exited 0. That is not a measurement of the 1366x768 and
+1920x1080 columns, which were not re-run, and it does not replace the full `--live --self-test` run
+in "Running the live check".
 
 Not exercised, and said so rather than counted as a pass: the CMD and PowerShell scrollback.
 `terminal-cmd` and `terminal-powershell` mount an xterm that shows "is not available on this host"

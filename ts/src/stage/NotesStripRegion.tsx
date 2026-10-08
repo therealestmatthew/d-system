@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Tooltip from './Tooltip'
+import BarElement from '../workbench/BarElement'
 import Popover from './Popover'
 import { useActiveSchemaVersion } from '../workbench/schemaVersionContext'
 import { loadActiveNotesFile, saveActiveNotesFile } from '../workbench/storage'
@@ -604,13 +605,17 @@ export default function NotesStripRegion() {
   const cyclingDisabled = contentState !== 'loaded' || entries.length < 2
 
   return (
-    <section className="stage-region stage-notes-strip" aria-label="Notes">
-      <div className="stage-notes-strip__row">
+    <section className="stage-panel stage-notes-strip" aria-label="Notes">
+      {/* The top bar is the slot's (ADR-031 decision 1): this panel supplies its elements only,
+          the `?` to the strip's help place and the one controls dropdown to its controls place. */}
+      <BarElement type="help">
         <Tooltip label="About the notes strip">
           Cycles owner-authored notes loaded at runtime from a chosen JSON file under{' '}
           <code>ts/public/</code>. Every control — cycling, the timed advance, and the file
           picker — lives in the dropdown at the right.
         </Tooltip>
+      </BarElement>
+      <div className="stage-notes-strip__row">
         {entry === null ? (
           <NoticeView key={contentState} text={notice ?? ''} />
         ) : entry.kind === 'image' ? (
@@ -627,6 +632,8 @@ export default function NotesStripRegion() {
             onPassFinished={advanceIfDue}
           />
         )}
+      </div>
+      <BarElement type="choice">
         <Popover triggerLabel="▾" title="Notes controls">
           {() => (
             <div className="stage-notes-strip__menu">
@@ -681,7 +688,7 @@ export default function NotesStripRegion() {
             </div>
           )}
         </Popover>
-      </div>
+      </BarElement>
     </section>
   )
 }

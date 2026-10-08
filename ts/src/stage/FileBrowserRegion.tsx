@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type MouseEvent as ReactMouseEvent } from 'react'
 import BookmarkCategories from './BookmarkCategories'
+import BarElement from '../workbench/BarElement'
 import DirectoryPickerDialog from './DirectoryPickerDialog'
 import FileTreeContextMenu from './FileTreeContextMenu'
 import { COMPATIBLE_EXTENSIONS } from './compatibleExtensions'
@@ -536,31 +537,31 @@ export default function FileBrowserRegion() {
   const contextMenuTerminalAvailable = terminalHandle !== null && terminalHandle.enabled && !terminalHandle.dropped
 
   return (
-    <section className="stage-region stage-region--file-browser" aria-label="File Browser">
-      <header className="stage-region__header">
-        <h2>File Browser</h2>
-        <div className="stage-file-browser__controls">
-          <select
-            className="stage-file-browser__preset"
-            aria-label="File Browser preset"
-            value={currentPresetId}
-            onChange={(event) => {
-              const preset = PRESETS.find((candidate) => candidate.id === event.target.value)
-              if (!preset) return
-              browseFolder(preset.directory)
-              setTypeFilter(preset.typeFilter)
-            }}
-          >
-            <option value="custom">Custom</option>
-            {PRESETS.map((preset) => (
-              <option key={preset.id} value={preset.id}>
-                {preset.label}
-              </option>
-            ))}
-          </select>
-          <DirectoryPickerDialog initialDirectory={contextFolder} onSelectDirectory={browseFolder} />
-        </div>
-      </header>
+    <section className="stage-panel stage-panel--file-browser" aria-label="File Browser">
+      {/* The top bar is the slot's (ADR-031 decision 1): this panel supplies its elements only. */}
+      <BarElement type="choice">
+        <select
+          className="stage-file-browser__preset"
+          aria-label="File Browser preset"
+          value={currentPresetId}
+          onChange={(event) => {
+            const preset = PRESETS.find((candidate) => candidate.id === event.target.value)
+            if (!preset) return
+            browseFolder(preset.directory)
+            setTypeFilter(preset.typeFilter)
+          }}
+        >
+          <option value="custom">Custom</option>
+          {PRESETS.map((preset) => (
+            <option key={preset.id} value={preset.id}>
+              {preset.label}
+            </option>
+          ))}
+        </select>
+      </BarElement>
+      <BarElement type="choice">
+        <DirectoryPickerDialog initialDirectory={contextFolder} onSelectDirectory={browseFolder} />
+      </BarElement>
       <div className="stage-region__body stage-region__body--file-browser">
         <p className="stage-file-browser__meta">
           Browsing <code>{contextFolder}</code>

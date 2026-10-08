@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import BarElement from '../../workbench/BarElement'
 
 export type SortDirection = 'asc' | 'desc'
 
@@ -23,7 +24,8 @@ export interface ExplorerViewLabels {
 }
 
 export interface ExplorerRegionProps<T> {
-  /** Panel title, shown in the header and used to build the search field's aria-label. */
+  /** Panel title, used to build the search field's aria-label (the slot's top bar names the
+   * panel, ADR-031). */
   title: string
   ariaLabel: string
   /** Suffix for the outer `.stage-region--*` modifier class — cosmetic hook only, no behavior
@@ -177,30 +179,28 @@ export default function ExplorerRegion<T>({
   const queueLabel = viewLabels?.queue ?? 'Priority queue'
 
   return (
-    <section className={`stage-region stage-region--${regionClassSuffix}`} aria-label={ariaLabel}>
-      <header className="stage-region__header">
-        <h2>{title}</h2>
-        <div className="stage-explorer__controls">
-          <div className="stage-explorer__view-toggle" role="group" aria-label="Explorer view">
-            <button
-              type="button"
-              className="stage-explorer__view-button"
-              aria-pressed={view === 'standard'}
-              onClick={() => selectView('standard')}
-            >
-              {standardLabel}
-            </button>
-            <button
-              type="button"
-              className="stage-explorer__view-button"
-              aria-pressed={view === 'queue'}
-              onClick={() => selectView('queue')}
-            >
-              {queueLabel}
-            </button>
-          </div>
+    <section className={`stage-panel stage-panel--${regionClassSuffix}`} aria-label={ariaLabel}>
+      {/* The top bar is the slot's (ADR-031 decision 1): this panel supplies its elements only. */}
+      <BarElement type="toggle" places={2}>
+        <div className="stage-explorer__view-toggle" role="group" aria-label="Explorer view">
+          <button
+            type="button"
+            className="stage-explorer__view-button"
+            aria-pressed={view === 'standard'}
+            onClick={() => selectView('standard')}
+          >
+            {standardLabel}
+          </button>
+          <button
+            type="button"
+            className="stage-explorer__view-button"
+            aria-pressed={view === 'queue'}
+            onClick={() => selectView('queue')}
+          >
+            {queueLabel}
+          </button>
         </div>
-      </header>
+      </BarElement>
       <div className="stage-region__body stage-region__body--explorer">
         <div className="stage-explorer__filters">
           <input

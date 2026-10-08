@@ -243,3 +243,23 @@ def test_no_source_or_data_file_carries_a_per_panel_or_per_slot_allow_list() -> 
             offenders.append(path.relative_to(ROOT).as_posix())
     assert offenders == [], f"an eligibility list is back: {offenders}"
 
+
+# --- a panel never draws a top bar (ADR-031 decision 1, REQ-011 R13) ----------------------------
+
+
+def test_no_panel_source_draws_a_top_bar() -> None:
+    """The cheap second check beside the rendered count in `oneHeaderPerSlot.test.tsx` (which counts
+    `header` and `role="banner"` elements per slot and is the real guarantee): the panel sources
+    contain no header element, no banner role and no `.stage-region__header` class. A panel
+    supplies bar elements through `BarElement` and the slot draws the one bar."""
+    panel_sources = sorted((TS_SRC / "stage").glob("*Region.tsx")) + sorted(
+        (TS_SRC / "stage" / "explorer").glob("*Region.tsx")
+    )
+    assert len(panel_sources) >= 8, "the panel sources were not found"
+    bar = re.compile(r"<header\b|role=\"banner\"|stage-region__header(?![\w-])")
+    offenders = [
+        path.relative_to(ROOT).as_posix()
+        for path in panel_sources
+        if bar.search(path.read_text("utf-8"))
+    ]
+    assert offenders == [], f"panel sources that draw a top bar: {offenders}"

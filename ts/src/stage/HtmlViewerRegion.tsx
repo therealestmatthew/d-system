@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import DirectoryPickerDialog from './DirectoryPickerDialog'
 import Popover from './Popover'
+import BarElement from '../workbench/BarElement'
 import { useActiveSchemaVersion } from '../workbench/schemaVersionContext'
 import { loadHtmlViewerTabs, saveHtmlViewerTabs } from '../workbench/storage'
 import { viewerBridge, type BatchReceipt, type ViewerBridgeHandle } from './panelBridge'
@@ -69,7 +70,7 @@ function basename(path: string): string {
   return index === -1 ? path : path.slice(index + 1)
 }
 
-/** The header badge's text for a file's mtime: local date and time to the second, so a regenerated
+/** The bar badge's text for a file's mtime: local date and time to the second, so a regenerated
  * page visibly advances. The exact ISO UTC value goes in the badge's `title`. */
 function formatModified(iso: string): string | null {
   const moment = new Date(iso)
@@ -149,10 +150,10 @@ function loadInitialTabs(schemaVersion: number | null): { tabs: ViewerTab[]; act
  * `MAX_TABS`). Unlike a terminal session, closing a viewer tab ends nothing live — there is no
  * process or socket behind it — so close needs no confirmation step, unlike the terminal's
  * guarded tab close (REQ-006 R11). The selected directory, search text and displayed page are
- * scoped to whichever tab is active (`ViewerTab`); the three header controls below the title —
+ * scoped to whichever tab is active (`ViewerTab`); the three bar controls (supplied to the slot's top bar, ADR-031) —
  * refresh, the searchable file dropdown, and the directory-change button — plus the kept
- * embed/open-in-tab toggle, stay shared: one instance in the header, acting on the active tab's
- * state, exactly as REQ-007 W08 specifies ("the header controls themselves are shared").
+ * embed/open-in-tab toggle, stay shared: one instance in the bar, acting on the active tab's
+ * state, exactly as REQ-007 W08 specifies ("the header controls themselves are shared", now the bar controls).
  *
  * Tab state (every open tab's directory/search/page, and which tab is active) persists under the
  * ADR-016 selections key (`ts/src/workbench/storage.ts`'s `saveHtmlViewerTabs`/
@@ -169,7 +170,7 @@ function loadInitialTabs(schemaVersion: number | null): { tabs: ViewerTab[]; act
  * anything. A tab restored from storage already has a directory (or `null` only if it was
  * persisted mid-seed) and is left alone.
  *
- * Three header controls sit right of the title, all fed by phase-wb-01's workbench read routes,
+ * Three bar controls sit in the slot's top bar, all fed by phase-wb-01's workbench read routes,
  * never a browser-native file/directory picker (ADR-015's rejected-alternative rule):
  * - Refresh: re-fetches the active tab's displayed page (a cache-busting query param on the
  *   iframe `src`, since a cached response would defeat the point of a manual refresh) and
@@ -216,7 +217,7 @@ export default function HtmlViewerRegion() {
   const [refreshToken, setRefreshToken] = useState(0)
 
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? null
-  // The search input is a shared header control (one `<input>`), but the text it shows and writes
+  // The search input is a shared control (one `<input>`), but the text it shows and writes
   // is the active tab's own (REQ-007 W08), so switching tabs swaps the displayed text.
   const searchText = activeTab?.searchText ?? ''
   const activeDirectory = activeTab?.directory ?? null
@@ -235,7 +236,7 @@ export default function HtmlViewerRegion() {
         ? settledPage.state
         : 'checking'
 
-  // The displayed file's mtime for the header badge (REQ-012 R03/R04). Keyed like the page check,
+  // The displayed file's mtime for the bar badge (REQ-012 R03/R04). Keyed like the page check,
   // so it is read again on a tab switch, on selecting a file and on Refresh: that re-fetch on select
   // is how the viewer learns a file changed on disk since it was last shown. Until the read for the
   // current key settles the badge says so rather than showing the previous file's time.
@@ -473,9 +474,9 @@ export default function HtmlViewerRegion() {
   }
 
   return (
-    <section className="stage-region stage-region--html-viewer" aria-label="HTML Viewer">
-      <header className="stage-region__header" style={{ flexWrap: 'wrap' }}>
-        <h2>HTML Viewer</h2>
+    <section className="stage-panel stage-panel--html-viewer" aria-label="HTML Viewer">
+      {/* The top bar is the slot's (ADR-031 decision 1): this panel supplies its elements only. */}
+      <BarElement type="status">
         {modifiedState === 'none' ? null : (
           <span
             className="stage-html-viewer__modified"
@@ -495,87 +496,90 @@ export default function HtmlViewerRegion() {
                 : 'Modified time unavailable'}
           </span>
         )}
-        <div className="stage-html-viewer__controls">
-          <button
-            type="button"
-            className="stage-html-viewer__refresh"
-            aria-label="Refresh the current page"
-            disabled={!activeTab?.selectedFile}
-            onClick={() => setRefreshToken((value) => value + 1)}
-          >
-            ⟳ Refresh
-          </button>
-
-          <Popover
-            triggerLabel={activeTab?.selectedFile ? basename(activeTab.selectedFile) : 'Choose a file ▾'}
-            triggerAriaLabel="Choose a compatible file"
-            title="Choose a file"
-          >
-            {(close) => (
-              <div className="stage-html-viewer__file-picker">
-                <input
-                  type="text"
-                  className="stage-html-viewer__search"
-                  placeholder="Filter files…"
-                  aria-label="Filter compatible files"
-                  value={searchText}
-                  onChange={(event) => {
-                    if (activeTab) updateTab(activeTab.id, { searchText: event.target.value })
-                  }}
-                />
-                {filesLoadState === 'loading' ? (
-                  <p className="stage-placeholder-text" role="status">Searching…</p>
-                ) : filesLoadState === 'error' ? (
-                  <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">
-                    Could not search this directory.
-                  </p>
-                ) : filteredFiles.length === 0 ? (
-                  <p className="stage-placeholder-text">No matching files.</p>
-                ) : (
-                  <ul className="stage-html-viewer__file-list">
-                    {filteredFiles.map((file) => (
-                      <li key={file.path}>
-                        <button
-                          type="button"
-                          className="stage-html-viewer__file-option"
-                          onClick={() => {
-                            if (activeTab) {
-                              // Re-selecting the file already displayed changes no state of its
-                              // own, so bump the refresh token: it re-checks the page, reloads the
-                              // frame and reads the file's mtime again (REQ-012 R04).
-                              if (activeTab.selectedFile === file.path) setRefreshToken((value) => value + 1)
-                              else updateTab(activeTab.id, { selectedFile: file.path })
-                            }
-                            close()
-                          }}
-                        >
-                          {file.path}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-          </Popover>
-
-          {activeTab && activeTab.directory !== null ? (
-            <DirectoryPickerDialog
-              initialDirectory={activeTab.directory}
-              onSelectDirectory={(directory) => updateTab(activeTab.id, { directory })}
-            />
-          ) : null}
-
-          <button
-            type="button"
-            className="stage-region__header-toggle"
-            aria-pressed={!embedded}
-            onClick={() => setEmbedded((value) => !value)}
-          >
-            {embedded ? 'Embedded' : 'Open-in-tab link (rung 3)'}
-          </button>
-        </div>
-      </header>
+      </BarElement>
+      <BarElement type="action">
+        <button
+          type="button"
+          className="stage-html-viewer__refresh"
+          aria-label="Refresh the current page"
+          disabled={!activeTab?.selectedFile}
+          onClick={() => setRefreshToken((value) => value + 1)}
+        >
+          ⟳ Refresh
+        </button>
+      </BarElement>
+      <BarElement type="choice">
+        <Popover
+          triggerLabel={activeTab?.selectedFile ? basename(activeTab.selectedFile) : 'Choose a file ▾'}
+          triggerAriaLabel="Choose a compatible file"
+          title="Choose a file"
+        >
+          {(close) => (
+            <div className="stage-html-viewer__file-picker">
+              <input
+                type="text"
+                className="stage-html-viewer__search"
+                placeholder="Filter files…"
+                aria-label="Filter compatible files"
+                value={searchText}
+                onChange={(event) => {
+                  if (activeTab) updateTab(activeTab.id, { searchText: event.target.value })
+                }}
+              />
+              {filesLoadState === 'loading' ? (
+                <p className="stage-placeholder-text" role="status">Searching…</p>
+              ) : filesLoadState === 'error' ? (
+                <p className="stage-placeholder-text stage-placeholder-text--absent" role="alert">
+                  Could not search this directory.
+                </p>
+              ) : filteredFiles.length === 0 ? (
+                <p className="stage-placeholder-text">No matching files.</p>
+              ) : (
+                <ul className="stage-html-viewer__file-list">
+                  {filteredFiles.map((file) => (
+                    <li key={file.path}>
+                      <button
+                        type="button"
+                        className="stage-html-viewer__file-option"
+                        onClick={() => {
+                          if (activeTab) {
+                            // Re-selecting the file already displayed changes no state of its
+                            // own, so bump the refresh token: it re-checks the page, reloads the
+                            // frame and reads the file's mtime again (REQ-012 R04).
+                            if (activeTab.selectedFile === file.path) setRefreshToken((value) => value + 1)
+                            else updateTab(activeTab.id, { selectedFile: file.path })
+                          }
+                          close()
+                        }}
+                      >
+                        {file.path}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </Popover>
+      </BarElement>
+      <BarElement type="choice">
+        {activeTab && activeTab.directory !== null ? (
+          <DirectoryPickerDialog
+            initialDirectory={activeTab.directory}
+            onSelectDirectory={(directory) => updateTab(activeTab.id, { directory })}
+          />
+        ) : null}
+      </BarElement>
+      <BarElement type="toggle">
+        <button
+          type="button"
+          className="stage-region__header-toggle"
+          aria-pressed={!embedded}
+          onClick={() => setEmbedded((value) => !value)}
+        >
+          {embedded ? 'Embedded' : 'Open-in-tab link (rung 3)'}
+        </button>
+      </BarElement>
       <div className="stage-region__body stage-region__body--html-viewer">
         <div className="stage-html-viewer__tabbar" role="tablist" aria-label="HTML Viewer tabs">
           {tabs.map((tab, index) => (
