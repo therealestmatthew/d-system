@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
+import type { CategorySummary } from './bookmarks'
 import type { ViewerBridgeTab } from './panelBridge'
 
 // Kept clear of the viewport edge when clamping the menu's position — same margin `Popover.tsx`
@@ -26,6 +27,13 @@ const VIEWPORT_MARGIN = 8
  * viewer tab", which an expand-in-place `role="menu"` nested under the parent `role="menuitem"`
  * satisfies structurally without that second clamping pass.
  *
+ * "Add to bookmark category" (ADR-029, files only) is a second inline submenu: the existing
+ * categories, then "New category…", which swaps the list for a name field that creates the category
+ * and adds the file in one step. `bookmarkCategories` is `null` when the bookmark routes are not
+ * available, which disables the item rather than hiding it. Private and gitignored files are
+ * deliberately unsupported as entries: the server refuses them and the refusal is shown in the
+ * File Browser's status line.
+ *
  * Every item inapplicable to the right-clicked entry is hidden (not shown-disabled) —
  * `viewerCompatible=false` (a non-`.html`/`.svg` file, or a directory) drops the whole "Open in
  * HTML Viewer" item, matching this dispatch's own example ("open-in-viewer on a .py file"). The
@@ -42,11 +50,15 @@ export default function FileTreeContextMenu({
   viewerAvailable,
   viewerTabs,
   terminalAvailable,
+  isFile,
+  bookmarkCategories,
   onReveal,
   onOpenInViewer,
   onCopyRelativePath,
   onCopyAbsolutePath,
   onInjectPath,
+  onAddToCategory,
+  onAddToNewCategory,
   onClose,
 }: {
   x: number
@@ -64,16 +76,24 @@ export default function FileTreeContextMenu({
    * (`useTerminalBridge()`) — governs "Inject path into terminal"'s `disabled` attribute, exactly
    * like the injection dropdowns' own `disabled`/`deactivated` split collapsed to one flag here. */
   terminalAvailable: boolean
+  /** Whether the right-clicked entry is a file (a directory cannot be bookmarked). */
+  isFile: boolean
+  /** The existing bookmark categories, or `null` when the bookmark routes are unavailable. */
+  bookmarkCategories: CategorySummary[] | null
   onReveal: () => void
   onOpenInViewer: (tabId: number) => void
   onCopyRelativePath: () => void
   onCopyAbsolutePath: () => void
   onInjectPath: () => void
+  onAddToCategory: (categoryId: string) => void
+  onAddToNewCategory: (name: string) => void
   onClose: () => void
 }) {
   const menuRef = useRef<HTMLDivElement>(null)
   const [style, setStyle] = useState<CSSProperties>({ left: x, top: y })
   const [viewerSubmenuOpen, setViewerSubmenuOpen] = useState(false)
+  const [bookmarkSubmenuOpen, setBookmarkSubmenuOpen] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState<string | null>(null)
 
   // Clamp against the viewport once the menu's real size is known — re-run whenever the submenu
   // opens/closes too, since expanding it changes the menu's own height and could push its bottom
@@ -95,7 +115,7 @@ export default function FileTreeContextMenu({
     left = Math.max(VIEWPORT_MARGIN, left)
     top = Math.max(VIEWPORT_MARGIN, top)
     setStyle({ left, top })
-  }, [x, y, viewerSubmenuOpen])
+  }, [x, y, viewerSubmenuOpen, bookmarkSubmenuOpen, newCategoryName])
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent): void {
@@ -166,6 +186,68 @@ export default function FileTreeContextMenu({
                     {tab.label}
                   </button>
                 ))
+              )}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {isFile ? (
+        <div className="stage-file-tree-menu__submenu-wrap">
+          <button
+            type="button"
+            role="menuitem"
+            aria-haspopup="menu"
+            aria-expanded={bookmarkSubmenuOpen}
+            className="stage-file-tree-menu__item stage-file-tree-menu__item--parent"
+            disabled={bookmarkCategories === null}
+            onClick={() => setBookmarkSubmenuOpen((value) => !value)}
+          >
+            Add to bookmark category {bookmarkCategories === null ? '(unavailable)' : '▸'}
+          </button>
+          {bookmarkSubmenuOpen && bookmarkCategories !== null ? (
+            <div role="menu" aria-label="Choose the bookmark category" className="stage-file-tree-menu__submenu">
+              {bookmarkCategories.map((category) => (
+                <button
+                  key={category.category_id}
+                  type="button"
+                  role="menuitem"
+                  className="stage-file-tree-menu__item"
+                  onClick={() => runAndClose(() => onAddToCategory(category.category_id))}
+                >
+                  {category.name}
+                </button>
+              ))}
+              {newCategoryName === null ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="stage-file-tree-menu__item"
+                  onClick={() => setNewCategoryName('')}
+                >
+                  New category…
+                </button>
+              ) : (
+                <form
+                  className="stage-file-tree-menu__new-category"
+                  onSubmit={(event) => {
+                    event.preventDefault()
+                    if (newCategoryName.trim() === '') return
+                    runAndClose(() => onAddToNewCategory(newCategoryName))
+                  }}
+                >
+                  <input
+                    type="text"
+                    aria-label="New category name"
+                    placeholder="Category name…"
+                    value={newCategoryName}
+                    autoFocus
+                    onChange={(event) => setNewCategoryName(event.target.value)}
+                  />
+                  <button type="submit" disabled={newCategoryName.trim() === ''}>
+                    Create and add
+                  </button>
+                </form>
               )}
             </div>
           ) : null}

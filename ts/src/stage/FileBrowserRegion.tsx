@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState, type MouseEvent as ReactMouseEvent } from 'react'
+import BookmarkCategories from './BookmarkCategories'
 import DirectoryPickerDialog from './DirectoryPickerDialog'
 import FileTreeContextMenu from './FileTreeContextMenu'
 import { COMPATIBLE_EXTENSIONS } from './compatibleExtensions'
 import { useTerminalBridge, useViewerBridge } from './panelBridge'
+import { useBookmarks } from './useBookmarks'
 import { fetchWorkbench } from './useTerminalEnabled'
 
 const SEARCH_URL = '/api/v1/workbench/search'
@@ -288,6 +290,9 @@ export default function FileBrowserRegion() {
   // which `FileTreeContextMenu` renders as a disabled/hidden item rather than a broken action.
   const terminalHandle = useTerminalBridge()
   const viewerHandle = useViewerBridge()
+  // ADR-029 bookmark categories: one model shared by the context menu (add a file) and the
+  // bookmarks section (list, open as a set, rename, delete).
+  const bookmarks = useBookmarks()
 
   useEffect(() => {
     let cancelled = false
@@ -492,6 +497,33 @@ export default function FileBrowserRegion() {
     })
   }
 
+  // ADR-029: the right-clicked file is added to a category by id; a refusal from the server (a
+  // private or gitignored file, a duplicate, a file that no longer exists) is shown by its
+  // reason, because private files are deliberately unsupported as entries.
+  async function handleAddToCategory(
+    node: FileTreeNode,
+    categoryId: string,
+    knownName?: string,
+  ): Promise<void> {
+    const result = await bookmarks.addFile(categoryId, node.path)
+    const name =
+      knownName ?? bookmarks.categories.find((c) => c.category_id === categoryId)?.name ?? categoryId
+    setActionStatus(
+      result.ok
+        ? { kind: 'info', message: `Added "${node.path}" to "${name}".` }
+        : { kind: 'error', message: `Could not add "${node.path}" to "${name}": ${result.message}` },
+    )
+  }
+
+  async function handleAddToNewCategory(node: FileTreeNode, name: string): Promise<void> {
+    const created = await bookmarks.create(name)
+    if (!created.ok) {
+      setActionStatus({ kind: 'error', message: `Could not create the category: ${created.message}` })
+      return
+    }
+    await handleAddToCategory(node, created.value.category_id, created.value.name)
+  }
+
   const contextMenuNode = contextMenu?.node ?? null
   const contextMenuViewerCompatible =
     contextMenuNode !== null &&
@@ -547,6 +579,7 @@ export default function FileBrowserRegion() {
             </button>
           </p>
         ) : null}
+        <BookmarkCategories model={bookmarks} />
         <div className="stage-file-browser__filters">
           <input
             type="text"
@@ -601,6 +634,8 @@ export default function FileBrowserRegion() {
           viewerAvailable={viewerHandle !== null}
           viewerTabs={viewerHandle?.tabs ?? []}
           terminalAvailable={contextMenuTerminalAvailable}
+          isFile={!contextMenu.node.isDir}
+          bookmarkCategories={bookmarks.loadState === 'ready' ? bookmarks.categories : null}
           onReveal={() => {
             void handleReveal(contextMenu.node)
           }}
@@ -610,6 +645,12 @@ export default function FileBrowserRegion() {
             void handleCopyAbsolutePath(contextMenu.node)
           }}
           onInjectPath={() => handleInjectPath(contextMenu.node)}
+          onAddToCategory={(categoryId) => {
+            void handleAddToCategory(contextMenu.node, categoryId)
+          }}
+          onAddToNewCategory={(name) => {
+            void handleAddToNewCategory(contextMenu.node, name)
+          }}
           onClose={() => setContextMenu(null)}
         />
       ) : null}

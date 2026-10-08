@@ -1041,6 +1041,158 @@ body {
   color: #555;
 }
 
+/* The bookmark-category section of the File Browser (`BookmarkCategories.tsx`, ADR-029): a
+   collapsible list of categories above the filters, with per-category open-as-set, rename, delete
+   and a file list that marks missing or excluded entries by path. */
+.stage-bookmarks {
+  border: 1px solid #e5e8ee;
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.78rem;
+}
+
+.stage-bookmarks__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.stage-bookmarks__toggle,
+.stage-bookmarks__name {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.78rem;
+  padding: 0.1rem 0.2rem;
+}
+
+.stage-bookmarks__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.3rem;
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
+.stage-bookmarks__button {
+  font-size: 0.74rem;
+  padding: 0.1rem 0.4rem;
+  cursor: pointer;
+}
+
+.stage-bookmarks__button:disabled {
+  cursor: not-allowed;
+}
+
+.stage-bookmarks__button--danger {
+  color: #7a1f1f;
+  border-color: #e3a1a1;
+}
+
+.stage-bookmarks__form {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.stage-bookmarks__form input {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+}
+
+.stage-bookmarks__list,
+.stage-bookmarks__entries,
+.stage-bookmarks__declined {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.stage-bookmarks__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.stage-bookmarks__name {
+  flex: 1;
+  min-width: 6rem;
+  word-break: break-word;
+}
+
+.stage-bookmarks__count {
+  color: #555;
+}
+
+.stage-bookmarks__files {
+  padding-left: 1rem;
+  margin-top: 0.2rem;
+}
+
+.stage-bookmarks__entry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.stage-bookmarks__entry code {
+  word-break: break-all;
+}
+
+.stage-bookmarks__entry-path--absent {
+  text-decoration: line-through;
+  color: #7a1f1f;
+}
+
+.stage-bookmarks__badge {
+  font-size: 0.7rem;
+  background: #fdecec;
+  border: 1px solid #e3a1a1;
+  border-radius: 3px;
+  padding: 0 0.3rem;
+  color: #7a1f1f;
+}
+
+.stage-bookmarks__status {
+  position: relative;
+  padding: 0.35rem 1.6rem 0.35rem 0.5rem;
+  border-radius: 4px;
+  background: #eef1f6;
+  border: 1px solid #c7ccd6;
+  word-break: break-word;
+}
+
+.stage-bookmarks__status--error {
+  background: #fdecec;
+  border-color: #e3a1a1;
+  color: #7a1f1f;
+}
+
+.stage-bookmarks__declined {
+  margin-top: 0.25rem;
+  padding-left: 0.6rem;
+}
+
+.stage-file-tree-menu__new-category {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.25rem 0.4rem;
+}
+
+.stage-file-tree-menu__new-category input {
+  font-size: 0.8rem;
+}
+
 /* The shared explorer table/sort/filter/queue-toggle surface (`ExplorerRegion`,
    `stage/explorer/ExplorerRegion.tsx`, REQ-007 W10/W11, `phase-wb-06`): a standard/priority-queue
    view toggle sits in the header; the filter row and the scrollable table fill the body as a flex
