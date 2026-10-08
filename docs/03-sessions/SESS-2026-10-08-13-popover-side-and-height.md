@@ -64,7 +64,11 @@ both sizes (opened downward, held by the list's own 14rem cap).
   pass=39 fail=2 ... 4 finding(s)". No popover finding remains. The four findings are none from
   the popover: two `tooltip` `not-clipped` findings (phase-wbf-14) and the `wrap` and `silent-clip`
   findings on the HTML Viewer header in layout-2 at 1024x768 (not in this phase's scope).
-- `cd ts && npm test`: see the final run recorded in the Review section. `npm run build`: built. `npm run lint`: clean.
+- After the review fixes and the rebase onto the trunk: `cd ts && npm test` Test Files 9 passed, Tests
+  104 passed; `npm run build` built in 2.02s; `npm run lint` clean; `uv run ruff check` All checks
+  passed; `uv run mypy src/` no issues in 51 source files; `uv run python -m src.governance` Governance
+  OK: 45 systems, 468 documents, 37 memories, 354 backlog phases; catalog diff clean. The earlier
+  `npm test` figure of 96 predates the three new tests and the trunk's new test file. `npm run build`: built. `npm run lint`: clean.
 - `uv run python -m src.governance`: OK. `uv run ruff check src/ test/ tools/`: clean.
   `uv run mypy src/`: no issues in 51 files.
 - `uv run pytest`: 1899 passed, 1 skipped, 1 failed when run whole:
