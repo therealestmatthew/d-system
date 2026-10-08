@@ -67,7 +67,7 @@ appears in the server log; an unauthenticated list answers 401; a listed session
 ## Evidence
 
 - `uv run pytest test/test_demo_terminal.py`: 56 passed.
-- `uv run pytest test/test_demo_terminal_api.py`: 111 passed.
+- `uv run pytest test/test_demo_terminal_api.py`: 111 passed at the first hand-off; 150 after the review round.
 - `uv run pytest` (full): 1961 passed, 1 skipped, **1 failed**:
   `test/test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused`. It fails the same
   way with this phase's changes stashed (the sandbox runs as uid 0, which ignores `chmod 0500`), so
@@ -126,9 +126,8 @@ Where the ADR is silent the safer option was chosen:
 9. `wait` is accepted as plain decimal (`5`, `0.5`), not exponent form; `after` and `limit` are
    plain decimal digits. The `after` and `limit` digits are capped at 18 characters.
 10. Responses carry `Cache-Control: no-store`.
-11. A write blocked in the pty holds that session's inject lock; there is no timeout on it.
-12. A shell whose pump died on a websocket send error while the shell lives keeps reporting
-    `alive: true` and its long polls wait out their `wait`. This is the ADR's known coupling.
+11. (Superseded by the review round.) A blocked pty write now has a deadline and a dead pump now
+    reads as not alive; see the Review section.
 
 ## Unresolved
 
@@ -138,4 +137,54 @@ Where the ADR is silent the safer option was chosen:
 
 ## Review
 
-Not yet reviewed. The Session Manager dispatches the independent review.
+Three reviews of `e39d74c` all passed. Verdict records, copied unchanged:
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-08-demo-adversary.json` (gating, four
+minor), `.../2026-10-08-phase-wbf-08-security-review.json` (gating, one major and minors) and
+`.../2026-10-08-phase-wbf-08-review-judge.json` (shadow, four minor). Dispositions:
+
+- Security F01 (major, a blocked pty write has no deadline): fixed. `_write_bounded` makes the master
+  descriptor non-blocking for the write and loops on `select` against a deadline
+  (`INJECT_WRITE_DEADLINE_SECONDS`, 5 s), restoring blocking mode afterwards; the executor await is
+  also wrapped in `asyncio.wait_for`. A partial write is returned with `accepted_bytes` set to the
+  bytes actually written; a write that accepts nothing is `409` with a **new code `write_timeout`**
+  (not in the ADR's table; the Session Manager or the owner must add it to ADR-030). The reviewer's
+  reproduction is a test (a running `sleep`, six 4000-byte injects with CRs: each answers inside the
+  deadline, one is `write_timeout`, and the shell is gone after the websocket closes). The websocket
+  path drops a keystroke with a warning if it meets `BlockingIOError`, which can only happen while an
+  inject holds the descriptor non-blocking; with the API off the descriptor is always blocking. An
+  adapter with no descriptor (ConPTY) keeps its own `write()`, bounded only by the wait: owner-machine,
+  not run.
+- Security F02 (write racing `adapter.close()`): fixed. Teardown sets `ended`, takes the session's
+  write lock (bounded by `WRITE_CLOSE_WAIT_SECONDS`, 7 s) and then closes the adapter. Tested by
+  holding the lock and checking that `close()` waits.
+- Security F03 (body read has no deadline; `ClientDisconnect`): fixed. The read is bounded by
+  `BODY_READ_DEADLINE_SECONDS` (10 s) and a disconnect is caught; both answer `422 invalid_request`.
+  Tested through the ASGI app with a stalled and a disconnecting body.
+- Security F04 and judge F04 (parent directory unchecked): fixed. `~/.d-system` gets the same
+  symlink, type and owner check; it is checked before the leaf is created, so a symlinked parent is
+  refused without creating anything behind it. Its mode is left as it is. Tests: symlinked parent,
+  foreign-owned parent (monkeypatched), parent mode kept.
+- Security F05 (websocket accepts any Origin or Host): not mine. Pre-existing, outside this range;
+  idea `000614`, ADR-030 open item 7.
+- Security F06 and adversary F02 (missing tests): fixed. Added: chunked body without a length,
+  concurrent injects, foreign Origin and Host with and without the token (and the CORS preflight),
+  `X-Forwarded-For`, the token absent from the shell's and the server's environment, a websocket
+  frame resetting the ceiling clock, the ring's content when the send raises, the post-exit drain
+  while the pump is held in a send. Mutation checks on the frame reset, the drain, append-before-send,
+  the teardown lock and the pump-alive rule each fail the new tests.
+- Security F07 and judge F03 (dead pump reads alive): fixed. `_stream_alive` is `not ended and not
+  pump_done`; an inject returns `409 session_ended` once the pump has stopped. Tested.
+- Adversary F01 (collecting the tests with both flags exported rotates the token): fixed in
+  `test/conftest.py`, which clears `D_SYSTEM_TERMINAL_API` before `src.main` is imported. The file
+  already existed and is **not named in this phase's deliverables, which must be widened by
+  `test/conftest.py`** (the Session Manager applies that on the trunk). HOME is not set there: it
+  would change what git and other subprocess tests read, and the cleared flag already prevents any
+  token write. A subprocess test collects both test files with both flags exported and a temporary
+  HOME and asserts no `.d-system` appears.
+- Adversary F03 (unused `type: ignore`): fixed; `uv run mypy test/test_demo_terminal_api.py` is clean.
+- Adversary F04 (`wait` and `after` grammar narrower than the ADR): fixed. `wait` is parsed with
+  `float()` plus a finite and range check (`.5`, `1e1`, `+1` accepted; non-ASCII and underscore forms
+  still refused); `after` and `limit` stay ASCII digits only, per the ADR, with no 18-digit cap.
+- Judge F01 (full pytest exits 1 on the root-sensitive test): not mine; unchanged and pre-existing.
+- Judge F02 (verification entry omits `test/test_demo_terminal_api.py`): the Session Manager applies
+  it on the trunk.

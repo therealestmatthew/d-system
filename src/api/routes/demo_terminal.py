@@ -115,6 +115,11 @@ TERMINAL_API_INJECT_CEILING_SECONDS: float = 3600.0
 # returning data indefinitely.
 OUTPUT_DRAIN_SECONDS: Final[float] = 2.0
 
+# How long session teardown waits for an in-flight HTTP inject write before closing the adapter
+# anyway. The write is itself bounded (`INJECT_WRITE_DEADLINE_SECONDS` in the API module), so this
+# only has to be a little longer than that.
+WRITE_CLOSE_WAIT_SECONDS: float = 7.0
+
 
 @dataclass
 class SessionOutput:
@@ -519,7 +524,15 @@ async def _run_session(websocket: WebSocket, session_id: str) -> None:
                 raise WebSocketDisconnect(message["code"], message.get("reason"))
             data = message.get("bytes")
             if data is not None:
-                adapter.write(data)
+                try:
+                    adapter.write(data)
+                except BlockingIOError:
+                    # Only possible while an HTTP inject holds the descriptor non-blocking and
+                    # the shell is not reading; the keystroke is dropped rather than ending the
+                    # session. With the API off the descriptor is always blocking.
+                    logger.warning(
+                        "demo terminal session %s dropped input: shell not reading", session_id
+                    )
                 continue
             text = message.get("text")
             if text is not None:
@@ -528,9 +541,23 @@ async def _run_session(websocket: WebSocket, session_id: str) -> None:
         pass
     finally:
         pump_task.cancel()
-        adapter.close()
+        holds_write_lock = False
+        try:
+            if output is not None:
+                # Mark the session ended so a queued inject refuses, then wait (bounded) for an
+                # in-flight write thread before the descriptor is closed, so the thread cannot
+                # write to a descriptor number another session has reused.
+                output.ended = True
+                with contextlib.suppress(TimeoutError):
+                    await asyncio.wait_for(
+                        output.write_lock.acquire(), timeout=WRITE_CLOSE_WAIT_SECONDS
+                    )
+                    holds_write_lock = True
+        finally:
+            adapter.close()
+            if holds_write_lock and output is not None:
+                output.write_lock.release()
         if output is not None:
-            output.ended = True
             with contextlib.suppress(Exception):
                 await output.notify()
 

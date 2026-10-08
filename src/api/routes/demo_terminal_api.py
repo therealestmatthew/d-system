@@ -30,9 +30,11 @@ import hmac
 import ipaddress
 import json
 import logging
+import math
 import os
 import re
 import secrets
+import select
 import stat
 import time
 from collections.abc import Callable, Coroutine
@@ -44,6 +46,7 @@ from typing import Any, Final
 from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
+from starlette.requests import ClientDisconnect
 
 from src.api.routes import demo_terminal
 from src.api.routes.demo_stage import REPO_ROOT
@@ -56,10 +59,18 @@ DEFAULT_OUTPUT_LIMIT: Final[int] = 65536
 MAX_OUTPUT_LIMIT: Final[int] = 262144
 MAX_WAIT_SECONDS: Final[float] = 10.0
 
+# Deadlines, read at the point of use so tests can lower them. An inject's PTY write is bounded
+# because a shell whose foreground process is not reading input (a long build) stops accepting
+# bytes once the line discipline's buffer is full; an unbounded write would hold the request, the
+# session's inject lock and an executor thread, and keep the shell alive after its session ends.
+INJECT_WRITE_DEADLINE_SECONDS: float = 5.0
+# Extra time the event loop gives the write thread past its own deadline before giving up on it.
+INJECT_WRITE_THREAD_GRACE_SECONDS: Final[float] = 2.0
+BODY_READ_DEADLINE_SECONDS: float = 10.0
+
 TOKEN_DIRECTORY_PARTS: Final[tuple[str, str]] = (".d-system", "terminal-api")
 SESSION_ID_PATTERN: Final[re.Pattern[str]] = re.compile(r"[0-9a-f]{32}")
-_INTEGER_PATTERN: Final[re.Pattern[str]] = re.compile(r"[0-9]{1,18}")
-_NUMBER_PATTERN: Final[re.Pattern[str]] = re.compile(r"[0-9]{1,6}(?:\.[0-9]{1,6})?")
+_DIGITS_PATTERN: Final[re.Pattern[str]] = re.compile(r"[0-9]+")
 
 # The token path and the inject audit line must be visible to the person running the server.
 # Uvicorn configures its own loggers, not the root logger, so an INFO line from this module's own
@@ -146,27 +157,37 @@ def token_file_path(repo_root: Path, home: Path | None = None) -> Path:
     return base.joinpath(*TOKEN_DIRECTORY_PARTS, f"{key}.token")
 
 
+def _check_token_directory(level: Path, *, tighten: bool) -> None:
+    """Refuse a symlink, a non-directory or a foreign owner at `level` (POSIX owner check).
+
+    The leaf is also tightened to 0700. The parent (`~/.d-system`) keeps its mode: a user may keep
+    other files there, and the leaf's own 0700 is what protects the token.
+    """
+    info = os.lstat(level)
+    if stat.S_ISLNK(info.st_mode):
+        raise TokenFileError(f"{level} is a symlink; refusing to write the API token under it")
+    if not stat.S_ISDIR(info.st_mode):
+        raise TokenFileError(f"{level} is not a directory")
+    if os.name == "posix":
+        if info.st_uid != os.geteuid():
+            raise TokenFileError(f"{level} is not owned by the current user")
+        if tighten and info.st_mode & 0o077:
+            os.chmod(level, 0o700)
+
+
 def _prepare_token_directory(directory: Path) -> None:
-    """Create the token directory at mode 0700 and refuse a symlink or a foreign owner (POSIX)."""
+    """Create the token directory at mode 0700; check it and its parent (ADR-030 section 3).
+
+    The parent is created and checked before the leaf is created, so a symlinked parent is refused
+    without creating anything behind it.
+    """
     try:
-        if os.name == "posix":
-            for level in (directory.parent, directory):
-                try:
-                    os.mkdir(level, 0o700)
-                except FileExistsError:
-                    pass
-        else:
-            directory.mkdir(parents=True, exist_ok=True)
-        info = os.lstat(directory)
-        if stat.S_ISLNK(info.st_mode):
-            raise TokenFileError(f"{directory} is a symlink; refusing to write the API token there")
-        if not stat.S_ISDIR(info.st_mode):
-            raise TokenFileError(f"{directory} is not a directory")
-        if os.name == "posix":
-            if info.st_uid != os.geteuid():
-                raise TokenFileError(f"{directory} is not owned by the current user")
-            if info.st_mode & 0o077:
-                os.chmod(directory, 0o700)
+        for level, tighten in ((directory.parent, False), (directory, True)):
+            try:
+                os.mkdir(level, 0o700)
+            except FileExistsError:
+                pass
+            _check_token_directory(level, tighten=tighten)
     except OSError as exc:
         raise TokenFileError(f"Cannot prepare {directory} for the API token: {exc}") from exc
 
@@ -276,8 +297,14 @@ def _lookup(session_id: str) -> tuple[Any, demo_terminal.SessionOutput]:
 
 
 def _stream_alive(adapter: Any, output: demo_terminal.SessionOutput) -> bool:
-    """False once the websocket has closed, or the shell has exited and its tail is drained."""
-    return not output.ended and (bool(adapter.alive) or not output.pump_done)
+    """False once the websocket has closed or the pump has stopped for any reason.
+
+    The pump ends when the shell has exited and its tail is drained, and also when it fails (for
+    example a send to a vanished browser), in which case nothing more would be captured, so the
+    session no longer reads as alive and no longer accepts input.
+    """
+    del adapter  # the pump, not the shell alone, decides: it drains the tail after the shell exits
+    return not output.ended and not output.pump_done
 
 
 # --- GET /sessions -------------------------------------------------------------------------------
@@ -341,12 +368,7 @@ def _too_large(message: str) -> TerminalApiError:
     return TerminalApiError(413, "payload_too_large", message)
 
 
-async def _read_limited_body(request: Request) -> bytes:
-    """Read the raw body, refusing it as soon as it passes `MAX_BODY_BYTES` (before any parsing)."""
-    declared = request.headers.get("content-length")
-    if declared is not None and declared.isascii() and declared.isdigit():
-        if len(declared) > 18 or int(declared) > MAX_BODY_BYTES:
-            raise _too_large(f"The request body may not exceed {MAX_BODY_BYTES} bytes")
+async def _collect_body(request: Request) -> bytes:
     chunks: list[bytes] = []
     size = 0
     async for chunk in request.stream():
@@ -355,6 +377,24 @@ async def _read_limited_body(request: Request) -> bytes:
             raise _too_large(f"The request body may not exceed {MAX_BODY_BYTES} bytes")
         chunks.append(chunk)
     return b"".join(chunks)
+
+
+async def _read_limited_body(request: Request) -> bytes:
+    """Read the raw body, refusing it as soon as it passes `MAX_BODY_BYTES` (before any parsing).
+
+    The read has a deadline, and a client that disconnects part-way is answered like a body that
+    never completed: both are `422 invalid_request`, an existing code.
+    """
+    declared = request.headers.get("content-length")
+    if declared is not None and declared.isascii() and declared.isdigit():
+        if len(declared) > 18 or int(declared) > MAX_BODY_BYTES:
+            raise _too_large(f"The request body may not exceed {MAX_BODY_BYTES} bytes")
+    try:
+        return await asyncio.wait_for(_collect_body(request), timeout=BODY_READ_DEADLINE_SECONDS)
+    except TimeoutError:
+        raise _invalid_request("The request body was not received in time") from None
+    except ClientDisconnect:
+        raise _invalid_request("The client disconnected before the body was complete") from None
 
 
 def _parse_inject_body(body: bytes) -> bytes:
@@ -391,6 +431,44 @@ def _parse_inject_body(body: bytes) -> bytes:
     return encoded + (b"\r" if submit else b"")
 
 
+def _write_bounded(adapter: Any, payload: bytes, deadline_seconds: float) -> int:
+    """Write `payload` to the shell without blocking past `deadline_seconds`; returns bytes written.
+
+    Runs on the write executor. For an adapter that exposes a PTY master descriptor
+    (`PosixPtyAdapter._master_fd`) the descriptor is made non-blocking for the duration and the
+    write is a loop of `select` for writability and `os.write`, so a shell that is not reading
+    cannot hold the thread. Zero bytes written by the deadline raises `TimeoutError`; a partial
+    write is returned as such and the caller reports it. An adapter without such a descriptor
+    (ConPTY) falls back to its own `write()`, which the caller still bounds with a timeout on the
+    wait, but whose thread this module cannot free. That fallback is owner-machine, not run.
+    """
+    fd = getattr(adapter, "_master_fd", None)
+    if not isinstance(fd, int):
+        adapter.write(payload)
+        return len(payload)
+    deadline = time.monotonic() + deadline_seconds
+    written = 0
+    os.set_blocking(fd, False)
+    try:
+        while written < len(payload):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
+            _, writable, _ = select.select([], [fd], [], remaining)
+            if not writable:
+                break
+            try:
+                written += os.write(fd, payload[written:])
+            except BlockingIOError:
+                continue
+    finally:
+        with contextlib.suppress(OSError):
+            os.set_blocking(fd, True)
+    if written == 0:
+        raise TimeoutError("the terminal did not accept input before the deadline")
+    return written
+
+
 @router.post("/sessions/{session_id}/input")
 async def inject_input(session_id: str, request: Request) -> JSONResponse:
     adapter, output = _lookup(session_id)
@@ -399,15 +477,28 @@ async def inject_input(session_id: str, request: Request) -> JSONResponse:
             415, "unsupported_media_type", "Content-Type must be application/json"
         )
     payload = _parse_inject_body(await _read_limited_body(request))
-    if not adapter.alive:
+    if output.pump_done or not adapter.alive:
         raise _session_ended()
     async with output.write_lock:
-        if output.ended or not adapter.alive:
+        if output.ended or output.pump_done or not adapter.alive:
             raise _session_ended()
         offset = output.total
         loop = asyncio.get_running_loop()
+        deadline = INJECT_WRITE_DEADLINE_SECONDS
         try:
-            await loop.run_in_executor(_get_write_executor(), adapter.write, payload)
+            written = await asyncio.wait_for(
+                loop.run_in_executor(
+                    _get_write_executor(), _write_bounded, adapter, payload, deadline
+                ),
+                timeout=deadline + INJECT_WRITE_THREAD_GRACE_SECONDS,
+            )
+        except TimeoutError:
+            # TimeoutError is an OSError, so it is handled first. Nothing was written.
+            raise TerminalApiError(
+                409,
+                "write_timeout",
+                "The terminal did not accept input in time; its foreground process may be busy",
+            ) from None
         except (OSError, RuntimeError):
             # OSError: the shell exited between the `alive` check and the write. RuntimeError:
             # the adapter was closed (its websocket ended) while this request waited.
@@ -415,10 +506,10 @@ async def inject_input(session_id: str, request: Request) -> JSONResponse:
         output.last_inject = time.monotonic()
     peer = request.client.host if request.client is not None else "unknown"
     logger.info(
-        "terminal API inject: session=%s bytes=%d peer=%s", session_id, len(payload), peer
+        "terminal API inject: session=%s bytes=%d peer=%s", session_id, written, peer
     )
     return _json_response(
-        {"session_id": session_id, "accepted_bytes": len(payload), "output_offset": offset}
+        {"session_id": session_id, "accepted_bytes": written, "output_offset": offset}
     )
 
 
@@ -433,22 +524,25 @@ def _single_param(request: Request, name: str) -> str | None:
 
 
 def _parse_integer_param(request: Request, name: str) -> int | None:
+    """A non-negative decimal integer: ASCII digits only, so no sign, space or underscore."""
     raw = _single_param(request, name)
     if raw is None:
         return None
-    if _INTEGER_PATTERN.fullmatch(raw) is None:
+    if _DIGITS_PATTERN.fullmatch(raw) is None or len(raw) > 4000:
         raise _invalid_request(f"{name} must be a non-negative integer")
     return int(raw)
 
 
 def _parse_wait_param(request: Request) -> float:
+    """A finite number of seconds from 0 to 10, in any form `float()` reads (`.5`, `1e1`)."""
     raw = _single_param(request, "wait")
     if raw is None:
         return 0.0
-    if _NUMBER_PATTERN.fullmatch(raw) is None:
-        raise _invalid_request("wait must be a number of seconds from 0 to 10")
-    value = float(raw)
-    if value > MAX_WAIT_SECONDS:
+    try:
+        value = float(raw) if raw.isascii() and "_" not in raw else math.nan
+    except ValueError:
+        value = math.nan
+    if not math.isfinite(value) or not 0.0 <= value <= MAX_WAIT_SECONDS:
         raise _invalid_request("wait must be a number of seconds from 0 to 10")
     return value
 

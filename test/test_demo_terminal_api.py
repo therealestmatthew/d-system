@@ -13,6 +13,7 @@ default permissions; `0700` and `0600` have no effect there) is owner-machine, n
 
 from __future__ import annotations
 
+import asyncio
 import base64
 import contextlib
 import importlib
@@ -22,7 +23,7 @@ import stat
 import sys
 import threading
 import time
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, MutableMapping
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
@@ -658,8 +659,26 @@ def test_write_error_is_409_session_ended_not_500(
         def _broken_write(data: bytes) -> None:
             raise OSError(5, "Input/output error")
 
+        # Without a master descriptor the API falls back to the adapter's own write().
+        monkeypatch.setattr(adapter, "_master_fd", None)
         monkeypatch.setattr(adapter, "write", _broken_write)
         assert_error(inject(client, session_id, "echo hi"), 409, "session_ended")
+
+
+def test_write_on_a_descriptor_the_kernel_refuses_is_409_session_ended(
+    client: TestClient,
+) -> None:
+    """A real descriptor error (here EBADF, as when the shell side has gone) reaches the bounded
+    writer's select and write and is answered 409, not 500."""
+    module = terminal_module()
+    with open_session(client) as (_websocket, session_id):
+        adapter = module.SESSIONS[session_id]
+        real_fd = adapter._master_fd  # noqa: SLF001
+        try:
+            adapter._master_fd = 10_000  # noqa: SLF001 - a descriptor number that is not open
+            assert_error(inject(client, session_id, "echo hi"), 409, "session_ended")
+        finally:
+            adapter._master_fd = real_fd  # noqa: SLF001
 
 
 def test_exited_shell_answers_409_on_inject_and_alive_false_on_read(client: TestClient) -> None:
@@ -837,12 +856,13 @@ def test_precedence_one_request_per_adjacent_pair(client: TestClient) -> None:
             )
 
         # 401 before 404, 415, 413 and 422: no token, whatever else is wrong.
-        for path, kwargs in (
+        unauthenticated: list[tuple[str, dict[str, Any]]] = [
             (input_url(UNKNOWN_ID), {"content": huge}),
             (input_url(session_id), {"content": huge, "headers": {"Content-Type": "text/plain"}}),
             (input_url(session_id), {"content": malformed}),
-        ):
-            assert_error(client.post(path, **kwargs), 401, "unauthorized")  # type: ignore[arg-type]
+        ]
+        for path, kwargs in unauthenticated:
+            assert_error(client.post(path, **kwargs), 401, "unauthorized")
 
         # 404 before 415, 413 and 422: right token, unknown session, everything else wrong.
         assert_error(
@@ -1460,3 +1480,601 @@ def test_idle_loop_ignores_the_api_when_capture_is_off(
         finally:
             with contextlib.suppress(Exception):
                 websocket_cm.__exit__(None, None, None)
+
+
+# --- review round: bounded writes, teardown, bodies, directories, dead pump ---------------------
+
+
+class FakeAdapter:
+    """A stand-in for a shell with no PTY descriptor, so the API uses the adapter's own write()."""
+
+    def __init__(self, write: Callable[[bytes], object] | None = None) -> None:
+        self.alive = True
+        self.writes: list[bytes] = []
+        self._write = write
+
+    def write(self, data: bytes) -> None:
+        if self._write is not None:
+            self._write(data)
+        self.writes.append(data)
+
+    def read(self, size: int = 4096, timeout: float | None = None) -> bytes:
+        return b""
+
+    def close(self) -> None:
+        self.alive = False
+
+
+def register_fake_session(
+    monkeypatch: pytest.MonkeyPatch, adapter: FakeAdapter, session_id: str = "ab" * 16
+) -> tuple[str, Any]:
+    module = terminal_module()
+    output = module.SessionOutput(shell=None)
+    monkeypatch.setitem(module.SESSIONS, session_id, adapter)
+    monkeypatch.setitem(module.OUTPUT_RECORDS, session_id, output)
+    return session_id, output
+
+
+def test_inject_into_a_shell_that_is_not_reading_is_bounded(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Security review F01. A foreground command that is not reading input stops the pty accepting
+    bytes once the line discipline's buffer is full. Every inject must still answer within the
+    deadline (a partial write is reported as such, a write that accepts nothing is 409
+    `write_timeout`), and the shell must be gone once the websocket closes."""
+    monkeypatch.setattr(api(), "INJECT_WRITE_DEADLINE_SECONDS", 1.0)
+    module = terminal_module()
+    results: list[tuple[int, Any]] = []
+    with open_session(client) as (_websocket, session_id):
+        adapter = module.SESSIONS[session_id]
+        assert inject(client, session_id, "sleep 60").status_code == 200
+        time.sleep(0.5)
+        for _ in range(6):
+            started = time.monotonic()
+            response = client.post(
+                input_url(session_id),
+                json={"input": ("x" * 79 + "\r") * 50, "submit": False},
+                headers=auth(),
+            )
+            assert time.monotonic() - started < 4.0, "an inject outlived its deadline"
+            results.append((response.status_code, response.json()))
+    assert any(
+        status == 409 and body["error"]["code"] == "write_timeout" for status, body in results
+    ), results
+    assert any(
+        (status == 200 and body["accepted_bytes"] < 4000)
+        or (status == 409 and body["error"]["code"] == "write_timeout")
+        for status, body in results
+    )
+    for status, body in results:
+        if status == 409:
+            assert_error_body(body, "write_timeout")
+    assert wait_until(lambda: not adapter.alive, timeout=8.0), "the shell outlived its session"
+    assert wait_until(lambda: not module.SESSIONS)
+
+
+def assert_error_body(body: dict[str, Any], code: str) -> None:
+    assert set(body) == {"error"}
+    assert body["error"]["code"] == code
+
+
+def test_descriptor_is_blocking_again_after_a_bounded_write(client: TestClient) -> None:
+    module = terminal_module()
+    with open_session(client) as (_websocket, session_id):
+        adapter = module.SESSIONS[session_id]
+        assert inject(client, session_id, "true").status_code == 200
+        assert os.get_blocking(adapter._master_fd) is True  # noqa: SLF001
+
+
+def test_adapter_without_a_descriptor_is_bounded_by_the_wait(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An adapter the API cannot write non-blockingly (ConPTY) is still answered at the deadline:
+    409 `write_timeout`, the inject lock is released, and the next request is not queued behind it.
+    The stuck thread itself cannot be freed; that is the documented limit of the fallback."""
+    release = threading.Event()
+    adapter = FakeAdapter(write=lambda data: release.wait(10))
+    session_id, _output = register_fake_session(monkeypatch, adapter)
+    monkeypatch.setattr(api(), "INJECT_WRITE_DEADLINE_SECONDS", 0.3)
+    monkeypatch.setattr(api(), "INJECT_WRITE_THREAD_GRACE_SECONDS", 0.3)
+    try:
+        started = time.monotonic()
+        assert_error(inject(client, session_id, "x", submit=False), 409, "write_timeout")
+        assert time.monotonic() - started < 3.0
+        started = time.monotonic()
+        assert_error(inject(client, session_id, "y", submit=False), 409, "write_timeout")
+        assert time.monotonic() - started < 3.0
+    finally:
+        release.set()
+
+
+def test_partial_write_reports_the_bytes_actually_accepted(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    module = terminal_module()
+    with open_session(client) as (_websocket, session_id):
+        adapter = module.SESSIONS[session_id]
+        monkeypatch.setattr(api(), "INJECT_WRITE_DEADLINE_SECONDS", 0.5)
+        real_write = os.write
+        calls: list[int] = []
+
+        def _short_write(fd: int, data: Any) -> int:
+            # Accept 3 bytes on the first call, then report the pty as full.
+            if fd == adapter._master_fd and not calls:  # noqa: SLF001
+                calls.append(1)
+                return real_write(fd, bytes(data[:3]))
+            if fd == adapter._master_fd:  # noqa: SLF001
+                raise BlockingIOError
+            return real_write(fd, data)
+
+        monkeypatch.setattr(api().os, "write", _short_write)
+        response = inject(client, session_id, "# abcdefgh", submit=False)
+        monkeypatch.setattr(api().os, "write", real_write)
+        assert response.status_code == 200
+        assert response.json()["accepted_bytes"] == 3
+
+
+def test_teardown_waits_for_an_inflight_inject_before_closing_the_adapter(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Security review F02. While an inject holds the session's write lock the adapter must not be
+    closed (its descriptor number could be reused under the write thread); it closes as soon as the
+    lock is released."""
+    module = terminal_module()
+    with open_session(client) as (websocket, session_id):
+        output = module.OUTPUT_RECORDS[session_id]
+        adapter = module.SESSIONS[session_id]
+        closed = threading.Event()
+        original_close = adapter.close
+
+        def _recording_close() -> None:
+            closed.set()
+            original_close()
+
+        monkeypatch.setattr(adapter, "close", _recording_close)
+        client.portal.call(output.write_lock.acquire)  # type: ignore[union-attr]
+        websocket.close()
+        time.sleep(0.8)
+        assert not closed.is_set(), "the adapter was closed while a write was in flight"
+        client.portal.call(output.write_lock.release)  # type: ignore[union-attr]
+        assert closed.wait(5.0)
+    assert wait_until(lambda: not module.SESSIONS)
+
+
+def test_queued_inject_refuses_once_the_session_is_ending(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    adapter = FakeAdapter()
+    session_id, output = register_fake_session(monkeypatch, adapter)
+    output.ended = True
+    assert_error(inject(client, session_id, "x"), 409, "session_ended")
+    assert adapter.writes == []
+
+
+# --- request bodies that stall or vanish ---------------------------------------------------------
+
+
+async def drive_asgi(
+    path: str,
+    headers: dict[str, str],
+    script: list[dict[str, Any]],
+    *,
+    timeout: float = 8.0,
+) -> tuple[int, dict[str, Any]]:
+    """Call the ASGI app directly with a scripted `receive`; after the script it stalls forever."""
+    sent: list[dict[str, Any]] = []
+    pending = iter(script)
+
+    async def receive() -> MutableMapping[str, Any]:
+        try:
+            return next(pending)
+        except StopIteration:
+            await asyncio.sleep(3600)
+            raise AssertionError("unreachable") from None
+
+    async def send(message: MutableMapping[str, Any]) -> None:
+        sent.append(dict(message))
+
+    scope = {
+        "type": "http",
+        "asgi": {"version": "3.0"},
+        "http_version": "1.1",
+        "method": "POST",
+        "path": path,
+        "raw_path": path.encode(),
+        "query_string": b"",
+        "headers": [(k.lower().encode(), v.encode()) for k, v in headers.items()],
+        "client": ("127.0.0.1", 50000),
+        "server": ("testserver", 80),
+        "scheme": "http",
+        "root_path": "",
+    }
+    await asyncio.wait_for(main_module.app(scope, receive, send), timeout)
+    status = next(m["status"] for m in sent if m["type"] == "http.response.start")
+    body = b"".join(m.get("body", b"") for m in sent if m["type"] == "http.response.body")
+    return status, json.loads(body)
+
+
+def _body_headers() -> dict[str, str]:
+    return {**auth(), "Content-Type": "application/json", "Content-Length": "100"}
+
+
+def test_stalled_request_body_is_answered_at_the_deadline(
+    build: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Security review F03: a body that never completes is 422, not an open connection."""
+    build()
+    monkeypatch.setattr(api(), "BODY_READ_DEADLINE_SECONDS", 0.3)
+    adapter = FakeAdapter()
+    session_id, _output = register_fake_session(monkeypatch, adapter)
+    started = time.monotonic()
+    status, body = asyncio.run(
+        drive_asgi(
+            input_url(session_id),
+            _body_headers(),
+            [{"type": "http.request", "body": b'{"input"', "more_body": True}],
+        )
+    )
+    assert time.monotonic() - started < 3.0
+    assert status == 422
+    assert_error_body(body, "invalid_request")
+    assert adapter.writes == []
+
+
+def test_disconnecting_client_during_the_body_is_not_a_server_error(
+    build: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    build()
+    adapter = FakeAdapter()
+    session_id, _output = register_fake_session(monkeypatch, adapter)
+    with caplog.at_level("ERROR"):
+        status, body = asyncio.run(
+            drive_asgi(
+                input_url(session_id),
+                _body_headers(),
+                [
+                    {"type": "http.request", "body": b'{"input"', "more_body": True},
+                    {"type": "http.disconnect"},
+                ],
+            )
+        )
+    assert status == 422
+    assert_error_body(body, "invalid_request")
+    assert "ClientDisconnect" not in caplog.text
+    assert adapter.writes == []
+
+
+def test_chunked_body_without_content_length_is_read_and_accepted(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    adapter = FakeAdapter()
+    session_id, _output = register_fake_session(monkeypatch, adapter)
+
+    def _chunks() -> Iterator[bytes]:
+        yield b'{"input": "chun'
+        yield b'ked", "submit": true}'
+
+    response = client.post(
+        input_url(session_id),
+        content=_chunks(),
+        headers={**auth(), "Content-Type": "application/json"},
+    )
+    assert response.status_code == 200, response.text
+    assert adapter.writes == [b"chunked\r"]
+
+
+def test_concurrent_injects_are_written_one_at_a_time(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The per-session lock: two simultaneous requests never overlap inside `write()`."""
+    spans: list[tuple[float, float]] = []
+
+    def _slow_write(data: bytes) -> None:
+        start = time.monotonic()
+        time.sleep(0.3)
+        spans.append((start, time.monotonic()))
+
+    adapter = FakeAdapter(write=_slow_write)
+    session_id, _output = register_fake_session(monkeypatch, adapter)
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        futures = [pool.submit(inject, client, session_id, f"msg-{n}") for n in range(3)]
+        responses = [future.result(timeout=15) for future in futures]
+    assert [r.status_code for r in responses] == [200, 200, 200]
+    assert len(spans) == 3
+    spans.sort()
+    for earlier, later in zip(spans, spans[1:], strict=False):
+        assert earlier[1] <= later[0], "two writes overlapped"
+    assert sorted(adapter.writes) == [b"msg-0\r", b"msg-1\r", b"msg-2\r"]
+
+
+# --- the token directory's parent ---------------------------------------------------------------
+
+
+def test_parent_directory_that_is_a_symlink_is_refused(
+    build: Callable[..., FastAPI], tmp_path: Path
+) -> None:
+    build()
+    module = api()
+    real = tmp_path / "elsewhere"
+    real.mkdir()
+    home = tmp_path / "linked-home"
+    home.mkdir()
+    (home / ".d-system").symlink_to(real)
+    with pytest.raises(module.TokenFileError, match="symlink"):
+        module.write_token_file(module.token_file_path(tmp_path / "repo", home), "t")
+    assert list(real.iterdir()) == []
+
+
+def test_parent_directory_owned_by_another_user_is_refused(
+    build: Callable[..., FastAPI], tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    build()
+    module = api()
+    home = tmp_path / "foreign-home"
+    (home / ".d-system").mkdir(parents=True)
+    monkeypatch.setattr(os, "geteuid", lambda: os.stat(home).st_uid + 1)
+    with pytest.raises(module.TokenFileError, match=r"\.d-system is not owned"):
+        module.write_token_file(module.token_file_path(tmp_path / "repo", home), "t")
+
+
+def test_parent_directory_keeps_its_mode(build: Callable[..., FastAPI], tmp_path: Path) -> None:
+    """Only the leaf is forced to 0700; a parent the user already keeps is left as it is."""
+    build()
+    module = api()
+    home = tmp_path / "shared-home"
+    (home / ".d-system").mkdir(parents=True)
+    (home / ".d-system").chmod(0o755)
+    path = module.token_file_path(tmp_path / "repo", home)
+    module.write_token_file(path, "t")
+    assert stat.S_IMODE((home / ".d-system").stat().st_mode) == 0o755
+    assert stat.S_IMODE(path.parent.stat().st_mode) == 0o700
+    assert stat.S_IMODE(path.stat().st_mode) == 0o600
+
+
+# --- a pump that stops for a reason other than the shell exiting ----------------------------------
+
+
+class ScriptedAdapter:
+    """Reads come from a script; `alive` turns false once `exit_after` reads have been made."""
+
+    def __init__(self, reads: list[bytes], exit_after: int | None) -> None:
+        self._reads = list(reads)
+        self._count = 0
+        self._exit_after = exit_after
+
+    @property
+    def alive(self) -> bool:
+        return self._exit_after is None or self._count < self._exit_after
+
+    def read(self, size: int = 4096, timeout: float | None = None) -> bytes:
+        self._count += 1
+        return self._reads.pop(0) if self._reads else b""
+
+
+class RecordingWebSocket:
+    def __init__(self, *, fail: bool = False, delay: float = 0.0) -> None:
+        self.sent: list[bytes] = []
+        self._fail = fail
+        self._delay = delay
+
+    async def send_bytes(self, data: bytes) -> None:
+        if self._fail:
+            raise ConnectionError("peer gone")
+        if self._delay:
+            await asyncio.sleep(self._delay)
+        self.sent.append(data)
+
+
+def test_ring_holds_the_chunk_when_the_send_raises(build: Callable[..., FastAPI]) -> None:
+    """ADR-030 section 5: append first, so a failed send cannot drop bytes from the ring."""
+    build()
+    module = terminal_module()
+    output = module.SessionOutput(shell=None)
+    adapter = ScriptedAdapter([b"kept-in-the-ring"], exit_after=None)
+    websocket = RecordingWebSocket(fail=True)
+    with pytest.raises(ConnectionError):
+        asyncio.run(module._pump_adapter_to_websocket(adapter, websocket, output))  # noqa: SLF001
+    assert bytes(output.buffer) == b"kept-in-the-ring"
+    assert output.total == len(b"kept-in-the-ring")
+    assert output.pump_done is True
+
+
+def test_pump_that_failed_makes_the_session_read_dead(build: Callable[..., FastAPI]) -> None:
+    build()
+    module = terminal_module()
+    output = module.SessionOutput(shell=None)
+    adapter = ScriptedAdapter([b"x"], exit_after=None)  # the shell itself is still running
+    with pytest.raises(ConnectionError):
+        asyncio.run(
+            module._pump_adapter_to_websocket(  # noqa: SLF001
+                adapter, RecordingWebSocket(fail=True), output
+            )
+        )
+    assert adapter.alive is True
+    assert api()._stream_alive(adapter, output) is False  # noqa: SLF001
+
+
+def test_inject_and_read_after_the_pump_died(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Security review F07 and judge F03: no output will be captured, so the session reads
+    `alive: false`, an inject is 409 and nothing is written."""
+    adapter = FakeAdapter()
+    session_id, output = register_fake_session(monkeypatch, adapter)
+    assert inject(client, session_id, "before").status_code == 200
+    output.pump_done = True
+    assert_error(inject(client, session_id, "after"), 409, "session_ended")
+    assert adapter.writes == [b"before\r"]
+    body = client.get(output_url(session_id), headers=auth()).json()
+    assert body["alive"] is False
+    listing = client.get(LIST_PATH, headers=auth()).json()["sessions"]
+    assert listing[0]["alive"] is False
+
+
+def test_drain_collects_the_tail_while_the_pump_is_held_in_a_send(
+    build: Callable[..., FastAPI],
+) -> None:
+    """The shell exits while the pump is still awaiting the send of its last chunk; the loop then
+    ends, and only the drain still reads (and sends) what the shell wrote just before it exited."""
+    build()
+    module = terminal_module()
+    output = module.SessionOutput(shell=None)
+    adapter = ScriptedAdapter([b"first|", b"tail-one|", b"tail-two"], exit_after=1)
+    websocket = RecordingWebSocket(delay=0.2)
+    asyncio.run(module._pump_adapter_to_websocket(adapter, websocket, output))  # noqa: SLF001
+    assert bytes(output.buffer) == b"first|tail-one|tail-two"
+    assert b"".join(websocket.sent) == b"first|tail-one|tail-two"
+    assert output.pump_done is True
+
+
+# --- foreign origins, forwarded headers, the token's reach ----------------------------------------
+
+
+def test_foreign_origin_and_host_need_the_token_and_get_no_cors_grant(
+    client: TestClient,
+) -> None:
+    evil = {"Origin": "http://evil.example", "Host": "evil.example:8019"}
+    assert_error(client.get(LIST_PATH, headers=evil), 401, "unauthorized")
+    # With the token the request is served: the token is the boundary, not the Origin or Host.
+    assert client.get(LIST_PATH, headers={**evil, **auth()}).status_code == 200
+    preflight = client.options(
+        LIST_PATH,
+        headers={
+            "Origin": "http://evil.example",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "authorization,content-type",
+        },
+    )
+    assert "access-control-allow-origin" not in preflight.headers
+    stage = client.options(
+        LIST_PATH,
+        headers={
+            "Origin": "http://localhost:5173",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "authorization,content-type",
+        },
+    )
+    assert stage.headers.get("access-control-allow-origin") == "http://localhost:5173"
+
+
+def test_forwarded_for_header_is_never_trusted(build: Callable[..., FastAPI]) -> None:
+    app = build()
+    token = auth()
+    with TestClient(app, client=("127.0.0.1", 1)) as local:
+        response = local.get(LIST_PATH, headers={**token, "X-Forwarded-For": "8.8.8.8"})
+        assert response.status_code == 200
+    with TestClient(app, client=("10.1.2.3", 1)) as remote:
+        response = remote.get(LIST_PATH, headers={**token, "X-Forwarded-For": "127.0.0.1"})
+        assert_error(response, 403, "forbidden_peer")
+
+
+def test_token_is_not_in_the_environment_of_the_server_or_a_shell(client: TestClient) -> None:
+    token = api().TOKEN.encode()
+    module = terminal_module()
+    with open_session(client) as (_websocket, session_id):
+        pid = module.SESSIONS[session_id]._process.pid  # noqa: SLF001
+        shell_environment = Path(f"/proc/{pid}/environ").read_bytes()
+    assert token not in shell_environment
+    assert token not in Path("/proc/self/environ").read_bytes()
+    assert token not in " ".join(os.environ.values()).encode()
+
+
+# --- the idle bound: a websocket frame resets the ceiling's clock -------------------------------
+
+
+def test_websocket_frame_resets_the_ceiling_clock(
+    build: Callable[..., FastAPI], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Idle bound 1.0 s, ceiling 1.9 s. An inject at ~0.3 s extends past the first timeout; a frame
+    at ~1.4 s restarts both clocks; an inject at ~2.0 s then extends the timeout at ~2.4 s, which is
+    past 1.9 s since the session started but only ~1.0 s since the frame. Without the frame's reset
+    the session would be reaped at ~2.4 s."""
+    monkeypatch.setenv(IDLE_TIMEOUT_ENV_VAR, "1.0")
+    app = build()
+    module = terminal_module()
+    monkeypatch.setattr(module, "TERMINAL_API_INJECT_CEILING_SECONDS", 1.9)
+    with TestClient(app, client=LOOPBACK_PEER) as client:
+        websocket_cm = client.websocket_connect(WS_PATH)
+        websocket = websocket_cm.__enter__()
+        try:
+            assert wait_until(lambda: len(module.SESSIONS) == 1)
+            session_id = next(iter(module.SESSIONS))
+            started = time.monotonic()
+
+            def _sleep_until(offset: float) -> None:
+                time.sleep(max(0.0, offset - (time.monotonic() - started)))
+
+            _sleep_until(0.3)
+            assert inject(client, session_id, "true").status_code == 200
+            _sleep_until(1.4)
+            websocket.send_text(json.dumps({"type": "resize", "cols": 100, "rows": 30}))
+            _sleep_until(2.0)
+            assert inject(client, session_id, "true").status_code == 200
+            _sleep_until(2.9)
+            assert session_id in module.SESSIONS, "the frame did not reset the ceiling clock"
+            assert wait_until(lambda: session_id not in module.SESSIONS, timeout=8.0)
+        finally:
+            with contextlib.suppress(Exception):
+                websocket_cm.__exit__(None, None, None)
+
+
+# --- query forms and import safety ----------------------------------------------------------------
+
+
+@pytest.mark.parametrize("wait", [".5", "1e1", "+1", "0", "10", "10.0", "0.25", "00.5"])
+def test_wait_accepts_the_forms_float_reads(client: TestClient, wait: str) -> None:
+    with open_session(client) as (_websocket, session_id):
+        response = client.get(f"{output_url(session_id)}?after=0&wait={wait}", headers=auth())
+        assert response.status_code == 200, (wait, response.text)
+
+
+@pytest.mark.parametrize("wait", ["1_0", "١", "1e2", "1e-400x", "infinity", "-0.1", "0x1"])
+def test_wait_still_refuses_non_finite_out_of_range_and_non_ascii(
+    client: TestClient, wait: str
+) -> None:
+    with open_session(client) as (_websocket, session_id):
+        response = client.get(output_url(session_id), params={"wait": wait}, headers=auth())
+        assert_error(response, 422, "invalid_request")
+
+
+def test_long_run_of_leading_zeros_in_after_is_accepted(client: TestClient) -> None:
+    with open_session(client) as (_websocket, session_id):
+        response = client.get(f"{output_url(session_id)}?after={'0' * 40}", headers=auth())
+        assert response.status_code == 200
+        assert response.json()["from"] == 0
+
+
+def test_collecting_the_tests_with_both_flags_exported_writes_no_token(tmp_path: Path) -> None:
+    """Review of ADR-030 tests (adversary F01): importing the app with both flags exported rotates
+    the token of a running server. `test/conftest.py` clears the second flag before the test
+    modules import `src.main`, so a collection run under exported flags writes nothing."""
+    import subprocess
+
+    repo_root = Path(__file__).resolve().parents[1]
+    environment = {
+        **os.environ,
+        "HOME": str(tmp_path),
+        "USERPROFILE": str(tmp_path),
+        TERMINAL_FLAG: "1",
+        API_FLAG: "1",
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "--collect-only",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "test/test_demo_terminal_api.py",
+            "test/test_demo_terminal.py",
+        ],
+        cwd=repo_root,
+        env=environment,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert not (tmp_path / ".d-system").exists()

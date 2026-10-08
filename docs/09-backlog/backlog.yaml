@@ -9668,9 +9668,10 @@ items:
   - test/test_demo_terminal.py
   - test/test_demo_terminal_api.py
   - docs/00-working/demo-runbook.md
+  - test/conftest.py
   - docs/03-sessions/SESS-2026-10-08-11-terminal-interaction-api-build.md
   result: 'Built against ADR-030 (proposed; awaiting the owner''s ratification, pre-approved run,
-    2026-10-08). test/test_demo_terminal.py 56 passed; test/test_demo_terminal_api.py 111 passed;
+    2026-10-08). test/test_demo_terminal.py 56 passed; test/test_demo_terminal_api.py 150 passed after the review round (111 before);
     full pytest 1961 passed, 1 skipped, 1 failed (test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused,
     pre-existing, fails on the trunk too because the sandbox runs as root); governance OK; ruff and
     mypy clean; npm test 84 passed; npm build ok. R17, R18 and R19 hold. Windows token-file
