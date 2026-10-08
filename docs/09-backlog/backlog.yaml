@@ -17775,7 +17775,8 @@ items:
   systems:
   - sys-wb-viewer
   owner: repository-owner
-  status: queued
+  agent: agent-builder-a
+  status: active
   priority: 3
   session_budget: 1
   depends_on: []
