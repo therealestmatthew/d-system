@@ -168,7 +168,9 @@ class DirectoryEntry(BaseModel):
     is_dir: bool
     # The entry's last-modified time on disk (`st_mtime`) as an ISO 8601 UTC string with
     # millisecond precision and a `Z` suffix, e.g. `2026-10-08T07:15:02.123Z` (REQ-012 R03). It is
-    # `None` only when the file system cannot report it (a dangling symlink, a racing delete).
+    # `None` for a removed file or a time a datetime cannot hold. A symlink reports the link's own
+    # mtime, not its target's (chosen so an out-of-repository time is never reported), so the
+    # badge of an in-repository symlinked page does not advance when its target is regenerated.
     # Optional with a default so a consumer that predates the field keeps reading entries
     # unchanged (the File Browser, the explorers).
     modified_at: str | None = None
