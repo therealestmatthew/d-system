@@ -33,6 +33,7 @@ CI regenerates it and fails on any difference.
 | ADR-027 | adr | accepted | repository-owner | docs/04-decisions/ADR-027-retire-plan-003.md |
 | ADR-028 | adr | accepted | repository-owner | docs/04-decisions/ADR-028-build-in-public-content-chain.md |
 | ADR-029 | adr | draft | repository-owner | docs/04-decisions/ADR-029-bookmark-categories-and-batch-bridge.md |
+| ADR-030 | adr | draft | repository-owner | docs/04-decisions/ADR-030-terminal-interaction-api.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
@@ -467,6 +468,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-10-08-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-02-execute-workbench-identifier-migration.md |
 | SESS-2026-10-08-03 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-03-ports-processes-lifecycle-exploration.md |
 | SESS-2026-10-08-04 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-04-html-viewer-toggle-runbook.md |
+| SESS-2026-10-08-05 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-05-terminal-interaction-api-decision.md |
 
 ## Plans and their phases
 
@@ -563,4 +565,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-460 documents — adr: 26, architecture: 12, governance: 19, operation: 29, plan: 81, prompt: 43, requirement: 35, session: 215.
+462 documents — adr: 27, architecture: 12, governance: 19, operation: 29, plan: 81, prompt: 43, requirement: 35, session: 216.
