@@ -25723,6 +25723,16 @@ Raised by Prompt Planner (plan amendment for phase-wbf-12..18) during the 2026-1
 The websocket route in src/api/routes/demo_terminal.py has no authentication and no Origin check (read from the code, not reproduced), so any local process or any web page the owner has open can start a shell. ADR-014 owns the route; ADR-030 lists this as its open item 7.
 Raised by Session 1 - Builder A (phase-wbf-07, ADR-030) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-10-08T05:54:51+00:00): Raised again by Session 1 - Builder A (phase-wbf-08) during the 2026-10-08 workbench run: the terminal websocket route still has no authentication (ADR-030 open item 7). A per-session or token check there would close the gap that the new token does not.
+
+</details>
+
 ---
 
 ## 000615 · Share one helper for reading feature flags in src/api/__init__.py.
@@ -25849,6 +25859,16 @@ Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live che
 By 1 to 6 px in layout 1 at 1280x720, 1366x768 and 1024x768.
 Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-10-08T05:54:51+00:00): Raised again by Session 3 - Standby Builder (phase-wbf-06) during the 2026-10-08 workbench run: the notes strip silent-clip finding is entirely this dropdown trigger, so fixing the trigger height clears both the visible and the silent-clip rows.
+
+</details>
+
 ---
 
 ## 000629 · Run the REQ-037 live fit check as a gate.
@@ -25858,6 +25878,10 @@ Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live che
 Needs a decision on adding Playwright to the Python dev dependencies in pyproject.toml and a fixture that starts the API and Vite servers on free ports; until then the live half of test/test_workbench_fit_contracts.py is a command, not a pytest gate, and exits 1 on the stock workbench because the defects it finds are real.
 Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Links**
+
+- relates_to ← `000636`
+
 ---
 
 ## 000630 · xterm 6 moved scrolling to a virtual scrollbar.
@@ -25866,3 +25890,144 @@ Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live che
 
 The .xterm-viewport overflow: scroll rule in the terminal CSS no longer scrolls anything; worth a look when the terminal CSS is next touched.
 Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
+
+---
+
+## 000631 · A double-click on a non-active viewer tab can miss because the first click moves the tab strip.
+
+**Created 2026-10-08T05:54:41+00:00 · Status: `open`**
+
+Double-clicking a non-active viewer tab can miss: the first click selects the tab and changes the header file button's label, the header row stops wrapping, and the tab strip moves up 14px at this panel width, so the second click lands on the strip. Observed in Playwright; predates the phase; the fix is CSS (a fixed-width file button or a non-wrapping header).
+Raised by Session 3 - Standby Builder (phase-wbf-01) during the 2026-10-08 workbench run.
+
+---
+
+## 000632 · The demo runbook's HTML Viewer entry should describe the double-click and Shift+Enter open-in-browser-tab behaviour.
+
+**Created 2026-10-08T05:54:41+00:00 · Status: `open`**
+
+The demo runbook entry for the HTML Viewer (docs/00-working/demo-runbook.md, around line 254) says only "Has tabs like the terminal". It should gain the double-click and Shift+Enter open-in-browser-tab behaviour.
+Raised by Session 3 - Standby Builder (phase-wbf-01) during the 2026-10-08 workbench run.
+
+---
+
+## 000633 · The stage page could show the session id or a visible driven-externally cue so a demo viewer can tell injected input from typed input.
+
+**Created 2026-10-08T05:54:42+00:00 · Status: `open`**
+
+The stage page could show the session id, or a visible "driven externally" cue, so a person watching a demo can tell an injected command from typed input.
+Raised by Session 1 - Builder A (phase-wbf-08) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-10-08T05:54:51+00:00): Overlaps 000616 (mark input injected through the HTTP terminal API in the panel). Recorded as given and left for triage.
+
+</details>
+
+---
+
+## 000634 · REQ-037 should drop its now-stale defect sentences and name the notes-strip moving element.
+
+**Created 2026-10-08T05:54:42+00:00 · Status: `open`**
+
+Remove or reword REQ-037's "unbounded entry is the defect phase-wbf-06 addresses" sentences and the C-row defect table entry now that the notes-strip active-entry row passes; and name the moving element (data-notes-part=track) in the notes-strip row per REQ-037's own boundaries text.
+Raised by Session 3 - Standby Builder (phase-wbf-06) during the 2026-10-08 workbench run.
+
+---
+
+## 000635 · The notes strip needs a tracked fixture directory of images so the Playwright rotator check can be committed and gated.
+
+**Created 2026-10-08T05:54:42+00:00 · Status: `open`**
+
+A notes-strip fixture directory of images under ts/public (or a tracked test image directory) would let the Playwright rotator check be committed and gated instead of relying on _public/images.
+Raised by Session 3 - Standby Builder (phase-wbf-06) during the 2026-10-08 workbench run.
+
+---
+
+## 000636 · Gate the scratch Playwright rotator check as a repeatable test.
+
+**Created 2026-10-08T05:54:42+00:00 · Status: `open`**
+
+Gate the scratch Playwright rotator check (scroll, pause, rotation rule, image entry) as a repeatable test once the fit contract's live run has a gate (REQ-037 follow-up; link to 000629).
+Raised by Session 3 - Standby Builder (phase-wbf-06) during the 2026-10-08 workbench run.
+
+**Links**
+
+- relates_to → `000629`
+
+---
+
+## 000637 · The HTML Viewer header at layout 2, 1024x768, needs 377 px in a 307 px box, so its controls are clipped.
+
+**Created 2026-10-08T05:54:43+00:00 · Status: `open`**
+
+Layout 2 at 1024x768: the HTML Viewer region header is 377 px of content in a 307 px box (live-check wrap and silent-clip findings), so header controls are clipped.
+Raised by Session 2 - Builder B (phase-wbf-13) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-ideation (2026-10-08T05:54:51+00:00): Overlaps 000626 (HTML Viewer header controls overflow their panel in layout 2 at 1024x768). Recorded as given and left for triage.
+
+</details>
+
+---
+
+## 000638 · The layout 2 Skills popover needs 395 px where 360 to 379 px of room exists, so its last entries scroll.
+
+**Created 2026-10-08T05:54:43+00:00 · Status: `open`**
+
+Layout 2 "Skills (11)" popover needs 395 px but only 360 to 379 px of room exists on the larger side at 1280x720, so its last entries scroll; the Skills/Prompts/Agents dropdowns could be made more compact.
+Raised by Session 2 - Builder B (phase-wbf-13) during the 2026-10-08 workbench run.
+
+---
+
+## 000639 · Count-at-rest Playwright checks cannot catch a popover that fails to scroll, so the live check should scroll it.
+
+**Created 2026-10-08T05:54:43+00:00 · Status: `open`**
+
+Count-at-rest Playwright checks (including the fit contract's file-selector measurement) cannot catch a popover that fails to scroll; the live check could scroll the popover body with a real wheel and assert scrollTop moves.
+Raised by Session 2 - Builder B (phase-wbf-13) during the 2026-10-08 workbench run.
+
+---
+
+## 000640 · REQ-037's live runner keys panel assignments by bare panel id, which breaks arch-07 and arch-08.
+
+**Created 2026-10-08T05:54:44+00:00 · Status: `open`**
+
+REQ-037's live runner seeds panel_assignments by bare panel id and builds its matrix from eligible_slots, so arch-07 and arch-08 both break it; worth a note on those phases' deliverables.
+Raised by Session 5 - Batch Runner (phase-arch-06) during the 2026-10-08 workbench run.
+
+---
+
+## 000641 · useWorkbenchLayouts.ts hardcodes the shell home slot and panel ids, the likeliest place for an arch-08 regression.
+
+**Created 2026-10-08T05:54:44+00:00 · Status: `open`**
+
+useWorkbenchLayouts.ts hardcodes the shell home slot (secondary) and the bash and PowerShell panel ids; these are type ids standing where instance ids will be, and are the likeliest place for an arch-08 regression.
+Raised by Session 5 - Batch Runner (phase-arch-06) during the 2026-10-08 workbench run.
+
+---
+
+## 000642 · Per-instance terminal tab caps of 4 against a global cap of 6 let two instances reach the cap with fewer than 8 tabs.
+
+**Created 2026-10-08T05:54:44+00:00 · Status: `open`**
+
+Per-instance terminal tab caps (4 each) against the global server cap (6): two terminal instances can reach the cap with fewer than 8 tabs; arch-08 should add a test for the refusal message with two instances.
+Raised by Session 5 - Batch Runner (phase-arch-06) during the 2026-10-08 workbench run.
+
+---
+
+## 000643 · The File Browser's could-not-search alert should show the API's error detail, since the listing fetch discards the response body.
+
+**Created 2026-10-08T05:54:45+00:00 · Status: `open`**
+
+File Browser could show the API's error detail (or status) in the could-not-search alert; the listing fetch discards the response body today.
+Raised by Session 5 - Batch Runner (phase-wbf-15) during the 2026-10-08 workbench run.
