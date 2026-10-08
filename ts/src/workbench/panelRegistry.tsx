@@ -44,16 +44,16 @@ import BacklogExplorerRegion from '../stage/BacklogExplorerRegion'
  * per REQ-007 W01, but is still that same single `.stage-region` box).
  *
  * `html-viewer` (`phase-wb-04`, `HtmlViewerRegion`) generalizes and replaces `overview` as
- * layout 1's main slot default (`_data/workbench/layouts/layout-1.json`): the generated overview
+ * layout 1's primary slot default (`_data/workbench/layouts/layout-1.json`): the generated overview
  * page is now one selectable entry inside the HTML Viewer's file dropdown rather than a
- * separately-admitted panel type, so layout 1's main slot admits `html-viewer` only. `overview`
- * stays registered here — `OverviewRegion` is untouched and layout 2's main slot still admits it
+ * separately-admitted panel type, so layout 1's primary slot admits `html-viewer` only. `overview`
+ * stays registered here — `OverviewRegion` is untouched and layout 2's primary slot still admits it
  * — this phase's dispatched deliverable paths did not include layout 2 or removing the older
  * component.
  *
  * `terminal-cmd` and `terminal-powershell` (REQ-007 W12) are the CMD and PowerShell panel
- * options — the terminal slot's `admits` list (`_data/workbench/layouts/*.json`) now names all
- * three terminal ids, so the terminal slot is this repo's first slot to actually reach `Slot.tsx`'s
+ * options — the secondary slot's `admits` list (`_data/workbench/layouts/*.json`) now names all
+ * three terminal ids, so the secondary slot is this repo's first slot to actually reach `Slot.tsx`'s
  * "more than one implemented panel" branch below: a slot-level header showing the current panel's
  * name beside a dropdown listing the other two, wrapping whichever terminal panel is selected in
  * an outer box. The wrapped panel still renders its own inner header too (the double-header
@@ -63,11 +63,11 @@ import BacklogExplorerRegion from '../stage/BacklogExplorerRegion'
  * logic.
  *
  * A slot resolving to more than one *implemented* panel is wrapped by `Slot.tsx` in an outer
- * dropdown header instead; the terminal slot (above) was the first to reach that branch, and the
+ * dropdown header instead; the secondary slot (above) was the first to reach that branch, and the
  * explorer slot is now the second, once `phase-wb-06` filled in `idea-explorer` and
  * `backlog-explorer` alongside `phase-wb-05`'s `file-browser` — the explorer slot's dropdown now
  * lists all three, per REQ-007 W06. The wrapped panel still renders its own inner header too (the
- * same double-header cosmetic case the terminal slot already carries) — left as-is here too, out
+ * same double-header cosmetic case the secondary slot already carries) — left as-is here too, out
  * of this phase's declared scope (`ts/src`), not because it is otherwise desirable.
  */
 export interface PanelDefinition {

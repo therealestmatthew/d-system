@@ -614,7 +614,7 @@ body {
    single-panel branch already gets for free (there, the panel's own `.stage-region` is the
    grid cell's direct flex child, per `.stage-workbench-slot` above) — the nested `.stage-region`
    child's own `flex: 1 1 auto` (declared on the base `.stage-region` rule) now applies and it
-   stretches to this wrapper's full height, in any slot geometry, not just the terminal slot's
+   stretches to this wrapper's full height, in any slot geometry, not just the secondary slot's
    current dimensions. */
 .stage-workbench-slot__body {
   display: flex;

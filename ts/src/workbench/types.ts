@@ -26,7 +26,7 @@
  *   exposed.
  */
 
-// --- the raw, on-disk layout file shape (schema_version 2, W16) ------------------------------
+// --- the raw, on-disk layout file shape (schema_version 3; shape from W16) -------------------
 
 export interface RawLayoutSlot {
   /** Stable within this layout file — persisted assignments and visible-panel choices key off
@@ -138,13 +138,14 @@ export function isRawLayoutFile(value: unknown): value is RawLayoutFile {
 }
 
 // The layout files' `schema_version` (ADR-016 rule 1: each layout file "carries a
-// `schema_version` integer"; both shipped files declare `2` since the W16 delta moved
-// eligibility from the slot to the panel) is not duplicated as a constant here. It is resolved
-// once, at runtime, from the fetched layout files by `useWorkbenchLayouts` (its `schemaVersion`
-// return value) and shared with every other consumer of the single namespaced storage key
-// ADR-016 rule 3 describes — the notes strip included — via `schemaVersionContext.ts`'s
-// `ActiveSchemaVersionProvider`/`useActiveSchemaVersion`. A hardcoded copy of the version number
-// is exactly what let the two consumers drift apart independently; see `schemaVersionContext.ts`
+// `schema_version` integer"; both shipped files declare `3`: 2 since the W16 delta moved
+// eligibility from the slot to the panel, 3 since the slot ids became role names) is not
+// duplicated as a constant here. It is resolved once, at runtime, from the fetched layout files
+// by `useWorkbenchLayouts` (its `schemaVersion` return value) and shared with every other
+// consumer of the single namespaced storage key ADR-016 rule 3 describes — the notes strip
+// included — via `schemaVersionContext.ts`'s `ActiveSchemaVersionProvider`/
+// `useActiveSchemaVersion`. A hardcoded copy of the version number is exactly what let the two
+// consumers drift apart independently; see `schemaVersionContext.ts`
 // for the shared source of truth.
 
 // --- the resolved, app-facing layout shape (unchanged from pre-W16, by design — see file doc) -

@@ -8,7 +8,7 @@ import type { LayoutSlotDefinition } from './types'
  *
  * `visiblePanelId` arrives already fully resolved by `useWorkbenchLayouts`'s `getSlotPanel` — the
  * one resolver, which accounts for the stored choice, the deliberate "nothing visible" state, the
- * terminal slot's platform-conditional default, the layout file's default and whether a panel type
+ * secondary slot's platform-conditional default, the layout file's default and whether a panel type
  * is implemented yet. This file never re-resolves it (the former exported `resolveImplementedPanel`
  * helper, which both this file and `StagePage.tsx` had to wrap every call in, is gone: see
  * `getSlotPanel`'s doc for why one function with one answer replaced it).

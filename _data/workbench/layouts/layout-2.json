@@ -1,46 +1,46 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "layout_id": "layout-2",
   "name": "Layout 2 — Terminal Bottom",
   "slots": [
-    { "slot_id": "notes-strip", "display_name": "Notes" },
-    { "slot_id": "main", "display_name": "Main" },
+    { "slot_id": "strip", "display_name": "Notes" },
+    { "slot_id": "primary", "display_name": "Main" },
     { "slot_id": "explorer", "display_name": "Explorer" },
-    { "slot_id": "terminal", "display_name": "Terminal" }
+    { "slot_id": "secondary", "display_name": "Terminal" }
   ],
   "panels": [
-    { "panel_id": "terminal", "eligible_slots": ["terminal", "main"] },
-    { "panel_id": "terminal-cmd", "eligible_slots": ["terminal", "main"] },
-    { "panel_id": "terminal-powershell", "eligible_slots": ["terminal", "main"] },
-    { "panel_id": "html-viewer", "eligible_slots": ["terminal", "main"] },
-    { "panel_id": "overview", "eligible_slots": ["main"] },
-    { "panel_id": "notes-strip", "eligible_slots": ["notes-strip"] },
+    { "panel_id": "terminal", "eligible_slots": ["secondary", "primary"] },
+    { "panel_id": "terminal-cmd", "eligible_slots": ["secondary", "primary"] },
+    { "panel_id": "terminal-powershell", "eligible_slots": ["secondary", "primary"] },
+    { "panel_id": "html-viewer", "eligible_slots": ["secondary", "primary"] },
+    { "panel_id": "overview", "eligible_slots": ["primary"] },
+    { "panel_id": "notes-strip", "eligible_slots": ["strip"] },
     { "panel_id": "file-browser", "eligible_slots": ["explorer"] },
     { "panel_id": "idea-explorer", "eligible_slots": ["explorer"] },
     { "panel_id": "backlog-explorer", "eligible_slots": ["explorer"] }
   ],
   "default_assignment": {
-    "terminal": "terminal",
-    "terminal-cmd": "terminal",
-    "terminal-powershell": "terminal",
-    "html-viewer": "main",
-    "overview": "main",
-    "notes-strip": "notes-strip",
+    "terminal": "secondary",
+    "terminal-cmd": "secondary",
+    "terminal-powershell": "secondary",
+    "html-viewer": "primary",
+    "overview": "primary",
+    "notes-strip": "strip",
     "file-browser": "explorer",
     "idea-explorer": "explorer",
     "backlog-explorer": "explorer"
   },
   "default_visible_panel": {
-    "terminal": "terminal",
-    "main": "html-viewer",
+    "secondary": "terminal",
+    "primary": "html-viewer",
     "explorer": "file-browser"
   },
   "grid": {
     "columns": ["1fr", "1fr", "1fr"],
     "rows": ["1fr", "1.6fr"],
     "areas": [
-      "notes-strip main explorer",
-      "terminal terminal terminal"
+      "strip primary explorer",
+      "secondary secondary secondary"
     ]
   }
 }

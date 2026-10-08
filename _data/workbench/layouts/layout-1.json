@@ -1,44 +1,44 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "layout_id": "layout-1",
   "name": "Layout 1 — Terminal Left",
   "slots": [
-    { "slot_id": "terminal", "display_name": "Terminal" },
-    { "slot_id": "notes-strip", "display_name": "Notes" },
-    { "slot_id": "main", "display_name": "Main" },
+    { "slot_id": "secondary", "display_name": "Terminal" },
+    { "slot_id": "strip", "display_name": "Notes" },
+    { "slot_id": "primary", "display_name": "Main" },
     { "slot_id": "explorer", "display_name": "Explorer" }
   ],
   "panels": [
-    { "panel_id": "terminal", "eligible_slots": ["terminal", "main"] },
-    { "panel_id": "terminal-cmd", "eligible_slots": ["terminal", "main"] },
-    { "panel_id": "terminal-powershell", "eligible_slots": ["terminal", "main"] },
-    { "panel_id": "html-viewer", "eligible_slots": ["terminal", "main"] },
-    { "panel_id": "notes-strip", "eligible_slots": ["notes-strip"] },
+    { "panel_id": "terminal", "eligible_slots": ["secondary", "primary"] },
+    { "panel_id": "terminal-cmd", "eligible_slots": ["secondary", "primary"] },
+    { "panel_id": "terminal-powershell", "eligible_slots": ["secondary", "primary"] },
+    { "panel_id": "html-viewer", "eligible_slots": ["secondary", "primary"] },
+    { "panel_id": "notes-strip", "eligible_slots": ["strip"] },
     { "panel_id": "file-browser", "eligible_slots": ["explorer"] },
     { "panel_id": "idea-explorer", "eligible_slots": ["explorer"] },
     { "panel_id": "backlog-explorer", "eligible_slots": ["explorer"] }
   ],
   "default_assignment": {
-    "terminal": "terminal",
-    "terminal-cmd": "terminal",
-    "terminal-powershell": "terminal",
-    "html-viewer": "main",
-    "notes-strip": "notes-strip",
+    "terminal": "secondary",
+    "terminal-cmd": "secondary",
+    "terminal-powershell": "secondary",
+    "html-viewer": "primary",
+    "notes-strip": "strip",
     "file-browser": "explorer",
     "idea-explorer": "explorer",
     "backlog-explorer": "explorer"
   },
   "default_visible_panel": {
-    "terminal": "terminal",
+    "secondary": "terminal",
     "explorer": "file-browser"
   },
   "grid": {
     "columns": ["1.4fr", "1fr"],
     "rows": ["0.25fr", "1.3fr", "1.15fr"],
     "areas": [
-      "terminal notes-strip",
-      "terminal main",
-      "terminal explorer"
+      "secondary strip",
+      "secondary primary",
+      "secondary explorer"
     ]
   }
 }

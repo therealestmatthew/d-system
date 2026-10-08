@@ -24,12 +24,14 @@ async function fetchLayout(id: string): Promise<unknown> {
   return response.json()
 }
 
-// --- REQ-007 W17: the terminal slot's fresh-store default becomes platform-conditional --------
+// --- REQ-007 W17: the secondary slot's fresh-store default becomes platform-conditional --------
 
 // The one slot id this default applies to, across both shipped layout files — hardcoded the same
 // way `TerminalRegion.tsx`'s own websocket path and shell allowlist are: a small, well-known
-// piece of this repo's fixed vocabulary, not a value layout files vary per-install.
-const TERMINAL_SLOT_ID = 'terminal'
+// piece of this repo's fixed vocabulary, not a value layout files vary per-install. It is the
+// slot the shells are assigned to by default; its id names that role (`secondary`), not the
+// shell panel type (terms-workbench-ui.md, "Slot naming rule").
+const SHELL_HOME_SLOT_ID = 'secondary'
 // The panel ids `panelRegistry.tsx` already registers for bash and PowerShell respectively.
 const BASH_PANEL_ID = 'terminal'
 const POWERSHELL_PANEL_ID = 'terminal-powershell'
@@ -38,12 +40,12 @@ const PLATFORM_ROUTE = '/api/v1/workbench/platform'
 /**
  * The stored `slot_visible_panel` value meaning "this slot deliberately shows nothing right now"
  * — distinct from *no stored entry at all*, which still resolves to the layout file's own default
- * (and, for the terminal slot, the platform-conditional default above).
+ * (and, for the secondary slot, the platform-conditional default above).
  *
  * It exists for exactly one situation (REQ-007 W16, W09 fix cycle 3): a reassignment that moves a
  * slot's *currently visible* panel out of it. Without this, `getSlotPanel` fell through to that
  * slot's "first still-assigned panel" default the instant the moved panel left `admits` — and for
- * the terminal slot, whose remaining assigned panels are CMD and PowerShell, that meant moving the
+ * the secondary slot, whose remaining assigned panels are CMD and PowerShell, that meant moving the
  * live bash panel to another slot spontaneously mounted a *CMD* panel, which opens a websocket and
  * spawns a shell nobody asked for, consuming one of the backend's six global session slots
  * (`MAX_CONCURRENT_SESSIONS`, ADR-014 section 4). A websocket-opening panel must never mount as a
@@ -58,7 +60,7 @@ const PLATFORM_ROUTE = '/api/v1/workbench/platform'
  */
 const NO_VISIBLE_PANEL = ''
 
-/** The terminal slot's platform-conditional fresh-store default panel id (REQ-007 W17): bash
+/** The secondary slot's platform-conditional fresh-store default panel id (REQ-007 W17): bash
  * unless the backend's `/platform` route (`src/api/routes/workbench.py`, W09-C1) reports
  * `windows`, in which case PowerShell. The route is gated behind `D_SYSTEM_DEMO_TERMINAL=1`
  * (ADR-015 rule 1) exactly like the terminal websocket itself, so a non-ok response — 404 when
@@ -178,7 +180,7 @@ export function useWorkbenchLayouts() {
   const [slotVisiblePanel, setSlotVisiblePanel] = useState<Record<string, Record<string, string>>>(
     {},
   )
-  // REQ-007 W17: the terminal slot's platform-conditional fresh-store default panel id, resolved
+  // REQ-007 W17: the secondary slot's platform-conditional fresh-store default panel id, resolved
   // once by the load effect below (see `fetchTerminalPlatformDefaultPanel`'s own doc for why it
   // is awaited alongside the layout files rather than fetched separately). The initial value here
   // is never actually observed by a consumer — `getSlotPanel` is only ever called once
@@ -272,7 +274,7 @@ export function useWorkbenchLayouts() {
 
   // The single ADR-016 schema version, resolved from the loaded layout files — the one source of
   // truth `NotesStripRegion` also reads, via `StagePage`'s `ActiveSchemaVersionProvider`, rather
-  // than a hardcoded constant of its own (both files ship `schema_version: 2` today, but only
+  // than a hardcoded constant of its own (both files ship `schema_version: 3` today, but only
   // this derivation is authoritative once a later data-only bump lands).
   const schemaVersion = rawLayouts[0]?.schema_version ?? null
 
@@ -301,7 +303,7 @@ export function useWorkbenchLayouts() {
   /**
    * The panel type id `slot` actually shows within `layout` — `null` for "show no panel here".
    * This is the *single* resolver: it already accounts for the stored visible-panel choice, the
-   * explicit `NO_VISIBLE_PANEL` sentinel, the terminal slot's platform-conditional fresh-store
+   * explicit `NO_VISIBLE_PANEL` sentinel, the secondary slot's platform-conditional fresh-store
    * default, the layout file's declared default, and whether the resolved panel type is actually
    * implemented yet (`PANEL_REGISTRY[id].Component` non-null — e.g. a slot admitting a panel id a
    * later phase will fill in). Both consumers — `Slot.tsx`'s header and `StagePage.tsx`'s portal
@@ -316,7 +318,7 @@ export function useWorkbenchLayouts() {
    * Resolution order:
    *  1. the stored choice, when it is the sentinel (-> `null`) or names an implemented panel
    *     currently assigned here;
-   *  2. the terminal slot's platform-conditional default (REQ-007 W17), when that panel is
+   *  2. the secondary slot's platform-conditional default (REQ-007 W17), when that panel is
    *     currently assigned here — fresh store only, since a stored choice already returned above;
    *  3. the layout file's own default for this slot (`buildSlots`), when implemented;
    *  4. the first implemented panel assigned here — what a slot whose declared default names an
@@ -332,14 +334,14 @@ export function useWorkbenchLayouts() {
     const stored = slotVisiblePanel[layout.layout_id]?.[slot.slot_id]
     if (stored === NO_VISIBLE_PANEL) return null
     if (implemented(stored)) return stored as string
-    // REQ-007 W17: only the terminal slot's *fresh-store* default (no stored choice survived
+    // REQ-007 W17: only the secondary slot's *fresh-store* default (no stored choice survived
     // validation above) is platform-conditional, and only when the platform-preferred panel is
     // actually one of this slot's currently-assigned panels — a user who has reassigned
-    // `terminal-powershell` away from the terminal slot, or a host the platform route reports as
+    // `terminal-powershell` away from the secondary slot, or a host the platform route reports as
     // not having PowerShell available, both fall straight through to the layout file's own
     // (platform-neutral) `default_panel` below, same as ADR-016 rule 4's "no valid override falls
     // back to the file's own default" posture elsewhere in this hook.
-    if (slot.slot_id === TERMINAL_SLOT_ID && implemented(terminalPlatformDefaultPanelId)) {
+    if (slot.slot_id === SHELL_HOME_SLOT_ID && implemented(terminalPlatformDefaultPanelId)) {
       return terminalPlatformDefaultPanelId
     }
     if (implemented(slot.default_panel)) return slot.default_panel
@@ -378,7 +380,7 @@ export function useWorkbenchLayouts() {
    *  3. `slotVisiblePanel[layoutId][sourceSlotId] = NO_VISIBLE_PANEL`, when the panel being moved
    *     was the source slot's visible panel. See `NO_VISIBLE_PANEL`'s own doc: this is what stops
    *     the vacated slot from spontaneously promoting the next panel assigned to it, which for the
-   *     terminal slot meant auto-mounting a CMD panel — a websocket, a shell process and one of
+   *     secondary slot meant auto-mounting a CMD panel — a websocket, a shell process and one of
    *     the backend's six global session slots, all as a side effect of moving a different panel.
    *
    * What this function deliberately no longer relies on is React batching *rescuing* a doomed

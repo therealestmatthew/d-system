@@ -100,7 +100,7 @@ export function useTerminalBridge(): TerminalBridgeHandle | null {
   return useSyncExternalStore(terminalBridge.subscribe, () => terminalBridge.get())
 }
 
-/** `null` whenever no HTML Viewer panel is currently mounted (e.g. layout 2's main slot resolved
+/** `null` whenever no HTML Viewer panel is currently mounted (e.g. layout 2's primary slot resolved
  * to `overview` instead) — the File Browser's menu hides/disables "Open in HTML Viewer"'s
  * submenu in that case rather than offering tabs that do not exist anywhere on screen. */
 export function useViewerBridge(): ViewerBridgeHandle | null {

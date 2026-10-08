@@ -87,7 +87,7 @@ function loadInitialTabs(schemaVersion: number | null): { tabs: ViewerTab[]; act
 
 /**
  * The HTML Viewer panel (REQ-007 W07/W08): generalizes the overview panel (`OverviewRegion`,
- * `phase-wb-02`) it replaces as the main slot's default in layout 1
+ * `phase-wb-02`) it replaces as the primary slot's default in layout 1
  * (`_data/workbench/layouts/layout-1.json`) — it displays a selected page in an iframe, with the
  * generated D-System overview page (`_public/`, produced by the `d-system-overview` skill,
  * `phase-demo-04`) one selectable entry among every compatible file found recursively under
@@ -283,7 +283,7 @@ export default function HtmlViewerRegion() {
   // route to reach this one (`panelBridge.ts`'s own doc comment explains why a bridge is needed
   // at all). Re-registers on every `tabs` change so the bridge's tab list (and each tab's label,
   // which is derived from array position) never lags the panel actually on screen; unregisters on
-  // unmount, e.g. the layout's main slot swapping away from `html-viewer` (layout 2 also admits
+  // unmount, e.g. the layout's primary slot swapping away from `html-viewer` (layout 2 also admits
   // `overview`), so a stale registration never outlives the panel it describes.
   useEffect(() => {
     const handle: ViewerBridgeHandle = {

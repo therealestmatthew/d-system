@@ -121,45 +121,46 @@ def test_shipped_layout_grid_areas_name_real_slots(path: Path) -> None:
 
 
 def test_shipped_eligibility_matches_req_007_w16() -> None:
-    """Terminal (bash), CMD, PowerShell and HTML Viewer are each eligible for both the terminal
-    and main slots in both layouts; Overview is eligible for the main slot only, where it exists
-    (layout 1 never shipped an overview panel and W16 does not add one); the notes strip and the
-    explorer slot's three panels keep their single-slot homes unchanged."""
+    """Terminal (bash), CMD, PowerShell and HTML Viewer are each eligible for both the secondary
+    and primary slots in both layouts; Overview is eligible for the primary slot only, where it
+    exists (layout 1 never shipped an overview panel and W16 does not add one); the notes strip
+    and the explorer slot's three panels keep their single-slot homes unchanged."""
     shared_shell_and_viewer_ids = {"terminal", "terminal-cmd", "terminal-powershell", "html-viewer"}
     for path in LAYOUT_FILES:
         layout = _load(path)
         eligibility = _panel_eligibility(layout)
         for panel_id in shared_shell_and_viewer_ids:
-            assert eligibility[panel_id] == {"terminal", "main"}, (
-                f"{path.name}: {panel_id} must be eligible for exactly the terminal and main slots"
+            assert eligibility[panel_id] == {"secondary", "primary"}, (
+                f"{path.name}: {panel_id} must be eligible for exactly the secondary and primary "
+                "slots"
             )
         if "overview" in eligibility:
-            assert eligibility["overview"] == {"main"}, (
-                f"{path.name}: overview must be eligible for the main slot only"
+            assert eligibility["overview"] == {"primary"}, (
+                f"{path.name}: overview must be eligible for the primary slot only"
             )
-        assert eligibility["notes-strip"] == {"notes-strip"}
+        assert eligibility["notes-strip"] == {"strip"}
         for panel_id in ("file-browser", "idea-explorer", "backlog-explorer"):
             assert eligibility[panel_id] == {"explorer"}
 
 
 def test_shipped_defaults_reproduce_the_pre_delta_arrangement() -> None:
-    """Defaults reproduce the pre-delta arrangement: shells default to the terminal slot with
-    bash visible, and HTML Viewer defaults to the main slot (with Overview behind it in layout 2)
+    """Defaults reproduce the pre-delta arrangement: shells default to the secondary slot with
+    bash visible, and HTML Viewer defaults to the primary slot (with Overview behind it in layout 2)
     — so a cleared browser looks unchanged (REQ-007 W16)."""
     for path in LAYOUT_FILES:
         layout = _load(path)
         assignment = layout["default_assignment"]
         for shell_id in ("terminal", "terminal-cmd", "terminal-powershell"):
-            assert assignment[shell_id] == "terminal"
-        assert assignment["html-viewer"] == "main"
-        assert layout["default_visible_panel"]["terminal"] == "terminal"
-        # `main` only needs an explicit default-visible entry when more than one panel is
+            assert assignment[shell_id] == "secondary"
+        assert assignment["html-viewer"] == "primary"
+        assert layout["default_visible_panel"]["secondary"] == "terminal"
+        # `primary` only needs an explicit default-visible entry when more than one panel is
         # assigned there by default (layout 2, where overview sits behind html-viewer); layout 1
-        # assigns only html-viewer to main, so no entry is required there.
-        if "main" in layout["default_visible_panel"]:
-            assert layout["default_visible_panel"]["main"] == "html-viewer"
+        # assigns only html-viewer to primary, so no entry is required there.
+        if "primary" in layout["default_visible_panel"]:
+            assert layout["default_visible_panel"]["primary"] == "html-viewer"
         if "overview" in assignment:
-            assert assignment["overview"] == "main"
+            assert assignment["overview"] == "primary"
 
 
 # --- deliberately malformed / invalid mutations fail before they ship ------------------------
@@ -207,8 +208,8 @@ def test_default_assignment_missing_a_panel_fails_invariant() -> None:
 
 def test_default_visible_panel_naming_an_unassigned_panel_fails_invariant() -> None:
     layout = copy.deepcopy(_load(LAYOUT_FILES[0]))
-    layout["default_visible_panel"]["terminal"] = "html-viewer"
-    layout["default_assignment"]["html-viewer"] = "main"
+    layout["default_visible_panel"]["secondary"] = "html-viewer"
+    layout["default_assignment"]["html-viewer"] = "primary"
     with pytest.raises(AssertionError):
         _assert_default_visible_panel_is_actually_assigned(layout)
 
