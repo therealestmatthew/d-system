@@ -17682,7 +17682,7 @@ items:
   - docs/00-working/popover-consumer-audit.md
   - docs/03-sessions/SESS-2026-10-08-13-popover-side-and-height.md
   result: 'Fully visible file entries (1280x720 / 1024x768): layout-1 2 -> 12 / 2 -> 13, layout-2 7 -> 12
-    / 7 -> 13; scrolling reaches entry 140 of 140 and the dismiss control stays on screen. The live
+    / 7 -> 13; a real mouse wheel reaches entry 140 of 140 in all four cells and the dismiss control stays on screen. The live
     check test_workbench_fit_contracts.py --live --quick --panel html-viewer no longer reports the
     popover not-starved finding (was 149 px bubble, 305 px needed, 529 px free); 4 non-popover findings
     remain (2 tooltip, 2 layout-2 header). cd ts && npm test 96 passed; npm run build built; npm run

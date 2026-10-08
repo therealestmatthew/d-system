@@ -38,7 +38,9 @@ both sizes (opened downward, held by the list's own 14rem cap).
   fits there, otherwise the larger side; unmeasured content uses the larger side). The height is the
   room on the chosen side up to 60% of the viewport and never more than the room, replacing the
   fixed 120 px floor. The content height is measured on the live bubble with `maxHeight` lifted and
-  restored in the same call.
+  restored in the same call, on open, on resize and when the body's content changes (a
+  `MutationObserver` on the body), and never on a scroll; the body's `scrollTop` is saved and put back
+  around the measurement.
 - `ts/src/stage/StagePage.css`: removed the 14rem `max-height` on `.stage-html-viewer__file-list`
   (the measurement showed it limited layout-2 to seven entries), so the popover body is the one
   scroller; the filter box is sticky at the top of that scroller.
@@ -49,13 +51,20 @@ both sizes (opened downward, held by the list's own 14rem cap).
 
 ## Evidence
 
-- Fully visible file entries after the change: layout-1 12 (1280x720) and 13 (1024x768); layout-2
-  12 and 13. Scrolling to the end reaches entry 140; the dismiss control is on screen in all four
-  cells.
-- The same live command after the change: no popover finding remains. Four findings remain, none from
+- Fully visible file entries after the change (real browser, `.stage-html-viewer__file-option`):
+  layout-1 12 (1280x720) and 13 (1024x768); layout-2 12 and 13; the dismiss control is on screen in
+  all four cells.
+- Real mouse wheel over the list (400 px steps, until it stops moving), all four cells: scrollTop
+  after the first three wheel steps 400, 800, 1200 in every cell; at the end scrollTop 3790
+  (layout-1 1280x720), 3761 (layout-1 1024x768), 3789 (layout-2 1280x720), 3761 (layout-2
+  1024x768); the last of the 140 entries fully visible and the dismiss control on screen in each.
+  (The first version of this change failed this check; see Review.)
+- The same live command after the fix (`--live http://localhost:5190 --quick --panel html-viewer`):
+  "8 panel cells; floating surfaces measured {'context-menu': 4, 'popover': 54, 'tooltip': 8}; rules
+  pass=39 fail=2 ... 4 finding(s)". No popover finding remains. The four findings are none from
   the popover: two `tooltip` `not-clipped` findings (phase-wbf-14) and the `wrap` and `silent-clip`
   findings on the HTML Viewer header in layout-2 at 1024x768 (not in this phase's scope).
-- `cd ts && npm test`: 96 passed. `npm run build`: built. `npm run lint`: clean.
+- `cd ts && npm test`: see the final run recorded in the Review section. `npm run build`: built. `npm run lint`: clean.
 - `uv run python -m src.governance`: OK. `uv run ruff check src/ test/ tools/`: clean.
   `uv run mypy src/`: no issues in 51 files.
 - `uv run pytest`: 1899 passed, 1 skipped, 1 failed when run whole:
@@ -74,3 +83,28 @@ both sizes (opened downward, held by the list's own 14rem cap).
 - Layout-2 "Skills (11)" needs 395 px and 360 px is the larger room, so its last entries scroll. Not a
   shared-component fault.
 - No decision here awaits ratification.
+
+## Review
+
+Gating review (demo adversary) and shadow review (judge) both rejected `0cdab8d`. Records:
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-13-demo-adversary.json` and
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-13-review-judge.json`.
+
+- Adversary F01 / judge F01 (blocker / major): scrolling inside a popover body snapped to the top
+  because the capture-phase scroll listener re-ran the height measurement. Correct, and the first
+  version's evidence counted entries at rest without scrolling. Fixed: the scroll handler ignores
+  events whose target is inside the bubble and never remeasures; measurement runs on open, resize and
+  content change; `scrollTop` is also saved and restored around it. Verified with a real wheel in
+  all four cells (above).
+- Adversary F02 (minor): no test covered scrolling. Added three tests to `Popover.test.tsx`: a scroll
+  on the body neither reads `offsetHeight` again nor changes `scrollTop`; a scroll outside the bubble
+  repositions without remeasuring; a content change after open remeasures. With the old handler the
+  first two fail.
+- Adversary F03 (minor): the sticky filter box pinned 8 px below the scroller top. Fixed with
+  `top: -0.5rem` on `.stage-html-viewer__search`.
+- Judge F02 (minor): placement used the content height at open only. Fixed by the content-change
+  remeasure above.
+- Judge F03 (minor): the audit note had only the 1280x720 column. Added the 1024x768 value for every
+  consumer.
+- Judge F04 (minor): `test_an_unwritable_worktree_parent_is_refused` fails as root; recorded above as
+  an environment artifact, not edited here.
