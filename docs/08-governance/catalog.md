@@ -483,6 +483,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-10-08-16 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-16-viewer-missing-page-check.md |
 | SESS-2026-10-08-17 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-17-terminal-persistence-audit.md |
 | SESS-2026-10-08-18 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-18-tooltip-bottom-clip.md |
+| SESS-2026-10-08-19 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-19-viewer-last-modified-badge.md |
 
 ## Plans and their phases
 
