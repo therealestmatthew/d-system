@@ -10,8 +10,10 @@ Covers: every route absent (404) with the flag unset; the six operations and the
 representation each one changes; the id rules (slug, empty-slug fallback, Windows reserved names,
 collision suffixes, length cap, immutability across rename); name rules; the ADR-015 path rules on
 write (absolute, `..`, symlink escape, directory, `_private/`, gitignored, missing); resolution of
-every entry to present, missing or excluded on read, with nothing pruned; concurrent adds losing
-nothing; and the schema against both the tracked example and deliberately broken records.
+every entry to present, missing or excluded on read, with nothing pruned; a segment over the
+filesystem's byte limit refused on write and read as excluded without relying on a filesystem call
+raising; concurrent adds losing nothing; and the schema against both the tracked example and
+deliberately broken records.
 """
 
 from __future__ import annotations
@@ -800,6 +802,64 @@ def test_hand_edited_unusable_entries_read_excluded_and_the_rest_still_read(
     removed = sandbox.remove("set", "bad\x00.md")
     assert removed.status_code == 200
     assert "bad\x00.md" not in [entry["path"] for entry in removed.json()["entries"]]
+
+
+def test_an_over_long_entry_reads_excluded_without_relying_on_a_raise(
+    sandbox: Sandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Python 3.14's `is_file()` returns False for a name longer than the filesystem allows, and
+    # older versions raise. With `is_file()` forced to return False for such a name on every
+    # version, only an explicit length check can still read the entry as excluded, not missing.
+    sandbox.create("Set")
+    record = sandbox.record("set")
+    record["entries"] = ["q" * 300, "docs/" + "\u00e9" * 200]
+    (sandbox.records_dir / "set.json").write_text(json.dumps(record), encoding="utf-8")
+    real_is_file = Path.is_file
+
+    def is_file_without_raising(self: Path) -> bool:
+        if any(len(os.fsencode(part)) > 255 for part in self.parts):
+            return False
+        return real_is_file(self)
+
+    monkeypatch.setattr(Path, "is_file", is_file_without_raising)
+    assert _statuses(sandbox, "set") == {
+        "q" * 300: "excluded",
+        "docs/" + "\u00e9" * 200: "excluded",
+    }
+
+
+def test_a_segment_over_the_filesystem_byte_limit_is_refused_on_write(sandbox: Sandbox) -> None:
+    # 200 characters passes the 255-character shape check, but is 400 bytes in UTF-8.
+    sandbox.create("Set")
+    response = sandbox.add("set", "docs/" + "\u00e9" * 200)
+    assert response.status_code == 400
+    assert "longer than the filesystem allows" in response.json()["detail"]
+    assert sandbox.record("set")["entries"] == []
+
+
+def test_the_segment_limit_comes_from_pathconf_and_falls_back_to_255(
+    sandbox: Sandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    module = _bookmarks_module()
+    sandbox.write_file("abcdefghijk.md")
+    sandbox.create("Set")
+    # A file the real filesystem holds is still refused when its name exceeds the reported limit.
+    monkeypatch.setattr(os, "pathconf", lambda path, name: 10, raising=False)
+    assert module.name_max() == 10
+    assert sandbox.add("set", "abcdefghijk.md").status_code == 400
+    record = sandbox.record("set")
+    record["entries"] = ["abcdefghijk.md"]
+    (sandbox.records_dir / "set.json").write_text(json.dumps(record), encoding="utf-8")
+    assert _statuses(sandbox, "set") == {"abcdefghijk.md": "excluded"}
+
+    def unavailable(path: object, name: str) -> int:
+        raise OSError("no limit reported")
+
+    monkeypatch.setattr(os, "pathconf", unavailable, raising=False)
+    assert module.name_max() == 255
+    monkeypatch.delattr(os, "pathconf", raising=False)
+    assert module.name_max() == 255
+    assert _statuses(sandbox, "set") == {"abcdefghijk.md": "present"}
 
 
 def test_a_record_holding_a_lone_surrogate_is_unreadable_not_a_crash(sandbox: Sandbox) -> None:

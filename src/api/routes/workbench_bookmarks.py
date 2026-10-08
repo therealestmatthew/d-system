@@ -50,6 +50,12 @@ and is ignored on read, but `.gitignore` does not cover it (outside this phase's
 Request bodies must be `application/json` and at most 64 KB, a category holds at most 500 entries,
 the data root at most 200 categories, and a path at most 1024 characters with no segment over 255.
 
+Over-long names: a segment whose encoded byte length exceeds the filesystem's name limit
+(`os.pathconf` `PC_NAME_MAX` on the repository root, 255 where that cannot be read) is refused on
+write (400) and reads as `excluded`. The check is explicit and made before any filesystem call,
+because whether `resolve()` or `is_file()` raises on such a name depends on the Python version
+(3.14's `is_file()` returns `False`, which would read as `missing`).
+
 Symlinks: git cannot check a path that passes through a symlinked directory (it aborts the whole
 batch), so an entry whose lexical path differs from its resolved path is refused on write and read
 as `excluded`, and `git check-ignore` is run on resolved paths only. A `git check-ignore` exit code
@@ -85,6 +91,8 @@ MAX_ENTRIES_PER_CATEGORY: Final[int] = 500
 MAX_CATEGORIES: Final[int] = 200
 MAX_PATH_LENGTH: Final[int] = 1024
 MAX_SEGMENT_LENGTH: Final[int] = 255
+#: The segment byte limit used when `os.pathconf` cannot report one (Windows has no `pathconf`).
+FALLBACK_NAME_MAX: Final[int] = 255
 _BODY_METHODS: Final[frozenset[str]] = frozenset({"POST", "PATCH", "DELETE"})
 
 
@@ -375,6 +383,23 @@ def normalize_entry_path(raw: str) -> str:
     return normalized
 
 
+def name_max() -> int:
+    """The longest file name, in bytes, the filesystem holding `REPO_ROOT` allows: `PC_NAME_MAX`
+    from `os.pathconf`, or `FALLBACK_NAME_MAX` where the platform or filesystem cannot report it."""
+    try:
+        limit = os.pathconf(REPO_ROOT, "PC_NAME_MAX")
+    except (AttributeError, OSError, ValueError):
+        return FALLBACK_NAME_MAX
+    return limit if limit > 0 else FALLBACK_NAME_MAX
+
+
+def _has_overlong_segment(parts: tuple[str, ...] | list[str]) -> bool:
+    """Whether any segment's encoded byte length exceeds `name_max()`. Decided here rather than
+    by a filesystem call raising, so the answer does not depend on the Python version."""
+    limit = name_max()
+    return any(len(os.fsencode(part)) > limit for part in parts)
+
+
 _BARRED_SEGMENTS: Final[frozenset[str]] = frozenset(
     name.casefold() for name in {PRIVATE_DIRECTORY_NAME, *ALWAYS_EXCLUDED_NAMES}
 )
@@ -421,10 +446,12 @@ def _inspect(path: str) -> tuple[EntryStatus | None, Path | None]:
     """Where `path` (a stored entry, possibly hand-edited) stands before the ignore check:
     `("excluded" | "missing", None)` when that is already decided, else `(None, resolved)` for a
     regular file whose path does not pass through a symlink and holds no private or `.git` segment.
-    Anything that raises while the path is examined (NUL, an over-long name, invalid text) is
-    `excluded`; nothing here raises."""
+    A segment longer than the filesystem allows is `excluded` by `_has_overlong_segment`, checked
+    before any filesystem call. Anything that raises while the path is examined (NUL, invalid
+    text) is `excluded`; nothing here raises."""
     try:
-        if _is_private_or_internal(path.replace("\\", "/").split("/")):
+        segments = path.replace("\\", "/").split("/")
+        if _is_private_or_internal(segments) or _has_overlong_segment(segments):
             return "excluded", None
         resolved = resolve_repo_relative_path(path)
         relative = resolved.relative_to(REPO_ROOT)
@@ -455,9 +482,14 @@ def resolve_entries(paths: list[str]) -> list[ResolvedEntry]:
 def validate_entry_file(raw: str) -> str:
     """The stored form of `raw`, after the ADR-015 rules for a path that is about to be written:
     it must exist, be a file, not pass through a symlink, stay inside the repository, and not be
-    private, internal or ignored. Raises 400 for a path that can never be valid and 404 for one
-    that does not exist."""
+    private, internal or ignored. Raises 400 for a path that can never be valid (including a
+    segment longer than the filesystem allows) and 404 for one that does not exist."""
     normalized = normalize_entry_path(raw)
+    if _has_overlong_segment(normalized.split("/")):
+        raise HTTPException(
+            status_code=400,
+            detail=f"A path segment is longer than the filesystem allows ({name_max()} bytes).",
+        )
     private = HTTPException(
         status_code=400, detail=f"Private and internal paths are not accepted: {raw!r}"
     )
