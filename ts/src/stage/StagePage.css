@@ -112,6 +112,91 @@ body {
   margin: 0;
 }
 
+/* The slot frame (ADR-031 decisions 1 and 2, REQ-011 R13): `Slot.tsx` draws one top bar per slot
+   from its role's frame schema, so a hosted panel never draws one. The bar is a row of sub-slots
+   in schema order: `identity` (the hosted panel's name or the panel switcher, filled by the slot),
+   `help` and `controls` (filled by the panel through `BarElement`) and `frame_actions` (filled by
+   the slot, empty until maximize and collapse land). The bar wraps rather than clipping, so a
+   panel with many controls (the terminal has five dropdowns) reflows inside the slot's width. */
+.stage-slot__bar {
+  flex-wrap: wrap;
+}
+
+.stage-slot__identity,
+.stage-slot__help,
+.stage-slot__frame-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+/* The panel's controls sit at the bar's far right, and wrap onto further rows when they do not
+   fit. `margin-left: auto` keeps the group right-aligned whatever sits to its left. */
+.stage-slot__controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-left: auto;
+  min-width: 0;
+}
+
+.stage-slot__controls .stage-region__header-toggle {
+  margin-left: 0;
+}
+
+/* A `BarElement` wrapper is a marker, not a box: it must neither add a gap between controls nor
+   change how the controls inside lay out, and an element with no content leaves no trace. */
+.stage-bar-element {
+  display: contents;
+}
+
+/* The inline arrangement (the `compact` frame, ADR-031 decision 2): the body shares the bar's one
+   row instead of sitting below it. The `<header>` generates no box of its own, so its help and
+   controls sub-slots and the body become items of the same row, ordered help, body, controls. */
+.stage-slot--inline {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+}
+
+.stage-slot--inline > .stage-slot__bar {
+  display: contents;
+}
+
+.stage-slot--inline > .stage-slot__bar > .stage-slot__help {
+  order: 1;
+  flex: 0 0 auto;
+}
+
+/* `flex: 1 1 0`, not `auto`: the body's own content (a long entry, however wide) must not count
+   toward its share of the row, or the help and controls places shrink to make room for it. */
+.stage-slot--inline > .stage-workbench-slot__portal-body {
+  order: 2;
+  flex: 1 1 0;
+  align-self: stretch;
+}
+
+.stage-slot--inline > .stage-slot__bar > .stage-slot__controls {
+  order: 3;
+  flex: 0 0 auto;
+  margin-left: 0;
+}
+
+/* What a panel's root is inside its slot's body: the box that fills it. The slot supplies the
+   border, the background and the top bar, so the panel draws none of those. */
+.stage-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
 .stage-region__body {
   flex: 1 1 auto;
   min-height: 0;
@@ -199,13 +284,6 @@ body {
 .stage-terminal-tab__new:disabled {
   opacity: 0.45;
   cursor: not-allowed;
-}
-
-/* REQ-007 W02: the terminal panel's sole "(...)" ellipsis menu (`TerminalMenu.tsx`), replacing
-   both the old standalone header collapse button and the old page-level drop control. Pushed to
-   the header's far right the same way those two controls were. */
-.stage-region--terminal .stage-region__header > .stage-popover:last-child {
-  margin-left: auto;
 }
 
 .stage-terminal-menu,
@@ -425,7 +503,7 @@ body {
   gap: 0.5rem;
   flex: 1 1 auto;
   min-height: 0;
-  padding: 0.4rem 0.6rem;
+  min-width: 0;
 }
 
 .stage-notes-strip__current {
@@ -594,47 +672,17 @@ body {
   padding: 0;
 }
 
-/* Workbench engine: a multi-panel slot's dropdown header and swap-list (REQ-007 W06). Not
-   reachable by either shipped layout file today — see `panelRegistry.tsx` — but styled ahead of
-   the first phase that populates a slot with more than one implemented panel. */
-.stage-workbench-slot__header {
-  gap: 0.4rem;
-}
-
-/* Fix for idea 000104 (REQ-007 W15): this body wraps a single implemented panel's own
-   `.stage-region` root as a *child* element whenever the slot admits more than one implemented
-   panel (Slot.tsx's multi-panel branch). `.stage-region__body`'s base rule above never sets
-   `display`, so without this rule the wrapper stayed the default `display: block` — a block
-   container ignores a flex child's `flex: 1 1 auto` (that property only has an effect inside a
-   flex/grid formatting context), so the nested `.stage-region` sized to `height: auto` /
-   content instead of stretching to fill the space this wrapper actually has available. Every
-   panel downstream inherited that content-sized starvation (confirmed for the terminal, the
-   HTML Viewer and the File Browser — see PROMPT dispatch W08-M diagnosis, phase-wb-08).
-   `display: flex; flex-direction: column` here restores the exact formatting context the
-   single-panel branch already gets for free (there, the panel's own `.stage-region` is the
-   grid cell's direct flex child, per `.stage-workbench-slot` above) — the nested `.stage-region`
-   child's own `flex: 1 1 auto` (declared on the base `.stage-region` rule) now applies and it
-   stretches to this wrapper's full height, in any slot geometry, not just the secondary slot's
-   current dimensions. */
-.stage-workbench-slot__body {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-}
-
-/* REQ-007 W17 item 4: a single-panel slot's portal body container (`Slot.tsx`) — the panel's own
-   component now mounts via a portal into this div rather than as a direct JSX child, so it can
-   move between slots (a reassignment) without unmounting. This must behave exactly like the
-   plain `<Component />` it replaces as `.stage-workbench-slot`'s direct flex child (that class is
-   `display: flex` with no explicit `flex-direction`, i.e. row): `flex: 1 1 auto` here is what
-   `.stage-region`'s own `flex: 1 1 auto` used to get for free from being that direct child,
-   `min-width: 0`/`min-height: 0` are the same shrink-to-fit guards every other slot-adjacent
-   wrapper in this file already carries, and `display: flex; flex-direction: column` gives the
-   nested `.stage-region` child the same column flex context `.stage-workbench-slot__body` above
-   already gives the multi-panel case (idea `000104`'s fix, generalized here to the single-panel
-   case this delta introduces a wrapper for). No border, background or padding — this container
-   must stay visually transparent. */
+/* REQ-007 W17 item 4: every slot's body container (`Slot.tsx`) — the hosted panel's component
+   mounts via a portal into a host element that `StagePage.tsx` appends to this div, so the panel
+   can move between slots (a reassignment) without unmounting. This must behave exactly like a
+   plain `<Component />` as the slot's body: `flex: 1 1 auto` fills the space under the one top
+   bar, `min-width: 0`/`min-height: 0` are the same shrink-to-fit guards every other slot-adjacent
+   wrapper in this file carries, and `display: flex; flex-direction: column` gives the panel's
+   `.stage-panel` root a column flex context whose `flex: 1 1 auto` stretches it to this body's
+   full height in any slot geometry (idea `000104`'s fix, which used to need a second rule for
+   multi-panel slots because the panel then drew its own box inside this one; a panel no longer
+   draws a box, so one body rule serves every slot). No border, background or padding — this
+   container must stay visually transparent. */
 .stage-workbench-slot__portal-body {
   display: flex;
   flex-direction: column;
@@ -700,21 +748,6 @@ body {
 
 .stage-workbench-config__layout-option {
   justify-content: flex-start;
-}
-
-/* The HTML Viewer panel (REQ-007 W07, `HtmlViewerRegion`): its three header controls (refresh,
-   searchable file dropdown, directory-dialog button) plus the kept embed/open-in-tab toggle sit
-   in one right-aligned group — `margin-left: auto` on the group itself, not on the individual
-   toggle button anymore, since the toggle is no longer the header's sole trailing control. */
-.stage-html-viewer__controls {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-left: auto;
-}
-
-.stage-html-viewer__controls .stage-region__header-toggle {
-  margin-left: 0;
 }
 
 .stage-html-viewer__refresh {
@@ -845,13 +878,6 @@ body {
    the meta line, the text/type filter row and the scrollable tree fill the body as a flex
    column, so the tree is the one part that grows/scrolls — the filters and meta line stay a
    fixed height regardless of tree depth. */
-.stage-file-browser__controls {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-left: auto;
-}
-
 .stage-file-browser__preset {
   font-size: 0.78rem;
   padding: 0.3rem 0.45rem;
@@ -859,6 +885,11 @@ body {
   border: 1px solid #99a3b3;
   background: #eef1f6;
   max-width: 12rem;
+  /* A small basis lets the select share a bar row with the next control and grow to its maximum
+     when there is room; a wrapping row decides what fits by basis, not by the width it could shrink
+     to. */
+  flex: 1 1 6rem;
+  min-width: 0;
 }
 
 .stage-region__body--file-browser {
@@ -1209,13 +1240,6 @@ body {
    configuration surface" requirement — so no `--idea-` or `--backlog-` variant of these rules
    exists; only the outer `.stage-region--idea-explorer` / `.stage-region--backlog-explorer`
    modifier classes stay panel-specific, as cosmetic hooks with no rules of their own yet. */
-.stage-explorer__controls {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-left: auto;
-}
-
 .stage-explorer__view-toggle {
   display: flex;
   gap: 0.2rem;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Tooltip from './Tooltip'
+import BarElement from '../workbench/BarElement'
 
 const OVERVIEW_LOCATION_URL = '/api/v1/demo/stage/overview-location'
 // Mirrors `ts/vite.config.ts`'s `serveGeneratedOverview` dev-server plugin, which serves
@@ -76,14 +77,16 @@ export default function OverviewRegion() {
   const embedSrc = relativePath ? `${GENERATED_OVERVIEW_PREFIX}${relativePath}` : null
 
   return (
-    <section className="stage-region stage-region--overview" aria-label="Overview">
-      <header className="stage-region__header">
-        <h2>Overview</h2>
+    <section className="stage-panel stage-panel--overview" aria-label="Overview">
+      {/* The top bar is the slot's (ADR-031 decision 1): this panel supplies its elements only. */}
+      <BarElement type="help">
         <Tooltip label="About the overview panel">
           Embeds the generated D-System overview page from <code>_public/</code> (produced by
           the <code>d-system-overview</code> skill, <code>phase-demo-04</code>). Switch to the
           "open in tab" layout state to see the rung-3 descope fallback.
         </Tooltip>
+      </BarElement>
+      <BarElement type="toggle">
         <button
           type="button"
           className="stage-region__header-toggle"
@@ -92,7 +95,7 @@ export default function OverviewRegion() {
         >
           {embedded ? 'Embedded' : 'Open-in-tab link (rung 3)'}
         </button>
-      </header>
+      </BarElement>
       <div
         className={
           'stage-region__body' +

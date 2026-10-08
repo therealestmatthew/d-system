@@ -71,6 +71,12 @@ ROOT_FILL_TOLERANCE_PX = 24.0
 REGION_FILL_TOLERANCE_PX = 32.0
 BOUNDS_TOLERANCE_PX = 1.5
 
+# A panel does not draw its slot's top bar: the slot does (ADR-031 decision 1), and the panel's bar
+# elements are portaled into the slot's bar sub-slots, outside the panel box. A contract selector
+# that names one of those sub-slots (`.stage-slot__controls`, `.stage-slot__help`) is therefore
+# searched for in the slot frame, and its bounds are checked against the frame, not the panel box.
+FRAME_SCOPE_MARKER = ".stage-slot__"
+
 # CSS classes owned by a library, not by `ts/src`, so the selector-grounding check cannot find
 # them in source.
 LIBRARY_CLASSES = frozenset({"xterm", "xterm-viewport", "scrollbar", "vertical"})
@@ -404,6 +410,11 @@ def floating_surface_sources(ts_src: Path) -> set[str]:
     return found
 
 
+def is_frame_scoped(selector: str) -> bool:
+    """True when the selector names a region of the slot frame (its top bar), not the panel."""
+    return FRAME_SCOPE_MARKER in selector
+
+
 def selector_classes(selector: str) -> set[str]:
     without_attrs = re.sub(r"\[[^\]]*\]", "", selector)
     return set(re.findall(r"\.([A-Za-z_][\w-]*)", without_attrs))
@@ -658,7 +669,11 @@ def judge_panel_cell(
                 counts["fail"] += 1
                 findings.append(Finding(where, "region-missing", f"{label} is not rendered"))
             continue
-        reasons = [check_alt(alt, rule.selector, region, root, body) for alt in rule.alts]
+        # A frame-scoped region (a bar sub-slot) lies outside the panel box by construction; its
+        # bounds are the slot frame's.
+        frame = cell.get("frame")
+        bound = frame if frame is not None and is_frame_scoped(rule.selector) else root
+        reasons = [check_alt(alt, rule.selector, region, bound, body) for alt in rule.alts]
         if any(reason is None for reason in reasons):
             counts["pass"] += 1
         else:
@@ -760,7 +775,7 @@ def judge_surface_cell(surface: str, rules: list[Rule], cell: dict[str, Any]) ->
 # Every key the judge reads from a measurement must be produced by the measurement script; the
 # static half asserts this so the two cannot drift apart unnoticed.
 JUDGE_FIELDS = (
-    "found", "doc", "root", "body", "regions", "clips", "exempt", "reach",
+    "found", "doc", "root", "body", "frame", "regions", "clips", "exempt", "reach",
     "bubble", "clipRects", "dismiss", "tipSw", "natural", "spaceAbove", "spaceBelow",
     "unavailable",
     "motion",
@@ -835,11 +850,15 @@ async function measureCell(browser, cell) {
         if (!host || !host.firstElementChild) return { found: false };
         const root = host.firstElementChild;
         const body = host.parentElement;
+        // The slot frame holds the one top bar (ADR-031 decision 1). A selector naming a bar
+        // sub-slot (`.stage-slot__controls`) is searched for there, not inside the panel box.
+        const frame = host.closest('.stage-slot');
         const regions = {};
         for (const sel of selectors) {
           if (sel === ':root') continue;
+          const scope = sel.includes('.stage-slot__') && frame ? frame : root;
           // The first match that renders: a hidden session tab's terminal also matches `.xterm`.
-          const all = root.matches(sel) ? [root] : [...root.querySelectorAll(sel)];
+          const all = scope.matches(sel) ? [scope] : [...scope.querySelectorAll(sel)];
           const e = all.find((c) => { const b = c.getBoundingClientRect(); return b.width > 0 && b.height > 0; }) || all[0];
           if (!e) { regions[sel] = { found: false }; continue; }
           const cs = getComputedStyle(e);
@@ -897,7 +916,8 @@ async function measureCell(browser, cell) {
         }
         const de = document.documentElement;
         return {
-          found: true, root: rectOf(root), body: rectOf(body), regions, clips,
+          found: true, root: rectOf(root), body: rectOf(body), frame: frame ? rectOf(frame) : null,
+          regions, clips,
           // A shell the host lacks (CMD or PowerShell on Linux) mounts an xterm that never connects
           // and shows this overlay; its scrollback cannot be exercised here.
           unavailable: !!root.querySelector('.stage-terminal-mount__overlay'),
@@ -1114,7 +1134,10 @@ def contract_breaks(rules: list[Rule]) -> list[tuple[str, str, str]]:
         if rule.selector == ":root":
             continue
         names = {alt.name for alt in rule.alts}
+        # A bar sub-slot is outside the panel host, so its selector stands alone.
         scope = f"[data-panel-host] {rule.selector}"
+        if is_frame_scoped(rule.selector):
+            scope = rule.selector
         if names & {"scroll-y", "scroll-x"} and "marquee" not in names:
             css, label = f"{scope}{{overflow:hidden !important}}", "overflow:hidden"
         elif "fill" in names:
@@ -1664,7 +1687,7 @@ def _tree(**over: Any) -> dict[str, Any]:
 
 def test_judge_accepts_a_conforming_file_browser() -> None:
     header = _region(10, 10, 480, 30, sw=300, cw=480)
-    regions = {sel: header for sel in (".stage-region__header", ".stage-file-browser__filters")}
+    regions = {sel: header for sel in (".stage-slot__controls", ".stage-file-browser__filters")}
     regions[".stage-file-browser__tree"] = _tree()
     findings, counts = judge_panel_cell(_rules("file-browser"), _cell("file-browser", regions))
     assert findings == [], [str(f) for f in findings]
@@ -1674,7 +1697,7 @@ def test_judge_accepts_a_conforming_file_browser() -> None:
 def test_judge_flags_the_file_browser_clip_w18() -> None:
     """Instance 2: tree content exceeds the body and nothing scrolls it (REQ-007 W18)."""
     header = _region(10, 10, 480, 30)
-    regions = {sel: header for sel in (".stage-region__header", ".stage-file-browser__filters")}
+    regions = {sel: header for sel in (".stage-slot__controls", ".stage-file-browser__filters")}
     regions[".stage-file-browser__tree"] = _tree(oy="hidden", ox="hidden")
     findings, _ = judge_panel_cell(_rules("file-browser"), _cell("file-browser", regions))
     assert any(
@@ -1718,8 +1741,8 @@ def test_notes_strip_declares_vertical_and_horizontal_scroll_as_alternatives(
     rules = _rules("notes-strip")
     entry = _region(20, 12, 420, 20, sw=900, cw=420, sh=20, ch=20, reach={"x": True}, **overflow)
     regions = {r.selector: entry for r in rules if r.selector != ":root"}
-    regions[".stage-popover__trigger"] = _region(450, 12, 30, 20)
-    regions[".stage-tooltip__trigger"] = _region(12, 12, 20, 20)
+    regions[".stage-slot__controls .stage-popover__trigger"] = _region(450, 12, 30, 20)
+    regions[".stage-slot__help .stage-tooltip__trigger"] = _region(12, 12, 20, 20)
     findings, _ = judge_panel_cell(
         rules, _cell("notes-strip", regions, root=_box(10, 10, 480, 40), body=_box(0, 0, 500, 50))
     )
@@ -1766,7 +1789,7 @@ def test_chrome_offset_does_not_make_a_correct_panel_fail() -> None:
         ".xterm": xterm,
         ".xterm .scrollbar.vertical": track,
     }
-    regions[".stage-region__header"] = _region(10, 10, 480, 40)
+    regions[".stage-slot__controls"] = _region(10, 10, 480, 40)
     cell = _cell("terminal", regions, root=root)
     cell["body"] = body
     findings, _ = judge_panel_cell(rules, cell)
@@ -1779,7 +1802,7 @@ def test_chrome_offset_does_not_make_a_correct_panel_fail() -> None:
 def test_judge_flags_a_header_that_overflows_instead_of_wrapping() -> None:
     rules = _rules("terminal")
     regions = {r.selector: _region(10, 10, 480, 40) for r in rules if r.selector != ":root"}
-    regions[".stage-region__header"] = _region(10, 10, 393, 40, sw=410, cw=393)
+    regions[".stage-slot__controls"] = _region(10, 10, 393, 40, sw=410, cw=393)
     findings, _ = judge_panel_cell(rules, _cell("terminal", regions))
     assert any("overflows instead of wrapping" in f.detail for f in findings)
 
@@ -1790,7 +1813,7 @@ def test_judge_reports_a_missing_non_optional_region_and_skips_optional_ones() -
     assert any(f.rule == "region-missing" for f in findings)
     term_rules = _rules("terminal-cmd")
     findings, counts = judge_panel_cell(
-        term_rules, _cell("terminal-cmd", {".stage-region__header": _region(10, 10, 480, 40)})
+        term_rules, _cell("terminal-cmd", {".stage-slot__controls": _region(10, 10, 480, 40)})
     )
     assert counts["na"] >= 1 and not any(f.rule == "region-missing" for f in findings)
 
@@ -1898,8 +1921,8 @@ def _notes_judgement(entry: dict[str, Any]) -> list[Finding]:
     """Judge a notes strip whose entry region is `entry`; every other region conforms."""
     rules = _rules("notes-strip")
     regions = {".stage-notes-strip__current": entry}
-    regions[".stage-popover__trigger"] = _region(450, 12, 30, 24)
-    regions[".stage-tooltip__trigger"] = _region(12, 12, 20, 24)
+    regions[".stage-slot__controls .stage-popover__trigger"] = _region(450, 12, 30, 24)
+    regions[".stage-slot__help .stage-tooltip__trigger"] = _region(12, 12, 20, 24)
     cell = _cell("notes-strip", regions, root=_box(10, 10, 480, 40), body=_box(0, 0, 500, 50))
     return judge_panel_cell(rules, cell)[0]
 
@@ -1974,6 +1997,40 @@ def test_wrap_fails_when_the_header_wraps_taller_than_its_panel() -> None:
     too_tall = _region(10, 10, 300, 160, sw=300, cw=300)
     assert check_alt(alt, ".h", fits, root, body) is None
     assert "more rows than the panel holds" in (check_alt(alt, ".h", too_tall, root, body) or "")
+
+
+def test_bar_regions_are_bounded_by_the_slot_frame_not_the_panel_box() -> None:
+    """ADR-031 decision 1: the strip's help trigger and controls dropdown sit in the slot's top
+    bar, beside the panel box and not inside it. A row naming a bar sub-slot is measured against
+    the slot frame, so a correct strip passes and a trigger pushed out of the frame still fails."""
+    rules = _rules("notes-strip")
+    root = _box(60, 10, 380, 40)  # the body between the help place and the controls place
+    frame = _box(10, 10, 480, 40)
+    entry = _region(70, 12, 360, 20, ox="visible", oy="auto")
+    regions = {r.selector: entry for r in rules if r.selector != ":root"}
+    regions[".stage-slot__controls .stage-popover__trigger"] = _region(450, 12, 30, 20)
+    regions[".stage-slot__help .stage-tooltip__trigger"] = _region(12, 12, 20, 20)
+
+    def judged(cell_frame: dict[str, Any] | None) -> list[Finding]:
+        cell = _cell("notes-strip", regions, root=root, body=_box(55, 0, 390, 50))
+        cell["frame"] = cell_frame
+        return judge_panel_cell(rules, cell)[0]
+
+    assert judged(frame) == []
+    # Measured against the panel box alone, the same correct strip would be reported as broken.
+    assert any(f.rule == "visible" for f in judged(None))
+    regions[".stage-slot__controls .stage-popover__trigger"] = _region(450, 500, 30, 20)
+    assert any(f.rule == "visible" for f in judged(frame))
+
+
+def test_a_bar_row_is_searched_for_in_the_slot_frame_and_broken_without_the_panel_host() -> None:
+    assert is_frame_scoped(".stage-slot__controls")
+    assert is_frame_scoped(".stage-slot__help .stage-tooltip__trigger")
+    assert not is_frame_scoped(".stage-notes-strip__current")
+    breaks = {selector: css for css, _label, selector in contract_breaks(_rules("notes-strip"))}
+    frame_break = breaks[".stage-slot__help .stage-tooltip__trigger"]
+    assert "[data-panel-host]" not in frame_break
+    assert "[data-panel-host]" in breaks[".stage-notes-strip__current"]
 
 
 def test_differential_choice_skips_regions_that_already_fail() -> None:

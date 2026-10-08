@@ -3,6 +3,7 @@ import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
 import Tooltip from './Tooltip'
+import BarElement from '../workbench/BarElement'
 import Popover from './Popover'
 import CommandPanel from './CommandPanel'
 import InjectionDropdowns from './InjectionDropdowns'
@@ -101,7 +102,7 @@ function refusalDisplayMessage(refusal: ShellRefusal): string {
 }
 
 // The imperative handle TerminalSession exposes to its parent (TerminalRegion) so the command
-// panel (REQ-006 R12) — rendered in TerminalRegion's own header, not inside TerminalSession —
+// panel (REQ-006 R12) — a bar element TerminalRegion supplies to its slot's top bar, not part of TerminalSession —
 // can reach the *active* session's live socket without new shared state. This is the repo's
 // existing prop-drilling style applied to a child's otherwise-private socket: the handle exposes
 // only "send this text", never the socket itself or term.write(), so an injected command is
@@ -363,19 +364,19 @@ const TerminalSession = forwardRef<
  * REQ-006 R10/R11: hosts up to four independent sessions as tabs (every session's
  * TerminalSession stays mounted; inactive tabs are CSS-hidden only), a collapse control that
  * hides the region via CSS, and a guarded whole-region drop. REQ-007 W02 moves both controls into
- * a single `(...)` ellipsis menu (`TerminalMenu`) at the header's top right: the header's own
- * standalone "Collapse terminal" button and the page-level drop control (`StagePage`'s old rung-4
+ * a single `(...)` ellipsis menu (`TerminalMenu`), the last of the controls this panel supplies to its
+ * slot's top bar (ADR-031): the panel's own standalone "Collapse terminal" button and the page-level drop control (`StagePage`'s old rung-4
  * "Terminal: Shown/Hidden" toggle, already gone as of `phase-wb-02`) no longer exist anywhere.
  * Collapse still only flips CSS (no session terminates); drop still goes through `TerminalMenu`'s
  * in-bubble confirm step before anything terminates.
  *
  * REQ-007 W03: dropping no longer makes the region disappear or unmount. `dropped` swaps only the
  * body — the tab bar and session views are replaced in place by an inactive-terminal info page —
- * while the header, including the ellipsis menu and every injection dropdown (`CommandPanel` plus
- * the Skills/Prompts/Agents dropdowns, `InjectionDropdowns`, REQ-007 W04), stays mounted and
- * visible. Each dropdown receives `deactivated={dropped}` so it renders grayed out and genuinely
+ * while the bar elements this panel supplies to its slot's top bar, including the ellipsis menu
+ * and every injection dropdown (`CommandPanel` plus the Skills/Prompts/Agents dropdowns,
+ * `InjectionDropdowns`, REQ-007 W04), stay mounted and visible. Each dropdown receives `deactivated={dropped}` so it renders grayed out and genuinely
  * unclickable (a real `disabled` attribute via `Popover`'s own `disabled` prop, not styling
- * alone) and reactivates the instant `dropped` goes false again. The section's own box — and so
+ * alone) and reactivates the instant `dropped` goes false again. The panel's own box — and so
  * the workbench layout engine's (`ts/src/workbench/`, REQ-007 W05/ADR-016) fixed slot geometry
  * around it — never changes shape between the two states.
  *
@@ -387,7 +388,7 @@ const TerminalSession = forwardRef<
  * (`ts/src/workbench/panelRegistry.tsx`: "Terminal (bash)", "CMD", "PowerShell") this instance
  * is — the three are functionally identical through this one component; nothing below forks on
  * it except the query param each session's socket opens with (`TerminalSession`, ADR-014
- * section 5's per-session shell selection) and the header's own label. Tabs, collapse, drop and
+ * section 5's per-session shell selection). Tabs, collapse, drop and
  * every injection dropdown behave identically regardless of shell, exactly once, here — never
  * copy-pasted per shell.
  */
@@ -454,7 +455,7 @@ export default function TerminalRegion({ shell = 'bash' }: { shell?: TerminalShe
   // `appendNewline: false`, the exact same call `InjectionDropdowns`' `onSelect` already makes
   // (R12 mechanics), so a menu-injected path behaves identically to a Skills/Prompts/Agents
   // selection. Re-registers whenever `enabledState`/`dropped`/`activeSessionId` change so the
-  // bridge's availability flags and injection target never lag what the header's own injection
+  // bridge's availability flags and injection target never lag what the bar's own injection
   // dropdowns are keyed on; unregisters on unmount (this terminal-type panel swapped out of its
   // slot, or the whole app tearing down).
   useEffect(() => {
@@ -467,18 +468,18 @@ export default function TerminalRegion({ shell = 'bash' }: { shell?: TerminalShe
     return () => terminalBridge.unregister(handle)
   }, [enabledState, dropped, sendToActiveSession])
 
-  // REQ-007 W12: bash keeps the pre-existing bare "Terminal" title (nothing about the bash
+  // REQ-007 W12: bash keeps the pre-existing bare "Terminal" label (nothing about the bash
   // panel's own label changes), cmd/powershell name themselves so the presenter can tell the
   // three dropdown-selected panel instances apart once one is placed in a slot.
   const regionTitle = shell === 'bash' ? 'Terminal' : `Terminal (${SHELL_LABELS[shell]})`
 
   return (
     <section
-      className={'stage-region stage-region--terminal' + (collapsed ? ' stage-region--terminal-collapsed' : '')}
+      className={'stage-panel stage-panel--terminal' + (collapsed ? ' stage-region--terminal-collapsed' : '')}
       aria-label={regionTitle}
     >
-      <header className="stage-region__header">
-        <h2>{regionTitle}</h2>
+      {/* The top bar is the slot's (ADR-031 decision 1): this panel supplies its elements only. */}
+      <BarElement type="help">
         <Tooltip label="About the terminal region">
           Up to four independent xterm.js terminals, each over its own websocket to a real
           shell, when the backend's terminal capability is enabled (ADR-013). Absent by default.
@@ -487,16 +488,22 @@ export default function TerminalRegion({ shell = 'bash' }: { shell?: TerminalShe
           shows an inactive-terminal info page in place and the injection dropdowns are
           deactivated until restored.
         </Tooltip>
+      </BarElement>
+      <BarElement type="choice">
         <CommandPanel
           disabled={enabledState !== 'enabled'}
           deactivated={dropped}
           onSelect={sendToActiveSession}
         />
+      </BarElement>
+      <BarElement type="choice" places={3}>
         <InjectionDropdowns
           disabled={enabledState !== 'enabled'}
           deactivated={dropped}
           onSelect={(injection) => sendToActiveSession(injection, false)}
         />
+      </BarElement>
+      <BarElement type="choice">
         {enabledState === 'enabled' ? (
           <TerminalMenu
             collapsed={collapsed}
@@ -506,7 +513,7 @@ export default function TerminalRegion({ shell = 'bash' }: { shell?: TerminalShe
             onConfirmDrop={() => setDropped(true)}
           />
         ) : null}
-      </header>
+      </BarElement>
       {dropped ? (
         <div className="stage-region__body stage-region__body--terminal-placeholder">
           <p className="stage-placeholder-text stage-placeholder-text--absent">

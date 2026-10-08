@@ -6,6 +6,8 @@ import LayoutConfigDialog from '../workbench/LayoutConfigDialog'
 import { useWorkbenchLayouts } from '../workbench/useWorkbenchLayouts'
 import { ActiveSchemaVersionProvider } from '../workbench/schemaVersionContext'
 import { PANEL_REGISTRY } from '../workbench/panelRegistry'
+import { frameForSlot } from '../workbench/slotEligibility'
+import { SlotFrameContext, type SlotFrameBinding } from '../workbench/slotFrameContext'
 import { guardedPanel } from './guardedPanel'
 
 type AttachedHosts = Record<string, HTMLDivElement>
@@ -87,6 +89,12 @@ function createAttachedHostsStore() {
  * deliberate: mounting hidden shell panels would open websockets and consume the backend's six
  * global session slots (ADR-014 section 4) for panels nobody is looking at.
  *
+ * The slot, not the panel, draws each slot's one top bar (ADR-031 decision 1, REQ-011 R13). Each
+ * `Slot` registers the DOM element of its panel-filled bar sub-slots (`registerSubSlot`), and this
+ * file wraps every panel portal in a `SlotFrameContext` naming the slot that currently holds it.
+ * The panel's `BarElement`s portal their children into that slot's sub-slots, so the elements move
+ * with the panel when it is reassigned (the context value changes; the panel is not remounted).
+ *
  * Also the sole provider of the ADR-016 schema version (`ActiveSchemaVersionProvider`, fed by
  * `useWorkbenchLayouts`'s own resolution of it): every panel that persists a selection under the
  * ADR-016 storage key — the notes strip included — reads it from here rather than a hardcoded
@@ -138,6 +146,38 @@ export default function StagePage() {
       previous[slotId] === element ? previous : { ...previous, [slotId]: element },
     )
   }, [])
+
+  // slot_id -> sub-slot id -> that panel-filled bar sub-slot's element, registered by each `Slot`
+  // once its top bar mounts. Same null-ignoring rule as `registerSlotBody`, for the same reason.
+  const [subSlotElements, setSubSlotElements] = useState<
+    Record<string, Record<string, HTMLElement>>
+  >({})
+  const registerSubSlot = useCallback(
+    (slotId: string, subSlotId: string, element: HTMLElement | null) => {
+      if (!element) return
+      setSubSlotElements((previous) =>
+        previous[slotId]?.[subSlotId] === element
+          ? previous
+          : { ...previous, [slotId]: { ...previous[slotId], [subSlotId]: element } },
+      )
+    },
+    [],
+  )
+  // slot_id -> what a panel hosted there sees of its frame (`BarElement` reads it). Rebuilt only
+  // when a sub-slot element is registered, so a panel's context value is stable across renders.
+  const frameBindings = useMemo(() => {
+    const bindings: Record<string, SlotFrameBinding> = {}
+    for (const slotId of Object.keys(subSlotElements)) {
+      const frame = frameForSlot(slotId)
+      if (!frame) continue
+      bindings[slotId] = {
+        role: slotId,
+        frame,
+        subSlotElement: (subSlotId) => subSlotElements[slotId]?.[subSlotId] ?? null,
+      }
+    }
+    return bindings
+  }, [subSlotElements])
 
   // panel_id -> that panel's own host element (see the file doc): created once, never replaced,
   // moved between slot bodies by the layout effect below. A ref, not state — its identity is
@@ -220,7 +260,15 @@ export default function StagePage() {
     const host = attachedHosts[panelId]
     const Component = PANEL_REGISTRY[panelId]?.Component
     if (!host || !Component) return []
-    return [createPortal(guardedPanel(panelId, Component), host, panelId)]
+    return [
+      createPortal(
+        <SlotFrameContext.Provider value={frameBindings[hostSlotByPanelId[panelId]] ?? null}>
+          {guardedPanel(panelId, Component)}
+        </SlotFrameContext.Provider>,
+        host,
+        panelId,
+      ),
+    ]
   })
 
   return (
@@ -281,6 +329,7 @@ export default function StagePage() {
                       setSlotPanel(activeLayout.layout_id, slot.slot_id, panelId)
                     }
                     registerBody={registerSlotBody}
+                    registerSubSlot={registerSubSlot}
                   />
                 </div>
               ))}
