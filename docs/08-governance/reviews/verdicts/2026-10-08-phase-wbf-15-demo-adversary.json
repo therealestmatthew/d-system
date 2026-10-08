@@ -1,0 +1,34 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-15-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-15",
+  "reviewed_commit": "9b138ce174ba5913c47d4184c3131e64c67b0886",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Brief stale error when returning to a previously failed folder while another fetch is pending",
+      "evidence": "FileBrowserRegion.tsx:283 loadState derives from settled.folder === contextFolder; settled stays {docs,error} while src is pending; browsing back to docs shows the alert (now tested first) instead of Loading until the refetch settles. No test covers it.",
+      "consequence": "Momentary stale could-not-search message; self-corrects when the refetch settles.",
+      "minimal_fix": "Optional: reset settled when a fetch starts, or key settled by a fetch counter."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Pending-folder test does not exercise the buildTree stale guard",
+      "evidence": "loadState is already 'loading' in the stale commit, so the test passes even if the entriesFolder guard at line 356 is removed; no console.error spy for duplicate keys.",
+      "consequence": "A regression of the key-collision protection would not fail the suite.",
+      "minimal_fix": "Use colliding entries (root README.md, docs/README.md) and assert console.error is not called."
+    }
+  ],
+  "raw_reply_sha256": "20278b4e9234d614dc82ba61a522b31b3caf28578ee6f97251d0863f3db8a14b",
+  "outcomes": [],
+  "notes": "Finding ids renumbered F1/F2 -> F01/F02 by the coordinator to satisfy the schema; text unchanged."
+}
