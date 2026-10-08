@@ -8889,6 +8889,16 @@ items:
   - docs/00-working/ports-and-processes-lifecycle.md
   next_action: Reconstruct the port-8000 conflict from the session records that hit it. A real
     trace beats a general treatment of what a port is.
+  session: doc-session-ports-processes-lifecycle-exploration
+  completion_evidence:
+  - docs/00-working/ports-and-processes-lifecycle.md
+  - docs/03-sessions/SESS-2026-10-08-03-ports-processes-lifecycle-exploration.md
+  result: 'uv run python -m src.governance printed Governance OK: 45 systems, 456 documents,
+    37 memories, 347 backlog phases. ruff and mypy clean. uv run pytest printed 5 failed,
+    1649 passed, 1 skipped; the same 5 fail with the new document removed (shallow clone
+    and uid 0), see the session record. The document cites all three incident families
+    (port 8000, orphaned dev servers, PTY reaping 000099/000129), adds Linux traces, and
+    proposes no application. Windows and macOS: owner-machine, not run.'
 - id: phase-arch-12
   title: Build the port and process management application
   plan: doc-workbench-architecture-quality
