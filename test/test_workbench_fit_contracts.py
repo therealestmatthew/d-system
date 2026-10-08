@@ -79,6 +79,12 @@ STARVED_BELOW_FRACTION = 0.85
 # file selector popover has a list long enough to need a height decision (REQ-012 R25).
 STRESS_VIEWER_DIRECTORY = "_public/engine/trace"
 SCROLL_MODES = frozenset({"scroll-y", "scroll-x", "scrollbar"})
+# Smallest box a scroller, marquee, visible region or wrapping header may have before it counts as
+# collapsed (instance 1). A scrollbar track is narrow by design, so only its height is floored.
+MIN_BOX_PX = 16.0
+MIN_TRACK_WIDTH_PX = 4.0
+# Style properties whose animation moves content horizontally; an opacity fade is not motion.
+MOTION_PROPERTIES = ("transform", "translate", "left", "marginLeft", "textIndent")
 
 PANEL_MODES = frozenset(
     {"fill", "frame", "scroll-y", "scroll-x", "scrollbar", "marquee", "wrap", "truncate", "visible"}
@@ -88,6 +94,12 @@ SURFACE_MODES = frozenset(
 )
 MODE_ARGS: dict[str, frozenset[str]] = {
     "fill": frozenset({"min-h", "min-w", "tol"}),
+    "scroll-y": frozenset({"min-h", "min-w"}),
+    "scroll-x": frozenset({"min-h", "min-w"}),
+    "scrollbar": frozenset({"min-h", "min-w"}),
+    "marquee": frozenset({"min-h", "min-w"}),
+    "wrap": frozenset({"min-h", "min-w"}),
+    "visible": frozenset({"min-h", "min-w"}),
     "frame": frozenset({"min-h"}),
 }
 
@@ -228,6 +240,59 @@ def registry_block(source: str) -> str:
     raise ValueError("PANEL_REGISTRY object literal is not closed")
 
 
+def scan_ts(text: str) -> tuple[str, list[str]]:
+    """Split TypeScript source into (code with comments removed, string literal contents).
+
+    A small scanner, not a parser: it understands line and block comments and single, double and
+    template strings. An unterminated single or double quote (an apostrophe in JSX text) is treated
+    as an ordinary character so one stray quote cannot swallow the rest of the file.
+    """
+    code: list[str] = []
+    strings: list[str] = []
+    i, n = 0, len(text)
+    while i < n:
+        char, pair = text[i], text[i : i + 2]
+        if pair == "//":
+            end = text.find("\n", i)
+            i = n if end == -1 else end
+        elif pair == "/*":
+            end = text.find("*/", i + 2)
+            i = n if end == -1 else end + 2
+        elif char in "'\"`":
+            j = i + 1
+            while j < n and text[j] != char:
+                if text[j] == "\\":
+                    j += 1
+                elif text[j] == "\n" and char != "`":
+                    break
+                j += 1
+            if j < n and text[j] == char:
+                strings.append(text[i + 1 : j])
+                code.append(text[i : j + 1])
+                i = j + 1
+            else:
+                code.append(char)
+                i += 1
+        else:
+            code.append(char)
+            i += 1
+    return "".join(code), strings
+
+
+def class_names_in_source(texts: Iterable[str]) -> set[str]:
+    """Class names that appear as whole tokens inside string literals of the given sources.
+
+    Whole tokens, not substrings: `stage-file-browser__tree` is not found inside
+    `stage-file-browser__tree-item`. Comments are excluded, and so is anything outside a string
+    literal, so only a class an element can actually be given counts as existing.
+    """
+    names: set[str] = set()
+    for text in texts:
+        for literal in scan_ts(text)[1]:
+            names.update(t for t in re.split(r"\s+|\$\{[^}]*\}", literal) if t)
+    return names
+
+
 def registered_panel_types(source: str) -> list[str]:
     """Registered panel type ids, parsed from the registry source.
 
@@ -238,9 +303,24 @@ def registered_panel_types(source: str) -> list[str]:
     return [quoted or bare for quoted, bare in keys]
 
 
+_ENTRY_LINE = re.compile(r"""(?:'[^']+'|"[^"]+"|[A-Za-z_]\w*)\s*:\s*\{""")
+_REGISTRY_MUTATIONS = (
+    r"PANEL_REGISTRY\s*\[[^\]]*\]\s*=(?!=)",
+    r"PANEL_REGISTRY\s*\.\s*\w+\s*=(?!=)",
+    r"PANEL_REGISTRY\s*=(?!=)",
+    r"\b(?:assign|defineProperty|defineProperties|set)\s*\(\s*PANEL_REGISTRY\b",
+)
+
+
 def assert_registry_parse_is_sound(source: str, ids: list[str]) -> None:
-    """Fail when the parse could be silently missing or inventing entries."""
-    block = registry_block(source)
+    """Fail when the parse could be silently missing or inventing entries.
+
+    Three guards: the key count must equal the `displayName:` and `Component:` counts; every line
+    at the literal's own indent must open a `key: {` entry (a spread or a factory call there would
+    register a type this parse cannot see); and nothing else in the file may assign to the registry.
+    """
+    code = scan_ts(source)[0]
+    block = registry_block(code)
     assert ids, "no panel types parsed from PANEL_REGISTRY: discovery is vacuous"
     assert len(set(ids)) == len(ids), f"duplicate panel type ids parsed: {ids}"
     display_names = len(re.findall(r"\bdisplayName\s*:", block))
@@ -249,6 +329,31 @@ def assert_registry_parse_is_sound(source: str, ids: list[str]) -> None:
         f"parsed {len(ids)} panel ids but the registry block holds {display_names} displayName "
         f"and {components} Component entries; the discovery regex has drifted from the source"
     )
+    body = [line for line in block.splitlines()[1:-1] if line.strip()]
+    indent = len(body[0]) - len(body[0].lstrip()) if body else 0
+    for line in body:
+        if len(line) - len(line.lstrip()) != indent:
+            continue
+        text = line.strip()
+        if _ENTRY_LINE.match(text) or text.startswith("}"):
+            continue
+        raise AssertionError(
+            f"registry line {text!r} is not a `key: {{` entry: a spread or call there registers "
+            f"panel types the discovery cannot see; write each entry as a literal"
+        )
+    for pattern in _REGISTRY_MUTATIONS:
+        found = re.search(pattern, code)
+        assert not found, (
+            f"PANEL_REGISTRY is modified outside its literal ({found.group(0)!r}); a type "
+            f"registered that way is invisible to discovery"
+        )
+
+
+def checked_panel_types(source: str) -> list[str]:
+    """`registered_panel_types` that refuses a registry the parse cannot be trusted on."""
+    ids = registered_panel_types(source)
+    assert_registry_parse_is_sound(source, ids)
+    return ids
 
 
 def layout_panel_ids() -> dict[str, set[str]]:
@@ -301,11 +406,12 @@ def selector_classes(selector: str) -> set[str]:
     return set(re.findall(r"\.([A-Za-z_][\w-]*)", without_attrs))
 
 
-def source_text(ts_src: Path) -> str:
-    return "\n".join(
+def source_class_names(ts_src: Path) -> set[str]:
+    """Class names in the `.tsx` sources (comments and tests excluded), as whole string tokens."""
+    return class_names_in_source(
         path.read_text(encoding="utf-8")
-        for path in sorted(ts_src.rglob("*"))
-        if path.suffix in {".tsx", ".ts", ".css"} and ".test." not in path.name
+        for path in sorted(ts_src.rglob("*.tsx"))
+        if ".test." not in path.name
     )
 
 
@@ -339,6 +445,26 @@ def _fmt(region: dict[str, Any]) -> str:
         f"box {region['w']:.0f}x{region['h']:.0f} at ({region['x']:.0f},{region['y']:.0f}), "
         f"bottom {region['b']:.0f}, right {region['r']:.0f}"
     )
+
+
+def _too_small(
+    alt: Alt, region: dict[str, Any], *, min_w: float = MIN_BOX_PX, min_h: float = MIN_BOX_PX
+) -> str | None:
+    """A region smaller than its floor is collapsed, whatever else it satisfies."""
+    need_w, need_h = alt.arg("min-w", min_w), alt.arg("min-h", min_h)
+    if region["w"] < need_w or region["h"] < need_h:
+        return (
+            f"region is {region['w']:.0f}x{region['h']:.0f}, below the minimum "
+            f"{need_w:.0f}x{need_h:.0f}"
+        )
+    return None
+
+
+def _clipped_on(region: dict[str, Any], axis: str) -> bool:
+    """True when content exceeds the box on `axis` and overflow there is hidden or clipped."""
+    if axis == "y":
+        return bool(region["oy"] in {"hidden", "clip"} and region["sh"] > region["ch"] + 1)
+    return bool(region["ox"] in {"hidden", "clip"} and region["sw"] > region["cw"] + 1)
 
 
 def check_alt(
@@ -387,13 +513,19 @@ def check_alt(
         # xterm 6 scrolls through its own virtual scrollbar, not a native overflow box: its
         # `.xterm-viewport` reports overflow `scroll` but never moves. The scrollbar track must be
         # bounded by the panel and carry a slider.
+        small = _too_small(alt, region, min_w=MIN_TRACK_WIDTH_PX)
+        if small:
+            return small
         if not _bounded(region, root):
             return f"scrollbar track is not bounded by its panel: {_fmt(region)} vs {_fmt(root)}"
         if region.get("slider") is None:
             return "scrollbar has no slider element"
         return None
     if name in {"scroll-y", "scroll-x"}:
-        axis = "y" if name == "scroll-y" else "x"
+        axis, cross = ("y", "x") if name == "scroll-y" else ("x", "y")
+        small = _too_small(alt, region)
+        if small:
+            return small
         if not _bounded(region, root):
             return (
                 f"scroller is not bounded by its panel: {_fmt(region)} vs panel {_fmt(root)}, "
@@ -402,19 +534,52 @@ def check_alt(
         overflow = region["oy" if axis == "y" else "ox"]
         if overflow not in {"auto", "scroll"}:
             return f"computed overflow-{axis} is {overflow!r}, which cannot scroll"
+        if _clipped_on(region, cross):
+            return (
+                f"content is clipped on {cross} ({region['sw']:.0f}x{region['sh']:.0f} in a "
+                f"{region['cw']:.0f}x{region['ch']:.0f} box, overflow-{cross} "
+                f"{region['o' + cross]!r}): scrolling {axis} leaves part of it unreachable"
+            )
         reach = (region.get("reach") or {}).get(axis)
         if reach is False:
             return f"content exceeds the box on {axis} but scrolling does not move it"
         return None
     if name == "marquee":
+        small = _too_small(alt, region)
+        if small:
+            return small
         if not _bounded(region, root):
             return f"marquee element is not bounded by its panel: {_fmt(region)} vs {_fmt(root)}"
+        if region["sh"] > region["ch"] + 1:
+            return (
+                f"content is {region['sh']:.0f}px high in a {region['ch']:.0f}px box: a marquee "
+                f"moves text sideways and cannot show vertical overflow"
+            )
+        if region["sw"] > region["cw"] + 1:
+            motion = region.get("motion") or {}
+            if not (motion.get("animations") or motion.get("changed")):
+                return (
+                    f"content is {region['sw']:.0f}px wide in a {region['cw']:.0f}px box and "
+                    f"nothing moves it: no running animation and no transform or scroll offset "
+                    f"changed between two samples, so the overflow is only clipped"
+                )
         return None
     if name == "wrap":
+        small = _too_small(alt, region)
+        if small:
+            return small
         if region["sw"] > region["cw"] + 1:
             return (
                 f"content is {region['sw']:.0f}px wide in a {region['cw']:.0f}px box: it overflows "
                 f"instead of wrapping"
+            )
+        if (
+            region["h"] > root["h"] + BOUNDS_TOLERANCE_PX
+            or region["b"] > root["b"] + BOUNDS_TOLERANCE_PX
+        ):
+            return (
+                f"wrapped content is {region['h']:.0f}px high and ends at {region['b']:.0f}px, "
+                f"beyond its panel ({_fmt(root)}): it wrapped into more rows than the panel holds"
             )
         return None
     if name == "truncate":
@@ -425,8 +590,9 @@ def check_alt(
             )
         return None
     if name == "visible":
-        if region["w"] < 1 or region["h"] < 1:
-            return "region has no rendered box"
+        small = _too_small(alt, region)
+        if small:
+            return small
         if not _bounded(region, root):
             return f"region is partly outside its panel box: {_fmt(region)} vs panel {_fmt(root)}"
         return None
@@ -434,14 +600,15 @@ def check_alt(
 
 
 def scroll_exercised(region: dict[str, Any], root: dict[str, Any]) -> bool:
-    slider = region.get("slider")
-    if slider is not None:
-        return 0 < slider["h"] < region["h"] - 1
     """True when this cell gave a scroll region more content than its box holds.
 
-    Content is "more than the box holds" when it overflows the scroller's own box, or when the
-    scroller grew out past its panel (the unbounded case the judge reports as a violation).
+    Content is "more than the box holds" when it overflows the scroller's own box, when the
+    scroller grew out past its panel (the unbounded case the judge reports as a violation), or,
+    for a virtual scrollbar, when its slider is shorter than its track.
     """
+    slider = region.get("slider")
+    if slider is not None:
+        return bool(0 < slider["h"] < region["h"] - 1)
     return bool(
         region.get("sh", 0) > region.get("ch", 0) + 1
         or region.get("sw", 0) > region.get("cw", 0) + 1
@@ -593,6 +760,8 @@ JUDGE_FIELDS = (
     "found", "doc", "root", "body", "regions", "clips", "exempt", "reach",
     "bubble", "clipRects", "dismiss", "tipSw", "natural", "spaceAbove", "spaceBelow",
     "unavailable",
+    "motion",
+    "animations",
 )  # fmt: skip
 
 MEASURE_JS = r"""
@@ -654,7 +823,7 @@ async function measureCell(browser, cell) {
     if (cell.css) await page.addStyleTag({ content: cell.css });
     await page.waitForTimeout(150);
     return await page.evaluate(
-      ({ panel, selectors, exempt }) => {
+      async ({ panel, selectors, exempt, motionSelectors, motionProps }) => {
         const rectOf = (e) => {
           const b = e.getBoundingClientRect();
           return { x: b.x, y: b.y, w: b.width, h: b.height, r: b.right, b: b.bottom };
@@ -685,12 +854,38 @@ async function measureCell(browser, cell) {
             slider: (() => { const sl = e.querySelector('.slider'); return sl ? { h: sl.getBoundingClientRect().height } : null; })(),
           };
         }
+        // Evidence that text moves, for regions declared `marquee`: a running animation of a
+        // horizontal-motion property, or a transform or scroll offset that differs between two
+        // samples. An opacity fade is not motion.
+        const sampleMotion = (e) =>
+          [e, ...e.querySelectorAll('*')].map((x) => getComputedStyle(x).transform + '|' + x.scrollLeft);
+        const motionBefore = {};
+        for (const sel of motionSelectors) {
+          const e = root.matches(sel) ? root : root.querySelector(sel);
+          if (e && regions[sel] && regions[sel].found) motionBefore[sel] = { e, before: sampleMotion(e) };
+        }
+        if (Object.keys(motionBefore).length) await new Promise((r) => setTimeout(r, 350));
+        const exemptAll = [...exempt];
+        for (const [sel, { e, before }] of Object.entries(motionBefore)) {
+          let animations = 0;
+          try {
+            animations = e
+              .getAnimations({ subtree: true })
+              .filter((a) => a.playState === 'running' && a.effect && a.effect.getKeyframes().some(
+                (k) => motionProps.some((p) => p in k && k[p] !== undefined && k[p] !== 'none'),
+              )).length;
+          } catch (err) { animations = 0; }
+          const after = sampleMotion(e);
+          const changed = after.length !== before.length || after.some((v, i) => v !== before[i]);
+          regions[sel].motion = { animations, changed };
+          if (animations || changed) exemptAll.push(sel);
+        }
         const clips = [];
         for (const e of [root, ...root.querySelectorAll('*')]) {
           const cs = getComputedStyle(e);
           if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
           if (e.scrollHeight <= e.clientHeight + 1 && e.scrollWidth <= e.clientWidth + 1) continue;
-          const exemptHit = exempt.some((s) => { const c = e.closest(s); return c && root.contains(c) && c !== root; });
+          const exemptHit = exemptAll.some((s) => { const c = e.closest(s); return c && root.contains(c) && c !== root; });
           clips.push({
             el: e.tagName.toLowerCase() + (e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\s+/).join('.') : ''),
             ox: cs.overflowX, oy: cs.overflowY, sh: e.scrollHeight, ch: e.clientHeight,
@@ -706,7 +901,13 @@ async function measureCell(browser, cell) {
           doc: { sw: de.scrollWidth, sh: de.scrollHeight, vw: innerWidth, vh: innerHeight },
         };
       },
-      { panel: cell.panel, selectors: cell.selectors, exempt: cell.exempt },
+      {
+        panel: cell.panel,
+        selectors: cell.selectors,
+        exempt: cell.exempt,
+        motionSelectors: cell.motionSelectors,
+        motionProps: cell.motionProps,
+      },
     );
   } finally {
     await ctx.close();
@@ -839,15 +1040,28 @@ def find_playwright_module() -> str | None:
 
 
 def exempt_selectors(contract: Contract) -> list[str]:
-    """Selectors whose subtree may clip: declared scrollers, frames, marquees and truncation."""
+    """Selectors whose subtree may clip: declared scrollers, frames and truncation.
+
+    A `marquee` selector is not listed: its content is clipped by design, so it is exempt only for a
+    cell where the measurement found it actually moving (see `motionSelectors`). A row that also
+    offers a scroll alternative stays exempt through that alternative, whose own check rejects a
+    scroller that does not scroll.
+    """
     exempt = {".xterm"}
     for rules in contract.panels.values():
         for rule in rules:
             if rule.selector != ":root" and any(
-                alt.name in SCROLL_MODES | {"frame", "marquee", "truncate"} for alt in rule.alts
+                alt.name in SCROLL_MODES | {"frame", "truncate"} for alt in rule.alts
             ):
                 exempt.add(rule.selector)
     return sorted(exempt)
+
+
+def motion_selectors(rules: list[Rule]) -> list[str]:
+    """Selectors of a panel's regions that may satisfy their row by moving (`marquee`)."""
+    return sorted(
+        {r.selector for r in rules if any(a.name == "marquee" for a in r.alts)} - {":root"}
+    )
 
 
 def live_cells(
@@ -878,33 +1092,80 @@ def live_cells(
                             "size": list(size),
                             "selectors": sorted({rule.selector for rule in rules} | {":root"}),
                             "exempt": exempt,
+                            "motionSelectors": motion_selectors(rules),
+                            "motionProps": list(MOTION_PROPERTIES),
                         }
                     )
     return cells
 
 
-def break_contract_css(rules: list[Rule]) -> tuple[str, str] | None:
-    """CSS that violates one of the panel's own rules, with a label naming the rule it breaks.
+def contract_breaks(rules: list[Rule]) -> list[tuple[str, str, str]]:
+    """Every way to violate one of the panel's own rows: (css, label, selector).
 
     A scroller loses its overflow, a fill region collapses, and a region that may also be a
-    marquee or must stay visible is pushed out of its panel. The first breakable non-root row wins.
+    marquee or must stay visible is pushed out of its panel.
     """
+    breaks: list[tuple[str, str, str]] = []
     for rule in rules:
         if rule.selector == ":root":
             continue
         names = {alt.name for alt in rule.alts}
         scope = f"[data-panel-host] {rule.selector}"
         if names & {"scroll-y", "scroll-x"} and "marquee" not in names:
-            return f"{scope}{{overflow:hidden !important}}", f"{rule.selector} overflow:hidden"
-        if "fill" in names:
-            css = "height:12px !important;min-height:0 !important;flex:none !important"
-            return f"{scope}{{{css}}}", f"{rule.selector} height:12px"
-        if names & {"marquee", "visible", "frame"}:
-            return (
-                f"{scope}{{transform:translateY(900px) !important}}",
-                f"{rule.selector} moved out",
+            css, label = f"{scope}{{overflow:hidden !important}}", "overflow:hidden"
+        elif "fill" in names:
+            css = f"{scope}{{height:12px !important;min-height:0 !important;flex:none !important}}"
+            label = "height:12px"
+        elif names & {"marquee", "visible", "frame"}:
+            css, label = f"{scope}{{transform:translateY(900px) !important}}", "moved out"
+        else:
+            continue
+        breaks.append((css, f"{rule.selector} {label}", rule.selector))
+    return breaks
+
+
+def break_contract_css(rules: list[Rule]) -> tuple[str, str] | None:
+    """The first break `contract_breaks` offers, as (css, label), or None when nothing breaks."""
+    breaks = contract_breaks(rules)
+    return (breaks[0][0], breaks[0][1]) if breaks else None
+
+
+def on_region(findings: Iterable[Finding], selector: str) -> list[Finding]:
+    """Findings that name a contract region (as `(selector)` in their detail)."""
+    return [f for f in findings if f"({selector})" in f.detail]
+
+
+def choose_differential_breaks(
+    contract: Contract, cells: list[dict[str, Any]], baseline: list[list[Finding]]
+) -> tuple[list[tuple[dict[str, Any], str, str]], list[str]]:
+    """Pick, per panel, a cell and break whose region passes unbroken.
+
+    A break proves the judge only if the region was clean before it: a region that already fails
+    produces the same finding with or without the injection. Returns the chosen
+    (cell with css, label, selector) triples and one message per panel with no clean candidate.
+    """
+    chosen: list[tuple[dict[str, Any], str, str]] = []
+    unproven: list[str] = []
+    for panel in dict.fromkeys(c["panel"] for c in cells):
+        failing: list[str] = []
+        picked = False
+        for cell, findings in zip(cells, baseline, strict=True):
+            if cell["panel"] != panel or picked:
+                continue
+            for css, label, selector in contract_breaks(contract.panels[panel]):
+                if on_region(findings, selector):
+                    failing.append(f"{selector} ({cell['layout']}@{cell['slot']})")
+                    continue
+                chosen.append(({**cell, "css": css}, label, selector))
+                picked = True
+                break
+        if not picked:
+            unproven.append(
+                f"{panel}: every breakable region already fails unbroken in the cells measured "
+                f"({', '.join(dict.fromkeys(failing)) or 'none breakable'}), so no injected "
+                f"break can be told apart from the existing finding"
             )
-    return None
+    return chosen, unproven
 
 
 def run_node(config: dict[str, Any], module: str) -> dict[str, Any]:
@@ -944,8 +1205,8 @@ def judge_live(
         rules = contract.panels[measured["panel"]]
         cell_findings, counts = judge_panel_cell(rules, measured)
         findings.extend(cell_findings)
-        for key in totals:
-            totals[key] += counts[key]
+        for counter in totals:
+            totals[counter] += counts[counter]
         if not measured.get("found"):
             continue
         rendered.add(measured["panel"])
@@ -1004,7 +1265,7 @@ def judge_live(
 
 def live_main(args: argparse.Namespace) -> int:
     contract = load_contract()
-    registered = registered_panel_types(REGISTRY_PATH.read_text(encoding="utf-8"))
+    registered = checked_panel_types(REGISTRY_PATH.read_text(encoding="utf-8"))
     assert_every_panel_declared(registered, contract)
     module = find_playwright_module()
     if module is None:
@@ -1043,33 +1304,37 @@ def live_main(args: argparse.Namespace) -> int:
 
 
 def self_test(contract: Contract, args: argparse.Namespace, module: str) -> int:
-    """Break each panel's own contract with injected CSS; the judge must name each break."""
-    cells: list[dict[str, Any]] = []
-    broke: dict[str, str] = {}
-    # Each panel is broken once, in the first layout (by file name) that can show it.
-    for cell in live_cells(contract, [REQUIRED_SIZES[0]], args.layout, args.panel):
-        if any(c["panel"] == cell["panel"] for c in cells):
-            continue
-        breakage = break_contract_css(contract.panels[cell["panel"]])
-        if breakage is None:
-            continue
-        cell["css"] = breakage[0]
-        broke[cell["panel"]] = breakage[1]
-        cells.append(cell)
-    data = run_node({"baseUrl": args.live, "cells": cells, "floating": []}, module)
-    failures = 0
-    for measured in data["cells"]:
-        findings, _ = judge_panel_cell(contract.panels[measured["panel"]], measured)
-        # A break only counts if the judge reports it on the region it broke.
-        region = broke[measured["panel"]].split(" ")[0]
-        caught = [f for f in findings if region in f.detail]
-        verdict = "caught" if caught else "NOT CAUGHT"
-        print(f"self-test {measured['panel']}: injected {broke[measured['panel']]}: {verdict}")
-        if caught:
-            print(f"    {caught[0]}")
-        else:
-            failures += 1
-    return 1 if failures or not data["cells"] else 0
+    """Differential self-test: break each panel's own contract and require a new finding.
+
+    First every candidate cell is judged unbroken. Each panel then gets one injected violation in a
+    cell and region that passed unbroken, and the break counts as caught only when the judge
+    reports a finding on that region. A panel whose regions all fail unbroken is named as unproven
+    rather than reported as caught.
+    """
+    cells = live_cells(contract, [REQUIRED_SIZES[0]], args.layout, args.panel)
+    base = run_node({"baseUrl": args.live, "cells": cells, "floating": []}, module)
+    baseline = [judge_panel_cell(contract.panels[m["panel"]], m)[0] for m in base["cells"]]
+    chosen, unproven = choose_differential_breaks(contract, cells, baseline)
+    failures = len(unproven)
+    for message in unproven:
+        print(f"self-test UNPROVEN {message}")
+    if chosen:
+        data = run_node(
+            {"baseUrl": args.live, "cells": [c for c, _, _ in chosen], "floating": []}, module
+        )
+        for measured, (cell, label, selector) in zip(data["cells"], chosen, strict=True):
+            findings, _ = judge_panel_cell(contract.panels[measured["panel"]], measured)
+            caught = on_region(findings, selector)
+            where = f"{cell['layout']}@{cell['slot']}"
+            print(
+                f"self-test {measured['panel']} ({where}): unbroken region passed, injected "
+                f"{label}: {'caught' if caught else 'NOT CAUGHT'}"
+            )
+            if caught:
+                print(f"    {caught[0]}")
+            else:
+                failures += 1
+    return 1 if failures or not chosen else 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1101,8 +1366,7 @@ def test_contract_document_is_the_governed_requirement() -> None:
 
 
 def test_registry_discovery_cannot_pass_vacuously() -> None:
-    ids = registered_panel_types(REGISTRY_SOURCE)
-    assert_registry_parse_is_sound(REGISTRY_SOURCE, ids)
+    ids = checked_panel_types(REGISTRY_SOURCE)
     declared_in_layouts = set().union(*layout_panel_ids().values())
     unregistered = sorted(declared_in_layouts - set(ids))
     assert not unregistered, (
@@ -1116,7 +1380,7 @@ def test_registry_discovery_cannot_pass_vacuously() -> None:
 
 
 def test_registry_parser_sees_added_and_removed_types() -> None:
-    ids = registered_panel_types(REGISTRY_SOURCE)
+    ids = checked_panel_types(REGISTRY_SOURCE)
     added = REGISTRY_SOURCE.replace(
         "export const PANEL_REGISTRY: Record<string, PanelDefinition> = {",
         "export const PANEL_REGISTRY: Record<string, PanelDefinition> = {\n"
@@ -1135,34 +1399,88 @@ def test_registry_parser_sees_added_and_removed_types() -> None:
         assert_registry_parse_is_sound(broken, registered_panel_types(broken))
 
 
+def _registry_with_extra_entry(entry: str) -> str:
+    """A copy of the registry source with one more line at the start of the literal."""
+    declaration = "export const PANEL_REGISTRY: Record<string, PanelDefinition> = {"
+    assert declaration in REGISTRY_SOURCE, "the registry declaration changed shape; update this"
+    return REGISTRY_SOURCE.replace(declaration, f"{declaration}\n  {entry}")
+
+
+@pytest.mark.parametrize(
+    ("label", "entry", "tail"),
+    [
+        ("a factory call entry", "'fake-panel': makeDefinition('x'),", ""),
+        ("a spread entry", "...EXTRA_PANELS,", ""),
+        ("a subscript assignment", "", "\nPANEL_REGISTRY['fake-panel'] = fakeDefinition\n"),
+        (
+            "an Object.assign call",
+            "",
+            "\nObject.assign(PANEL_REGISTRY, { fake: fakeDefinition })\n",
+        ),
+        ("a property assignment", "", "\nPANEL_REGISTRY.fake = fakeDefinition\n"),
+    ],
+)
+def test_registry_registration_the_parse_cannot_see_is_refused(
+    label: str, entry: str, tail: str
+) -> None:
+    """A panel type registered by a call, a spread or a later assignment would be invisible."""
+    mutated = _registry_with_extra_entry(entry) + tail if entry else REGISTRY_SOURCE + tail
+    with pytest.raises(AssertionError):
+        checked_panel_types(mutated)
+    assert checked_panel_types(REGISTRY_SOURCE), f"{label}: the unmodified registry must pass"
+
+
+def test_registry_mutation_scan_ignores_comments_and_reads() -> None:
+    """Reads like `PANEL_REGISTRY[id]?.Component` and prose in comments are not mutations."""
+    commented = (
+        REGISTRY_SOURCE + "\n// PANEL_REGISTRY['x'] = y; Object.assign(PANEL_REGISTRY, {})\n"
+    )
+    assert checked_panel_types(commented) == checked_panel_types(REGISTRY_SOURCE)
+
+
 def test_every_registered_panel_type_has_a_contract() -> None:
     """REQ-011 R09/R10: one contract per shipped panel type, none undeclared."""
-    assert_every_panel_declared(registered_panel_types(REGISTRY_SOURCE), load_contract())
+    assert_every_panel_declared(checked_panel_types(REGISTRY_SOURCE), load_contract())
 
 
 def test_undeclared_panel_fails_and_is_named() -> None:
-    """REQ-011 R10: a panel registered without a contract fails, and the failure names it."""
+    """REQ-011 R10: a panel registered without a contract fails, and the failure names it.
+
+    The fake type is registered in a copy of the registry source and read back through the same
+    discovery the live check uses, so the whole path from source to failure is exercised.
+    """
     contract = load_contract()
-    ids = registered_panel_types(REGISTRY_SOURCE)
+    mutated = _registry_with_extra_entry(
+        "'fake-panel': { displayName: 'Fake', Component: TerminalRegion },"
+    )
+    ids = checked_panel_types(mutated)
+    assert "fake-panel" in ids
     with pytest.raises(AssertionError, match="fake-panel"):
-        assert_every_panel_declared([*ids, "fake-panel"], contract)
+        assert_every_panel_declared(ids, contract)
+    real_ids = checked_panel_types(REGISTRY_SOURCE)
     stripped = Contract(
         panels={k: v for k, v in contract.panels.items() if k != "file-browser"},
         surfaces=contract.surfaces,
     )
     with pytest.raises(AssertionError, match="file-browser"):
-        assert_every_panel_declared(ids, stripped)
-    assert undeclared_panels(ids, contract) == []
+        assert_every_panel_declared(real_ids, stripped)
+    assert undeclared_panels(real_ids, contract) == []
 
 
 def test_no_contract_row_names_an_unregistered_panel() -> None:
-    stale = stale_contract_panels(registered_panel_types(REGISTRY_SOURCE), load_contract())
+    stale = stale_contract_panels(checked_panel_types(REGISTRY_SOURCE), load_contract())
     assert not stale, f"contract rows name panel types the registry no longer has: {stale}"
 
 
 def test_every_panel_declares_how_it_fills_its_slot() -> None:
-    """Fill is mandatory: a panel with only scroll rows could still collapse to nothing."""
-    for panel, rules in load_contract().panels.items():
+    """Fill is mandatory: a panel with only scroll rows could still collapse to nothing.
+
+    Iterates the registry, not the contract, so a registered type with no rows at all fails here
+    too and is named.
+    """
+    contract = load_contract()
+    for panel in checked_panel_types(REGISTRY_SOURCE):
+        rules = contract.panels.get(panel, [])
         fills = [
             r for r in rules if r.selector == ":root" and any(a.name == "fill" for a in r.alts)
         ]
@@ -1186,16 +1504,63 @@ def test_every_row_uses_known_modes_and_arguments() -> None:
                 assert alt.name in SURFACE_MODES, f"{owner}: unknown surface mode {alt.name!r}"
 
 
-def test_contract_selectors_name_classes_that_exist_in_source() -> None:
-    """A renamed CSS class makes a row stale without any browser; catch it statically."""
-    text = source_text(TS_SRC)
+def _contract_classes() -> dict[str, set[str]]:
+    """class name -> the rows (owner and selector) that rely on it, library classes excluded."""
+    users: dict[str, set[str]] = {}
     contract = load_contract()
     for owner, rules in [*contract.panels.items(), *contract.surfaces.items()]:
         for rule in rules:
             for cls in selector_classes(rule.selector) - LIBRARY_CLASSES:
-                assert cls in text, (
-                    f"{owner} row {rule.selector!r}: class {cls!r} appears nowhere in ts/src"
-                )
+                users.setdefault(cls, set()).add(f"{owner} {rule.selector}")
+    return users
+
+
+def test_contract_selectors_name_classes_that_exist_in_source() -> None:
+    """A renamed CSS class makes a row stale without any browser; catch it statically."""
+    existing = source_class_names(TS_SRC)
+    assert len(existing) > 100, "class discovery found almost nothing: it is vacuous"
+    for cls, users in sorted(_contract_classes().items()):
+        assert cls in existing, (
+            f"class {cls!r} (rows: {sorted(users)}) is in no className in ts/src"
+        )
+
+
+def test_renaming_a_class_in_source_is_detected() -> None:
+    """The File Browser tree row survives only while its exact class does, not a longer one."""
+    tree = "stage-file-browser__tree"
+    sources = {
+        path: path.read_text(encoding="utf-8")
+        for path in sorted(TS_SRC.rglob("*.tsx"))
+        if ".test." not in path.name
+    }
+    before = class_names_in_source(sources.values())
+    assert tree in before
+    assert f"{tree}-item" in before, "the longer sibling classes are what a substring check hits"
+    renamed = {
+        path: re.sub(rf"(?<![\w-]){tree}(?![\w-])", f"{tree}-pane", text)
+        for path, text in sources.items()
+    }
+    after = class_names_in_source(renamed.values())
+    assert tree not in after, "a whole-token match must see that the exact class is gone"
+    assert f"{tree}-pane" in after
+    assert tree in _contract_classes()
+    stale = sorted(cls for cls in _contract_classes() if cls not in after)
+    assert tree in stale
+
+
+def test_class_discovery_ignores_comments_and_prefix_matches() -> None:
+    source = """
+    // className="in-a-line-comment"
+    /* className="in-a-block-comment" */
+    const a = <div className="stage-x stage-x__item" />
+    const b = <div className={'stage-y' + (on ? ' stage-y--on' : '')} />
+    const c = <p>Don't {x}</p>
+    const d = <i className={`stage-z ${extra}`} />
+    """
+    names = class_names_in_source([source])
+    assert {"stage-x", "stage-x__item", "stage-y", "stage-y--on", "stage-z"} <= names
+    assert not {"in-a-line-comment", "in-a-block-comment", "stage"} & names
+    assert "stage-x__it" not in names
 
 
 def test_every_floating_surface_in_source_has_a_contract_row() -> None:
@@ -1482,7 +1847,7 @@ def test_tooltip_judge_flags_the_rotator_cutoff_000130() -> None:
 def test_live_matrix_covers_every_registered_panel_in_every_eligible_slot() -> None:
     contract = load_contract()
     cells = live_cells(contract, REQUIRED_SIZES)
-    ids = set(registered_panel_types(REGISTRY_SOURCE))
+    ids = set(checked_panel_types(REGISTRY_SOURCE))
     assert {c["panel"] for c in cells} == ids
     for layout in LAYOUTS_DIR.glob("*.json"):
         data = json.loads(layout.read_text(encoding="utf-8"))
@@ -1520,6 +1885,115 @@ def test_frame_and_visible_modes() -> None:
     assert "below the floor" in (check_alt(frame, ".f", _region(10, 60, 480, 20), root, body) or "")
     assert check_alt(visible, ".v", _region(450, 12, 26, 20), root, body) is None
     assert "outside" in (check_alt(visible, ".v", _region(470, 300, 40, 30), root, body) or "")
+
+
+def _notes_judgement(entry: dict[str, Any]) -> list[Finding]:
+    """Judge a notes strip whose entry region is `entry`; every other region conforms."""
+    rules = _rules("notes-strip")
+    regions = {".stage-notes-strip__current": entry}
+    regions[".stage-popover__trigger"] = _region(450, 12, 30, 24)
+    regions[".stage-tooltip__trigger"] = _region(12, 12, 20, 24)
+    cell = _cell("notes-strip", regions, root=_box(10, 10, 480, 40), body=_box(0, 0, 500, 50))
+    return judge_panel_cell(rules, cell)[0]
+
+
+def _on_entry(findings: list[Finding]) -> list[Finding]:
+    return on_region(findings, ".stage-notes-strip__current")
+
+
+def test_bounded_clip_with_no_way_to_read_it_fails() -> None:
+    """A strip entry cut off at 20 px with 90 px of text and no scrolling must not conform."""
+    clipped = _region(20, 12, 420, 20, ox="hidden", oy="hidden", sh=90, ch=20)
+    assert _on_entry(_notes_judgement(clipped)), "overflow hidden must not pass any alternative"
+
+
+def test_horizontal_scroller_that_clips_vertically_fails() -> None:
+    entry = _region(20, 12, 420, 20, ox="auto", oy="hidden", sw=900, cw=420, sh=90, ch=20)
+    findings = _on_entry(_notes_judgement(entry))
+    assert findings and "clipped on y" in findings[0].detail
+
+
+def test_collapsed_regions_fail_their_minimum_size() -> None:
+    entry = _region(20, 12, 1, 1, ox="auto", oy="auto")
+    assert "below the minimum" in _on_entry(_notes_judgement(entry))[0].detail
+    tiny_trigger = _region(450, 12, 4, 4)
+    assert "below the minimum" in (
+        check_alt(Alt("visible"), ".t", tiny_trigger, _box(10, 10, 480, 40), _box(0, 0, 500, 50))
+        or ""
+    )
+
+
+def test_a_legal_horizontal_scroll_still_passes() -> None:
+    entry = _region(
+        20, 12, 420, 20, ox="auto", oy="hidden", sw=900, cw=420, sh=20, ch=20, reach={"x": True}
+    )
+    assert _on_entry(_notes_judgement(entry)) == []
+
+
+@pytest.mark.parametrize(
+    "motion", [{"animations": 1, "changed": False}, {"animations": 0, "changed": True}]
+)
+def test_a_legal_animated_marquee_passes(motion: dict[str, Any]) -> None:
+    """phase-wbf-06's variant: text wider than its box, clipped by design, moving."""
+    entry = _region(20, 12, 420, 20, ox="hidden", oy="hidden", sw=900, cw=420, motion=motion)
+    assert _on_entry(_notes_judgement(entry)) == []
+
+
+def test_a_marquee_that_does_not_move_fails() -> None:
+    entry = _region(
+        20,
+        12,
+        420,
+        20,
+        ox="hidden",
+        oy="hidden",
+        sw=900,
+        cw=420,
+        motion={"animations": 0, "changed": False},
+    )
+    findings = _on_entry(_notes_judgement(entry))
+    assert findings and "nothing moves it" in findings[0].detail
+
+
+def test_a_marquee_with_nothing_to_move_passes_without_motion() -> None:
+    entry = _region(20, 12, 420, 20, ox="hidden", oy="hidden", sw=300, cw=420)
+    assert _on_entry(_notes_judgement(entry)) == []
+
+
+def test_wrap_fails_when_the_header_wraps_taller_than_its_panel() -> None:
+    alt = Alt("wrap")
+    root, body = _box(10, 10, 300, 100), _box(0, 0, 320, 120)
+    fits = _region(10, 10, 300, 60, sw=300, cw=300)
+    too_tall = _region(10, 10, 300, 160, sw=300, cw=300)
+    assert check_alt(alt, ".h", fits, root, body) is None
+    assert "more rows than the panel holds" in (check_alt(alt, ".h", too_tall, root, body) or "")
+
+
+def test_differential_choice_skips_regions_that_already_fail() -> None:
+    contract = load_contract()
+    cells = [
+        {"panel": "notes-strip", "layout": "layout-1", "slot": "strip"},
+        {"panel": "notes-strip", "layout": "layout-2", "slot": "strip"},
+    ]
+    failing_entry = Finding("w", "scroll-y", "Active entry (.stage-notes-strip__current): x")
+    chosen, unproven = choose_differential_breaks(contract, cells, [[failing_entry], []])
+    assert unproven == []
+    (cell, _label, selector) = chosen[0]
+    assert selector != ".stage-notes-strip__current" or cell["layout"] == "layout-2"
+    assert "css" in cell
+
+
+def test_differential_choice_names_a_panel_whose_every_region_already_fails() -> None:
+    contract = load_contract()
+    cells = [{"panel": "notes-strip", "layout": "layout-1", "slot": "strip"}]
+    every = [
+        Finding("w", "m", f"x ({sel}): y")
+        for _, _, sel in contract_breaks(contract.panels["notes-strip"])
+    ]
+    chosen, unproven = choose_differential_breaks(contract, cells, [every])
+    assert chosen == []
+    assert len(unproven) == 1 and unproven[0].startswith("notes-strip:")
+    assert "already fails" in unproven[0]
 
 
 if __name__ == "__main__":

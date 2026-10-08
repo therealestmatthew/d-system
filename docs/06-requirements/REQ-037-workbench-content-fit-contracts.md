@@ -56,18 +56,20 @@ not applicable and never as a pass.
 |---|---|
 | `fill` | On `:root` (the panel box): sit inside its slot body and leave no more than 24 px unfilled on either axis, which is the slot body's own padding. On any other region: be at least `min-h`/`min-w` px, stay inside the panel box, and end within 32 px of the panel's bottom edge. Measured against the panel box, never the slot body, so the chrome offset (instance 5) does not defeat it. |
 | `frame` | Be an embedded document that scrolls itself: at least `min-h` px high and inside the panel box. |
-| `scroll-y`, `scroll-x` | Be bounded by the panel box, have a computed overflow that scrolls on that axis, and, when its content exceeds its box, actually move when scrolled. |
+| `scroll-y`, `scroll-x` | Be at least 16x16 px, be bounded by the panel box, have a computed overflow that scrolls on that axis, not clip the other axis (`hidden` or `clip` overflow there with content larger than the box fails, because part of the content could not be reached), and, when its content exceeds its box, actually move when scrolled. |
 | `scrollbar` | Be a virtual scrollbar track bounded by the panel box and carrying a slider. For xterm 6, whose scrollback moves through its own scrollbar while the native `.xterm-viewport` reports `overflow: scroll` and never scrolls. |
-| `marquee` | Be bounded by the panel box. The declared way for text to move horizontally instead of scrolling (`phase-wbf-06`). |
-| `wrap` | Hold its content within its own width, by wrapping or reflowing. |
+| `marquee` | Be at least 16x16 px, be bounded by the panel box and show no vertical overflow. When its content is wider than its box, something must move it: a running animation of a horizontal-motion property (`transform`, `translate`, `left`, `margin-left`, `text-indent`; an opacity fade does not count), or a transform or scroll offset in its subtree that differs between two samples 350 ms apart. Content that fits needs no motion. A box that only clips wide text does not conform. This is the declared way for text to move instead of scrolling (`phase-wbf-06`). |
+| `wrap` | Be at least 16x16 px, hold its content within its own width by wrapping or reflowing, and not wrap into more rows than its panel holds (the region may not be taller than, or end below, the panel box). |
 | `truncate` | Cut text with an ellipsis: `text-overflow: ellipsis` with `white-space: nowrap`. No shipped panel declares this today; it is in the vocabulary so the first panel that truncates declares it rather than clipping. |
-| `visible` | Render a box that lies wholly inside the panel box. |
+| `visible` | Be at least 16x16 px and lie wholly inside the panel box. |
 
 Two rules apply to every panel without a row. **Page scroll:** the document is never larger than
 the viewport (`REQ-006` R02). **Silent clip:** no element inside the panel may have `overflow`
 hidden or clip while its content is larger than its box, unless it is inside a region declared as a
-scroller, frame, marquee or truncation (or inside xterm, which manages its own surface). This is
-what makes the contract complete by default: an overflow nobody declared is a finding.
+scroller, frame or truncation, or is a marquee that was measured moving (or inside xterm, which
+manages its own surface). A marquee that does not move is not exempt. This is what makes the
+contract complete by default: an overflow nobody declared is a finding. Floors can be overridden per
+row with `min-h` and `min-w` (`scroll-y(min-h=40)`).
 
 Floating surfaces use their own modes. `in-viewport`: the bubble lies inside the viewport.
 `dismiss-visible`: a popover's dismiss control lies inside the viewport. `not-clipped`: the bubble
@@ -80,13 +82,13 @@ viewport and the room on its larger side (less 2 px), so it does not open short 
 | ID | Required observable behavior | Verification method |
 |---|---|---|
 | C01 | Every panel type registered in `panelRegistry.tsx` has at least one row in the panel contract table, and no row names an unregistered type. | `uv run pytest test/test_workbench_fit_contracts.py`: `test_every_registered_panel_type_has_a_contract` and `test_no_contract_row_names_an_unregistered_panel` pass. Nine types are registered on 2026-10-08. |
-| C02 | A panel type registered without a contract row fails the check, and the failure names the type. | `test_undeclared_panel_fails_and_is_named` registers a fake type in a copy of the registry source and removes a real type's rows from the table, and requires `AssertionError` naming each. |
-| C03 | Discovery of registered types cannot pass vacuously. The parse is cross-checked three ways: key count equals the `displayName:` count and the `Component:` count in the same block, every layout panel id is registered, and every registered id appears in a layout file (otherwise the live check could never render it). | `test_registry_discovery_cannot_pass_vacuously` and `test_registry_parser_sees_added_and_removed_types`, which add, remove and obscure a key and require the count check to trip. |
-| C04 | Every panel type declares how it fills its slot: a `:root` row with mode `fill`. | `test_every_panel_declares_how_it_fills_its_slot`. |
+| C02 | A panel type registered without a contract row fails the check, and the failure names the type. | `test_undeclared_panel_fails_and_is_named` registers a fake type in a copy of the registry source, reads it back through the same discovery the live check uses, and removes a real type's rows from the table; each must raise `AssertionError` naming the type. |
+| C03 | Discovery of registered types cannot pass vacuously. The parse is cross-checked: key count equals the `displayName:` count and the `Component:` count in the same block; every line at the literal's own indent opens a `key: {` entry, so a spread or a factory call is refused; nothing else in the file assigns to `PANEL_REGISTRY` (subscript or property assignment, `Object.assign`, `defineProperty`); every layout panel id is registered; and every registered id appears in a layout file (otherwise the live check could never render it). | `test_registry_discovery_cannot_pass_vacuously`, `test_registry_parser_sees_added_and_removed_types` (adds, removes and obscures a key) and `test_registry_registration_the_parse_cannot_see_is_refused` (the factory-call, spread, subscript, `Object.assign` and property-assignment probes, each of which must fail). |
+| C04 | Every panel type declares how it fills its slot: a `:root` row with mode `fill`. | `test_every_panel_declares_how_it_fills_its_slot`, which iterates the registry, so a type with no rows at all fails it too. |
 | C05 | Each contract region is asserted in a real browser, for every layout, every registered panel type, every slot the layout makes it eligible for, at 1280x720, 1366x768, 1920x1080 and 1024x768. The run exits non-zero on any violation, on a panel never rendered, on a scroll region that was present but never given content to scroll, and on a surface kind never opened. | `uv run python test/test_workbench_fit_contracts.py --live <url>` against a running workbench. The matrix is read from `_data/workbench/layouts/*.json`; `test_live_matrix_covers_every_registered_panel_in_every_eligible_slot` asserts it. |
-| C06 | A panel given content that violates its own contract fails. | `--self-test` injects CSS that breaks one region per panel (a scroller loses its overflow, a fill region collapses, a marquee or visible region is pushed out of its panel) and requires the judge to name the broken region. The judge itself is unit-tested against synthetic measurements of each of the five instances. |
-| C07 | The notes strip declares vertical scroll, horizontal scroll and a bounded marquee as alternatives for a long entry, so the rotator variants of `phase-wbf-06` (`REQ-012` R12) are conformant, not violations. | `test_notes_strip_declares_vertical_and_horizontal_scroll_as_alternatives` and `test_notes_strip_marquee_variant_is_declared_and_bounded`. |
-| C08 | Every selector in either table names a CSS class that exists in `ts/src`, so a renamed class fails statically rather than leaving a stale row. | `test_contract_selectors_name_classes_that_exist_in_source`. `.xterm` and `.xterm-viewport` are library classes and are exempt by name. |
+| C06 | A panel given content that violates its own contract fails. | `--self-test` is differential. It judges every candidate cell unbroken, then injects one violation per panel (a scroller loses its overflow, a fill region collapses, a marquee, visible or frame region is pushed out of its panel) into a cell and region that passed unbroken, and counts it caught only when the judge reports a finding on that region. A panel whose every breakable region already fails unbroken is printed as `UNPROVEN` by name and fails the run, never as caught. The judge itself is unit-tested against synthetic measurements of each of the five instances, the notes-strip bounded-clip probe and its legal variants. |
+| C07 | The notes strip declares vertical scroll, horizontal scroll and a bounded marquee as alternatives for a long entry, so the rotator variants of `phase-wbf-06` (`REQ-012` R12) are conformant, not violations. | `test_notes_strip_declares_vertical_and_horizontal_scroll_as_alternatives`, `test_a_legal_horizontal_scroll_still_passes`, `test_a_legal_animated_marquee_passes` and `test_notes_strip_marquee_variant_is_declared_and_bounded` keep the variants legal; `test_bounded_clip_with_no_way_to_read_it_fails`, `test_horizontal_scroller_that_clips_vertically_fails` and `test_a_marquee_that_does_not_move_fails` keep a plain clip from passing as one of them. |
+| C08 | Every selector in either table names a CSS class that exists in `ts/src` as a whole token in a `className` string literal (comments excluded), so a renamed class fails statically rather than leaving a stale row. A longer class that merely contains it, such as `stage-file-browser__tree-item` for `stage-file-browser__tree`, does not count. | `test_contract_selectors_name_classes_that_exist_in_source`, and `test_renaming_a_class_in_source_is_detected`, which renames the File Browser tree class in a copy of the source text and requires the row to be reported stale. `.xterm`, `.xterm-viewport`, `.scrollbar` and `.vertical` are library classes and are exempt by name. |
 | C09 | Every floating surface in `ts/src` (a component portaled into `document.body`, or a tooltip bubble) has a row in the floating surface table, and every row points at such a source. | `test_every_floating_surface_in_source_has_a_contract_row`. |
 | C10 | The CMD and PowerShell panels' fit on the owner's Windows machine, where the real shells exist, is an owner check, not asserted from Linux. On a host where the shell is unavailable the panel shows its in-panel message (`REQ-007` W12) and the terminal-only regions are `optional`. | Run `--live` on the owner's machine and record the output. Linux evidence does not close this row. |
 
@@ -226,21 +228,31 @@ Not exercised, and said so rather than counted as a pass: the CMD and PowerShell
 on Linux, so no output exists to scroll. The run reports both by name; the owner's Windows machine
 closes them (`C10`).
 
-The self-test injected one violation into each of the nine panel types' own contracts at 1280x720,
-and the judge named the broken region in every case: the three terminals' tab bar and the HTML
-Viewer tab bar given `overflow: hidden`, the notes strip entry and the overview frame moved out of
-their panels, and the File Browser tree and both explorer tables collapsed to 12 px. The overview
-exists only in layout 2, so it was broken there and the other eight in layout 1.
+The differential self-test (`--self-test`, full matrix) judged each candidate cell unbroken first and
+injected one violation per panel type into a region that passed unbroken at 1280x720. The judge
+reported a new finding on the broken region for all nine panel types: the three terminals' and the
+HTML Viewer's tab bars given `overflow: hidden`, the notes strip's help `?` trigger, the overview
+frame, moved out of their panels, and the File Browser tree and both explorer tables collapsed to
+12 px. The notes strip's entry region fails unbroken in layout 1 (above), so an earlier run that
+broke it was not evidence; the differential run proves the notes strip on its help trigger instead.
+The overview exists only in layout 2, so it was broken there and the other eight in layout 1.
 
 ## Boundaries and unresolved
 
-**The live half is not part of `uv run pytest`.** It needs a running workbench, Chromium and Node
-Playwright, none of which the Python dependencies provide. A pytest test that passed when they were
-absent would be the vacuous pass `R10` forbids, and one that failed would break the suite on any
-machine without a browser. Running it from pytest would need Playwright added to the dev
-dependencies and a fixture that starts both servers; both are outside this phase's declared files,
-so that choice is the owner's. Until then, `C05` and `C06` are verified by the command in each row,
-and `C01` to `C04` and `C07` to `C09` by `uv run pytest`.
+**The live half is not part of `uv run pytest`, and for this phase `R09`'s "suite" is the `--live`
+command.** The live half needs a running workbench, Chromium and Node Playwright, none of which the
+Python dependencies provide. A pytest test that passed when they were absent would be the vacuous
+pass `R10` forbids, and one that failed would break the suite on any machine without a browser.
+Running it from pytest would need Playwright added to the dev dependencies and a fixture that starts
+both servers; both are outside this phase's declared files. The Session Manager therefore ruled,
+under the owner's pre-approval, that `R09` closes for this phase on the documented command
+(`uv run python test/test_workbench_fit_contracts.py --live <url> --self-test`): decision proposed;
+**awaiting the owner's ratification (pre-approved run, 2026-10-08)**. The consequence is real: a
+panel regression passes `uv run pytest` and CI until someone runs the command. Gating it (Playwright
+as a dev dependency plus a server fixture, or a CI job that runs the command once
+`phase-wbf-06`, `-13` and `-14` and the header-wrap findings make it green) is an open follow-up.
+Until then, `C05` and `C06` are verified by the command in each row, and `C01` to `C04` and `C07`
+to `C09` by `uv run pytest`.
 
 **The live run exits non-zero today.** The defects above are real, so the command cannot gate
 anything until `phase-wbf-06`, `phase-wbf-13`, `phase-wbf-14` and the header-wrap findings are fixed.
