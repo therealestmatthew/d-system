@@ -32,6 +32,7 @@ CI regenerates it and fails on any difference.
 | ADR-025 | adr | accepted | repository-owner | docs/04-decisions/ADR-025-plugin-idea-log-lock.md |
 | ADR-027 | adr | accepted | repository-owner | docs/04-decisions/ADR-027-retire-plan-003.md |
 | ADR-028 | adr | accepted | repository-owner | docs/04-decisions/ADR-028-build-in-public-content-chain.md |
+| ADR-029 | adr | draft | repository-owner | docs/04-decisions/ADR-029-bookmark-categories-and-batch-bridge.md |
 | ARCH-001 | architecture | active | repository-owner | docs/07-architecture/ARCH-001-tagging-system.md |
 | ARCH-002 | architecture | active | repository-owner | docs/07-architecture/ARCH-002-system-audit.md |
 | ARCH-003 | architecture | active | repository-owner | docs/07-architecture/ARCH-003-html-adversarial-audit.md |
@@ -559,4 +560,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-456 documents — adr: 25, architecture: 12, governance: 19, operation: 29, plan: 81, prompt: 43, requirement: 35, session: 212.
+457 documents — adr: 26, architecture: 12, governance: 19, operation: 29, plan: 81, prompt: 43, requirement: 35, session: 212.
