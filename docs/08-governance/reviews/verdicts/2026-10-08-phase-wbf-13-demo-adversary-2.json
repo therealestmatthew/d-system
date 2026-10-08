@@ -1,0 +1,42 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-13-demo-adversary-2",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-13",
+  "reviewed_commit": "a234b19400f94df14d1052f3d07d91fff7d09fe3",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Late content is placed in two steps and can flip the bubble's side",
+      "evidence": "Search route delayed 2.5 s, layout-1 1280x720: rAF-sampled bubble geometry 40/108, one frame 0/149, then 191/432. Typing a filter that matches one-line content ('zzzz') flips the bubble from below the trigger to above it (top 40, 108 px); clearing flips it back. 0 style mutations in 2 s idle, so no loop.",
+      "consequence": "Cosmetic: a one-frame flash on late content and the bubble jumping across the trigger while a filter narrows the list. R25 unaffected.",
+      "minimal_fix": "Optional: keep the chosen side while open (choose on open and resize only) and apply the observer's remeasure synchronously (flushSync)."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Two protections in the fix are not killed by any test",
+      "evidence": "Removing the in-bubble early return alone: 15/15 Popover tests pass (reposition(false) never measures, so the guard is redundant). Removing the body.scrollTop restore: 15/15 pass in jsdom, but in Chromium scrollTop becomes 0 after resizing a scrolled body (1000 -> 0).",
+      "consequence": "A refactor could reintroduce a snap-back on resize or content change without a red test.",
+      "minimal_fix": "Add a test with a scrollTop setter that clamps while inline maxHeight is lifted and assert the offset is restored after a resize event."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Bottom viewport margin is not kept when the room below is the limit",
+      "evidence": "layout-2 1024x768, trigger moved 200 px down: bubble top 358 + height 410 = bottom 768 = viewport height. top = rect.bottom + 8 with maxHeight = vh - rect.bottom - 8. The new test 'keeps the whole bubble inside the viewport' passes only because the 60% cap binds in its fixture.",
+      "consequence": "A room-limited bubble touches the viewport bottom edge; the dismiss control stays visible, so R25 holds. Behaviour predates the phase but the new comment and test claim a margin.",
+      "minimal_fix": "Use viewportHeight - rect.bottom - 2 * VIEWPORT_MARGIN for spaceBelow and add a room-limited test fixture."
+    }
+  ],
+  "raw_reply_sha256": "ba04921544dc28898a0c7d7909b16394bf9bfe58ba44f6462da481e53aeb1b1b",
+  "outcomes": [],
+  "notes": "Second gating review after the reject at 0cdab8d. Dispatched and briefed by the Session Manager; brief regenerated for a234b19 (range 1755096..a234b19 with the fix, the extra tests, the audit column and the earlier verdict records; the session record and backlog bookkeeping excluded), scratch clone at the reviewed commit, runner manifest at _working/review-checks/phase-wbf-13/a234b19400f9/. The adversary verified the fix in Chromium with a real wheel in all four cells and five reverted mutations. No builder-written input."
+}

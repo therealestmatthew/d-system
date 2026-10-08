@@ -1,0 +1,50 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-13-review-judge-2",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-13",
+  "reviewed_commit": "a234b19400f94df14d1052f3d07d91fff7d09fe3",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Popover side can flip while the user types a filter",
+      "evidence": "MutationObserver on the body calls reposition(true) on every list change; choosePlacement keeps the upward side whenever the whole content fits above (Popover.tsx diff), so a filter that shrinks the list can move the bubble from below to above the trigger.",
+      "consequence": "Cosmetic jump of the bubble mid-typing in layouts where the trigger has less room above than below; no data or scroll loss.",
+      "minimal_fix": "Choose the side once at open and re-measure only the height afterwards, or add hysteresis."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Sticky filter offset, scrollTop clamp and text-only mutations are not guarded by the tests",
+      "evidence": "StagePage.css top: -0.5rem on .stage-html-viewer__search is unverified by jsdom; the MutationObserver options are childList and subtree only, so characterData changes do not remeasure; jsdom does not clamp scrollTop, so the save and restore in measureNaturalHeight is not exercised.",
+      "consequence": "A cosmetic or stale-size regression would pass the unit suite and show only in a real browser.",
+      "minimal_fix": "Add characterData: true to the observer options and keep the Playwright wheel and count check as a recorded step."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Gate pytest exits 1 from a run-as-root environment artifact",
+      "evidence": "07-gate.txt lines 82-105: test_an_unwritable_worktree_parent_is_refused 'DID NOT RAISE Refused' under /tmp/pytest-of-root; 1 failed, 1903 passed, 1 skipped. The diff touches no Python.",
+      "consequence": "Non-zero gate exit unrelated to the phase; could be misread as a phase defect.",
+      "minimal_fix": "Outside this phase: skip the test when the process runs as root."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Audit note refers to the session record and states the grep hit count as nine",
+      "evidence": "popover-consumer-audit.md says '(review finding, see the session record)' and 'nine' grep hits; at the branch Popover.test.tsx also matches from '.*Popover'.",
+      "consequence": "A governed working note points readers at a session document and the literal grep count is ten at the branch.",
+      "minimal_fix": "Remove the session-record pointer and say 'nine consumers (the new test file also matches the grep)'."
+    }
+  ],
+  "raw_reply_sha256": "ded0e21ac2f04178f20fdf7835fefd55bd6ad6c50b8a172480cb5a491fd57e6a",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), second dispatch on the post-fix commit after the first reject; same brief as the second gating review plus the runner manifest; no checkout. Its F01, F02 and F04 are carried to the builder with the gating findings. Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}
