@@ -1,0 +1,82 @@
+{
+  "verdict_id": "2026-10-08-phase-arch-05-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-arch-05",
+  "reviewed_commit": "ba97611354fa4d8d2b797fc0332c4376447628c0",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "Notes-strip entry contract passes a bounded clip (marquee = bounded only, scroll-x ignores vertical clip, silent-clip exempted)",
+      "evidence": "check_alt marquee only calls _bounded; exempt_selectors exempts marquee selectors. Probe: bounded overflow:hidden entry with scrollHeight 90 in a 20px box judges {'pass': 4, 'fail': 0} with no findings; so does ox=auto/oy=hidden with vertical clip and a 1x1 box.",
+      "consequence": "A phase-wbf-06 'fix' of height:20px; overflow:hidden turns the live command green while long entries remain cut off; the contract constrains only containment.",
+      "minimal_fix": "Require marquee to show motion (animation/transform change between samples) or reachable content; make scroll-x fail when vertical content is clipped; add minimum box sizes."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "C08 stale-selector check uses substring match and misses renames",
+      "evidence": "test_contract_selectors_name_classes_that_exist_in_source uses `cls in text`. Renaming stage-file-browser__tree to stage-file-browser__tree-pane across ts/src: pytest still 31 passed.",
+      "consequence": "File Browser tree rows (and any class that is a prefix of another) go stale with the only automated check green; the live check that would notice is not run by pytest.",
+      "minimal_fix": "Match the class with non-word, non-hyphen boundaries, ideally only in className strings and CSS selectors."
+    },
+    {
+      "id": "F03",
+      "severity": "major",
+      "title": "R09 'suite fails when a panel violates its contract' is carried only by a manual live command that is in no gate",
+      "evidence": "Live half runs only via `python test/test_workbench_fit_contracts.py --live <url>`; exits 1 today (32 findings in --quick run); not collected by pytest or CI. Disclosed in REQ-037 'Boundaries and unresolved'.",
+      "consequence": "A regression in panel fit passes uv run pytest, CI and the phase's verification list; R09 closes only if the owner accepts a command as the suite.",
+      "minimal_fix": "Coordinator records that R09 closes on the command and opens a follow-up (Playwright dev dep plus server fixture, or a CI job running --live --self-test after wbf-06/13/14)."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Self-test is non-differential; notes-strip 'caught' is vacuous",
+      "evidence": "self_test judges only the broken cell and matches the selector in any finding. Run with --layout layout-1 --panel notes-strip --self-test prints 'caught' with the same 'not bounded by its panel' finding that exists at baseline.",
+      "consequence": "'Judge named the broken region in every case' is unproven for the notes strip, the panel most at risk.",
+      "minimal_fix": "Judge the unbroken cell too and require a new finding on the injected region."
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "Registry parser bypassed by non-literal registration",
+      "evidence": "Probes: `fake: makeDef('x'),`, `...EXTRA,`, `PANEL_REGISTRY['fake']=...`, Object.assign(PANEL_REGISTRY, ...) all parse OK with the fake unseen and counts agreeing.",
+      "consequence": "A panel registered by factory call or after the literal is neither contracted nor named by R10; C03's 'cannot pass vacuously' holds only for literal entries.",
+      "minimal_fix": "Reject non `key: {` entries at the literal's indent and other assignments to PANEL_REGISTRY in the file."
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "title": "C02 overstates test_undeclared_panel_fails_and_is_named",
+      "evidence": "The test calls assert_every_panel_declared([*ids, 'fake-panel'], contract) directly; it does not register a fake in a copy of the registry source as REQ-037 C02 states.",
+      "consequence": "The source-to-failure path is not covered by a single test; documentation overstates the proof.",
+      "minimal_fix": "Derive the ids from a mutated REGISTRY_SOURCE copy in the test, or correct the C02 wording."
+    },
+    {
+      "id": "F07",
+      "severity": "minor",
+      "title": "mypy errors and dead docstring in the test module",
+      "evidence": "uv run mypy test/test_workbench_fit_contracts.py: 6 errors (:439, :960-963); scroll_exercised docstring placed after return (:440). mypy src/ is clean and is the only CI gate.",
+      "consequence": "Cosmetic; the reused `key` variable is a latent bug source; 'mypy clean' holds only for src/.",
+      "minimal_fix": "Rename the second key, cast the bool, move the docstring."
+    },
+    {
+      "id": "F08",
+      "severity": "minor",
+      "title": "No minimum size on scroll, marquee, visible, wrap modes",
+      "evidence": "Probe: a 1x1 overflow:hidden notes-strip entry passes; wrap checks width only.",
+      "consequence": "A collapsed scroller, trigger or header satisfies its row.",
+      "minimal_fix": "Add a default minimum height/width to those modes and a wrap height-within-panel check."
+    }
+  ],
+  "raw_reply_sha256": "f96665b200e1cc8ea57242c12ce90a8dd8095feca8c8093032e0e6e4e212a939",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager (subagent run, 2026-10-08). Brief: phase entry from dev's backlog.yaml, range 5dc1211..ba97611, diff with the session record and backlog bookkeeping excluded, scratch clone at the reviewed commit, runner manifest at _working/review-checks/phase-arch-05/ba97611354fa/. The adversary ran the pytest half, the live --quick run on ports 5185/8015 and registry mutations, all reverted. No builder-written input."
+}

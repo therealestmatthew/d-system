@@ -1,0 +1,66 @@
+{
+  "verdict_id": "2026-10-08-phase-arch-05-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-arch-05",
+  "reviewed_commit": "ba97611354fa4d8d2b797fc0332c4376447628c0",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "reject",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "R09 real-panel assertion is a live command outside pytest, not run by the runner",
+      "evidence": "Brief 'Boundaries and unresolved': the live half is not part of uv run pytest and exits non-zero today. No runner evidence file for --live or --self-test. All pytest tests feed hand-built dictionaries to judge_*.",
+      "consequence": "The suite cannot fail when a panel is given violating content. All live results in REQ-037 (cells, pass/fail counts, instances 3 and 4 reproduced, self-test) are unverified by the gate, and a browser regression stays green.",
+      "minimal_fix": "Owner decides: gate a live run (Playwright in dev dependencies plus a server fixture, failing or skipping loudly) or record that R09's 'suite' is the --live command and attach real run output as evidence."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "--self-test 'caught' can be satisfied by a pre-existing violation",
+      "evidence": "self_test() treats a break as caught if any finding detail contains the broken selector, with no unbroken baseline. REQ-037 reports .stage-notes-strip__current already failing in layout 1, and notes-strip is broken in layout-1 (first layout by name).",
+      "consequence": "The claim that the judge named the broken region in every case is unsupported for notes-strip. The proof is vacuous wherever the baseline already fails.",
+      "minimal_fix": "Judge an unbroken baseline cell first and count a break as caught only if it adds a finding the baseline lacks, or skip panels whose baseline fails and say so."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "marquee mode only checks bounds and exempts its subtree from silent-clip",
+      "evidence": "check_alt marquee branch returns None if _bounded; exempt_selectors adds marquee selectors; notes-strip row is 'scroll-y or scroll-x or marquee'.",
+      "consequence": "A bounded notes-strip entry with overflow hidden and silently clipped text passes, which is the clip the contract targets.",
+      "minimal_fix": "Require evidence of movement (animation or transform) for marquee, or do not exempt marquee subtrees from the clip rule without it."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Fill-declaration test iterates the contract rather than the registry",
+      "evidence": "test_every_panel_declares_how_it_fills_its_slot loops over load_contract().panels; coverage of undeclared types comes only from a separate test.",
+      "consequence": "No gap today, but the fill test alone passes for any panel with no rows.",
+      "minimal_fix": "Iterate registered_panel_types(REGISTRY_SOURCE) in that test."
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "Unreachable docstring after return in scroll_exercised",
+      "evidence": "The slider branch returns, then a triple-quoted string follows mid-function and the function has no real docstring.",
+      "consequence": "Misplaced documentation; no behavioural effect.",
+      "minimal_fix": "Move the string to the top of the function."
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "title": "uv run pytest exits 1 on a test outside the phase's files",
+      "evidence": "File 03, line 100: test/test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused 'DID NOT RAISE Refused' after chmod 0o500; paths indicate the runner ran as root. The 31 tests in test_workbench_fit_contracts.py passed.",
+      "consequence": "Not caused by this diff, but the verification command did not exit 0 in this run, so a clean-pytest requirement cannot be confirmed from it.",
+      "minimal_fix": "Rerun as a non-root user or compare against trunk; no change in this phase."
+    }
+  ],
+  "raw_reply_sha256": "4e51fa464b449334c9de2ac2a9d26ca4aaeb3188cc587a0f2a57336cbb1c80bf",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), same brief as the gating reviewer plus the runner manifest; no checkout. Its reject rests on F01 (the live half is a command outside pytest) and F02 (the self-test lacks a baseline comparison); the coordinator carried both to the builder's fix round regardless of the gating verdict. Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}
