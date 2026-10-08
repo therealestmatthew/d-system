@@ -442,6 +442,7 @@ Response `200`:
 | `wait` (output) | Finite number from 0 to 10, default 0. Negative, larger, `nan`, `inf` or not a number. | 422 `invalid_request` |
 | Other query parameters | A repeated `after`, `limit` or `wait` is refused; a parameter this record does not name is ignored. | 422 / ignored |
 | Session state | The shell has exited (`alive` false) when an inject is validated, or the write raises `OSError`. | 409 `session_ended` |
+| Write deadline | The PTY accepted none of the inject within the write deadline (the shell is alive but not reading; the master fd is written non-blocking under a `select` deadline). A partial write returns 200 with `accepted_bytes` set to the bytes written. | 409 `write_timeout` |
 
 **Long-poll wake mechanism.** Each session record holds an `asyncio.Condition`. The pump calls
 `notify_all` after every append and when it ends, and `terminal_websocket`'s `finally` marks the
@@ -642,6 +643,8 @@ Each of the following would be a new capability and starts from its own decision
   path from the startup log; nothing in the repository holds it.
 
 ## Open items for the owner
+
+(Amendment by the Session Manager on 2026-10-08 under the owner's pre-approval: the build phase `phase-wbf-08` bounded the PTY write after its security review and added the error code `write_timeout` (409) to the validation table above. The code is awaiting ratification with the rest of this record.)
 
 These are the points the owner is asked to ratify or change.
 
