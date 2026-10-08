@@ -1,0 +1,121 @@
+# Session Manager board — workbench run, 2026-10-08
+
+Protocol: GOV-017 / PROMPT-037 adapted to subagents (one cloud session; roles are dispatch lanes).
+Trunk for this run: `ccr-b69b05b4-tdcrux` (cut from dev at 6951bb6). Only this branch is pushed.
+Primary checkout: /home/user/d-system on the trunk. Worktrees: ../d-system-worktrees/<id>, branch agent/<id>.
+
+## Owner decisions (2026-10-08, before the run)
+1. Trunk = session branch; owner merges to dev afterwards.
+2. Both tracks (phase-arch-*, phase-wbf-*), disjoint phases.
+3. Fully autonomous: claims and merges pre-approved; owner asked only for something dangerous.
+4. phase-idg-12 (agent-batch-runner) is stale: release it in the first trunk turn, note to re-claim after this run.
+5. Uncovered defect ideas: amend PLAN-027/REQ-012 with defect phases, then build them. Non-defect ideas (000360, 000122, 000123, 000569, 000583) get a written proposal only.
+6. phase-wbf-02: build it; restore idea 000102 discarded -> triaged with a finding recording the reversal.
+7. ADR phases: dependents proceed on the ADR's recommended option, flagged for ratification. Exception: phase-arch-12 (process kill) and everything after it wait for the owner.
+8. Stop rule: run until no conflict-free ready workbench phase remains, or a phase fails review three times.
+
+## Model policy
+Scouts/Ideation: haiku. Builders, Prompt Planner, reviewers (demo-adversary, review-judge): sonnet. Opus only if a sonnet build is rejected twice.
+
+## Lanes (agent ids)
+agent-batch-runner = Session 5 (serial sys-wb-layout chain) | agent-builder-a = Session 1 | agent-builder-b = Session 2 | agent-standby = Session 3 | Scout = Session 4 (read-only) | Ideation | Prompt Planner.
+
+## Lock
+Held by: Session Manager (always, subagents never write in the primary checkout).
+
+## Slots (max_active 4)
+| Slot | Phase | Agent | Worktree | State |
+|---|---|---|---|---|
+
+## Wave plan (from scout/workbench-phases.md)
+W1: arch-02 (batch-runner), arch-11 (builder-a), wbf-03 (builder-b); Prompt Planner: PLAN-027 amendment (unclaimed worktree agent/plan-wbf-defects).
+W2: arch-05 (batch-runner), wbf-04, wbf-07 [+ arch-03 if slot]
+W3: arch-03/arch-06, wbf-06, wbf-01
+W4: arch-04, wbf-02 (after wbf-01), new defect phases
+W5+: arch-06/07/08/09/10/13/14/15/16/17/18 serial; wbf-05, wbf-08; STOP before arch-12.
+
+## Event log
+- 2026-10-08 trunk fc7e42f: released phase-idg-12; claimed arch-02 (batch-runner), arch-11 (builder-a), wbf-03 (builder-b). Pushed.
+- Departure: local `dev` is fast-forwarded to the trunk after each trunk commit (never pushed) so run_review_checks.py and the adversary's `git diff dev...` read this run's backlog. Reset with `git branch -f dev origin/dev` at hand-off.
+- Departure: CI runs only on dev/main pushes, so check_dev_ci.py cannot gate this trunk; the runner's manifest (five gate checks) is the green check before each merge.
+- Dispatched: builders for arch-02, arch-11, wbf-03; Prompt Planner on agent/plan-wbf-defects (PLAN-027 defect amendment); Ideation on 000102 (option A: revisit -> reviewing).
+- 2026-10-08 trunk 9f5f103: Ideation turn, 000102 discarded -> reviewing (revisit spent; writer has no path to triaged). Pushed. Note for owner: generator warns 000308 marks 000296 superseded while 000296 is triaged (pre-existing).
+- Owner instruction (2026-10-08, mid-run): keep going until the claimable set is exhausted. Then switch to PLANNING-ONLY mode: scout the repository and propose improvements, optimisations and new features for the workbench. Implement nothing from that planning until the owner approves.
+- REVIEW-REQUEST received: arch-02 @ e2edb8d, arch-11 @ 051fedf, wbf-03 @ 4cc805c, plan-wbf-defects @ 5477ea4 (rebased; gate.sh green except 5 env pytest failures, baseline OK, diff-patterns OK).
+- Clone was shallow: `git fetch --unshallow` done (1879 commits now); 4 of the 5 env failures were history reads. Remaining env failure: test_run_review_checks::test_an_unwritable_worktree_parent_is_refused (runs as root).
+- Runner started for the three phases (background); demo-adversary dispatched for all four branches; review-judge to follow once manifests exist.
+- Flags to carry: wbf-05 deliverables too narrow (ts/src/stage/ only, but sys-api routes/schema/tests needed) -> widen on the trunk before claiming; commit trailers on builder commits say "Claude Sonnet 5.5" -> rewrite to the session's attribution line at merge.
+- Wave 2 plan (after W1 merges): arch-05 (batch-runner), wbf-07 (builder-a), wbf-04 (builder-b), wbf-18 (standby). arch-03 and wbf-12..17 wait on arch-05 (locks all sys-wb-*).
+- VERDICT wbf-03 (pass, 1 major 5 minor) and arch-11 (pass, 6 minor) sent; both builders fixed every finding and sent READY: arch-11 @ dbacd38, wbf-03 @ d4d9904. gate.sh running on both.
+- Runner manifest arch-02 @ e2edb8d: all entries exit 0 except pytest (1 failed: test_an_unwritable_worktree_parent_is_refused, root-only; 1653 passed). Runner continuing with arch-11, wbf-03.
+- Commit-trailer rewrite (Sonnet 5.5 -> Fable 5.1) was refused by the permission classifier as history rewriting; trailers stay as the builders wrote them. Report to owner.
+- Run Reporter subagent dispatched to publish and maintain the run artifact.
+- trunk 026bf4f: ff-merged agent/plan-wbf-defects (PLAN-027 amendment, phase-wbf-12..18; adversary pass, 1 major 7 minor all fixed; no schema-valid verdict record possible for unclaimed work, raw reply kept at review-replies/plan-wbf-defects-demo-adversary.md). Pushed.
+- trunk cb6b4a1: merged+completed phase-arch-11 (adversary pass 6 minor fixed; judge pass 3 minor). trunk e4b19db: merged+completed phase-wbf-03 (ADR-029 proposed; adversary pass 1 major 5 minor fixed; judge pass 4 minor, F02/F03 carried to wbf-05 brief). trunk a7bbfe0: claimed wbf-07 (builder-a), wbf-18 (standby); widened wbf-04/05 deliverables. All pushed.
+- trunk 986d4cd: merged+completed phase-arch-02 (adversary pass 3 minor: F01/F02 fixed with tests, F03 accepted; judge pass 3 minor). trunk 5dc1211: claimed arch-05 (batch-runner), wbf-04 (builder-b). wbf-18 REVIEW-REQUEST @ 725cd56; runner + brief running. Reporter asked to UPDATE the artifact. Catalog conflicts on rebase are routine: resolved by --catalog regeneration each time.
+- trunk 71f01b9: Ideation turn, ideas 000600-000613 recorded; 000569/000556/000516/000463 annotated. Pushed.
+- Coordinator slip: dispatched the wbf-18 judge before the runner re-run wrote its manifest; judge rejected on missing input. Recorded as-is; re-judge after the runner finishes. Lesson: never dispatch the judge until the manifest file exists.
+- READY: wbf-07 @ 7b35726 (adversary pass 4 major 3 minor all fixed; judge pending on runner), wbf-04 @ fd3908e (adversary pass 4 minor F01-F03 fixed F04 accepted; judge pending on runner), wbf-18 @ c815de3 (adversary pass 1 minor fixed; judge pass; gate running). Follow-up for the trunk: widen phase-wbf-08 deliverables with src/api/__init__.py and the runbook per ADR-030.
+- trunk 6eb3304: merged+completed phase-wbf-18. trunk 6ba10a0: wbf-08 deliverables named per ADR-030. Pushed. Gates running for wbf-07, wbf-04; arch-05 building.
+- trunk ee53f42: merged+completed phase-wbf-07 (ADR-030; adversary pass 4 major 3 minor all fixed; judge pass 5 minor). trunk 228bb19: merged+completed phase-wbf-04 (adversary pass 4 minor; judge pass 3 minor). Claimed wbf-05 (builder-b). Helper bug fixed: pipe-masked exit codes in merge_phase.sh let a refused ff-merge continue; no trunk damage (hook refused the stray commit; working tree restored).
+- REVIEW-REQUEST wbf-05 @ 4bb71ff: security review pass (1 major F01 symlinked-directory fail-open, 5 minor), judge pass (3 minor); adversary running. REVIEW-REQUEST arch-05 @ ba97611 (REQ-037 new, 1526-line check; live run found real defects incl. 000117/000130 reproduced); runner + adversary running. Both reviews pending before VERDICT.
+- IDEA lines pending (arch-05): terminal header overflow in narrow slots; HTML Viewer header overflow (layout 2, 1024x768); File Browser header overflow; notes-strip dropdown trigger overrun; REQ-037 live check as a gate once Playwright is a dev dependency; xterm 6 virtual scrollbar vs .xterm-viewport overflow rule. (wbf-05): viewer-absent/flag-unset e2e coverage; iframe sandbox blocks scripts in _public/d-system-architecture.html; shared fixture for gated-route reloads; ADR-015 rule 4 / data_root() pointer on ratification.
+- trunk 50f33cd: merged+completed phase-wbf-05 (adversary pass 4 minor; security pass 1 major 5 minor; judge pass 3 minor; all fixed except judge F03 accepted). trunk 211ee2e: claimed wbf-08 (builder-a), wbf-01 (standby). arch-05 in fix round (adversary pass 3 major 5 minor; judge reject 2 major 4 minor; R09 live-suite ruling flagged for ratification).
+- trunk b9aae45: Ideation turn, ideas 000614-000630 recorded. Pushed.
+- trunk 1fc1aeb: merged+completed phase-arch-05 (REQ-037; adversary pass 3 major 5 minor, judge reject 2 major 4 minor; all fixed; R09 live-suite ruling flagged). trunk 1755096: claimed arch-06 (batch-runner), wbf-13 (builder-b). wbf-01 READY @ 1820d33 + judge record 0d17fbb, gate running; wbf-08 REVIEW-REQUEST @ e39d74c, adversary + security + runner running.
+- trunk 6d453f4: merged+completed phase-wbf-01 (adversary pass 2 minor; judge pass 3 minor). trunk 3857331: claimed wbf-06 (standby). wbf-08: judge pass 4 minor; adversary + security pending.
+- wbf-08 security review: pass, 1 major (F01 blocked PTY write without deadline), 4 minor, F05 pre-existing websocket Origin gap (000614). Reviewer ran 'pkill sleep' on the shared machine; no observed damage. Judge: pass 4 minor. Adversary pending.
+- wbf-13 @ 0cdab8d: GATING REJECT (adversary F01 blocker: scroll snaps to top; judge reject F01 major same cause). Fix round sent; re-review required.
+- trunk cbbbabe: merged+completed phase-arch-06 (ADR-031 supersedes ADR-016; adversary pass 2 major 8 minor, judge pass 4 minor; all fixed; 11 open items for ratification). wbf-06 judge: reject (F01 double-step); adversary pending. wbf-13 second review running; wbf-08 gate queued.
+- wbf-15 REVIEW-REQUEST @ 9b138ce (builder-a slot reused by batch-runner claim); runner + adversary dispatched; judge waits for manifest.
+- wbf-06: adversary pass (2 major, 4 minor; delivered after a turn-limit nudge), judge reject (1 major, 3 minor). Combined VERDICT sent (A-F01/F02 majors, J-F01 double-step, J-F03 token clip, J-F02 REQ-037 wording -> IDEA line only). Adversary left dev servers on 8024/5194/5195 (pkill killed its own shell).
+- wbf-08 gate @ a0980e2: all checks pass except diff patterns (two added type-ignore[union-attr] in test_demo_terminal_api.py). Baseline "missing" rows are the arch-06 verdict timing artifact. Fix round sent to builder-a.
+- wbf-08 READY @ dc5869e (type-ignores removed; one test-only commit on the gated tip a0980e2). Departure: full gate not re-run for this delta; the gated parent passed all five checks and the builder re-ran pytest on the file, ruff, mypy, diff-patterns. merge_phase.sh will re-run its quick checks. Merge waits for the Ideation commit in the primary checkout (no concurrent primary-checkout git work).
+- wbf-15: adversary pass (2 minor; ids renumbered F01/F02 to fit the schema); runner at step 05 (pytest); judge after manifest.
+- trunk 157bd90: merged+completed phase-wbf-08 (adversary pass, security pass, judge pass; gate fix: type-ignores). trunk 0507a37: Ideation, ideas 000631-000643. trunk 80dc015: claimed wbf-16 (builder-a); worktree set up; builder dispatched (ports 8026/5196). Pushed.
+- wbf-15: judge pass (2; F02 'note' mapped to minor for the schema). VERDICT sent (stale-guard test, settled reset). wbf-13 gate running @ 29e0e8f. Artifact v6.
+- Claimable after wbf-13 merges: arch-07 (layout+styles); after wbf-15: arch-14, arch-03 (needs most sys-wb-*; serialize). Terminal track (arch-16, wbf-12, wbf-17) share sys-wb-terminal: serial. wbf-02 waits on sys-ui (wbf-06). arch-18 last.
+- wbf-15 READY @ 004138e (settled reset fix; stale-guard test cannot isolate the buildTree guard: three layers; recorded). Gate queued behind wbf-13's.
+- trunk 53002f2: merged+completed phase-wbf-13 (2 review rounds; both recorded). merge_phase.sh fix: the REBASE_HEAD check was a false positive after a completed rebase (stale ref); now checks rebase-merge/rebase-apply dirs. gate.sh's `npm test | tail -4` cuts the vitest summary (jsdom hint follows it); confirmed wbf-13 vitest by hand (108 passed); fix gate.sh to tail -12 once the wbf-15/wbf-06 gates finish (script edits while running are unsafe).
+- wbf-06 READY @ c35f8da (all findings fixed; A-F02 chose hidden scrollbar; images need >=100 px strip; NoticeView). Deliverables already include the test file. Gate queued behind wbf-15's. Builder could not use SubagentHandback twice; its READY arrived as plain output.
+- trunk f82d2ae: wbf-16 deliverables widened (two viewer test stubs gain the sandbox header); claimed arch-07 (builder-b), worktree set up, builder dispatched (ports 8028/5198, session code 17). wbf-16 REVIEW-REQUEST @ 482282c: brief, runner, adversary dispatched (ports 8027/5197); judge after manifest. Pushed.
+- Ratification item from wbf-16: the trailer rule (contract says Fable 5.1; the subagent's own reminder says its model) - the contract stands for this run; listed for the owner.
+- arch-07 BLOCKED by its builder: R12/R13 need ADR-031's widening row (six region files, StagePage.tsx, _data/workbench/, schemas/, two test modules, maybe vite.config.ts). Widening on the trunk was refused by the governance check (concurrent phases share deliverable paths with wbf-06/15/16 and systems sys-ui/explorers/viewer). Claim released at 269197d; worktree and branch removed (empty). RE-CLAIM arch-07 WITH THE WIDENING once wbf-06, wbf-15, wbf-16 are complete; ratification item: the widening itself. Lesson: the primary-checkout `git checkout --` after a refused commit restored the index copy, not HEAD; use `git restore --staged --worktree`.
+- trunk 21f890f: claimed arch-16 (builder-b; audit, docs/00-working only; ports 8029/5199; session code 17). Pushed. wbf-16 adversary pass (1 minor F01 comma-split); judge after manifest. Terminal track order after arch-16: wbf-17 then wbf-12 (all share sys-wb-terminal).
+- wbf-16: judge pass (2 notes). VERDICT sent (comma-split fix, live evidence in record, flake note). New flake seen once in the wbf-16 runner gate under load: test_demo_terminal_api::test_control_characters_reach_the_shell (0.3 s sleep before Ctrl-C, 8 s read timeout); passed in every other run. IDEA to record: make that test robust to load (wait for the sleep prompt instead of a fixed 0.3 s).
+- trunk f2f9a75: merged+completed phase-wbf-15 (adversary pass 2 minor, judge pass 2; fix round). wbf-16 READY @ 6747bbb; gate queued behind wbf-06's. Claimed wbf-14 (batch-runner; ports 8030/5200; session code 18). Pushed.
+- wbf-06 gate #1 INVALID: gate.sh's rebase stopped on a backlog.yaml + catalog conflict (trunk's deliverable widening vs the branch's session fields on the same lines); the pipe masked the exit and the checks ran on a tree with conflict markers (58 failed, 47 errors, all YAML parse). Rebase aborted, redone by hand (kept both sides), catalog regenerated; branch now 4 commits on 418edf3. gate2.sh written (rebase failure aborts and exits; vitest summary captured); used from now on. wbf-06 gate #2 queued behind wbf-16's gate. Lesson: never widen an active phase's entry on the trunk while its builder may edit the same entry; widen at completion instead.
+- wbf-14 REVIEW-REQUEST @ 0b23ba0 (tooltip portal + fixed; fit check tooltip rows 2 -> 0; Playwright 14/14). Brief, runner, adversary dispatched (ports 8031/5201); judge after manifest. Ratification items: tooltip prefers the side above (choosePlacement reuse), Tooltip imports from Popover, notes-strip font question, trailer (Sonnet 5.5 used; contract says Fable 5.1).
+- wbf-16 gate #1 INVALID for the same reason (catalog conflict mid-rebase; checks ran on a conflicted tree). Rebase redone by hand (catalog only), 5 commits on 418edf3, catalog clean. Gate #2 (gate2.sh) queued behind wbf-06 gate #2. The temp-clone base run always shows the same 4 environment failures (root test, no dev branch in the clone, .venv symlink not ignored); harmless for the baseline comparison.
+- wbf-14 judge pass (4 minor: F01 scroll listener resets bubble scrollTop; notes). test_control_characters_reach_the_shell failed a SECOND time in a runner gate under load (wbf-14 runner); still passes in gates run alone. Flake idea stands; now two occurrences.
+- trunk 5e9a7f2: merged+completed phase-wbf-06 (gate #2 clean: 139 vitest, pytest root-only). Pushed. 13 phases complete.
+- Artifact v7. Reporter's count is right: 14 complete (I had 13; wbf-18 was uncounted). Use 14.
+- arch-16 REVIEW-REQUEST @ 33dd9ff (audit doc +614; 12 IDEA lines; D1-D5 ratification). Brief, runner, adversary dispatched. Trailer: Sonnet 5.5 used.
+- wbf-14: adversary pass (2 minor: inert bubble scroll, gap collapse), judge pass (4). VERDICT sent (fix F01 scroll, bridge the gap preferred). Rulings: side-above + Popover import kept, for ratification.
+- trunk 25ba80c: merged+completed phase-wbf-16 (15 complete). Claimed wbf-02 (builder-a; deliverables widened at claim time: route, model, api test, viewer test; verification fixed). arch-16 judge dispatched. Serial plan after wbf-14/arch-16/wbf-02: arch-07 alone, then arch-03, arch-14, then dependents; wbf-17, wbf-12 after arch-16; arch-18 last.
+- arch-16 judge pass (5 minor: 5.4 table attribution, cap-refusal cause wording, appendix params, label strictness). Adversary pending.
+- wbf-14 READY @ 2cc06e3 (scroll kept, gap bridged; 159 vitest). Gate running (gate2).
+- trunk 91f33b3: Ideation, ideas 000644-000662 recorded (000107/000246 annotated+linked). Pushed.
+- arch-16: adversary REJECT (1 major F01: bash panel on Windows is not refused, it starts the host default shell; 5 minor). VERDICT sent.
+- wbf-14 gate clean (159 vitest; pytest root-only). Merging.
+- trunk 9f0b740: merged+completed phase-wbf-14 (16 complete). Pushed. Two slots free but nothing claimable without overlap until wbf-02 (sys-ui/sys-api) or arch-16 (sys-wb-terminal/sys-demo-stage) merge: arch-07/03/14 and wbf-12/17 all collide. arch-18 last.
+- arch-16 READY @ 469da0e (fix round; F13/O11 added). Second gating review: brief rebuilt, runner + adversary-2 dispatched; judge-2 after manifest.
+- arch-16 second adversary REJECT (1 major: appendix A script still 20/200/40 ms with no warm-up while the prose says 30/300/30 + warm-up; 3 minor). Third fix round to the same builder (edits are small and exact); third gating review after. Judge-2 still pending on manifest.
+- wbf-02 REVIEW-REQUEST @ 3bdb606 (modified_at on list/search entries; badge; header wraps inline; 000637 reduced not fixed). Brief, runner, adversary, security review dispatched; judge after manifest. arch-16 judge-2 dispatched at 469da0e. Leaked scratch Vite (wbf-16) killed; port 8033 held by a scratch-arch-16 uvicorn per the wbf-02 builder.
+- arch-16 judge-2 REJECT (same appendix-script major; F04 column header, F05 reviewer-attributed figures). Record written; builder's third round already covers these (F04/F05 overlap A2-F02/F04).
+- wbf-02 security review pass (3 minor: fromtimestamp outside try -> 500; stat follows symlinks; list per select). Adversary + judge pending.
+- wbf-02 adversary REJECT (1 major: openInTab on the displayed file never refreshes the badge; 3 minor incl. the fromtimestamp 500 also found by security). VERDICT sent once the judge lands; second gating review after.
+- wbf-02 judge pass (5). VERDICT sent (openInTab/openFiles refresh, compact badge vs wrap with measurements, fromtimestamp try, lstat, pending test). Second gating review after READY. Both active lanes (wbf-02, arch-16) in fix rounds; slots 3 and 4 idle by design.
+- arch-16 READY @ 8eba39f (round 3: script now matches prose; verified by extraction). Third gating review dispatched; judge-2 record still to be committed by the builder with round-3 records.
+- wbf-02 READY @ 53e1c1f (round 2: openInTab bump, lstat, fromtimestamp try, pending test; header wrap kept with per-cell cost 9-23 px). Second gating review dispatched.
+- WIND-DOWN requested by the owner at ~391k context. HANDOFF.md written. No new claims. Finish wbf-02 round 2 and arch-16 round 3, merge if green, update artifact, then stop.
+- arch-16 round 3 adversary PASS (3 minor: factory.py line 21, O6/O7 baselines, 5.4 dev-only qualifier). Judge-3 running. Final fix round to the builder after the judge, then gate2 + merge.
+- arch-16 round 3: adversary PASS (3 minor), judge-3 PASS (5 minor). Final text-only fix round sent (no further review); then gate2 + merge. Artifact v9 has 'How to resume'.
+- arch-16 READY @ 246fd9e (final round). gate2 running; merge on pass.
+- OWNER DECISIONS (AskUserQuestion, wind-down): (1) arch-07: widen per ADR-031 and build it alone after the reset; (2) arch-12/arch-13 stay held; (3) remove merged phases' worktrees and all scratch clones at hand-off (approved); (4) ratification: owner reviews the artifact table first, then confirms all or names adjustments; record nothing as accepted until then.
+- wbf-02 round 2: adversary PASS (2 minor: lstat vs in-repo symlink + stale comment; header +8-22 px, pre-existing clip), judge-2 PASS (6 minor notes). Final text/comment round to the builder, then gate2 + merge.
+- wbf-02 READY @ 726a94a (final round). gate2 queued behind arch-16's gate; merge on pass. After both merges: worktree cleanup (approved), artifact v10, dev reset, stop.
+- trunk 1f025db: merged+completed phase-arch-16 (17 complete). Pushed. Worktree cleanup (owner-approved) starting for merged phases and scratch clones; phase-wbf-02 worktree kept (gate running).
+- OWNER RULINGS batch 2 (see HANDOFF.md 5-12): artifact ratification table APPROVED IN FULL; websocket token phase to queue; ADR-016 rule 3 qualifier dropped; wbf-18 label renumbered to rung 7; 000102 -> realized; housekeeping commit first next session; no re-review sweep; D1 direction = PRESERVE sessions (detach/reattach; needs an ADR); owner checklist doc in docs/00-working/.
+- trunk f8e298a: merged+completed phase-wbf-02 (18 complete). Pushed. CLOSE-OUT: wbf-02 worktree removed (worktrees dir empty), local dev reset to origin/dev, no listeners left, HANDOFF.md final. Next session starts at HANDOFF.md "Next session, in order".
+- Artifact v11 (final for this session): run closed at f8e298a; its section-2 ruling numbers 11-21 are the reporter's own, not HANDOFF.md's 1-12. Session Manager context reset next.
