@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-16-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-16",
+  "reviewed_commit": "482282c43b261caf39b5684d4816dc2ee6abef31",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Directive parse assumes a single policy per header value",
+      "evidence": "HtmlViewerRegion.tsx:211-215 splits on ';' only; a comma-merged multi-policy value ('sandbox, default-src ...') yields first token 'sandbox,' and is rejected.",
+      "consequence": "Only if a fronting proxy adds a second CSP header would a served file read as absent; unreachable in current loopback dev/demo setup.",
+      "minimal_fix": "Split on /[;,]/ instead of ';' (optional)."
+    }
+  ],
+  "raw_reply_sha256": "cde7d15893066927fe69cb6458e0539a94c0bc35a55df9c8621c82a17faaaae3",
+  "outcomes": []
+}
