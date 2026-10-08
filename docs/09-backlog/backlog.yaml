@@ -17674,6 +17674,20 @@ items:
     record which side it opens on, its bubble height and how many entries show, so the change is
     measured against a baseline. Then list the consumers with grep -rl "from '.*Popover'" ts/src (nine hits) and
     check the count against the nine named here.
+  session: doc-session-popover-side-and-height
+  completion_evidence:
+  - ts/src/stage/Popover.tsx
+  - ts/src/stage/Popover.test.tsx
+  - ts/src/stage/StagePage.css
+  - docs/00-working/popover-consumer-audit.md
+  - docs/03-sessions/SESS-2026-10-08-13-popover-side-and-height.md
+  result: 'Fully visible file entries (1280x720 / 1024x768): layout-1 2 -> 12 / 2 -> 13, layout-2 7 -> 12
+    / 7 -> 13; scrolling reaches entry 140 of 140 and the dismiss control stays on screen. The live
+    check test_workbench_fit_contracts.py --live --quick --panel html-viewer no longer reports the
+    popover not-starved finding (was 149 px bubble, 305 px needed, 529 px free); 4 non-popover findings
+    remain (2 tooltip, 2 layout-2 header). cd ts && npm test 96 passed; npm run build built; npm run
+    lint clean. src.governance OK; ruff clean; mypy no issues in 51 files; pytest 1899 passed with
+    test_an_unwritable_worktree_parent_is_refused deselected (fails as uid 0, unrelated).'
 - id: phase-wbf-14
   title: Stop the notes strip tooltip being cut off at the panel bottom
   plan: doc-workbench-features-defects
