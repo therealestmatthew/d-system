@@ -5446,7 +5446,7 @@ PROPOSED LINK: 000101 --relates_to--> 000134 (000134's audit would encompass thi
 
 ## 000102 · Rehearsal idea from demo-validator-web dry-run
 
-**Created 2026-09-11T04:10:22-04:00 · Status: `discarded`**
+**Created 2026-09-11T04:10:22-04:00 · Status: `reviewing` · revisited 1×**
 
 Recorded during the 2026-09-11 phase-wb-07 rehearsal (demo-validator-web agent pass). [Rehearsal entry: this idea is part of the demo record, not a real audience suggestion.] Suggestion used for timing the /idea step of the live-segment runbook: add a small "last refreshed" timestamp badge to the HTML Viewer's header so a presenter can show the overview is current without opening dev tools.
 
@@ -5454,7 +5454,7 @@ Recorded during the 2026-09-11 phase-wb-07 rehearsal (demo-validator-web agent p
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-idea-triage (2026-09-11T20:42:01-04:00): Rehearsal idea from the demo-validator-web agent's dry-run pass, recorded during phase-wb-07 timing exercises. Marked as a rehearsal entry, not a production feature request.
 
@@ -5466,6 +5466,7 @@ No related ideas found. This suggestion does not overlap with other open ideas o
 - **finding** by agent-ideation (2026-09-24T02:14:15-04:00): Declined: owner ruling at /partition-ideas GATE 3, 2026-09-23, in Session 2 - Builder B, relayed by Session Manager. Recorded as `discarded` because the idea writer has no `declined` status; the owner chose `discarded` with this reason when Ideation asked on 2026-09-24.
 
 Decline candidate nominated by both analysts (R1 and R4) in the accepted partition (docs/00-working/idea-partition-2026-09-23.json, decline_candidates.nominated_by_both). Reason given there: R1: a rehearsal artifact, not a feature ask; its text marks it as part of the demo record. R4: it states it is a fabricated rehearsal entry; nothing to build.
+- **finding** by repository-owner (2026-10-08T01:33:46+00:00): Owner ruling 2026-10-08, relayed by the Session Manager: The owner's 2026-09-14 ruling in PLAN-027 decision 1 stands: content decides buildability, and the badge is real, small, shippable work. The 2026-09-23 partition-gate decline, recorded 2026-09-24, ruled on the rehearsal marker rather than the content and is reversed. phase-wbf-02 builds it in the 2026-10-08 workbench run. The writer's only exit from discarded is `reviewing`; the owner's instruction named `triaged`, and the Session Manager chose `reviewing` as the writer's own undo state. The revisit budget is spent by this move.
 
 </details>
 
