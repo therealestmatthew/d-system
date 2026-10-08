@@ -1,0 +1,42 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-04-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-04",
+  "reviewed_commit": "5ce2e3167cebc7152c8305f1c711fb9609cbfa42",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Duplicate input paths: requested keeps duplicates but receipts account for distinct paths only",
+      "evidence": "panelBridge.ts deliverBatch: distinct = [...new Set(requested)] is what targets receive and what normalizeReceipt checks, while the returned outcome.requested retains duplicates; the docblock concedes this; no test pins it.",
+      "consequence": "For [a, a, b], requested has 3 entries but delivered + declined has 2, so a caller checking N in against N accounted for sees a mismatch. It also deviates slightly from 'each target receives the full ordered list'.",
+      "minimal_fix": "Set outcome.requested to distinct, or document that callers must dedupe, and add a test for the chosen behaviour."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "isBatchAvailable is not reactive across multiple channels",
+      "evidence": "isBatchAvailable calls channel.resolve() once and does not use useSyncExternalStore; only useViewerBridges and useTerminalBridges subscribe.",
+      "consequence": "A multi-channel batch action's disabled state can go stale unless the caller also re-renders via a bridge hook. This is a trap for phase-wbf-05; the ADR's 'availability hook reads null' is still satisfied.",
+      "minimal_fix": "Note in the isBatchAvailable docblock that it must be called during a render that subscribes via a bridge hook, or add a hook that subscribes to all listed channels."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "uv run pytest gate exits 1 on an environment-dependent test unrelated to the diff",
+      "evidence": "06-gate.txt lines 76-100: test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused 'DID NOT RAISE Refused'; it chmods a directory to 0o500 and the runner is root (/tmp/pytest-of-root/). The diff touches only ts/src/stage/.",
+      "consequence": "manifest.result reads 'failed' although every phase verification command passed; the gate record shows a red the phase did not cause.",
+      "minimal_fix": "None in this phase. Run the gate as a non-root user, or skip that test when running as root."
+    }
+  ],
+  "raw_reply_sha256": "c5c86f2270201574fd333ad72f6c6e91d33afe2fcd521381d7b38815feaef62c",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), same brief as the gating reviewer plus the runner manifest; no checkout. Its F01 and F02 coincide with the gating reviewer's F02 and F03, which the builder fixed before this record was written (requested deduplicated with a test; useBatchAvailable hook added with a rendered test). Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}
