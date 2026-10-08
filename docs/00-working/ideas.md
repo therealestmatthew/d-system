@@ -25726,3 +25726,11 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 **Created 2026-10-08T10:04:11+00:00 · Status: `open`**
 
 The digest HTML export phase (phase-syn-05) depends on phase-html-10 and its scope names the existing YAML-to-JSON page build pipeline. Both were cancelled when PLAN-003 was retired (ADR-027). The phase should be re-scoped to the house template family before anyone claims it. Found by the template exploration of the cloud session of 2026-10-08.
+
+---
+
+## 000616 · A command-line entry point for the capture structuring step
+
+**Created 2026-10-08T14:59:17+00:00 · Status: `open`**
+
+Today the structuring step between a raw capture and a staged record exists only as library functions: structure() and stage_capture() in src/capture/structure.py. tools/review.py imports only StructuringError, and no script under tools/ calls either function, so the owner cannot run structuring by hand; a session or an agent has to call it. Intake (tools/capture.py) and review and promotion (tools/review.py) both have commands. Owner ruling, 2026-10-08, in the cloud session on branch claude/productivity-system-templates-ie1x8d: there should be a command-line entry point for structuring. Found by the document digest for the portfolio guide (_public/portfolio-guide.html, section 4, "Review and promote staged records"). Related: 000361 (a quick-entry writer for people, commitments and tasks), which addresses the same friction from the other side.

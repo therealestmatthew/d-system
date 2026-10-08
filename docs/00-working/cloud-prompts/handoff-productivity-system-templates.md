@@ -171,3 +171,15 @@ Ranked by how much a different answer would change.
 
 Five agents in total: two read-only researchers dispatched together at the open, and three creators dispatched after the owner's correction. No Opus. No fix cycles. One worker
 restart mid-session, with nothing lost because every result was already in a file.
+
+
+## 9. Owner rulings after the hand-off (2026-10-08)
+
+The owner answered the guide's decisions list in the session, after the hand-off was first pushed. Recorded here so the gate and the next session see them; none has been applied to backlog.yaml, which a cloud session does not edit.
+
+1. **The portfolio data question (`phase-proj-01`).** Owner ruling: yes, people and commitments hold real records; they are simply not tracked and are absent from the cloud clone. This is the answer `phase-proj-01` exists to obtain; the phase's record and 000022's correction remain to be written on the local side.
+2. **Which template first.** Owner ruling: approved as recommended, the shared loader and fixture set (000614) first, then the commitments ledger (000602).
+3. **Timeline shape and Gantt scope.** The owner asked for a recommendation; the session gave one in its reply (per-project chronological timeline with created dates excluded as events, milestone development events accepted as the milestone source, a shared card component; project-level Gantt first with a separate small schema phase adding start_date to task and commitment, no interim dependency field). Not yet ruled.
+4. **The as-of date rule.** The owner asked for clarity; the session explained the determinism requirement and recommended an explicit --as-of parameter, required for committed and test output and defaulting to today for renders to gitignored locations, stamped on the page. Not yet ruled.
+5. **Re-scoping `phase-syn-05`.** The owner asked for more detail; the session gave it in its reply. Not yet ruled. Idea 000615 carries the finding.
+6. **The structuring command gap.** Owner ruling: yes, a command-line entry point for the structuring step should exist. Recorded as idea 000616.
