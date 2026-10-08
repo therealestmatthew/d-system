@@ -1,0 +1,49 @@
+{
+  "verdict_id": "2026-10-08-phase-arch-16-demo-adversary-2",
+  "date": "2026-10-08",
+  "phase": "phase-arch-16",
+  "reviewed_commit": "469da0ed7a4b1452f0b95291db4f74707cc73229",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet",
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "Appendix A script has neither the warm-up connection nor the 30/300/30 ms parameters the document says it has",
+      "evidence": "Section 6.1, O6 and the appendix A preamble say the script discards one warm-up connection and uses 30 connections, 300 echoes, 30 ms apart. The script has `for (let i = 0; i < 20; i++)`, `for (let i = 0; i < 200; i++)`, `await sleep(40)` and no warm-up. Run verbatim twice: open p95=max=105.7 and 93.9 ms, first_byte p95=max=130.9 and 109.1 ms, n=20; the max is sample 1 (72-91 ms open per-sample runs). An earlier HTTP request removes the outlier (6.1/23 ms first sample), so the warm-up the prose promises is absent.",
+      "consequence": "The owner's O6 run on Windows will report a p95 that is the client's first-connection cost, the misattribution the first review raised, while the document says the first sample is excluded. The reproduction claim for the 6.1 and 6.2 figures is false for the artefact as written; the figures in the preamble cannot come from this script.",
+      "minimal_fix": "Add one discarded warm-up connect before the timed loop, set the loops to 30 connections, 300 echoes and sleep(30), re-run once and replace the preamble figures; or change 6.1, O6, O7 and the preamble to say 20/200/40 ms with no warm-up. Keep O7's '200 keystrokes' consistent."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Evidence attributed to a reviewer's re-run and to an unrecorded earlier script form",
+      "evidence": "Section 6.1 ('a reviewer re-running that form ... 75 to 100 ms') and section 6.5/F5 ('3 of 4 in a reviewer's re-run') cite a procedure and an earlier script form that are not in the document.",
+      "consequence": "The staging document depends on a review process it does not carry; these numbers cannot be reproduced from it. The first-connection explanation is independently reproducible and does not need them.",
+      "minimal_fix": "Report the sample-1 versus later-samples observation from the script as written, and drop or label the reviewer-attributed figures as procedure not recorded."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "F5 asserts 'starts two shells' under a Measured label but only websocket counts are recorded",
+      "evidence": "F5 evidence cell: 'Measured (Linux), sections 2 and 6.5'. Sections 2 and 6.5 record two websockets per mount and server session counts; no experiment records a shell spawned for the socket closed at handshake, and 6.5 says the order of release and arrival was not traced.",
+      "consequence": "A code-reading inference is stated as a measured fact in the findings table the idea log will be built from.",
+      "minimal_fix": "Reword to 'opens two websockets (whether the first starts a shell was not traced)' or add a sessions-list check during the first socket's life."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Label and naming residue from the first review",
+      "evidence": "F13 cites DEFAULT_WINDOWS_SHELL at src/demo/windows.py line 16, where the name is DEFAULT_SHELL (alias at src/demo/factory.py line 21). Section 4.1 'Intent (Document)' column contains a '(Code reading)' tagged statement in row 3. F5's evidence cell labels the whole row Measured although the cause is an inference.",
+      "consequence": "No conclusion changes; small mislabels in a document whose value is label accuracy.",
+      "minimal_fix": "Cite factory.py 21 with windows.py 16; move the code-reading tag out of the Document column or rename the column; split F5's evidence cell into measured and inferred parts."
+    }
+  ],
+  "raw_reply_sha256": "b7c6bf0edebfe2b0b7174ee889c9ea23e6f1e4109ac35ec6b02aa7105dfac2c2",
+  "outcomes": []
+}

@@ -137,6 +137,31 @@ files are another. One line per finding:
 - **Judge F01, no change.** It notes the known failures in the review's own gate run (the root-only
   test and a load-sensitive control-character test). The first is recorded below.
 
+## Third round after the second gating review
+
+The second gating demo-adversary rejected `469da0e` (1 major, 3 minor); its verdict is in
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-arch-16-demo-adversary-2.json`, unchanged. One
+line per finding:
+
+- **A2-F01 (major), fixed.** The second round described a warm-up and 30/300/30 parameters in prose
+  but left the old script in appendix A. The script in the document now contains both. I extracted it
+  from the document with `awk` and ran it: twice with the warm-up (open max 10.6 and 7.8 ms,
+  first-byte max 32.7 and 28.5 ms) and once with the warm-up line removed (open max 87.7 ms,
+  first-byte max 102.0 ms). The preamble quotes those runs. O7's keystroke count is 300. The proxy
+  figures that had been quoted in the preamble came from a run of a script form that is not in the
+  document and are removed.
+- **A2-F02, fixed.** Section 6.1 reports the observation from the script as written; the
+  reviewer-attributed figures are dropped from 6.1, 6.5 and F5. Per-sample values were not recorded, so
+  "the outlier is sample 1" is stated as inferred from removing the warm-up.
+- **A2-F03, fixed.** F5 says the mount opens two websockets and that whether the first starts a shell
+  was not traced; its evidence cell separates measured from inferred.
+- **A2-F04, fixed.** F13 cites `DEFAULT_SHELL` (`src/demo/windows.py` line 16) and its alias
+  `DEFAULT_WINDOWS_SHELL` (`src/demo/factory.py` line 20). The 4.1 Intent column header now reads
+  "Document; Code reading where tagged".
+- **Process note.** The scratch copy of the script I had edited in round two no longer contained the
+  edit when I looked in round three, so the round-two figures cannot be tied to a file I still have;
+  this round's figures are tied to the document's own text.
+
 ## Acceptance
 
 - **`REQ-011` R23 (three-shell by five-event matrix with survival, intent and communication in every
@@ -185,15 +210,15 @@ files are another. One line per finding:
 
 No independent review has run on this record. Review is dispatched by the Session Manager.
 
-## Gate results after the fix round and the rebase onto `91f33b3`
+## Gate results after the third round and the rebase onto `9f0b740`
 
 | Command | Result |
 |---|---|
-| `uv run python -m src.governance` | `Governance OK: 45 systems, 475 documents, 37 memories, 354 backlog phases` |
-| `uv run pytest` | `1 failed, 2071 passed, 1 skipped, 1 warning in 376.94s`; the one failure is the known root-only `test/test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused` (idea `000604`), recorded and not retried. The control-character flake did not occur in this run. |
+| `uv run python -m src.governance` | `Governance OK: 45 systems, 476 documents, 37 memories, 354 backlog phases` |
+| `uv run pytest` | `1 failed, 2074 passed, 1 skipped, 1 warning in 390.90s`; the one failure is the known root-only `test/test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused` (idea `000604`), recorded and not retried. The control-character flake did not occur. |
 | `uv run ruff check src/ test/ tools/` | `All checks passed!` |
 | `uv run mypy src/` | `Success: no issues found in 52 source files` |
-| `cd ts && npm test` | `Tests  146 passed (146)` |
+| `cd ts && npm test` | `Tests  159 passed (159)` |
 
-The catalog conflict in the rebase was resolved by regeneration only. Servers started for the fix
-round (backend 8029, frontend 5199) were stopped by pid.
+Catalog conflicts in both rebases were resolved by regeneration only. The backend started for the
+third round (port 8029) was stopped by pid; no frontend was needed.
