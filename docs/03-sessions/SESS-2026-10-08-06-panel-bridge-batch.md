@@ -38,10 +38,11 @@ the run's integration branch `ccr-b69b05b4-tdcrux`.
   error? }] }`. Absent targets are reported, registered ones still receive the list, a throwing
   target is recorded as `failed` without stopping the others, and nothing is queued.
 - Additions beyond the ADR's named members: `useTerminalBridges()` and `useViewerBridges()` (hooks
-  over `getAll()`, `null` when empty), `isBatchAvailable(targets)` (true when at least one listed
-  target is registered), and `callOpenFiles` (the viewer's batch call).
+  over `getAll()`, `null` when empty), `isBatchAvailable(targets)` (point-in-time read, true when at
+  least one listed target is registered), `useBatchAvailable(targets)` (the same flag, reactive;
+  added after review, F03), and `callOpenFiles` (the viewer's batch call).
 
-`ts/src/stage/panelBridge.test.tsx` (28 tests, stub handles) proves the keyed-channel rules, the
+`ts/src/stage/panelBridge.test.tsx` (32 tests, stub handles) proves the keyed-channel rules, the
 R07 invariant (delivered plus declined equals requested, each path once) and the R08 absent and
 partial cases.
 
@@ -57,6 +58,24 @@ partial cases.
 - REQ-012 R08: met. With no target registered every target is `absent`, nothing is delivered, nothing
   throws, and `isBatchAvailable` is false. With some registered, the registered ones receive the
   list and the absent ones are named (best effort per target, as the ADR chose).
+
+## Review
+
+Gating verdict: pass, four minor findings. Verdict record:
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-04-demo-adversary.json`.
+
+- F01 (a thrown value with no string form made `deliverBatch` throw): fixed. A helper wraps the
+  conversion in its own try/catch with the fixed message `target threw a non-printable value`;
+  tests throw `Object.create(null)` and an object whose `toString` throws.
+- F02 (duplicate paths made `requested` and the receipt disagree): fixed. `requested` is deduplicated
+  too, so requested, delivered and declined are over the same distinct paths; test with
+  `['a', 'a', 'b']`.
+- F03 (`isBatchAvailable` is not reactive): fixed. `useBatchAvailable(targets)` subscribes to every
+  listed channel; a rendered test shows the flag flip on register and unregister.
+  `isBatchAvailable` stays, documented as a point-in-time read.
+- F04 (keyless-caller compatibility proved by types and stubs, not the real regions): accepted. A
+  test that mounts the regions is outside this phase's deliverables; `phase-wbf-05`'s
+  `HtmlViewerRegion` test covers the real register and unregister.
 
 ## Awaiting ratification
 
@@ -75,16 +94,16 @@ builds against its recommendation.
 3. The bridge normalizes whatever a target returns so the invariant holds even for a faulty handle:
    an omitted, duplicated, or both-delivered-and-declined path is declined `failed`; paths the
    target invented are dropped; an unknown reason becomes `failed`.
-4. Duplicate paths in the request are collapsed to one occurrence in each target's call and
-   receipt (`requested` keeps the caller's list as given). The ADR does not address duplicates;
-   callers are expected to pass distinct paths.
+4. Duplicate paths in the request are collapsed to their first occurrence; `requested`, each
+   target's call and each receipt are over the same distinct paths (changed after review, F02). The
+   ADR does not address duplicates.
 5. `deliverBatch` is typed with a mapped tuple so each target's `call` is checked against its own
    channel's handle type without `any`.
 
 ## Evidence
 
 - `cd ts && npm run build`: succeeds (`tsc -b && vite build`, `built in 2.13s`).
-- `cd ts && npm test`: `Test Files 4 passed (4)`, `Tests 38 passed (38)`.
+- `cd ts && npm test`: `Test Files 4 passed (4)`, `Tests 42 passed (42)`.
 - `cd ts && npx eslint . --max-warnings 0`: no output (clean).
 - `uv run python -m src.governance`: `Governance OK` (rerun after the catalog regeneration).
 - `uv run ruff check src/ test/ tools/`: `All checks passed!`

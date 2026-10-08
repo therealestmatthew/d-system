@@ -4,6 +4,7 @@ import {
   callOpenFiles,
   deliverBatch,
   isBatchAvailable,
+  useBatchAvailable,
   terminalBridge,
   useViewerBridge,
   useViewerBridges,
@@ -249,6 +250,51 @@ describe('deliverBatch: every requested path is accounted for (R07)', () => {
     expect(targets[0].receipt?.declined.map((d) => d.reason)).toEqual(['failed', 'failed'])
   })
 
+  it('collapses a duplicated path so requested, the call and the receipt agree', () => {
+    const openFiles = vi.fn(acceptAll)
+    register(viewerStub(openFiles))
+    const outcome = deliverBatch(['a', 'a', 'b'], [{ channel: viewerBridge, call: callOpenFiles }])
+    expect(openFiles).toHaveBeenCalledWith(['a', 'b'])
+    expect(outcome.requested).toEqual(['a', 'b'])
+    expect(outcome.targets[0].receipt).toEqual({ delivered: ['a', 'b'], declined: [] })
+  })
+
+  it('records a thrown value with no string form instead of throwing', () => {
+    const throwers: unknown[] = [
+      Object.create(null),
+      {
+        toString() {
+          throw new Error('no string for you')
+        },
+      },
+    ]
+    for (const thrown of throwers) {
+      register(
+        viewerStub(() => {
+          throw thrown
+        }),
+      )
+      const terminal = terminalStub()
+      terminalBridge.register(terminal)
+      registered.push(() => terminalBridge.unregister(terminal))
+      let outcome: ReturnType<typeof deliverBatch> | undefined
+      expect(() => {
+        outcome = deliverBatch(['a.html'], [
+          { channel: viewerBridge, call: callOpenFiles },
+          { channel: terminalBridge, call: terminalCall },
+        ])
+      }).not.toThrow()
+      expect(outcome!.targets[0].error).toBe('target threw a non-printable value')
+      expect(outcome!.targets[0].receipt).toEqual({
+        delivered: [],
+        declined: [{ path: 'a.html', reason: 'failed' }],
+      })
+      // The other target still received the list.
+      expect(outcome!.targets[1].receipt).toEqual({ delivered: ['a.html'], declined: [] })
+      registered.splice(0).forEach((undo) => undo())
+    }
+  })
+
   it('declines every path as failed and records the error when the target throws', () => {
     register(
       viewerStub(() => {
@@ -367,5 +413,38 @@ describe('deliverBatch: absent and partial targets (R08)', () => {
     register(viewerStub(acceptAll))
     expect(isBatchAvailable([...targets])).toBe(true)
     expect(isBatchAvailable([{ channel: terminalBridge, call: terminalCall }])).toBe(false)
+  })
+})
+
+describe('useBatchAvailable', () => {
+  it('flips when a listed panel registers and unregisters', () => {
+    const { result } = renderHook(() =>
+      useBatchAvailable([
+        { channel: viewerBridge, call: callOpenFiles },
+        { channel: terminalBridge, call: terminalCall },
+      ]),
+    )
+    expect(result.current).toBe(false)
+    const viewer = viewerStub(acceptAll)
+    act(() => register(viewer))
+    expect(result.current).toBe(true)
+    const terminal = terminalStub()
+    act(() => terminalBridge.register(terminal))
+    expect(result.current).toBe(true)
+    act(() => viewerBridge.unregister(viewer))
+    expect(result.current).toBe(true)
+    act(() => terminalBridge.unregister(terminal))
+    expect(result.current).toBe(false)
+  })
+
+  it('follows a keyed target only while that key is registered', () => {
+    const { result } = renderHook(() =>
+      useBatchAvailable([{ channel: viewerBridge, call: callOpenFiles, key: 'two' }]),
+    )
+    const one = viewerStub(acceptAll)
+    act(() => register(one, 'one'))
+    expect(result.current).toBe(false)
+    act(() => register(viewerStub(acceptAll), 'two'))
+    expect(result.current).toBe(true)
   })
 })

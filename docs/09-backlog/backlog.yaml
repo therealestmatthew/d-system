@@ -9409,7 +9409,7 @@ items:
   - ts/src/stage/panelBridge.test.tsx
   - docs/03-sessions/SESS-2026-10-08-06-panel-bridge-batch.md
   result: 'Built against proposed ADR-029 section 6 (awaiting the owner''s ratification). cd ts && npm
-    run build succeeded; cd ts && npm test 4 files, 38 tests passed (28 in panelBridge.test.tsx);
+    run build succeeded; cd ts && npm test 4 files, 42 tests passed (32 in panelBridge.test.tsx);
     governance OK. R07 and R08 proven with stub handles; grep of ts/src/stage/ finds no file-passing
     path outside panelBridge.ts.'
   next_action: Read the existing BridgeSlot contract before changing it. The single-handle,

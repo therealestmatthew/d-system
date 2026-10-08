@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 
 /**
  * Cross-panel reach for the File Browser's right-click context menu (REQ-007 W09, items 2 and
@@ -234,20 +234,30 @@ function normalizeReceipt(paths: string[], raw: unknown): BatchReceipt {
   return result
 }
 
+/** The message for a thrown value. Never throws itself: a value with no usable string form (a null
+ * prototype object, or a `toString` that throws) gets a fixed message. */
+function describeThrown(error: unknown): string {
+  try {
+    return error instanceof Error ? error.message : String(error)
+  } catch {
+    return 'target threw a non-printable value'
+  }
+}
+
 /** The one entry point that delivers an ordered list of paths to one or more targets. Each listed
  * target receives the full list; the caller chooses the fan-out, and the bridge never adds
  * targets. Returns an outcome value synchronously: it never throws and never queues. A target with
  * no registered handle is reported `absent` and the rest still receive the list (best effort per
  * target). A target whose method throws is recorded in `error` with all its paths declined
  * `failed`. The bridge does no I/O and no path validation; callers pass resolved paths. A path
- * repeated in `paths` is accounted for once per occurrence in `requested` but appears once in a
- * receipt, so callers should pass distinct paths. */
+ * repeated in `paths` is collapsed to its first occurrence: `requested`, every target's call and
+ * every receipt are over the same distinct, ordered paths. */
 export function deliverBatch<Hs extends unknown[]>(
   paths: string[],
   targets: { [I in keyof Hs]: BatchTarget<Hs[I]> },
 ): BatchOutcome {
-  const requested = [...paths]
-  const distinct = [...new Set(requested)]
+  const distinct = [...new Set(paths)]
+  const requested = [...distinct]
   const outcomes: BatchTargetOutcome[] = []
   for (const target of targets as Array<BatchTarget<unknown>>) {
     const channel = target.channel.id
@@ -271,7 +281,7 @@ export function deliverBatch<Hs extends unknown[]>(
         key: entry.key,
         absent: false,
         receipt: declineAll(distinct, 'failed'),
-        error: error instanceof Error ? error.message : String(error),
+        error: describeThrown(error),
       })
     }
   }
@@ -279,11 +289,34 @@ export function deliverBatch<Hs extends unknown[]>(
 }
 
 /** Whether a batch action should be enabled: at least one listed target has a registered handle
- * (ADR-029 section 6 point 6). Read this where the UI decides whether to disable the action. */
+ * (ADR-029 section 6 point 6). A point-in-time read with no subscription: use it in event handlers
+ * and tests, and use `useBatchAvailable` where a rendered control must follow registrations. */
 export function isBatchAvailable<Hs extends unknown[]>(targets: {
   [I in keyof Hs]: BatchTarget<Hs[I]>
 }): boolean {
   return (targets as Array<BatchTarget<unknown>>).some(
     (target) => target.channel.resolve(target.key) !== null,
   )
+}
+
+/** Reactive form of `isBatchAvailable`: re-renders when any listed channel registers or
+ * unregisters a handle, so a batch action disables when no listed target is on screen and enables
+ * when one mounts (REQ-012 R08). Subscribes to every listed channel. */
+export function useBatchAvailable<Hs extends unknown[]>(targets: {
+  [I in keyof Hs]: BatchTarget<Hs[I]>
+}): boolean {
+  const list = targets as Array<BatchTarget<unknown>>
+  // The caller usually builds `targets` inline, so resubscribe only when the set of channels
+  // changes, not on every render. The snapshot is a boolean, which is stable by value.
+  const channels = [...new Set(list.map((target) => target.channel))]
+  const channelsKey = channels.map((channel) => channel.id).join('|')
+  const subscribe = useCallback(
+    (listener: () => void) => {
+      const unsubscribers = channels.map((channel) => channel.subscribe(listener))
+      return () => unsubscribers.forEach((unsubscribe) => unsubscribe())
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [channelsKey],
+  )
+  return useSyncExternalStore(subscribe, () => isBatchAvailable(targets))
 }
