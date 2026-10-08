@@ -17780,6 +17780,17 @@ items:
   next_action: Write the failing test first (success for the root folder, status 500 for the
     second folder, then browse to it) and confirm it shows Loading before changing the render
     order.
+  session: doc-session-file-browser-folder-error
+  completion_evidence:
+  - ts/src/stage/FileBrowserRegion.tsx
+  - ts/src/stage/FileBrowserRegion.test.tsx
+  - docs/03-sessions/SESS-2026-10-08-15-file-browser-folder-error.md
+  result: 'Vitest: 3 new FileBrowserRegion tests (error after a folder change, recovery on a
+    later browse, pending shows Loading with no previous entries); written first, the two error
+    tests failed on the old order and all pass on the new (92 tests in the full ts suite).
+    cd ts && npm run build built with no errors. src.governance: Governance OK. ruff and mypy
+    clean. Full pytest 1 failed (test_an_unwritable_worktree_parent_is_refused, uid 0 ignores
+    chmod; fails identically without this change), 1903 passed. No Playwright pass.'
 - id: phase-wbf-16
   title: Report a missing HTML Viewer page when the file route is absent
   plan: doc-workbench-features-defects
