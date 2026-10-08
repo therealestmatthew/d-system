@@ -522,7 +522,7 @@ CI regenerates it and fails on any difference.
 | PLAN-025 | doc-repeatable-idea-partition | draft | 0 | 0 | 3 | agent-build, agent-builder-b, agent-partition |
 | PLAN-026 | doc-concurrency-git-safety | active | 6 | 0 | 4 | agent-conc, agent-coord, agent-night |
 | PLAN-027 | doc-workbench-features-defects | draft | 6 | 3 | 10 | agent-builder-a, agent-builder-b, agent-demo-a, agent-prog, agent-standby, agent-standby-3 |
-| PLAN-028 | doc-workbench-architecture-quality | draft | 13 | 1 | 6 | agent-arch, agent-arch-vocab, agent-batch-runner, agent-builder-a, agent-prog |
+| PLAN-028 | doc-workbench-architecture-quality | draft | 13 | 0 | 7 | agent-arch, agent-arch-vocab, agent-batch-runner, agent-builder-a, agent-prog |
 | PLAN-029 | doc-idea-graph-lifecycle | active | 15 | 0 | 5 | agent-builder-a, agent-builder-b, agent-coord, agent-night |
 | PLAN-030 | doc-document-backlog-governance | active | 4 | 0 | 4 | agent-batch-runner, agent-builder-b, agent-coord, agent-night |
 | PLAN-031 | doc-agent-engineering-delegation | active | 12 | 0 | 2 | agent-build, agent-night |
