@@ -1,0 +1,33 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-02-demo-adversary-2",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-02",
+  "reviewed_commit": "53e1c1f847ccda1d35251a579bc060d03dfdd77f",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "lstat makes the badge show the link's mtime, not the displayed target's, for an in-repo symlink; DirectoryEntry comment says a dangling symlink gives None but the code returns the link's time",
+      "evidence": "Live: _public/zz-inrepo.html -> zz-target.html, link touched to 2026-01-01, target touched to 2026-09-09; /workbench/list returns modified_at 2026-01-01T00:00:00.000Z for the link while vite serves the target's content at /workbench-file/_public/zz-inrepo.html (HTTP 200 for an in-repo symlink). The comment at workbench.py DirectoryEntry.modified_at lists 'a dangling symlink' as a None case; the dangling link returned its own mtime and the test asserts is not None.",
+      "consequence": "R03 (badge matches the displayed file's mtime) is wrong, silently, for an in-repo symlinked page: regenerating the target never advances the badge. No tracked symlinks exist today, so the exposure is contrived; the lstat choice was made to avoid out-of-repo disclosure and that part works.",
+      "minimal_fix": "For a symlink, stat the resolved target only when it resolves inside REPO_ROOT, else lstat; or document the limitation in the comment and correct the dangling-symlink sentence."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Header is 8.4 to 22.4 px taller than baseline in all four layout/size cells; Embedded toggle still clips at layout-2 primary 1024x768",
+      "evidence": "Measured: layout-1 1280 62.8 vs 54.4; layout-1 1024 76.8 vs 54.4; layout-2 1280 76.8 vs 54.4; layout-2 1024 76.8 vs 54.4. The growth is caused by the inline flexWrap, identical with the badge hidden. At layout-2 1024x768 the toggle spans past the section edge (718 vs 666.7), same as baseline (771 vs 666.7); live REQ-037 check still reports 'Header controls ... 324px wide in a 307px box'. The live check seeds no selected file, so it cannot see the badge.",
+      "consequence": "Less page area in the viewer at every measured cell (about 95 px of content at layout-2 1024x768); toggle partly unreachable at one named layout/size, pre-existing (idea 000637) and not worsened. The wrap fixes the baseline clip at layout-2 1280x720.",
+      "minimal_fix": "Accept as pre-existing/within the REQ-037 wrap contract, or add flex-wrap to .stage-html-viewer__controls in StagePage.css (needs a deliverables amendment) and seed the live check with a selected file."
+    }
+  ],
+  "raw_reply_sha256": "2b7797c05d8f0960bdcb8db60b110a25361b760036f4baa6670c59b51fd82ce5",
+  "outcomes": []
+}
