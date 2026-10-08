@@ -27,7 +27,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from jsonschema import Draft7Validator
 
@@ -643,6 +643,325 @@ def test_the_list_counts_entries_without_resolving_them(sandbox: Sandbox) -> Non
     ]
 
 
+# --- review findings: symlinks, hostile paths, content type, limits ---------------------------
+
+
+def _bookmarks_module() -> Any:
+    return sys.modules[BOOKMARKS_MODULE]
+
+
+def test_a_symlinked_directory_into_private_is_refused_and_reads_excluded(
+    sandbox: Sandbox,
+) -> None:
+    sandbox.write_file("_private/s.md")
+    (sandbox.repo / "linkdir").symlink_to(sandbox.repo / "_private", target_is_directory=True)
+    sandbox.create("Set")
+    assert sandbox.add("set", "linkdir/s.md").status_code == 400
+    assert sandbox.record("set")["entries"] == []
+
+    record = sandbox.record("set")
+    record["entries"] = ["linkdir/s.md"]
+    (sandbox.records_dir / "set.json").write_text(json.dumps(record), encoding="utf-8")
+    assert _statuses(sandbox, "set") == {"linkdir/s.md": "excluded"}
+
+
+def test_symlinks_to_git_internals_are_refused_and_read_excluded(sandbox: Sandbox) -> None:
+    (sandbox.repo / "gitlink").symlink_to(sandbox.repo / ".git", target_is_directory=True)
+    (sandbox.repo / "headlink.md").symlink_to(sandbox.repo / ".git" / "HEAD")
+    sandbox.create("Set")
+    assert sandbox.add("set", "gitlink/HEAD").status_code == 400
+    assert sandbox.add("set", "headlink.md").status_code == 400
+    record = sandbox.record("set")
+    record["entries"] = ["gitlink/HEAD", "headlink.md"]
+    (sandbox.records_dir / "set.json").write_text(json.dumps(record), encoding="utf-8")
+    assert _statuses(sandbox, "set") == {"gitlink/HEAD": "excluded", "headlink.md": "excluded"}
+
+
+def test_a_symlink_to_an_ordinary_file_inside_the_repository_is_refused(sandbox: Sandbox) -> None:
+    sandbox.write_file("real.md")
+    (sandbox.repo / "alias.md").symlink_to(sandbox.repo / "real.md")
+    sandbox.create("Set")
+    assert sandbox.add("set", "alias.md").status_code == 400
+    assert sandbox.add("set", "real.md").status_code == 201
+
+
+def test_an_ignore_check_that_fails_is_treated_as_everything_ignored(
+    sandbox: Sandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sandbox.write_file("a.md")
+    sandbox.write_file("b.md")
+    sandbox.create("Set")
+    assert sandbox.add("set", "a.md").status_code == 201
+
+    def broken(payload: bytes) -> subprocess.CompletedProcess[bytes]:
+        return subprocess.CompletedProcess(["git"], 128, stdout=b"", stderr=b"fatal: broken")
+
+    monkeypatch.setattr(_bookmarks_module(), "_run_check_ignore", broken)
+    assert sandbox.add("set", "b.md").status_code == 400
+    assert _statuses(sandbox, "set") == {"a.md": "excluded"}
+
+
+def test_an_ignore_check_that_cannot_run_is_treated_as_everything_ignored(
+    sandbox: Sandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sandbox.write_file("a.md")
+    sandbox.create("Set")
+
+    def missing(payload: bytes) -> subprocess.CompletedProcess[bytes]:
+        raise FileNotFoundError("git")
+
+    monkeypatch.setattr(_bookmarks_module(), "_run_check_ignore", missing)
+    assert sandbox.add("set", "a.md").status_code == 400
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "sub/.git/config",
+        ".GIT/config",
+        ".git./config",
+        ".git /config",
+        "docs/_PRIVATE/x.md",
+        "a/_private/x.md",
+        "_Private/x.md",
+    ],
+)
+def test_git_and_private_segments_are_refused_at_any_depth_and_case(
+    sandbox: Sandbox, path: str
+) -> None:
+    sandbox.write_file(path)
+    sandbox.create("Set")
+    assert sandbox.add("set", path).status_code == 400
+    assert sandbox.record("set")["entries"] == []
+
+
+def test_hand_edited_nested_git_and_cased_entries_read_excluded(sandbox: Sandbox) -> None:
+    sandbox.write_file("sub/.git/config")
+    sandbox.create("Set")
+    record = sandbox.record("set")
+    record["entries"] = ["sub/.git/config", ".GIT/config", "docs/_PRIVATE/x.md"]
+    (sandbox.records_dir / "set.json").write_text(json.dumps(record), encoding="utf-8")
+    assert set(_statuses(sandbox, "set").values()) == {"excluded"}
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "a.md\x00",
+        "\x00",
+        "dir\x00/a.md",
+        "x" * 300 + ".md",
+        "docs/" + "y" * 256,
+        "z/" * 600 + "a.md",
+    ],
+)
+def test_hostile_paths_are_refused_with_400_not_500(sandbox: Sandbox, path: str) -> None:
+    sandbox.write_file("a.md")
+    sandbox.create("Set")
+    assert sandbox.add("set", path).status_code == 400
+    assert sandbox.record("set")["entries"] == []
+
+
+def test_a_path_with_a_lone_surrogate_is_refused_not_a_server_error(sandbox: Sandbox) -> None:
+    sandbox.create("Set")
+    response = sandbox.client.post(
+        f"{BOOKMARKS}/set/entries",
+        content=b'{"path": "a\\ud800.md"}',
+        headers={"content-type": "application/json"},
+    )
+    assert response.status_code in (400, 422)
+    named = sandbox.client.post(
+        BOOKMARKS, content=b'{"name": "x\\ud800"}', headers={"content-type": "application/json"}
+    )
+    assert named.status_code in (400, 422)
+
+
+def test_a_path_of_exactly_the_limits_is_accepted_in_shape(sandbox: Sandbox) -> None:
+    module = _bookmarks_module()
+    assert module.normalize_entry_path("a" * 255) == "a" * 255
+    assert module.MAX_PATH_LENGTH == 1024 and module.MAX_SEGMENT_LENGTH == 255
+
+
+def test_hand_edited_unusable_entries_read_excluded_and_the_rest_still_read(
+    sandbox: Sandbox,
+) -> None:
+    sandbox.write_file("ok.md")
+    sandbox.create("Set")
+    record = sandbox.record("set")
+    record["entries"] = ["ok.md", "bad\x00.md", "q" * 300, "w/" * 700 + "z"]
+    (sandbox.records_dir / "set.json").write_text(json.dumps(record), encoding="utf-8")
+    response = sandbox.client.get(f"{BOOKMARKS}/set")
+    assert response.status_code == 200
+    statuses = {entry["path"]: entry["status"] for entry in response.json()["entries"]}
+    assert statuses["ok.md"] == "present"
+    assert statuses["bad\x00.md"] == "excluded"
+    assert statuses["q" * 300] == "excluded"
+    # The unusable entry can still be removed, by its stored text.
+    removed = sandbox.remove("set", "bad\x00.md")
+    assert removed.status_code == 200
+    assert "bad\x00.md" not in [entry["path"] for entry in removed.json()["entries"]]
+
+
+def test_a_record_holding_a_lone_surrogate_is_unreadable_not_a_crash(sandbox: Sandbox) -> None:
+    sandbox.create("Set")
+    path = sandbox.records_dir / "set.json"
+    path.write_text(
+        '{"schema_version": 1, "category_id": "set", "name": "Set", "entries": ["a\\ud800"]}',
+        encoding="utf-8",
+    )
+    assert sandbox.client.get(f"{BOOKMARKS}/set").status_code == 500
+    assert sandbox.client.get(BOOKMARKS).json() == []
+
+
+@pytest.mark.parametrize("content_type", ["text/plain", "application/x-www-form-urlencoded", None])
+def test_writes_without_a_json_content_type_are_refused_with_415(
+    sandbox: Sandbox, content_type: str | None
+) -> None:
+    sandbox.write_file("a.md")
+    sandbox.create("Set")
+    headers = {"content-type": content_type} if content_type else {"content-type": ""}
+    body = b'{"name": "Other"}'
+    entry = b'{"path": "a.md"}'
+    assert sandbox.client.post(BOOKMARKS, content=body, headers=headers).status_code == 415
+    assert (
+        sandbox.client.patch(f"{BOOKMARKS}/set", content=body, headers=headers).status_code == 415
+    )
+    assert (
+        sandbox.client.post(f"{BOOKMARKS}/set/entries", content=entry, headers=headers).status_code
+        == 415
+    )
+    assert sandbox.add("set", "a.md").status_code == 201
+    assert (
+        sandbox.client.request(
+            "DELETE", f"{BOOKMARKS}/set/entries", content=entry, headers=headers
+        ).status_code
+        == 415
+    )
+    assert [row["name"] for row in sandbox.client.get(BOOKMARKS).json()] == ["Set"]
+    assert sandbox.record("set")["entries"] == ["a.md"]
+
+
+def test_a_json_content_type_with_a_charset_is_accepted(sandbox: Sandbox) -> None:
+    response = sandbox.client.post(
+        BOOKMARKS,
+        content=b'{"name": "Charset"}',
+        headers={"content-type": "Application/JSON; charset=utf-8"},
+    )
+    assert response.status_code == 201
+
+
+def test_a_category_delete_needs_no_body_or_content_type(sandbox: Sandbox) -> None:
+    sandbox.create("Set")
+    assert sandbox.client.delete(f"{BOOKMARKS}/set").status_code == 200
+
+
+def test_an_oversized_body_is_refused_with_413(sandbox: Sandbox) -> None:
+    sandbox.create("Set")
+    big = {"name": "x" * 70_000}
+    assert sandbox.client.post(BOOKMARKS, json=big).status_code == 413
+    assert sandbox.client.patch(f"{BOOKMARKS}/set", json=big).status_code == 413
+    assert (
+        sandbox.client.post(f"{BOOKMARKS}/set/entries", json={"path": "p" * 70_000}).status_code
+        == 413
+    )
+    assert [row["name"] for row in sandbox.client.get(BOOKMARKS).json()] == ["Set"]
+
+
+def test_the_default_limits_are_the_documented_ones() -> None:
+    importlib.import_module("src.api.routes.workbench")  # the module under test imports it
+    module = importlib.import_module(BOOKMARKS_MODULE)
+    assert module.MAX_ENTRIES_PER_CATEGORY == 500
+    assert module.MAX_CATEGORIES == 200
+    assert module.MAX_REQUEST_BYTES == 64 * 1024
+
+
+def test_a_category_holds_a_bounded_number_of_files(
+    sandbox: Sandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(_bookmarks_module(), "MAX_ENTRIES_PER_CATEGORY", 2)
+    for name in ("a.md", "b.md", "c.md"):
+        sandbox.write_file(name)
+    sandbox.create("Set")
+    assert sandbox.add("set", "a.md").status_code == 201
+    assert sandbox.add("set", "b.md").status_code == 201
+    assert sandbox.add("set", "c.md").status_code == 409
+    assert sandbox.record("set")["entries"] == ["a.md", "b.md"]
+    # A removal makes room again.
+    sandbox.remove("set", "a.md")
+    assert sandbox.add("set", "c.md").status_code == 201
+
+
+def test_the_number_of_categories_is_bounded(
+    sandbox: Sandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(_bookmarks_module(), "MAX_CATEGORIES", 2)
+    sandbox.create("One")
+    sandbox.create("Two")
+    assert sandbox.client.post(BOOKMARKS, json={"name": "Three"}).status_code == 409
+    sandbox.client.delete(f"{BOOKMARKS}/one")
+    assert sandbox.client.post(BOOKMARKS, json={"name": "Three"}).status_code == 201
+
+
+def test_a_write_flushes_the_temporary_file_to_disk_before_the_replace(
+    sandbox: Sandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    events: list[str] = []
+    real_fsync = os.fsync
+    real_replace = os.replace
+
+    def spy_fsync(descriptor: int) -> None:
+        events.append("fsync")
+        real_fsync(descriptor)
+
+    def spy_replace(source: Any, target: Any) -> None:
+        events.append("replace")
+        real_replace(source, target)
+
+    monkeypatch.setattr(os, "fsync", spy_fsync)
+    monkeypatch.setattr(os, "replace", spy_replace)
+    sandbox.create("Set")
+    assert events == ["fsync", "replace"]
+
+
+@pytest.mark.parametrize(
+    "category_id",
+    [
+        "a\\b",
+        "..",
+        "../x",
+        "a/b",
+        "Live",
+        "con",
+        "COM1",
+        "com1",
+        "nul",
+        "x" * 65,
+        "",
+        "a--b",
+        "-a",
+        "a-",
+        "a b",
+    ],
+)
+def test_the_id_guard_rejects_what_cannot_be_a_file_name_stem(category_id: str) -> None:
+    importlib.import_module("src.api.routes.workbench")
+    module = importlib.import_module(BOOKMARKS_MODULE)
+    assert module.is_valid_category_id(category_id) is False
+    with pytest.raises(HTTPException) as caught:
+        module._record_path(category_id)
+    assert caught.value.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "category_id", ["a", "live-demo", "x" * 64, "com0", "console", "con-category"]
+)
+def test_the_id_guard_accepts_valid_ids(category_id: str) -> None:
+    importlib.import_module("src.api.routes.workbench")
+    module = importlib.import_module(BOOKMARKS_MODULE)
+    assert module.is_valid_category_id(category_id) is True
+    assert module._record_path(category_id).name == f"{category_id}.json"
+
+
 # --- the schema -------------------------------------------------------------------------------
 
 
@@ -697,6 +1016,8 @@ def _with(**changes: Any) -> dict[str, Any]:
         _with(entries=["docs//a.md"]),
         _with(entries=["docs/"]),
         _with(entries=[3]),
+        _with(entries=[f"f{index}.md" for index in range(501)]),
+        _with(entries=["p" * 1025]),
         _with(extra="nope"),
     ],
 )

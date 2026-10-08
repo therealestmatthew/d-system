@@ -143,6 +143,21 @@ describe('HtmlViewerRegion openFiles', () => {
     expect(tabLabels()).toEqual(['Tab 1', 'Tab 2', 'Tab 3', 'Tab 4'])
   })
 
+  it('makes the first delivered file of the second call the active tab, not the first tab', async () => {
+    await mountedViewer()
+    act(() => {
+      handle().openFiles?.(['first.html'])
+    })
+    // The empty tab took the first file, so Tab 1 is active and the next set lands in new tabs.
+    expect(selectedTab()).toBe('Tab 1')
+    act(() => {
+      handle().openFiles?.(['a.html', 'b.html', 'c.html'])
+    })
+    expect(tabLabels()).toEqual(['Tab 1', 'Tab 2', 'Tab 3', 'Tab 4'])
+    expect(selectedTab()).toBe('Tab 2')
+    await waitFor(() => expect(iframeSrc()).toContain('/workbench-file/a.html'))
+  })
+
   it('is reachable through deliverBatch, the one file-passing path', async () => {
     await mountedViewer()
     let outcome: ReturnType<typeof deliverBatch> | undefined

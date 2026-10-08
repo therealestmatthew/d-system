@@ -39,9 +39,22 @@ refused on write and reads as `excluded` if it became ignored later. A category 
 content when `D_SYSTEM_DATA_ROOT` points at the private portfolio, so it must not name files that
 the File Browser and the other workbench routes would never show.
 
-Writes write a temporary file in the same directory and atomically replace the record. Every
-mutation is a read-modify-write under one process lock, so two browser tabs adding different files
-to one category do not lose either.
+Writes write a temporary file in the same directory, fsync it and atomically replace the record.
+Every mutation is a read-modify-write under one process lock, so two browser tabs adding different
+files to one category do not lose either.
+
+Limits: the lock is per process, so two backends sharing one data root are not supported (the
+worktree launcher can start several backends; give each its own `D_SYSTEM_DATA_ROOT` or run one).
+A hard kill can leave a `.<id>.*.tmp` file in the bookmarks directory; it is not matched by `*.json`
+and is ignored on read, but `.gitignore` does not cover it (outside this phase's deliverables).
+Request bodies must be `application/json` and at most 64 KB, a category holds at most 500 entries,
+the data root at most 200 categories, and a path at most 1024 characters with no segment over 255.
+
+Symlinks: git cannot check a path that passes through a symlinked directory (it aborts the whole
+batch), so an entry whose lexical path differs from its resolved path is refused on write and read
+as `excluded`, and `git check-ignore` is run on resolved paths only. A `git check-ignore` exit code
+other than 0 or 1 is treated as "everything ignored" (fail closed); the helper in `workbench.py`
+does not do that, so this module has its own.
 """
 
 from __future__ import annotations
@@ -50,24 +63,60 @@ import json
 import os
 import posixpath
 import re
+import subprocess
 import tempfile
 import threading
 from pathlib import Path
 from typing import Any, Final, Literal
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from src.api.routes.workbench import (
     ALWAYS_EXCLUDED_NAMES,
     REPO_ROOT,
     PathEscapesRepositoryError,
-    _git_ignored_paths,
     resolve_repo_relative_path,
 )
 from src.db.source_validation import data_root
 
-router = APIRouter()
+MAX_REQUEST_BYTES: Final[int] = 64 * 1024
+MAX_ENTRIES_PER_CATEGORY: Final[int] = 500
+MAX_CATEGORIES: Final[int] = 200
+MAX_PATH_LENGTH: Final[int] = 1024
+MAX_SEGMENT_LENGTH: Final[int] = 255
+_BODY_METHODS: Final[frozenset[str]] = frozenset({"POST", "PATCH", "DELETE"})
+
+
+async def require_json_within_limit(request: Request) -> None:
+    """Router dependency: a write must say it is JSON (415 otherwise) and be small (413).
+
+    A cross-origin page can send a "simple" POST with `text/plain` and no preflight; refusing any
+    other content type means such a request creates nothing, whatever the FastAPI version parses.
+    POST and PATCH always need a JSON content type; DELETE needs one only when it carries a body
+    (the category delete has none, and a cross-origin DELETE needs a preflight anyway).
+    """
+    if request.method not in _BODY_METHODS:
+        return
+    declared = request.headers.get("content-length")
+    try:
+        declared_length = int(declared) if declared is not None else 0
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid Content-Length.") from None
+    if declared_length > MAX_REQUEST_BYTES:
+        raise HTTPException(status_code=413, detail="The request body is too large.")
+    has_body = declared_length > 0 or "transfer-encoding" in request.headers
+    if request.method != "DELETE" or has_body:
+        media_type = request.headers.get("content-type", "").split(";", 1)[0].strip().lower()
+        if media_type != "application/json":
+            raise HTTPException(
+                status_code=415, detail="The request body must be application/json."
+            )
+    if has_body and len(await request.body()) > MAX_REQUEST_BYTES:
+        raise HTTPException(status_code=413, detail="The request body is too large.")
+
+
+router = APIRouter(dependencies=[Depends(require_json_within_limit)])
 
 SCHEMA_VERSION: Final[int] = 1
 BOOKMARKS_SUBDIRECTORY: Final[tuple[str, ...]] = ("workbench", "bookmarks")
@@ -153,6 +202,15 @@ def _record_path(category_id: str) -> Path:
     return bookmarks_directory() / f"{category_id}.json"
 
 
+def _encodable(text: str) -> bool:
+    """Whether `text` can be written as UTF-8 (a lone surrogate cannot, in a file or a response)."""
+    try:
+        text.encode("utf-8")
+    except UnicodeEncodeError:
+        return False
+    return True
+
+
 def _read_record(path: Path) -> dict[str, Any] | None:
     """The parsed record, or `None` when the file is absent, unreadable, or not a record whose
     shape and `category_id` match its file name."""
@@ -168,7 +226,8 @@ def _read_record(path: Path) -> dict[str, Any] | None:
         raw.get("category_id") != path.stem
         or not isinstance(name, str)
         or not isinstance(entries, list)
-        or not all(isinstance(entry, str) for entry in entries)
+        or not all(isinstance(entry, str) and _encodable(entry) for entry in entries)
+        or not _encodable(name)
     ):
         return None
     return raw
@@ -214,6 +273,8 @@ def _write_record(record: dict[str, Any]) -> None:
     try:
         with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as handle:
             handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
         os.replace(temporary, path)
     except BaseException:
         Path(temporary).unlink(missing_ok=True)
@@ -232,6 +293,8 @@ def _clean_name(raw: str) -> str:
             status_code=400,
             detail=f"A category name is at most {NAME_MAX_LENGTH} characters.",
         )
+    if not _encodable(name):
+        raise HTTPException(status_code=400, detail="A category name must be valid text.")
     if any(ord(character) < 32 or ord(character) == 127 for character in name):
         raise HTTPException(
             status_code=400, detail="A category name must not contain control characters."
@@ -283,8 +346,16 @@ def _ensure_name_unused(name: str, records: list[dict[str, Any]], *, except_id: 
 def normalize_entry_path(raw: str) -> str:
     """The stored form of a requested path: forward slashes, no `.` segments, no repeated
     separators, case preserved. Rejects what can never be a repository-relative file path:
-    empty, absolute (POSIX, UNC or drive-lettered), or containing a `..` segment. Lexical only;
-    whether the file exists and is allowed is `validate_entry_file`'s job."""
+    empty, containing NUL or text that is not valid UTF-8, longer than `MAX_PATH_LENGTH`, with a
+    segment longer than `MAX_SEGMENT_LENGTH`, absolute (POSIX, UNC or drive-lettered), or containing
+    a `..` segment. Lexical only; whether the file exists and is allowed is `validate_entry_file`'s
+    job."""
+    if "\x00" in raw or not _encodable(raw):
+        raise HTTPException(status_code=400, detail="A file path must be valid text without NUL.")
+    if len(raw) > MAX_PATH_LENGTH:
+        raise HTTPException(
+            status_code=400, detail=f"A file path is at most {MAX_PATH_LENGTH} characters."
+        )
     unified = raw.replace("\\", "/")
     if not unified.strip():
         raise HTTPException(status_code=400, detail="A file path must not be empty.")
@@ -293,79 +364,129 @@ def normalize_entry_path(raw: str) -> str:
     segments = [segment for segment in unified.split("/") if segment not in ("", ".")]
     if ".." in segments:
         raise HTTPException(status_code=400, detail=f"Path escapes the repository root: {raw!r}")
+    if any(len(segment) > MAX_SEGMENT_LENGTH for segment in segments):
+        raise HTTPException(
+            status_code=400,
+            detail=f"A path segment is at most {MAX_SEGMENT_LENGTH} characters.",
+        )
     normalized = posixpath.normpath("/".join(segments)) if segments else "."
     if normalized == ".":
         raise HTTPException(status_code=400, detail="A file path must name a file.")
     return normalized
 
 
-def _is_private_or_internal(normalized: str) -> bool:
-    first = normalized.split("/", 1)[0]
-    return first == PRIVATE_DIRECTORY_NAME or first in ALWAYS_EXCLUDED_NAMES
+_BARRED_SEGMENTS: Final[frozenset[str]] = frozenset(
+    name.casefold() for name in {PRIVATE_DIRECTORY_NAME, *ALWAYS_EXCLUDED_NAMES}
+)
 
 
-def _resolved_inside_repository(normalized: str) -> Path | None:
-    """The resolved path of `normalized`, or `None` when it resolves outside the repository (a
-    symlink leaving the root)."""
+def _is_private_or_internal(parts: tuple[str, ...] | list[str]) -> bool:
+    """Whether any segment names `_private` or `.git` (or another always-excluded name), at any
+    depth, compared casefolded with trailing dots and spaces removed: a case-insensitive or
+    Windows filesystem treats `.GIT` and `.git.` as `.git`."""
+    return any(part.casefold().rstrip(". ") in _BARRED_SEGMENTS for part in parts)
+
+
+def _ignored_paths(paths: list[Path]) -> set[Path]:
+    """The subset of `paths` that `git check-ignore` reports ignored. Fails closed: a git exit code
+    other than 0 (some ignored) or 1 (none ignored), or git being unavailable, reports every path
+    ignored. Paths must be resolved (no symlink components) and inside `REPO_ROOT`."""
+    if not paths:
+        return set()
+    payload = b"\0".join(str(path.relative_to(REPO_ROOT)).encode() for path in paths) + b"\0"
     try:
-        return resolve_repo_relative_path(normalized)
-    except PathEscapesRepositoryError:
-        return None
+        result = _run_check_ignore(payload)
+    except OSError:
+        return set(paths)
+    if result.returncode not in (0, 1):
+        return set(paths)
+    ignored: set[Path] = set()
+    for name in result.stdout.split(b"\0"):
+        if name:
+            ignored.add(REPO_ROOT / name.decode())
+    return ignored
 
 
-def _entry_status(normalized: str, ignored: set[Path]) -> EntryStatus:
-    """Resolve one stored entry against the current working tree."""
-    if _is_private_or_internal(normalized):
-        return "excluded"
-    resolved = _resolved_inside_repository(normalized)
-    if resolved is None:
-        return "excluded"
-    lexical = REPO_ROOT / normalized
-    if not lexical.is_file():
-        return "missing"
-    if lexical in ignored or resolved in ignored:
-        return "excluded"
-    return "present"
+def _run_check_ignore(payload: bytes) -> subprocess.CompletedProcess[bytes]:
+    return subprocess.run(
+        ["git", "check-ignore", "-z", "--stdin"],
+        input=payload,
+        cwd=REPO_ROOT,
+        capture_output=True,
+        check=False,
+    )
+
+
+def _inspect(path: str) -> tuple[EntryStatus | None, Path | None]:
+    """Where `path` (a stored entry, possibly hand-edited) stands before the ignore check:
+    `("excluded" | "missing", None)` when that is already decided, else `(None, resolved)` for a
+    regular file whose path does not pass through a symlink and holds no private or `.git` segment.
+    Anything that raises while the path is examined (NUL, an over-long name, invalid text) is
+    `excluded`; nothing here raises."""
+    try:
+        if _is_private_or_internal(path.replace("\\", "/").split("/")):
+            return "excluded", None
+        resolved = resolve_repo_relative_path(path)
+        relative = resolved.relative_to(REPO_ROOT)
+        if _is_private_or_internal(relative.parts):
+            return "excluded", None
+        if os.path.normcase(relative.as_posix()) != os.path.normcase(path):
+            # A symlink (or a non-normalised hand edit): git cannot vouch for such a path.
+            return "excluded", None
+        if not resolved.is_file():
+            return "missing", None
+        return None, resolved
+    except (OSError, ValueError, UnicodeError):
+        return "excluded", None
 
 
 def resolve_entries(paths: list[str]) -> list[ResolvedEntry]:
     """Every entry's status, recomputed now. One `git check-ignore` call covers the batch."""
-    candidates: list[Path] = []
-    for normalized in paths:
-        if _is_private_or_internal(normalized):
-            continue
-        resolved = _resolved_inside_repository(normalized)
-        lexical = REPO_ROOT / normalized
-        if resolved is not None and lexical.is_file():
-            candidates.append(lexical)
-            if resolved != lexical:
-                candidates.append(resolved)
-    ignored = _git_ignored_paths(candidates)
-    return [ResolvedEntry(path=path, status=_entry_status(path, ignored)) for path in paths]
+    inspected = [(path, *_inspect(path)) for path in paths]
+    ignored = _ignored_paths([resolved for _, _, resolved in inspected if resolved is not None])
+    result: list[ResolvedEntry] = []
+    for path, status, resolved in inspected:
+        if status is None:
+            status = "excluded" if resolved in ignored else "present"
+        result.append(ResolvedEntry(path=path, status=status))
+    return result
 
 
 def validate_entry_file(raw: str) -> str:
     """The stored form of `raw`, after the ADR-015 rules for a path that is about to be written:
-    it must exist, be a file, stay inside the repository when symlinks are followed, and not be
-    private or ignored. Raises 400 for a path that can never be valid and 404 for one that does
-    not exist."""
+    it must exist, be a file, not pass through a symlink, stay inside the repository, and not be
+    private, internal or ignored. Raises 400 for a path that can never be valid and 404 for one
+    that does not exist."""
     normalized = normalize_entry_path(raw)
-    if _is_private_or_internal(normalized):
+    private = HTTPException(
+        status_code=400, detail=f"Private and internal paths are not accepted: {raw!r}"
+    )
+    if _is_private_or_internal(normalized.split("/")):
+        raise private
+    try:
+        resolved = resolve_repo_relative_path(normalized)
+        relative = resolved.relative_to(REPO_ROOT)
+        exists = resolved.exists()
+        is_file = resolved.is_file()
+    except PathEscapesRepositoryError:
         raise HTTPException(
-            status_code=400, detail=f"Private and internal paths are not accepted: {raw!r}"
+            status_code=400, detail=f"Path escapes the repository root: {raw!r}"
+        ) from None
+    except (OSError, ValueError, UnicodeError):
+        raise HTTPException(status_code=400, detail=f"Not a usable file path: {raw!r}") from None
+    if _is_private_or_internal(relative.parts):
+        raise private
+    if os.path.normcase(relative.as_posix()) != os.path.normcase(normalized):
+        raise HTTPException(
+            status_code=400, detail=f"Paths through a symbolic link are not accepted: {raw!r}"
         )
-    resolved = _resolved_inside_repository(normalized)
-    if resolved is None:
-        raise HTTPException(status_code=400, detail=f"Path escapes the repository root: {raw!r}")
-    lexical = REPO_ROOT / normalized
-    if not lexical.exists():
+    if not exists:
         raise HTTPException(status_code=404, detail=f"No such file: {raw!r}")
-    if not lexical.is_file():
+    if not is_file:
         raise HTTPException(
             status_code=400, detail=f"Only files can be bookmarked, not directories: {raw!r}"
         )
-    ignored = _git_ignored_paths([lexical] if resolved == lexical else [lexical, resolved])
-    if ignored:
+    if _ignored_paths([resolved]):
         raise HTTPException(status_code=400, detail=f"Path is private or ignored by git: {raw!r}")
     return normalized
 
@@ -412,6 +533,10 @@ def create_category(request: CategoryNameRequest) -> CategoryDetail:
         directory = bookmarks_directory()
         if directory.is_dir():
             taken.update(path.stem for path in directory.glob("*.json"))
+        if len(taken) >= MAX_CATEGORIES:
+            raise HTTPException(
+                status_code=409, detail=f"At most {MAX_CATEGORIES} categories are allowed."
+            )
         record: dict[str, Any] = {
             "schema_version": SCHEMA_VERSION,
             "category_id": _unique_category_id(name, taken),
@@ -450,6 +575,11 @@ def add_entry(category_id: str, request: EntryRequest) -> CategoryDetail:
         stored = validate_entry_file(request.path)
         if stored in record["entries"]:
             raise HTTPException(status_code=409, detail=f"Already in this category: {stored!r}")
+        if len(record["entries"]) >= MAX_ENTRIES_PER_CATEGORY:
+            raise HTTPException(
+                status_code=409,
+                detail=f"A category holds at most {MAX_ENTRIES_PER_CATEGORY} files.",
+            )
         record["entries"] = [*record["entries"], stored]
         _write_record(record)
     return _detail(record)
@@ -457,10 +587,15 @@ def add_entry(category_id: str, request: EntryRequest) -> CategoryDetail:
 
 @router.delete("/{category_id}/entries", response_model=CategoryDetail)
 def remove_entry(category_id: str, request: EntryRequest) -> CategoryDetail:
-    # Lexical normalisation only: the file may be gone, and a missing entry must stay removable.
-    stored = normalize_entry_path(request.path)
+    # The file may be gone, and a hand-edited entry may be unusable as a path, so removal matches
+    # the stored text exactly first and only then its normalised form; no file access is needed.
     with _WRITE_LOCK:
         record = _load_record(category_id)
+        stored = (
+            request.path
+            if request.path in record["entries"]
+            else normalize_entry_path(request.path)
+        )
         if stored not in record["entries"]:
             raise HTTPException(status_code=404, detail=f"Not in this category: {stored!r}")
         record["entries"] = [entry for entry in record["entries"] if entry != stored]
