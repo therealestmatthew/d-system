@@ -91,13 +91,17 @@ describe('FileBrowserRegion listing state after a folder change (R28)', () => {
     expect(screen.queryByText('Loading…')).toBeNull()
   })
 
-  it('shows Loading and no entries from the previous folder while the new listing is pending', async () => {
+  it('shows Loading and builds no tree from the previous folder while the new listing is pending', async () => {
+    // The root and docs listings both hold a README.md. If the stale root entries were fed to
+    // buildTree under the docs prefix, `README.md` would compute to `docs/README.md` and collide
+    // with the real entry: React logs a duplicate-key error at that commit.
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
     let resolveDocs: (response: Response) => void = () => {}
     const pendingDocs = new Promise<Response>((resolve) => {
       resolveDocs = resolve
     })
     stubBackend({
-      '.': async () => listing('root-file.txt'),
+      '.': async () => listing('README.md', 'root-file.txt'),
       docs: () => pendingDocs,
     })
     render(<FileBrowserRegion />)
@@ -108,12 +112,55 @@ describe('FileBrowserRegion listing state after a folder change (R28)', () => {
     await screen.findByText('Loading…')
     expect(screen.queryByRole('alert')).toBeNull()
     expect(screen.queryByText('root-file.txt')).toBeNull()
+    expect(screen.queryByText('README.md')).toBeNull()
+    expect(consoleError).not.toHaveBeenCalled()
 
     // The pending listing then settles normally.
     await act(async () => {
-      resolveDocs(listing('guide.md'))
+      resolveDocs(listing('README.md', 'guide.md'))
     })
     await waitFor(() => expect(screen.getByText('guide.md')).toBeTruthy())
     expect(screen.queryByText('Loading…')).toBeNull()
+    expect(consoleError).not.toHaveBeenCalled()
+    consoleError.mockRestore()
+  })
+
+  it('shows Loading, not the old alert, when browsing back to a failed folder', async () => {
+    let docsCalls = 0
+    let resolveSecondDocs: (response: Response) => void = () => {}
+    const secondDocs = new Promise<Response>((resolve) => {
+      resolveSecondDocs = resolve
+    })
+    let resolveSrc: (response: Response) => void = () => {}
+    const pendingSrc = new Promise<Response>((resolve) => {
+      resolveSrc = resolve
+    })
+    stubBackend({
+      '.': async () => listing('root-file.txt'),
+      docs: () => {
+        docsCalls += 1
+        return docsCalls === 1 ? Promise.resolve(new Response(null, { status: 500 })) : secondDocs
+      },
+      src: () => pendingSrc,
+    })
+    render(<FileBrowserRegion />)
+    await screen.findByText('root-file.txt')
+
+    act(() => screen.getByRole('button', { name: 'browse docs' }).click())
+    await screen.findByRole('alert')
+
+    // src is pending, then the user returns to docs, whose refetch is also pending.
+    act(() => screen.getByRole('button', { name: 'browse src' }).click())
+    await screen.findByText('Loading…')
+    act(() => screen.getByRole('button', { name: 'browse docs' }).click())
+    await screen.findByText('Loading…')
+    expect(screen.queryByRole('alert')).toBeNull()
+
+    await act(async () => {
+      resolveSecondDocs(listing('guide.md'))
+    })
+    await screen.findByText('guide.md')
+    expect(screen.queryByRole('alert')).toBeNull()
+    resolveSrc(listing('main.py'))
   })
 })

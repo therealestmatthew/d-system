@@ -46,6 +46,34 @@ from `phase-wbf-05` was not touched.
 Written first and run on the old order: tests 1 and 2 failed (the tree area held "Loading…"), test
 3 passed. On the new order all three pass.
 
+## Fix round after review (verdicts at 9b138ce: adversary PASS, judge PASS, both minor findings)
+
+Verdict records are in `docs/08-governance/reviews/verdicts/` (`2026-10-08-phase-wbf-15-demo-adversary.json`,
+`2026-10-08-phase-wbf-15-review-judge.json`), copied unchanged.
+
+- Adversary F01 (brief stale error when returning to a previously failed folder while another fetch
+  is pending): fixed. `browseFolder` now calls `setSettled(null)`, so a settled result does not
+  outlive a browse away and back. I judged this inside R28's text ("a later successful browse
+  replaces the message" and "while a listing is pending, the panel still shows Loading…"). New test:
+  docs fails, src pending, browse back to docs, Loading shown and no alert until docs settles; it
+  fails without the fix.
+- Adversary F02 / judge F01 (pending-folder test does not exercise the `buildTree` guard): the test
+  now uses colliding entries (root `README.md`, `docs/README.md`) and a `console.error` spy,
+  asserting no call while docs is pending and after it settles. I removed guards to check that it
+  fails. Result, stated plainly: removing the `entriesFolder === contextFolder` guard in `buildTree`
+  alone does not fail any test, and neither does removing it together with the render gate. Cause:
+  three layers independently stop a stale tree reaching the DOM (the folder-keyed `loadState`, the
+  render gate, the `buildTree` guard), and a duplicate-key warning needs `TreeLevel` to render.
+  The `buildTree` guard is not observable alone. With all three removed (and `setSettled(null)`
+  removed) the pending test fails, as does the new back-to-docs test; with only the first two
+  removed, only the back-to-docs test fails. So the tests catch loss of the stale-render protection
+  as a whole, not loss of that one guard. The guard was restored.
+- Judge F02 (fails-on-old-order not shown by runner evidence): already recorded under Outcome; the
+  tests were run on the old order before the fix (two failed).
+
+Fix-round checks: `cd ts && npm test`: 9 files, 93 tests passed. `npm run build`: built.
+`npm run lint`: eslint with `--max-warnings 0`, no output.
+
 ## Acceptance
 
 - REQ-012 R28, error case: met (tests 1 and 2).

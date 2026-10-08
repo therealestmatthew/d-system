@@ -17785,6 +17785,8 @@ items:
   - ts/src/stage/FileBrowserRegion.tsx
   - ts/src/stage/FileBrowserRegion.test.tsx
   - docs/03-sessions/SESS-2026-10-08-15-file-browser-folder-error.md
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-15-demo-adversary.json
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-15-review-judge.json
   result: 'Vitest: 3 new FileBrowserRegion tests (error after a folder change, recovery on a
     later browse, pending shows Loading with no previous entries); written first, the two error
     tests failed on the old order and all pass on the new (92 tests in the full ts suite).

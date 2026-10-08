@@ -323,6 +323,10 @@ export default function FileBrowserRegion() {
   const browseFolder = (folder: string) => {
     if (folder === contextFolder) return
     setContextFolder(folder)
+    // Drop the previous settled result. It names its own folder, so it would otherwise survive a
+    // browse away and back: returning to a folder whose earlier listing failed would show that
+    // old error until the new fetch settles, instead of "Loading…".
+    setSettled(null)
     setExpandedPaths(new Set())
     setContextMenu(null)
   }
