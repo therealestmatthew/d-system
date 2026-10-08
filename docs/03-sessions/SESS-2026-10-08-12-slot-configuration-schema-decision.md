@@ -112,7 +112,10 @@ selections, versus data-only geometry), item 2 (instances declared, not browser-
 ## Review
 
 The gating review (demo adversary) passed the phase with two major and eight minor findings. Verdict
-record: `docs/08-governance/reviews/verdicts/2026-10-08-phase-arch-06-demo-adversary.json`, reply
+records: `docs/08-governance/reviews/verdicts/2026-10-08-phase-arch-06-demo-adversary.json` and the
+shadow judge's `docs/08-governance/reviews/verdicts/2026-10-08-phase-arch-06-review-judge.json`
+(pass, four minor: F01 the uid 0 pytest failure, recorded above as pre-existing; F02 the early
+supersede, ADR open item 5; F03 fixed below; F04 no fix required). Reply
 `_working/session-manager/review-replies/phase-arch-06-demo-adversary.md` (not tracked). All ten were
 fixed in `ADR-031`. The fixes are the Session Manager's choices under the owner's pre-approval and
 are awaiting ratification with the rest of the ADR.
@@ -140,3 +143,5 @@ are awaiting ratification with the rest of the ADR.
   is open item 10.
 - F10: decision 8 says a spanning slot's floor applies to the sum of its tracks; the 1024x768 check
   uses those sums.
+- Judge F03: the keep-versus-replace section of `ADR-031` now says `grid_tracks` is the one place stored
+  selections gain geometry and points to open item 1.

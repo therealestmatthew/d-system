@@ -119,6 +119,10 @@ persistence posture. The four decisions of the layout decision (`ADR-016`), one 
 | 3. The browser stores selections only, under one namespaced key carrying the layouts' `schema_version`; unknown layout, slot, panel or version is discarded silently in favor of the layout file's defaults, never an error, never a migration | **Keep**, with the stored shape widened | "Selections only" and the silent-discard rule are the load-bearing choices and `R05`, `phase-arch-08` and `R27` all rely on them. What changes is what a selection refers to (an instance, not a bare panel id) and the list of things that are explicitly not stored (maximize, collapse). The qualifier "in demo week" is kept as written; whether to drop it, so that no migration code is ever written, is open item 10. |
 | 4. The repository defaults are the fallback state; a fresh browser, a cleared store or a version mismatch yields layout-1 with its default assignments | **Keep unchanged** | Nothing in the new model touches it, and clearing one key as the way to reset a machine is still what the demo needs. |
 
+`grid_tracks` (decision 8) is the one place where stored selections gain geometry; every other stored
+field is an assignment, a choice or panel state. It is the part of this record that departs most from
+`ADR-016`, and open item 1 asks the owner to ratify or refuse it.
+
 Of `ADR-016`'s three rejected alternatives: server-side layout persistence stays rejected
 (`ADR-015` rule 4 is unchanged); pixel geometries stay rejected for layout definitions (decision 8
 introduces content floors, but the layout files stay fractional, and a standing check keeps the
