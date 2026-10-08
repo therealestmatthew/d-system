@@ -1,0 +1,50 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-04-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-04",
+  "reviewed_commit": "5ce2e3167cebc7152c8305f1c711fb9609cbfa42",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "deliverBatch can throw when a target throws an unstringifiable value",
+      "evidence": "ts/src/stage/panelBridge.ts:671 String(error) in the catch block; probe: throw Object.create(null) gives 'NULLPROTO THREW TypeError: Cannot convert object to primitive value'; throw {toString(){throw}} gives 'THROWOBJ THREW Error: x'",
+      "consequence": "Violates the never-throws contract (ADR-029 s6 point 4) and aborts the remaining targets, for exotic thrown values only; no test covers a non-Error throw",
+      "minimal_fix": "Build the error message in a helper that wraps String(error) in its own try/catch with a fixed fallback string; add a test throwing Object.create(null)"
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Duplicate paths: requested and receipt disagree, and the target receives a deduplicated list",
+      "evidence": "panelBridge.ts:646-647 and :657; probe deliverBatch(['a','a','b']) returned requested ['a','a','b'] with delivered ['a','b']; the docblock at :639-641 admits it; no test",
+      "consequence": "N-in-N-accounted and 'full ordered list' (ADR-029 s6 points 2 and 3) are false for duplicate input; wbf-05's 'opened X of Y' could show a mismatch with nothing declined",
+      "minimal_fix": "Dedupe requested too, or tell wbf-05 to compute Y from the receipt and dedupe at the caller; add one test"
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "isBatchAvailable is not reactive; no availability hook over a target list",
+      "evidence": "panelBridge.ts:680-686 reads resolve() at call time with no subscription; ADR-029 s6 point 5 says 'the availability hook reads null'; the test calls it outside React",
+      "consequence": "A render that calls isBatchAvailable without also calling the plural hooks for every listed channel will not update when a panel registers or unregisters, leaving a stale disabled state (R08)",
+      "minimal_fix": "Document that a plural hook per listed channel must run in the same component, or add useBatchAvailable(targets) over useSyncExternalStore with a rendered test"
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Keyless-caller compatibility proved by types and stubs, not by the real regions",
+      "evidence": "All 28 tests in panelBridge.test.tsx use viewerStub/terminalStub; none mounts HtmlViewerRegion or TerminalRegion; tsc -b passes and the 10-mutant run shows the slot semantics are pinned",
+      "consequence": "A later change to a region's register effect would not be caught by this phase's tests; low risk",
+      "minimal_fix": "None required here; wbf-05's HtmlViewerRegion test should cover the real register/unregister"
+    }
+  ],
+  "raw_reply_sha256": "66757a2ef8b71950bf1a0d96ef30b66e65f6259f6f669c2cd62a216264316394",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager (subagent run, 2026-10-08). Brief: phase entry from dev's backlog.yaml, range 327ac0d..5ce2e31, diff with the session record and backlog bookkeeping excluded, scratch clone at the reviewed commit; the runner manifest was still queued, the adversary ran build, tests, lint, governance and a ten-mutant run itself. No builder-written input."
+}
