@@ -480,6 +480,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-10-08-13 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-13-popover-side-and-height.md |
 | SESS-2026-10-08-14 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-14-rotator-variants.md |
 | SESS-2026-10-08-15 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-15-file-browser-folder-error.md |
+| SESS-2026-10-08-16 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-16-viewer-missing-page-check.md |
 
 ## Plans and their phases
 

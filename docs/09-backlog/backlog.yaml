@@ -17864,6 +17864,20 @@ items:
     an existing file under the key the viewer persists to, load the page and confirm the iframe
     frames the app shell. Then check that a HEAD to a real file carries the sandbox header and a
     HEAD answered by the fallback does not.
+  session: doc-session-viewer-missing-page-check
+  completion_evidence:
+  - ts/src/stage/HtmlViewerRegion.tsx
+  - ts/src/stage/HtmlViewerRegion.test.tsx
+  - docs/03-sessions/SESS-2026-10-08-16-viewer-missing-page-check.md
+  result: 'cd ts && npm test: 9 files, 95 tests passed (6 new in HtmlViewerRegion.test.tsx; the
+    two that cover the defect fail on the unmodified component). cd ts && npm run build built
+    with no errors. src.governance: Governance OK. Playwright on ports 8026/5196, stored viewer
+    tab naming README.md: flag unset, the fallback HEAD is 200 text/html with no
+    Content-Security-Policy, the panel reads "Selected page is absent" and no iframe renders; flag
+    set, the HEAD carries Content-Security-Policy: sandbox and the iframe frames the rendered
+    README. ts/vite.config.ts not edited. The two existing viewer test files had their file-route
+    stubs given the header (deliverable widening, Session Manager to apply). pytest: 1 failed, 2059
+    passed, the known uid-0 failure (idea 000604).'
 - id: phase-wbf-17
   title: Show the reason in the terminal panel when a session fails to start
   plan: doc-workbench-features-defects
