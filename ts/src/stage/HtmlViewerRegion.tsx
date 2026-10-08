@@ -28,6 +28,20 @@ interface DirectoryEntry {
 }
 
 type FilesLoadState = 'loading' | 'loaded' | 'error'
+
+/** The file route (`serveRepositoryFiles` in `vite.config.ts`) sets `Content-Security-Policy:
+ * sandbox` on every response that serves a file (the 403 and 404 refusals do not carry it, and
+ * are not `ok` anyway). The dev server's single-page fallback answers any unregistered path (the route is registered only when
+ * `D_SYSTEM_DEMO_TERMINAL=1` in the frontend process) with 200 and the application shell and
+ * never sets that header, so a bare `response.ok` cannot tell a file from the shell (REQ-012 R29,
+ * idea 000555). Requiring the header is the same-origin signal that the response came from the
+ * file route; it is readable here because the request is same-origin. */
+function isServedByFileRoute(response: Response): boolean {
+  if (!response.ok) return false
+  const policy = response.headers.get('Content-Security-Policy') ?? ''
+  return policy.split(';').some((directive) => directive.trim().toLowerCase().split(/\s+/)[0] === 'sandbox')
+}
+
 type PageState = 'idle' | 'checking' | 'ready' | 'missing' | 'error'
 
 /** One HTML Viewer tab's live (in-memory) context — the same three fields ADR-016 calls out as
@@ -305,7 +319,9 @@ export default function HtmlViewerRegion() {
     let cancelled = false
     fetch(`${WORKBENCH_FILE_PREFIX}${activeSelectedFile}`, { method: 'HEAD', cache: 'no-store' })
       .then((response) => {
-        if (!cancelled) setSettledPage({ key: pageKey, state: response.ok ? 'ready' : 'missing' })
+        if (!cancelled) {
+          setSettledPage({ key: pageKey, state: isServedByFileRoute(response) ? 'ready' : 'missing' })
+        }
       })
       .catch(() => {
         if (!cancelled) setSettledPage({ key: pageKey, state: 'error' })

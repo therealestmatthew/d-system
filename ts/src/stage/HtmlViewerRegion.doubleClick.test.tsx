@@ -17,7 +17,11 @@ function stubBackend() {
       }
       if (url.includes('/demo/stage/overview-location')) return new Response(null, { status: 500 })
       if (url.includes('/workbench/search')) return new Response('[]', { status: 200 })
-      if (url.includes('/workbench-file/')) return new Response(null, { status: 200 })
+      // The file route marks every file response with this header, which the viewer's existence
+      // check requires (REQ-012 R29).
+      if (url.includes('/workbench-file/')) {
+        return new Response(null, { status: 200, headers: { 'Content-Security-Policy': 'sandbox' } })
+      }
       return new Response(null, { status: 404 })
     }),
   )
