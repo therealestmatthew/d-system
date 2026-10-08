@@ -1,0 +1,98 @@
+{
+  "verdict_id": "2026-10-08-phase-arch-06-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-arch-06",
+  "reviewed_commit": "896982f7094f026646f7f021e07ae41b9ad7e4d0",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "arch-08's recommended second HTML Viewer in `explorer` violates ADR-031's own eligibility rule, and is hidden so R14 is not observable",
+      "evidence": "The arch-08 row recommends 'a second HTML Viewer assigned to explorer in layout 2, hidden by default'. Decision 2 gives explorer a body admitting only tree and table; decision 4 maps html-viewer to document-frame. Running the rule gives 'html-viewer in explorer? False'. StagePage portals only the visible panel per slot, so a hidden instance is unmounted.",
+      "consequence": "A builder following the recommendation writes a default_assignment the matcher rejects, and a cleared browser does not show two instances mounted, so R14 is not observed.",
+      "minimal_fix": "Name an eligible slot (primary or secondary in layout 2), hidden by default, and state that R14's test makes it visible by selection."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "The matcher is a TS pure function; the ADR does not say how pytest computes eligibility",
+      "evidence": "Decision 4 puts `elements` in PANEL_REGISTRY (TS); the arch-07 row says test_workbench_fit_contracts.py 'must use the matcher' but that test builds its matrix in Python from layout JSON (eligible_slots at lines 1084 and 1854). The ADR rejects TS constants as 'invisible to pytest'.",
+      "consequence": "arch-07 must guess between a second Python implementation (a drifting second eligibility authority, forbidden by R12), a regex parse plus a Python copy, or a node call.",
+      "minimal_fix": "State the single implementation site and how Python tests consume it, e.g. a node script emitting the eligibility matrix as JSON, or `elements` kept in a data file both sides read."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "On shipped data, 'structural match' reduces to a body-kind tag match; bar capacities are deferred",
+      "evidence": "Step 2 of the decision 4 rule cannot exclude anything shipped; capacities are left to arch-07 with the constraint 'must not exclude any W16 assignment'. The 16/17 result depends only on the body-kind mapping, with primary and secondary each admitting both kinds.",
+      "consequence": "The rejected alternatives 'capability tags' and 'body kind alone' describe what actually ships, so the text overstates what structure decides.",
+      "minimal_fix": "State that body kind is the only shipped discriminator, or require one negative bar-capacity test case in arch-07."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Claim that the first instance keeping the type id makes a bare type id 'an obvious bug' is backwards",
+      "evidence": "Decision 5: 'makes a bare type id used where an instance id is meant an obvious bug rather than a silent one'. For every shipped instance instance_id equals the type id.",
+      "consequence": "A bare type id used as an instance id works silently in every existing test and fails only for -2 instances; plain string aliases do not catch it.",
+      "minimal_fix": "Reword; require branded types or a standing test exercising a -2 instance of every type."
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "The double header is prevented by contract plus a test, not by construction",
+      "evidence": "Decision 1 says it 'cannot be produced by a panel that follows the contract'; the mechanism is left to arch-07; checks are grep-style (no .stage-region__header, no import path).",
+      "consequence": "A panel or sub-app drawing its own bar under another class passes the grep; R13 passes only if the count is by element or role.",
+      "minimal_fix": "Define the R13 count as header elements and role=banner per slot, not by class, and say the guarantee is a standing test."
+    },
+    {
+      "id": "F06",
+      "severity": "minor",
+      "title": "ADR is silent on REQ-007 W01 (notes strip has no title; only control is the dropdown)",
+      "evidence": "Every frame has an identity sub-slot filled by the slot and a frame_actions sub-slot; W01 requires no title or label on the strip; the widening list amends W16 and REQ-037 rows, not W01.",
+      "consequence": "arch-07 either shows a forbidden 'Notes' label and extra buttons on the strip or deviates from W01 without an amendment.",
+      "minimal_fix": "Make identity and frame_actions optional per frame (compact omits identity), or list W01 among the rows arch-07 amends."
+    },
+    {
+      "id": "F07",
+      "severity": "minor",
+      "title": "'Undeclared instance is dropped' is ambiguous against workbench-wide instance ids",
+      "evidence": "Decision 6 drops instance_state entries for undeclared instances; decision 5 makes ids workbench-wide; arch-08 declares html-viewer-2 in layout 2 only.",
+      "consequence": "If judged per active layout, switching to layout 1 and writing state wipes layout 2's second-viewer tabs, contradicting the kept discard-only-unknown rule.",
+      "minimal_fix": "Say 'undeclared in every layout file'."
+    },
+    {
+      "id": "F08",
+      "severity": "minor",
+      "title": "Recommended cross-panel default target amends ADR-029 section 6 point 3 while the ADR claims not to touch it",
+      "evidence": "Decision 7 recommends 'the visible instance last interacted with' for an omitted key; ADR-029 section 6 points 1 and 3 define get() and an omitted key as the most recently registered handle.",
+      "consequence": "arch-08 either changes BridgeSlot.get() semantics that phase-wbf-04 and phase-wbf-05 build on, or adds a second default path, with ADR-029 not named as amended.",
+      "minimal_fix": "State that the rule is a caller-level resolver leaving BridgeSlot.get() as ADR-029 defines it, or name ADR-029 point 3 as amended."
+    },
+    {
+      "id": "F09",
+      "severity": "minor",
+      "title": "A new standing rule ('no migration code, now or later') is added outside the open items",
+      "evidence": "Decision-3 row of the keep/replace table drops 'in demo week' and states the rule; PLAN-028 decision 3 asks only to keep the persistence posture; the nine open items do not list it.",
+      "consequence": "The owner is not asked to ratify a rule stronger than ADR-016's wording.",
+      "minimal_fix": "Add it as an open item or restore the time qualifier."
+    },
+    {
+      "id": "F10",
+      "severity": "minor",
+      "title": "Per-track minmax floors do not say how a spanning slot's floor maps to tracks",
+      "evidence": "Decision 8 uses minmax(<floor>, <size>fr) per track; secondary spans three rows in layout 1 and three columns in layout 2; strip alone occupies a 0.25fr row.",
+      "consequence": "arch-09 invents the mapping, and the 'floors fit 1024x768' check depends on it.",
+      "minimal_fix": "State that a spanning slot's floor applies to the sum of its tracks (or is divided across them)."
+    }
+  ],
+  "raw_reply_sha256": "c083e9d727e9c757ff5c645048e65dc038f5cec83393823ce415375059f68faf",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager (subagent run, 2026-10-08). Brief: phase entry from dev's backlog.yaml, range 1755096..896982f, diff with the session record and backlog bookkeeping excluded, scratch clone at the reviewed commit; the adversary ran governance, a partial pytest (-x stopped at the root-only test) and the eligibility rule against both layouts itself; the runner manifest was still queued. No builder-written input."
+}
