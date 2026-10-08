@@ -9392,6 +9392,8 @@ items:
   - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-02-demo-adversary.json
   - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-02-security-review.json
   - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-02-review-judge.json
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-02-demo-adversary-2.json
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-02-review-judge-2.json
   result: 'The list and search routes now return modified_at (ISO 8601 UTC, ms, Z suffix; null when
     unreadable) on every entry, optional so the File Browser and explorers are unchanged. The viewer
     header shows Modified YYYY-MM-DD HH:mm:ss, re-read on tab switch, selection, re-selection of the

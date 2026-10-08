@@ -181,3 +181,28 @@ verdicts are separate commits.
 - **Rebase.** Rebased onto `ccr-b69b05b4-tdcrux` at `9f0b740`; the only conflict was
   `docs/08-governance/catalog.md`, resolved by regenerating it.
 - **Checks after the fix.** See the hand-off message for the command tails.
+
+## Second review round
+
+Second gating adversary PASS (2 minor) and second shadow judge PASS (6 minor notes) at `53e1c1f`; the
+two verdict records (`2026-10-08-phase-wbf-02-demo-adversary-2.json`, `-review-judge-2.json`) are
+committed unchanged under `docs/08-governance/reviews/verdicts/` and listed in the phase's
+`completion_evidence`. This round changed one code comment and this record; no behaviour changed.
+
+- **Both reviewers: stale comment.** The `DirectoryEntry.modified_at` comment said `None` came from
+  "a dangling symlink, a racing delete"; with `lstat` a dangling link returns its own time. It now
+  says `None` is for a removed file or a time a datetime cannot hold, and that a symlink reports the
+  link's own mtime, not its target's (chosen so an out-of-repository time is never reported), so the
+  badge of an in-repository symlinked page does not advance when its target is regenerated (adversary
+  F01, judge F02). That limitation is accepted, not fixed.
+- **Adversary F02: header heights as the reviewer measured them (px), badge phase against baseline
+  54.4 in every cell.** layout 1 1280x720: 62.8; layout 1 1024x768, layout 2 1280x720 and layout 2
+  1024x768: 76.8 each. These supersede the table in the first fix round, whose baseline column
+  (40 and 54) came from a different seeded state. The reviewer found the growth identical with the
+  badge hidden: the header's `flex-wrap` sets the height, not the badge. The Embedded toggle clip at
+  layout 2 1024x768 is the pre-existing 000637, unchanged in kind (reviewer: toggle spans past the
+  section edge at baseline too); the wrap removes the baseline clip at layout 2 1280x720.
+- **Judge notes, one line each.** F03: the wrap and the badge's inline styles are checked by no
+  runner check, only by the live measurements recorded here. F04: the zone is stated in the title
+  only; the visible text carries no zone. F05: the two full-suite failures are the known ones. F06:
+  the verdict JSON files are review records and sit outside the phase's deliverables by design.
