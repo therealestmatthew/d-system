@@ -3,9 +3,10 @@ import DirectoryPickerDialog from './DirectoryPickerDialog'
 import Popover from './Popover'
 import { useActiveSchemaVersion } from '../workbench/schemaVersionContext'
 import { loadHtmlViewerTabs, saveHtmlViewerTabs } from '../workbench/storage'
-import { viewerBridge, type ViewerBridgeHandle } from './panelBridge'
+import { viewerBridge, type BatchReceipt, type ViewerBridgeHandle } from './panelBridge'
 import { fetchWorkbench } from './useTerminalEnabled'
-import { COMPATIBLE_EXTENSIONS } from './compatibleExtensions'
+import { COMPATIBLE_EXTENSIONS, isViewerCompatible } from './compatibleExtensions'
+import { planOpenFiles } from './viewerPlacement'
 
 const OVERVIEW_LOCATION_URL = '/api/v1/demo/stage/overview-location'
 const SEARCH_URL = '/api/v1/workbench/search'
@@ -180,6 +181,51 @@ export default function HtmlViewerRegion() {
         ? settledPage.state
         : 'checking'
 
+  // The tabs as of the latest committed render, plus any `openFiles` call since. `openFiles` must
+  // answer synchronously with a receipt (ADR-029 section 6 point 2) and two calls can land before
+  // React re-renders, so the placement plan is computed from this ref, not from the render's
+  // `tabs` closure, and the ref is advanced by the same change that is queued on the state.
+  const tabsRef = useRef<ViewerTab[]>(tabs)
+  useEffect(() => {
+    tabsRef.current = tabs
+  }, [tabs])
+
+  /** ADR-029 section 6 point 8: opens an ordered set of files. Fills empty tabs first, then adds
+   * tabs up to `MAX_TABS`, never replaces a tab that holds a page, and declines the rest. The first
+   * delivered file's tab becomes active. */
+  function openFiles(paths: string[]): BatchReceipt {
+    const plan = planOpenFiles(tabsRef.current, paths, {
+      maxTabs: MAX_TABS,
+      nextTabId: nextTabIdRef.current,
+      isCompatible: isViewerCompatible,
+    })
+    if (plan.assignments.length === 0) return plan.receipt
+    nextTabIdRef.current += plan.assignments.filter((assignment) => assignment.newTab).length
+    const apply = (previous: ViewerTab[]): ViewerTab[] => {
+      const next = [...previous]
+      for (const { tabId, path, newTab } of plan.assignments) {
+        if (newTab) {
+          next.push({ id: tabId, directory: dirname(path), searchText: '', selectedFile: path })
+          continue
+        }
+        const index = next.findIndex((tab) => tab.id === tabId)
+        if (index === -1) continue
+        // A tab still waiting for the overview-location seed has no directory; give it one so the
+        // seed (which only fills a tab whose directory is null) does not replace this file.
+        next[index] = {
+          ...next[index],
+          selectedFile: path,
+          directory: next[index].directory ?? dirname(path),
+        }
+      }
+      return next
+    }
+    tabsRef.current = apply(tabsRef.current)
+    setTabs(apply)
+    setActiveTabId(plan.assignments[0].tabId)
+    return plan.receipt
+  }
+
   function updateTab(id: number, patch: Partial<Omit<ViewerTab, 'id'>>) {
     setTabs((previous) => previous.map((tab) => (tab.id === id ? { ...tab, ...patch } : tab)))
   }
@@ -292,6 +338,7 @@ export default function HtmlViewerRegion() {
         updateTab(tabId, { selectedFile: path })
         setActiveTabId(tabId)
       },
+      openFiles: (paths) => openFiles(paths),
     }
     viewerBridge.register(handle)
     return () => viewerBridge.unregister(handle)

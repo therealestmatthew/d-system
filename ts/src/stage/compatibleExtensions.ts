@@ -20,3 +20,13 @@ export const COMPATIBLE_EXTENSIONS = [
   '.webp',
   '.ico',
 ]
+
+/** Whether the HTML Viewer can show `path`, by the same extension list. The extension is the text
+ * from the last dot of the file name (lowercased); a name with no extension, or only a leading dot
+ * (`.gitignore`), is not compatible. */
+export function isViewerCompatible(path: string): boolean {
+  const name = path.slice(path.lastIndexOf('/') + 1)
+  const dot = name.lastIndexOf('.')
+  if (dot <= 0) return false
+  return COMPATIBLE_EXTENSIONS.includes(name.slice(dot).toLowerCase())
+}
