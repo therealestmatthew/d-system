@@ -1,0 +1,33 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-14-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-14",
+  "reviewed_commit": "0b23ba0b0a76837a342d7b85b76c1dca89eab920",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Bubble's own scroll is undone by the capture-phase scroll listener, so overflow-y:auto fallback is inert",
+      "evidence": "Tooltip.tsx adds window scroll listener (capture) -> reposition() sets maxHeight none, clamping scrollTop to 0. At 1280x260 layout-1 terminal tooltip: sh=178 ch=113; setting scrollTop=40 reads st:0 after 200ms; wheel over bubble leaves st:0. Popover.tsx measureNaturalHeight saves/restores scrollTop; Tooltip does not.",
+      "consequence": "On viewports too short for the text (about 300px high or less) the bottom of the tooltip text cannot be scrolled to, contradicting the CSS comment. Acceptance sizes (1280x720, 1024x768) are unaffected.",
+      "minimal_fix": "In reposition/scroll handler ignore events whose target is bubbleRef.current, or save and restore bubble.scrollTop around the maxHeight lift."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Comment and test claim the pointer can move from trigger onto the bubble without collapsing; a real pointer crosses an 8px gap and collapses it",
+      "evidence": "Real Chromium 20-step move from trigger centre to bubble centre: open=false in all 4 layout/size cells for notes strip and terminal. The 8px VIEWPORT_MARGIN gap is outside both wrapper and portaled bubble. Tooltip.test.tsx 'stays open while the pointer is over the portaled bubble' uses synthetic mouseOut/mouseOver with relatedTarget under jsdom. Old inline bubble (about 6px gap) behaved the same.",
+      "consequence": "REQ-006 R03 collapse holds, but the test gives false assurance of a path users cannot take; with F01 the bubble is effectively non-interactive.",
+      "minimal_fix": "Reword the comment and test to say only a direct pointer jump keeps it open, or bridge the gap (padding or invisible hit area on the bubble) so the pointer can reach it."
+    }
+  ],
+  "raw_reply_sha256": "31460ffa54c7233ce235cdb19b91a49260c62f8d4d2ae77ecec941c63287efca",
+  "outcomes": []
+}

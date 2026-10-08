@@ -75,6 +75,45 @@ with the bubble box inside the viewport, scroll width and height equal to client
 to (2, 2), and document scroll extents zero (REQ-006 R02). The notes strip bubble is now at
 (760,114)-(1000,211) at 1280x720 in layout-1. The script is not committed (a scratch file).
 
+## Fix round after review (verdicts at 0b23ba0: adversary PASS, judge PASS, both minor findings)
+
+Verdict records are in `docs/08-governance/reviews/verdicts/` (`2026-10-08-phase-wbf-14-demo-adversary.json`,
+`2026-10-08-phase-wbf-14-review-judge.json`), copied unchanged. The branch was rebased onto the
+trunk at 5e9a7f2 (phase-wbf-06 merged); no file of mine conflicted and `NotesStripRegion.tsx` was
+not touched.
+
+- F01 (both reviewers: the bubble's own scroll was undone, so the `overflow-y: auto` fallback was
+  inert on short viewports): fixed in `Tooltip.tsx`. The capture-phase scroll listener ignores
+  events whose target is inside the tooltip, and `reposition()` saves `scrollTop` before lifting
+  `maxHeight` for the measurement and puts it back, as `Popover.tsx`'s `measureNaturalHeight` does.
+  Two new vitest tests (a scroll event on the bubble; a window resize) with `scrollTop` backed by a
+  variable that clamps to 0 when the height is read with `maxHeight` lifted. Each passes with either
+  half of the fix; both fail with both halves removed. Checked in Chromium at 1280x260: a wheel over
+  the terminal tooltip moved `scrollTop` to 60 (to its maximum, 22, in layout-2), where before it
+  snapped to 0.
+- F02 (adversary; judge F02: a real pointer crossing the 8 px gap collapsed the tooltip, so the old
+  test overstated what a user could do): I chose to bridge the gap rather than reword the test. The
+  scrollable fallback from F01 is useful only if the pointer can reach the bubble, and rewording
+  would have left the bubble unreachable. The bubble is wrapped in a transparent
+  `.stage-tooltip__bridge` element that touches the trigger and carries the 8 px as its own padding
+  (above or below, by side), so the visible bubble is exactly where it was and the fit-check
+  measurement of `.stage-tooltip__bubble` is unchanged. The bridge is a React descendant of the
+  trigger's wrapper, so React treats the pointer crossing it as staying inside. The test now moves
+  trigger to bridge to bubble. Checked with real mouse moves in Chromium (down from the trigger,
+  then across): the tooltip stayed open for the notes strip and the terminal at 1280x720, 1024x768
+  and 1280x260 in both layouts, and collapsed when the pointer went to (2, 2). A diagonal move that
+  leaves the 18 px trigger sideways before reaching the bridge still collapses it, which is
+  REQ-006 R03.
+- Judge F03: `test/test_demo_terminal_api.py::test_control_characters_reach_the_shell` failed in the
+  runner's gate under load. It passed in my own full pytest run, and it is unrelated to `ts/`.
+- Judge F04: the Playwright evidence is written in this record because the runner cannot run a
+  backlog verification entry that is prose.
+
+After the fix: fit check `--live --quick` has no tooltip findings (28 findings in total after the
+rebase, none from tooltips); the 14-trigger hover run is still all inside the viewport, text fits,
+collapses on pointer leave, zero page scroll. At 1280x260 in layout-1 the notes strip's `?` is
+covered by the region header and cannot be hovered; that layout fault is outside this phase.
+
 ## Unresolved
 
 - The overview panel is only reachable in layout-2's main slot, and the fit check does not assign it
@@ -92,4 +131,5 @@ to (2, 2), and document scroll extents zero (REQ-006 R02). The notes strip bubbl
   text fits there. A tooltip near the bottom of the viewport therefore opens above its trigger. No
   existing row says which side a tooltip should prefer. Awaiting the owner's confirmation if a
   below-first preference is wanted.
-- `Tooltip.tsx` now imports from `Popover.tsx`, so the two share one placement rule.
+- `Tooltip.tsx` now imports from `Popover.tsx`, so the two share one placement rule. Both this and
+  the side-above preference were ruled to stay by the Session Manager; both go on the ratification list.

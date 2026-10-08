@@ -1,0 +1,49 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-14-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-14",
+  "reviewed_commit": "0b23ba0b0a76837a342d7b85b76c1dca89eab920",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Scroll listener resets the bubble's own scrollTop in the overflow case",
+      "evidence": "Tooltip.tsx adds window 'scroll' listener with capture=true; reposition() sets bubble.style.maxHeight='none' and reads offsetHeight, which clamps scrollTop to 0, and restores only maxHeight. StagePage.css makes .stage-tooltip__bubble overflow-y:auto. Popover.tsx saves and restores scrollTop for the same reason.",
+      "consequence": "When text is taller than the room (viewport shorter than ~200px), scrolling inside the bubble snaps it back to the top, so the overflowing text cannot be read. Not reachable at 1280x720 or 1024x768.",
+      "minimal_fix": "Ignore scroll events whose target is the bubble (or save and restore scrollTop around the measurement, as Popover does)."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Note: unit tests use mocked geometry and do not exercise the trigger-to-bubble gap",
+      "evidence": "Tooltip.test.tsx mocks getBoundingClientRect, offsetHeight and offsetWidth. The hover-over-bubble test dispatches mouseOut/mouseOver with relatedTarget. The bubble sits 8px from the trigger.",
+      "consequence": "The tests check the placement arithmetic and the portal parent, not real clipping or reachability of the bubble across the gap. The old CSS also had a gap, so this is not a regression.",
+      "minimal_fix": "Cover with the Playwright check; optionally bridge the gap with padding on the wrapper or bubble."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Note: second pytest failure not on the known list",
+      "evidence": "07-gate.txt:120-123 and 146: test/test_demo_terminal_api.py::test_control_characters_reach_the_shell failed ('after-ctrl-c-4' never appeared). Summary at line 148: 2 failed, 2064 passed, 1 skipped.",
+      "consequence": "Probably environmental (pty/shell test in a root VM) and unrelated, since the diff touches only ts/. Unconfirmed against the base.",
+      "minimal_fix": "Confirm the test also fails on the base commit and record it as a known environment failure."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Note: Playwright verification not run, so acceptance 1 is unconfirmed in a browser",
+      "evidence": "manifest.json lists the Playwright entry as 'not run: not a command' with no evidence file. The runner and I cannot run it.",
+      "consequence": "Acceptance 1 (bubble inside the viewport and text fully visible at 1280x720 and 1024x768 in both layouts for all three triggers) rests on code reading and mocked-geometry tests.",
+      "minimal_fix": "Run the Playwright hover check and record the bounding boxes against the viewport."
+    }
+  ],
+  "raw_reply_sha256": "25e0f1a110c9247da5ccebf85c1aed31f032c5229607b7dea7993cf6d7d9ce71",
+  "outcomes": []
+}

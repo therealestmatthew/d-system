@@ -17771,6 +17771,8 @@ items:
   - ts/src/stage/Tooltip.test.tsx
   - ts/src/stage/StagePage.css
   - docs/03-sessions/SESS-2026-10-08-18-tooltip-bottom-clip.md
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-14-demo-adversary.json
+  - docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-14-review-judge.json
   result: 'Measured first: the notes strip bubble was 240x113 at (760,106), bottom 219, in a strip
     whose bottom was 109 (1280x720), so the clip came from .stage-region overflow hidden and not
     the shared popover. Tooltip now portals into document.body and is placed with choosePlacement.
@@ -17779,7 +17781,11 @@ items:
     layout-2, layout-2 with overview): bubble inside the viewport, text fits, collapses on
     pointer leave, zero page scroll. ts: 123 tests pass (11 new in Tooltip.test.tsx), build and
     lint clean. src.governance OK, ruff and mypy clean. Full pytest 1 failed
-    (test_an_unwritable_worktree_parent_is_refused, root; idea 000604), 2065 passed.'
+    (test_an_unwritable_worktree_parent_is_refused, root; idea 000604), 2065 passed.
+    Fix round after review (both verdicts PASS, minor): the tooltip keeps its scroll position (the
+    scroll listener ignores the bubble, scrollTop saved and restored) and a transparent bridge
+    spans the gap so the pointer can reach the bubble; 13 Tooltip tests, real-mouse checks in
+    Chromium at 1280x260, 1280x720 and 1024x768.'
 - id: phase-wbf-15
   title: Show the File Browser error when a folder listing fails after a folder change
   plan: doc-workbench-features-defects
