@@ -112,3 +112,23 @@ Gating review (demo adversary) and shadow review (judge) both rejected `0cdab8d`
   consumer.
 - Judge F04 (minor): `test_an_unwritable_worktree_parent_is_refused` fails as root; recorded above as
   an environment artifact, not edited here.
+
+### Second review round
+
+Records: `docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-13-demo-adversary-2.json` and
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-13-review-judge-2.json`. Both passed `a234b19`.
+
+- Adversary F01 / judge F01 (minor): the side could flip while a filter was typed, and late content
+  placed in two steps. Fixed: the side is chosen on open, on resize and when the trigger moves, and
+  kept when only the body's content changes (the observer remeasures the height only). Test added.
+- Adversary F02 / judge F02 (minor): the scrollTop restore and text-only mutations were unguarded.
+  Added a test whose `scrollTop` is clamped while the inline `maxHeight` is lifted and asserts the offset
+  is restored after a resize, and one for a text-node change; the observer now also sets
+  `characterData: true`. Each was checked by reverting the line: the test fails.
+- Adversary F03 (minor): a room-limited bubble touched the viewport edge. Fixed: each side's room loses
+  the viewport margin twice (`2 * VIEWPORT_MARGIN`); room-limited test added (top 338 + height
+  = 712 = viewport minus 8).
+- Judge F04 (minor): the audit note pointed at this record and counted the grep as nine. Pointer
+  removed; the note says "nine consumers (the new test file also matches the grep)".
+- Judge F03 (minor): pytest under root; accepted as an environment artifact (see above).
+

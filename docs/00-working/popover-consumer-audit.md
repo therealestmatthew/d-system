@@ -7,7 +7,7 @@ Measured on 2026-10-08 against `ts/src/stage/Popover.tsx` before and after the p
 Viewer pointed at `_public/engine/trace` (140 compatible files). The command opens every enabled
 popover trigger on the page at 1280x720 and 1024x768 and records the bubble box.
 
-Consumers found by `grep -rl "from '.*Popover'" ts/src`: nine, the nine the phase names.
+Consumers found by `grep -rl "from '.*Popover'" ts/src`: nine consumers (the new test file also matches the grep).
 
 Bubble height in px, written `1280x720 / 1024x768`; `a -> b` means before -> after the change, a
 single number means unchanged.
@@ -22,16 +22,18 @@ single number means unchanged.
 | `Slot` ("HTML Viewer" chooser) | not in layout | 77 / 77 | Content fully shown; unchanged. |
 | `Slot` ("File Browser" chooser) | 109 / 109 | 109 / 109 | Content fully shown; unchanged. |
 | `CommandPanel` ("Commands (4)") | 229 / 229 | 229 / 229 | Content fully shown; unchanged. |
-| `InjectionDropdowns` ("Skills (11)") | 397 / 397 | 360 / 379 | layout-1 content fully shown. layout-2: content needs 395 px and 360 to 379 px is the room on the larger side, so the last entries scroll inside the bubble. Cannot be larger; the viewport has no more room on either side. |
-| `InjectionDropdowns` ("Prompts (43)") | 432 / 461 | 360 / 379 | Content needs 1909 px; scrolls inside the bubble at the 60% cap (layout-1) or the room above (layout-2). Unchanged. |
-| `InjectionDropdowns` ("Agents (16)") | 432 / 461 | 360 / 379 | Content needs 555 px; scrolls inside as above. Unchanged. |
+| `InjectionDropdowns` ("Skills (11)") | 397 / 397 | 360 -> 352 / 379 -> 371 | layout-1 content fully shown. layout-2: content needs 395 px and 352 to 371 px is the room on the larger side, so the last entries scroll inside the bubble. Cannot be larger; the viewport has no more room on either side. |
+| `InjectionDropdowns` ("Prompts (43)") | 432 / 461 | 360 -> 352 / 379 -> 371 | Content needs 1909 px; scrolls inside the bubble at the 60% cap (layout-1) or the room above (layout-2). Unchanged. |
+| `InjectionDropdowns` ("Agents (16)") | 432 / 461 | 360 -> 352 / 379 -> 371 | Content needs 555 px; scrolls inside as above. Unchanged. |
 | `TerminalMenu` ("...") | 111 / 111 | 111 / 111 | Content fully shown; unchanged. |
 | `TerminalRegion` (close session "x") | 128 / 128 | 128 / 128 | Content fully shown; unchanged. |
 | `NotesStripRegion` ("v", notes controls) | 164 / 164 | 164 / 164 | Content fully shown; unchanged. |
 
+In layout-2 the three dropdown lists lose 8 px to the second viewport margin (a bubble limited by
+the room now ends 8 px above the viewport edge instead of touching it).
+
 Scrolling bodies (Prompts, Agents, layout-2 Skills, the file list) keep their scroll position while
-being scrolled: the shared component no longer remeasures on a scroll inside the bubble (review
-finding, see the session record).
+being scrolled: the shared component no longer remeasures on a scroll inside the bubble.
 
 ## Baseline of the defect, from the file selector measurement
 
