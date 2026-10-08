@@ -106,7 +106,7 @@ describe('Popover placement in the DOM', () => {
       const bottom = isTrigger ? triggerBottom : 0
       return { top, bottom, left: 400, right: 480, width: 80, height: bottom - top, x: 400, y: top } as DOMRect
     })
-    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(naturalHeight)
+    return vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(naturalHeight)
   }
 
   async function open() {
@@ -142,5 +142,40 @@ describe('Popover placement in the DOM', () => {
     const bubble = await open()
     const top = parseFloat(bubble.style.top)
     expect(top + parseFloat(bubble.style.maxHeight)).toBeLessThanOrEqual(VH - 8)
+  })
+
+  it('does not remeasure or reset the body scroll position when the body itself scrolls', async () => {
+    const offsetHeight = mockGeometry(157, 187, 2000)
+    const bubble = await open()
+    const body = bubble.querySelector('.stage-popover__body') as HTMLElement
+    body.scrollTop = 300
+    const readsBefore = offsetHeight.mock.calls.length
+    await act(async () => {
+      body.dispatchEvent(new Event('scroll'))
+    })
+    expect(offsetHeight.mock.calls.length).toBe(readsBefore)
+    expect(body.scrollTop).toBe(300)
+  })
+
+  it('repositions without remeasuring when the page outside the bubble scrolls', async () => {
+    const offsetHeight = mockGeometry(157, 187, 2000)
+    await open()
+    const readsBefore = offsetHeight.mock.calls.length
+    await act(async () => {
+      document.body.dispatchEvent(new Event('scroll'))
+    })
+    expect(offsetHeight.mock.calls.length).toBe(readsBefore)
+  })
+
+  it('remeasures when the content changes after open', async () => {
+    const offsetHeight = mockGeometry(157, 187, 2000)
+    const bubble = await open()
+    const body = bubble.querySelector('.stage-popover__body') as HTMLElement
+    const readsBefore = offsetHeight.mock.calls.length
+    await act(async () => {
+      body.appendChild(document.createElement('p'))
+      await Promise.resolve()
+    })
+    expect(offsetHeight.mock.calls.length).toBeGreaterThan(readsBefore)
   })
 })

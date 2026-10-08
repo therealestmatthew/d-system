@@ -743,7 +743,7 @@ body {
    at the top of that scroller so a long list can still be narrowed. */
 .stage-html-viewer__search {
   position: sticky;
-  top: 0;
+  top: -0.5rem;
   z-index: 1;
   background: #fff;
   font-size: 0.8rem;

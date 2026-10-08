@@ -72,15 +72,20 @@ export function choosePlacement({
 
 // The bubble's height with no maxHeight applied, at the width it will have. Measured on the live
 // element (its inline size is restored straight after, because React skips a style property whose
-// value it believes unchanged). Returns undefined before the bubble has rendered.
+// value it believes unchanged). Lifting maxHeight lets the browser clamp the body's scrollTop, so
+// that is saved and put back too. Returns undefined before the bubble has rendered. It forces a
+// layout, so it runs on open, resize and content change only, never on a scroll.
 function measureNaturalHeight(bubble: HTMLDivElement | null, width: number): number | undefined {
   if (!bubble) return undefined
+  const body = bubble.querySelector<HTMLElement>('.stage-popover__body')
+  const scrollTop = body?.scrollTop ?? 0
   const { maxHeight, width: previousWidth } = bubble.style
   bubble.style.maxHeight = 'none'
   bubble.style.width = `${width}px`
   const natural = bubble.offsetHeight
   bubble.style.maxHeight = maxHeight
   bubble.style.width = previousWidth
+  if (body && body.scrollTop !== scrollTop) body.scrollTop = scrollTop
   return natural
 }
 
@@ -136,7 +141,10 @@ export default function Popover({
   const triggerRef = useRef<HTMLButtonElement>(null)
   const bubbleRef = useRef<HTMLDivElement>(null)
 
-  const reposition = useCallback(() => {
+  // The content height measured at the last open, resize or content change; a scroll reuses it.
+  const naturalRef = useRef<number | undefined>(undefined)
+
+  const reposition = useCallback((remeasure: boolean) => {
     const trigger = triggerRef.current
     if (!trigger) return
     const rect = trigger.getBoundingClientRect()
@@ -150,11 +158,12 @@ export default function Popover({
     }
     left = Math.max(VIEWPORT_MARGIN, left)
 
+    if (remeasure) naturalRef.current = measureNaturalHeight(bubbleRef.current, clampedWidth)
     const { openUpward, maxHeight } = choosePlacement({
       spaceAbove: rect.top - VIEWPORT_MARGIN,
       spaceBelow: viewportHeight - rect.bottom - VIEWPORT_MARGIN,
       viewportHeight,
-      naturalHeight: measureNaturalHeight(bubbleRef.current, clampedWidth),
+      naturalHeight: naturalRef.current,
     })
 
     const next: CSSProperties = {
@@ -190,12 +199,27 @@ export default function Popover({
 
   useLayoutEffect(() => {
     if (!open) return
-    reposition()
-    window.addEventListener('resize', reposition)
-    window.addEventListener('scroll', reposition, true)
+    naturalRef.current = undefined
+    reposition(true)
+    const onResize = () => reposition(true)
+    // Capture phase, so it also sees scrolls of the page's inner scrollers that move the trigger.
+    // A scroll inside the bubble (the body's own list) moves nothing and must not touch layout:
+    // remeasuring there reset the body's scrollTop to 0.
+    const onScroll = (event: Event) => {
+      if (bubbleRef.current?.contains(event.target as Node)) return
+      reposition(false)
+    }
+    window.addEventListener('resize', onResize)
+    window.addEventListener('scroll', onScroll, true)
+    // The content can change after open (a list that finishes loading, a filter typed): size the
+    // bubble for what it holds now, not for what it held when it opened.
+    const body = bubbleRef.current?.querySelector('.stage-popover__body')
+    const observer = body ? new MutationObserver(() => reposition(true)) : null
+    if (body) observer?.observe(body, { childList: true, subtree: true })
     return () => {
-      window.removeEventListener('resize', reposition)
-      window.removeEventListener('scroll', reposition, true)
+      window.removeEventListener('resize', onResize)
+      window.removeEventListener('scroll', onScroll, true)
+      observer?.disconnect()
     }
   }, [open, reposition])
 
