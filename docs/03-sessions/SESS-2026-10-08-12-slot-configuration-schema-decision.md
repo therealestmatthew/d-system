@@ -63,7 +63,7 @@ Nothing was built. The record's recommendation:
 **Proposed; awaiting the owner's ratification (pre-approved run, 2026-10-08).** The ADR front matter
 is `status: draft`, following `ADR-029` and `ADR-030`. `ADR-016` reads `superseded` already because
 the governance validator requires it of a `supersedes` target; until the owner ratifies, `ADR-016`
-still describes what is shipped. Nine ratification points are listed under "Open items for the
+still describes what is shipped. Eleven ratification points are listed under "Open items for the
 owner" in the ADR; the ones that change what a later phase builds are item 1 (browser track-size
 selections, versus data-only geometry), item 2 (instances declared, not browser-created) and item 4
 (the terminal's collapse toggle moves to the slot).
@@ -108,3 +108,35 @@ selections, versus data-only geometry), item 2 (instances declared, not browser-
 
 - Ratification of the ADR, in particular the geometry decision.
 - Whether the owner wants the `overview` eligibility change prevented (ADR open item 3).
+
+## Review
+
+The gating review (demo adversary) passed the phase with two major and eight minor findings. Verdict
+record: `docs/08-governance/reviews/verdicts/2026-10-08-phase-arch-06-demo-adversary.json`, reply
+`_working/session-manager/review-replies/phase-arch-06-demo-adversary.md` (not tracked). All ten were
+fixed in `ADR-031`. The fixes are the Session Manager's choices under the owner's pre-approval and
+are awaiting ratification with the rest of the ADR.
+
+- F01 (major): the `phase-arch-08` `R14` instance is now `html-viewer-2` assigned to `secondary` in
+  layout 2, hidden by default; `R14`'s test makes it visible through the `secondary` panel switcher.
+  The decision 5 example changed to match.
+- F02 (major): decision 4 and the `phase-arch-07` row now state where the rule lives. Element
+  configurations are in `_data/workbench/panel-elements.json`, which the registry refers to; the
+  matcher is written once in TypeScript and once in Python as a documented pair, with a shared
+  fixture test over every shipped (panel type, role) pair. Open item 11 records the alternative.
+- F03: decision 4 says the body kind is the only discriminator on shipped data and bar capacity
+  guards future panels; `phase-arch-07` includes one negative bar-capacity case.
+- F04: decision 5 no longer claims the first-instance convention exposes type/instance confusion;
+  it requires branded types and a standing `-2`-instance test in `phase-arch-08`.
+- F05: decision 1 says the guarantee is a standing test, and `R13` counts `header` elements and
+  `role="banner"` inside a slot, not a class.
+- F06: `identity` and `frame_actions` are optional per frame; `compact` omits `identity`; `REQ-007`
+  W01 is among the rows `phase-arch-07` amends; a check bars multiple instances in a role whose frame
+  has no `identity`.
+- F07: the stored-state drop rule reads "undeclared in every layout file".
+- F08: the cross-panel default is a caller-level resolver; `BridgeSlot.get()` and `ADR-029` are
+  untouched.
+- F09: the "in demo week" qualifier is restored in the keep/replace table; "no migration code, ever"
+  is open item 10.
+- F10: decision 8 says a spanning slot's floor applies to the sum of its tracks; the 1024x768 check
+  uses those sums.

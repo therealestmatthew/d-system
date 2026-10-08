@@ -32,6 +32,13 @@ is built by this record.
 record is ratified, `ADR-016` still describes what the shipped workbench does, and its status says
 otherwise. If the owner rejects this record, revert both front matters in one commit.
 
+The gating review of this record (`phase-arch-06`, verdict
+`docs/08-governance/reviews/verdicts/2026-10-08-phase-arch-06-demo-adversary.json`) passed with two
+major and eight minor findings. Each is fixed below. The fixes are the Session Manager's choices
+under the owner's pre-approval and are **awaiting the owner's ratification** with the rest of the
+record; the ones that change what a later phase builds are in decisions 4, 5, 7 and 8 and in open
+items 10 and 11.
+
 Field names and file names below are indicative; the properties are binding. The phases that build
 them may rename a field if they keep the property.
 
@@ -109,7 +116,7 @@ persistence posture. The four decisions of the layout decision (`ADR-016`), one 
 |---|---|---|
 | 1. Layouts are versioned JSON at `_data/workbench/layouts/`, one file per layout, with a stable id, a display name, slots with stable ids, fractional grid geometry and default assignment, and "the set of panel types it admits" | **Keep**, except the last clause, which is **replaced** | The location, the one-file-per-layout rule, the `schema_version` integer, stable slot ids and fractional geometry are not in question, and the shipped layouts and their tests rely on them. "The set of panel types it admits" is the per-panel allow-list that `R12` removes. It is replaced by structural eligibility (decision 4). |
 | 2. Geometry changes are data-file edits; the configuration surface never edits geometry | **Replace** | Its reason was a one-week runway and the risk of unreviewable browser state (`ADR-016`, 2026-09-10). The runway has ended, and `000133` asks to revisit exactly this. Decision 8 admits bounded track-size selections in the browser while topology, ranges and floors stay in data, which answers the second reason. |
-| 3. The browser stores selections only, under one namespaced key carrying the layouts' `schema_version`; unknown layout, slot, panel or version is discarded silently in favor of the layout file's defaults, never an error, never a migration | **Keep**, with the stored shape widened | "Selections only" and the silent-discard rule are the load-bearing choices and `R05`, `phase-arch-08` and `R27` all rely on them. What changes is what a selection refers to (an instance, not a bare panel id) and the list of things that are explicitly not stored (maximize, collapse). The words "in demo week" are dropped as a qualifier: no migration code is written for any version bump, now or later, unless a later record says otherwise. |
+| 3. The browser stores selections only, under one namespaced key carrying the layouts' `schema_version`; unknown layout, slot, panel or version is discarded silently in favor of the layout file's defaults, never an error, never a migration | **Keep**, with the stored shape widened | "Selections only" and the silent-discard rule are the load-bearing choices and `R05`, `phase-arch-08` and `R27` all rely on them. What changes is what a selection refers to (an instance, not a bare panel id) and the list of things that are explicitly not stored (maximize, collapse). The qualifier "in demo week" is kept as written; whether to drop it, so that no migration code is ever written, is open item 10. |
 | 4. The repository defaults are the fallback state; a fresh browser, a cleared store or a version mismatch yields layout-1 with its default assignments | **Keep unchanged** | Nothing in the new model touches it, and clearing one key as the way to reset a machine is still what the demo needs. |
 
 Of `ADR-016`'s three rejected alternatives: server-side layout persistence stays rejected
@@ -123,7 +130,9 @@ for the reason in the table.
 ### 1. A slot is a schema-owned frame: one top bar and one body, and panels fill the sub-slots
 
 Every slot renders exactly one **frame**, drawn by the slot and never by a panel. A frame has a **top
-bar** and a **body**. The top bar is a fixed set of named **sub-slots**, in order:
+bar** and a **body**. The top bar is a fixed set of named **sub-slots**, in order. `identity` and `frame_actions` are
+optional per frame (the `compact` frame in decision 2 omits `identity`); `help` and `controls` are
+present wherever a frame admits panel-filled elements.
 
 | Sub-slot | Filled by | Admits | Purpose |
 |---|---|---|---|
@@ -137,9 +146,12 @@ The body is one sub-slot that admits a **body kind** (decision 4) and hosts the 
 **A panel never draws a top bar.** It declares element types and renders its elements into the
 sub-slots the slot gives it. The panel module has no import path to a header renderer and its markup
 contains no `.stage-region__header`. Two bars in one slot therefore cannot be produced by a panel
-that follows the contract, and `R13` is asserted as a standing check anyway: assign every panel type
-into every slot it is eligible for, in both layouts, and count the rendered top bars per slot; any
-count other than one fails.
+that follows the contract. **That is a contract, not a language guarantee**: nothing in React stops
+a panel, or a sub-app, from rendering its own `<header>` under another class name. The guarantee is
+a standing test. `R13` counts rendered bars per slot as `header` elements plus elements with
+`role="banner"` inside the slot's frame, never by class name: assign every panel type into every
+slot it is eligible for, in both layouts, and any count other than one fails. A grep for
+`.stage-region__header` in panel sources is a second, cheaper check and does not replace the count.
 
 The mechanism is `phase-arch-07`'s to choose. The properties it must hold: (1) a panel has no way to
 render a top bar; (2) a panel's bar elements keep its state, so a viewer's refresh button still sees
@@ -178,7 +190,12 @@ Proposed starting content, which `phase-arch-07` confirms by measuring the nine 
 `primary` and `secondary` have the same schema because the shipped data already makes them
 interchangeable and the terms file says the only honest difference is which surface is focal. They
 remain two roles. The strip uses an inline frame so its body shares the bar's row and it keeps
-the single thin row it has today; this is still one bar. Capacity numbers (`controls` and `help`
+the single thin row it has today; this is still one bar. The `compact` frame omits `identity`:
+`REQ-007` W01 gives the strip no title or label, and its only control is the dropdown. A frame
+without `identity` has no panel switcher, so `phase-arch-07` adds a check that a layout assigns at
+most one instance to a role whose frame omits it. Whether `compact` carries `frame_actions` is
+`phase-arch-17`'s call, since `R25` asks every panel type to maximize; if it does not, `REQ-011`
+`R25` and `REQ-007` W01 are amended together there. Capacity numbers (`controls` and `help`
 per frame) are for `phase-arch-07` to set from the real element counts of the nine panels; they must
 not exclude any assignment that `REQ-007` W16 ships.
 
@@ -200,16 +217,18 @@ deeper tree is a later schema version.
 
 ### 4. Eligibility is a structural match, and nothing else decides it
 
-Each panel type declares an **element configuration** next to its component, in `PANEL_REGISTRY`
-(the one registration point `REQ-037` discovers by parsing that literal):
+Each panel type declares an **element configuration**. The declarations live in one tracked data
+file, `_data/workbench/panel-elements.json`, keyed by panel type, so that the TypeScript matcher and
+the Python tests read the same bytes:
 
-```ts
-'html-viewer': {
-  displayName: 'HTML Viewer',
-  Component: HtmlViewerRegion,
-  elements: { body: 'document-frame', bar: ['action', 'choice', 'toggle'] },
-},
+```json
+"html-viewer": { "body": "document-frame", "bar": ["action", "choice", "toggle"] }
 ```
+
+`PANEL_REGISTRY` (the one registration point `REQ-037` discovers by parsing that literal) refers to
+the file rather than restating it, for example `elements: panelElements['html-viewer']`. Whether the
+file is imported or fetched at runtime is `phase-arch-07`'s call, and the entry keeps the
+`displayName:` and `Component:` fields `REQ-037` `C03` counts, so that parse stays green.
 
 A panel type is **eligible** for a role when, and only when:
 
@@ -220,9 +239,18 @@ A panel type is **eligible** for a role when, and only when:
 3. every required sub-slot is satisfied (the body is required).
 
 The inputs are the panel's element configuration and the role's schema. The panel type's id, the
-slot id and the layout are not inputs. An element configuration is a property of the component's
-code, so it lives with the component and cannot drift from what it renders; a data file listing it
-would be a second copy.
+slot id and the layout are not inputs.
+
+**Where the rule is implemented.** The authority is the data: `panel-elements.json` and
+`slot-schemas.json`. The rule is written twice, once in TypeScript for the workbench and once in
+Python for `pytest` (the layout-schema test and the fit-contract matrix), as a documented pair, each
+pointing at the other in a comment. A shared fixture test asserts that both implementations agree on
+every shipped (panel type, role) pair and on the negative case below. This is a deliberate
+duplication of a small pure function, guarded by that test, and it replaces the alternatives of a
+Python copy with no guard, a regex parse of nested TypeScript, and a node call from `pytest`. An
+element configuration can drift from what its component renders; a check that the component's
+rendered bar elements are drawn from its declared types is `phase-arch-07`'s to add if it can be done
+cheaply, and the render-time error in decision 1 point 4 catches the undeclared case at run time.
 
 **Applied to the shipped panels, the rule reproduces `REQ-007` W16's eligibility in all but one
 cell.** Checked on 2026-10-08 against both shipped layout files, with `terminal`, `terminal-cmd` and
@@ -232,6 +260,13 @@ cell.** Checked on 2026-10-08 against both shipped layout files, with `terminal`
 eligible for `secondary` as well as `primary`. That is correct by the rule (`overview` embeds an iframe exactly
 as the HTML Viewer does) and is a visible change, so it is open item 3. `overview` is the panel type
 `phase-arch-03`'s duplication audit may retire.
+
+**On the shipped data the body kind is the only discriminator.** No bar capacity excludes any
+shipped panel from any role, so today structural eligibility is a body-kind match with the bar rule
+behind it. Bar capacity guards future panels and sub-apps (a panel with more controls than a role
+has room for is refused). `phase-arch-07` includes one negative bar-capacity case: a synthetic panel
+with more controls than the `strip` role's frame admits is not eligible for `strip`, in both
+implementations.
 
 There is no per-panel or per-slot allow-list anywhere, including as a generated cache. `R12`'s
 verification includes a layout carrying an `eligible_slots` key failing the layout JSON Schema.
@@ -249,7 +284,7 @@ Layout files declare instances, not types:
   { "instance_id": "html-viewer",   "panel_type": "html-viewer" },
   { "instance_id": "html-viewer-2", "panel_type": "html-viewer", "label": "HTML Viewer 2" }
 ],
-"default_assignment": { "html-viewer": "primary", "html-viewer-2": "explorer" }
+"default_assignment": { "html-viewer": "primary", "html-viewer-2": "secondary" }
 ```
 
 - `instance_id` is a lowercase kebab string, unique across the **workbench**, not only within a
@@ -258,13 +293,17 @@ Layout files declare instances, not types:
   declaring an id gives it the same `panel_type`.
 - The first instance of a type keeps the type id as its instance id (`terminal` is the
   `terminal` instance of type `terminal`); further instances are `<type>-<n>` from 2. This keeps the
-  shipped defaults, tests and prose readable, and makes a bare type id used where an instance id is
-  meant an obvious bug rather than a silent one.
+  shipped defaults, tests and prose readable. It has a cost: for every first instance the type id
+  and the instance id are the same string, so a type id used where an instance id is meant works
+  silently and fails only for a `-2` instance. The convention does not protect against that; the
+  two measures in the next point do.
 - `label` is optional and shown in the `identity` sub-slot; it defaults to the type's display name,
   with an ordinal appended when a layout declares more than one instance of the type.
 - `panel_id` stops existing as a name in layout data, storage and the TypeScript types, so a type and
-  an instance cannot be confused. The code distinguishes the two by distinct types
-  (`PanelTypeId`, `PanelInstanceId`), and a panel component receives its identity from a hook
+  an instance cannot be confused. The code distinguishes the two by **branded**
+  types (`PanelTypeId`, `PanelInstanceId`; plain string aliases would not stop the confusion), and
+  `phase-arch-08` adds a standing test that exercises a `-2` instance of every panel type that holds
+  state (bridge registration, stored state, session ownership, host identity). A panel component receives its identity from a hook
   (`usePanelInstance()`), not from props, because `Component` is a zero-prop component type today.
 - `eligible_slots` is removed from `panels` (decision 4). Eligibility is computed per instance from
   its type.
@@ -292,7 +331,7 @@ The single namespaced key and the silent-discard rule are kept. The stored state
 | `active_layout` | layout id | unchanged |
 | `panel_assignments` | layout id, then instance id, then slot id | validated against the layout's declared instances and structural eligibility |
 | `slot_visible_panel` | layout id, then slot id, then instance id | unchanged in form; values are instance ids |
-| `instance_state` | instance id, then that instance's own state | replaces the single `html_viewer_tabs` and `active_notes_file` fields; each panel validates its own entry, as the viewer validates its tabs today; an entry for an undeclared instance is dropped |
+| `instance_state` | instance id, then that instance's own state | replaces the single `html_viewer_tabs` and `active_notes_file` fields; each panel validates its own entry, as the viewer validates its tabs today; an entry for an instance id that is undeclared in every layout file is dropped; an id declared by any layout is kept, so state written in layout 2 survives a visit to layout 1 |
 | `grid_tracks` | layout id, then column and row track sizes | added by `phase-arch-09` (decision 8); optional |
 
 **Not stored, by rule:** maximize and collapse state (decision 9), open popovers, scroll positions,
@@ -301,7 +340,7 @@ file's arrangement plus the stored selections above.
 
 The repository holds everything that defines the workbench's structure: slot schemas, layout
 topology, the declared instances, default assignment and visibility, default track sizes and
-content floors. The panel registry (code) holds each type's element configuration.
+content floors. Each type's element configuration is in `panel-elements.json`, which the panel registry (code) refers to.
 
 ### 7. Session ownership: per instance in the browser, no change on the server
 
@@ -324,8 +363,11 @@ session by instance, that record decides it.
 Cross-panel actions need a rule for which instance they reach. The bridge's batch contract
 (`ADR-029` section 6) leaves fan-out to the caller and defaults an omitted key to the most recently
 registered handle. With two instances of a type that default is arbitrary from the user's point of
-view. `phase-arch-08` states and tests the rule; the recommendation is that a caller without an
-explicit key reaches the visible instance the user last interacted with.
+view. `phase-arch-08` states and tests the rule; the recommendation is that a caller without an explicit
+key reaches the visible instance the user last interacted with. That rule belongs to a caller-level
+resolver that picks the key before it calls `deliverBatch`. It leaves `BridgeSlot.get()` and the
+omitted-key behavior exactly as `ADR-029` section 6 points 1 and 3 define them, so `phase-wbf-04`
+and `phase-wbf-05` are unaffected and `ADR-029` is not amended.
 
 ### 8. Geometry: constraints come from the schema, and the browser may choose track sizes inside them
 
@@ -347,7 +389,12 @@ Three parts.
    (fractions) may be adjusted in the browser and stored as `grid_tracks` per layout. The renderer
    enforces each track's floor with `minmax(<floor>, <size>fr)`, so a stored value can never make a
    slot smaller than its role allows, and the zero-scroll obligation does not depend on what is
-   stored. A stored value of the wrong shape or unit is discarded to the layout's default sizes
+   stored. A slot's floor applies to the **sum** of the tracks it spans on each axis: in the shipped
+   layouts `secondary` spans three rows in layout 1 and three columns in layout 2, and `strip`
+   alone occupies one row. A slot that occupies a single track puts its floor on that track. When a
+   track is spanned by one slot and also holds another, the larger requirement wins. How the
+   renderer realizes the sum (for example by distributing a shortfall across the spanned tracks) is
+   `phase-arch-09`'s; the 1024x768 check below uses these sums. A stored value of the wrong shape or unit is discarded to the layout's default sizes
    under the kept discard rule. Resetting is clearing the key, or a reset control.
 
 The pixel concern that rejected "pixel geometries" in `ADR-016` is met by a standing check: the sum
@@ -381,7 +428,8 @@ panel type has them and none implements them (`R25`).
 ### 10. Migration from schema_version 3
 
 The kept discard rule is the migration: a version bump means the old key is never read again and
-every reader falls through to the layout files' defaults. No migration code is written. The shape
+every reader falls through to the layout files' defaults. No migration code is written for these
+bumps (open item 10 asks whether that should become permanent). The shape
 changes land in three phases, and each bumps `schema_version` in the same commit as the shape change
 (the `phase-arch-02` precedent for the slot-id rename, version 2 to 3).
 
@@ -403,10 +451,10 @@ not change what a stored selection means.
 
 | Phase | Builds | Deliverables that need widening |
 |---|---|---|
-| `phase-arch-07` (schema-owned slots and sub-slots with structural eligibility) | `slot-schemas.json` and its JSON Schema; `elements` on each registry entry; the matcher as a pure function; the frame renderer with the four sub-slots and the typed wrapper panels use; the eight panels' headers moved into bar elements; `eligible_slots` removed and version 4; the configuration dialog fed by the matcher; the header-count test written first (`R13`) and the no-allow-list check (`R12`); the `REQ-007` W16 row and the `REQ-037` rows that name `.stage-region__header` or that measure bar controls against the panel box (notes strip trigger and tooltip rows, every "Header controls" row) amended, since those controls now sit outside the panel box | `ts/src/stage/` panel sources (`TerminalRegion.tsx`, `HtmlViewerRegion.tsx`, `OverviewRegion.tsx`, `FileBrowserRegion.tsx`, `explorer/ExplorerRegion.tsx`, `NotesStripRegion.tsx`) and `StagePage.tsx`; `_data/workbench/` (the new file and both layouts); `schemas/workbench-layout.schema.json` and the new slot-schema schema; `test/test_workbench_layout_schema.py`; `test/test_workbench_fit_contracts.py` (builds its live matrix from `eligible_slots` and must use the matcher); `ts/vite.config.ts` (serves only `_data/workbench/layouts/`, so the new file needs a route). `REQ-037`'s `C03` parse of `PANEL_REGISTRY` must stay green when entries gain `elements`. |
-| `phase-arch-08` (multi-instance panel identity) | `instance_id` and `panel_type` in layout data and the schema (version 5); instance-keyed hosts, assignment, visibility and `instance_state`; `usePanelInstance()`; bridge keys; terminal session ownership per instance; the dialog and the hard-coded ids in `useWorkbenchLayouts.ts` (the shell home slot, the bash and PowerShell panel ids) converted so no type id stands where an instance id is meant; one extra instance in a shipped layout so `R14` is observable (recommended: a second HTML Viewer assigned to `explorer` in layout 2, hidden by default, so the cleared-browser arrangement is unchanged). No `src/` change; `sys-api` is listed on the phase but is not exercised under decision 7 | `ts/src/stage/StagePage.tsx`, `guardedPanel.tsx`, `panelBridge.ts`, `HtmlViewerRegion.tsx`, `NotesStripRegion.tsx` and the File Browser's bridge callers; `schemas/workbench-layout.schema.json`; `test/test_workbench_layout_schema.py`; `test/test_workbench_fit_contracts.py` (its live runner seeds `panel_assignments` by panel id). Terms file gains **panel instance**. |
+| `phase-arch-07` (schema-owned slots and sub-slots with structural eligibility) | `slot-schemas.json`, `panel-elements.json` and their JSON Schemas; each registry entry referring to its `panel-elements.json` entry; the TypeScript matcher as a pure function; the frame renderer with the four sub-slots and the typed wrapper panels use; the eight panels' headers moved into bar elements; `eligible_slots` removed and version 4; the configuration dialog fed by the matcher; the header-count test (`R13`, counting `header` and `role="banner"` elements per slot) written first, the no-allow-list check (`R12`) and one negative bar-capacity case; the matcher written once in TypeScript and once in Python over `panel-elements.json` and `slot-schemas.json`, with the shared fixture test of decision 4; the `REQ-007` W01 and W16 rows and the `REQ-037` rows that name `.stage-region__header` or that measure bar controls against the panel box (notes strip trigger and tooltip rows, every "Header controls" row) amended, since those controls now sit outside the panel box | `ts/src/stage/` panel sources (`TerminalRegion.tsx`, `HtmlViewerRegion.tsx`, `OverviewRegion.tsx`, `FileBrowserRegion.tsx`, `explorer/ExplorerRegion.tsx`, `NotesStripRegion.tsx`) and `StagePage.tsx`; `_data/workbench/` (the two new files and both layouts); `schemas/workbench-layout.schema.json` and the new slot-schema schema; `test/test_workbench_layout_schema.py`; `test/test_workbench_fit_contracts.py` (builds its live matrix from `eligible_slots` and must use the Python matcher; a new test module holds the pair test); `ts/vite.config.ts` (serves only `_data/workbench/layouts/`, so the new files need a route if they are fetched rather than imported). `REQ-037`'s `C03` parse of `PANEL_REGISTRY` must stay green when entries gain `elements`. |
+| `phase-arch-08` (multi-instance panel identity) | `instance_id` and `panel_type` in layout data and the schema (version 5); instance-keyed hosts, assignment, visibility and `instance_state`; `usePanelInstance()`; bridge keys; terminal session ownership per instance; the dialog and the hard-coded ids in `useWorkbenchLayouts.ts` (the shell home slot, the bash and PowerShell panel ids) converted so no type id stands where an instance id is meant; one extra instance in a shipped layout so `R14` is observable (recommended: a second HTML Viewer, `html-viewer-2`, assigned to `secondary` in layout 2 and hidden by default, since `secondary` admits `document-frame`; the cleared-browser arrangement is unchanged, and `R14`'s test makes it visible through the `secondary` header's panel switcher so that both viewers are mounted, in `primary` and `secondary`, with independent tabs. A hidden instance is unmounted, so `R14` is observed only after that selection). No `src/` change; `sys-api` is listed on the phase but is not exercised under decision 7 | `ts/src/stage/StagePage.tsx`, `guardedPanel.tsx`, `panelBridge.ts`, `HtmlViewerRegion.tsx`, `NotesStripRegion.tsx` and the File Browser's bridge callers; `schemas/workbench-layout.schema.json`; `test/test_workbench_layout_schema.py`; `test/test_workbench_fit_contracts.py` (its live runner seeds `panel_assignments` by panel id). Also the branded types and the `-2`-instance standing test of decision 5. Terms file gains **panel instance**. |
 | `phase-arch-09` (reconfigurable slot geometry) | The per-kind floor table in the slot-schema data (the table `next_action` asks for first); floors as `minmax` in the grid; `grid_tracks` selections with a way to change and reset them; the two standing checks (floors at least the `REQ-037` minimum; floors fit 1024x768); the zero-scroll checks at four sizes in both layouts. If the owner rejects open item 1, it builds the two checks and no stored geometry | `_data/workbench/slot-schemas.json`; `docs/06-requirements/` and `test/` (`R15` asks for a readable constraint statement per role, which the data alone is not) |
-| `phase-arch-10` (sub-app package contract) | A document only. It must state registration as one `PANEL_REGISTRY` entry with an element configuration (decision 4); that a package never renders a top bar; how it obtains its instance identity (`usePanelInstance()`) and stores its own state (`instance_state`); that session ownership is the package's own, per instance. How it receives data is its own decision | none: `docs/06-requirements/` suffices |
+| `phase-arch-10` (sub-app package contract) | A document only. It must state registration as one `PANEL_REGISTRY` entry plus its entry in `panel-elements.json` (decision 4); that a package never renders a top bar; how it obtains its instance identity (`usePanelInstance()`) and stores its own state (`instance_state`); that session ownership is the package's own, per instance. How it receives data is its own decision | none: `docs/06-requirements/` suffices |
 | `phase-arch-17` (panel maximize and collapse) | The `maximize` and `collapse` frame actions; transient state keyed by slot id; no reparent of the instance host; the terminal's collapse flag and class moved to the slot or retired; the `R28` test first | `ts/src/stage/TerminalRegion.tsx`, `TerminalMenu.tsx` and `StagePage.tsx`; the `REQ-007` row for the terminal collapse toggle if retired |
 
 ## Alternatives considered
@@ -522,7 +570,14 @@ These are the points the owner is asked to ratify or change.
 8. **The `strip` role uses an inline frame (decision 2)** so it stays one thin row. If that proves
    unworkable, the strip takes a stacked frame and its fit contract is restated.
 9. **The default target for a cross-panel action with several instances (decision 7):** the visible
-   instance last interacted with.
+   instance last interacted with, chosen by a caller-level resolver, with `ADR-029` untouched.
+10. **No migration code, ever (decision 10).** This record keeps `ADR-016` rule 3 as written, "never
+    a migration attempt in demo week", and uses silent discard for the three version bumps. Whether
+    to make "no migration code" permanent, dropping the time qualifier, is the owner's call.
+11. **Element configurations and the Python matcher (decision 4).** The matcher is implemented
+    twice, guarded by a shared fixture test, over data files both read. The alternative is one
+    implementation with a node call from `pytest`, at the cost of making the Python gate depend on
+    Node.
 
 ## Revisit trigger
 
