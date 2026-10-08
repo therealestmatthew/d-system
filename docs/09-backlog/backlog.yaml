@@ -9372,9 +9372,11 @@ items:
     and the partial-target behavior matches what the ADR chose.
   verification:
   - cd ts && npm run build
+  - cd ts && npm test
   - uv run python -m src.governance
   deliverables:
   - ts/src/stage/panelBridge.ts
+  - ts/src/stage/panelBridge.test.tsx
   next_action: Read the existing BridgeSlot contract before changing it. The single-handle,
     single-action shape is deliberate, and the extension has to widen it without losing the
     never-throws-never-queues property that shape was chosen for.
@@ -9413,6 +9415,11 @@ items:
   - uv run python -m src.governance
   deliverables:
   - ts/src/stage/
+  - src/api/routes/workbench_bookmarks.py
+  - src/api/__init__.py
+  - schemas/workbench-bookmark-category.schema.json
+  - _data/workbench/bookmarks/
+  - test/test_workbench_bookmarks.py
   next_action: Build the storage and the six operations before any consuming surface. Opening a
     category as a set is the feature, but it has nothing to open until categories can be created
     and populated.
@@ -9463,7 +9470,8 @@ items:
   systems:
   - sys-contracts
   owner: repository-owner
-  status: queued
+  agent: agent-builder-a
+  status: active
   priority: 2
   session_budget: 1
   depends_on: []
@@ -17718,7 +17726,8 @@ items:
   systems:
   - sys-demo-stage
   owner: repository-owner
-  status: queued
+  agent: agent-standby
+  status: active
   priority: 4
   session_budget: 1
   depends_on: []
