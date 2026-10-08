@@ -1,0 +1,50 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-13-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-13",
+  "reviewed_commit": "0cdab8d8f6c4f63c12b5ad721b10962c6f74b332",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "reject",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "Natural-height measurement in the scroll handler may reset the popover body's scroll position",
+      "evidence": "Popover.tsx: window.addEventListener('scroll', reposition, true) is capture-phase, so scrolling .stage-popover__body triggers reposition; reposition now calls measureNaturalHeight, which sets maxHeight 'none', reads offsetHeight (forced layout, body no longer overflows so scrollTop clamps to 0) and restores maxHeight. Popover.test.tsx mocks offsetHeight and getBoundingClientRect and has no scroll-path test. Unverified because no browser was available.",
+      "consequence": "Wheel or scrollbar scrolling in the file list (and any long popover body such as Prompts, Agents, Skills in layout-2, the directory picker) may snap back to the top, breaking R25 'scrolls inside the popup for the rest' and R26 'no consumer made worse'.",
+      "minimal_fix": "Measure natural height only on open, resize and content change, not from the scroll handler (or ignore scroll events whose target is inside the bubble, or save and restore body scrollTop around the measurement); add a test that fires a scroll event and asserts scrollTop is preserved; re-run a real-browser check that scrolls to the last of 140 entries."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Placement uses the content height at open time only",
+      "evidence": "measureNaturalHeight runs inside reposition, which runs on open, resize and scroll only; HtmlViewerRegion renders 'Searching\u2026' while filesLoadState is 'loading'.",
+      "consequence": "If the bubble opens while the list is loading, side and maxHeight are chosen for a small natural height and may reproduce the short-bubble defect once the list arrives. Edge case, since files load on directory change.",
+      "minimal_fix": "Re-run reposition when the bubble's content size changes (ResizeObserver or re-measure on content render)."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Audit note records only the 1280x720 column for the consumers",
+      "evidence": "popover-consumer-audit.md lines 87-88: 'Only the 1280x720 column is listed here; 1024x768 differs by a few pixels'.",
+      "consequence": "R26's measured visible height at 1024x768 is asserted, not recorded, for eight of the nine consumers.",
+      "minimal_fix": "Add a 1024x768 before/after column to the table."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Gate pytest exit 1 from a run-as-root environment artifact",
+      "evidence": "07-gate.txt lines 92-105: test_an_unwritable_worktree_parent_is_refused 'DID NOT RAISE Refused' (chmod 0o500 has no effect as root); 1 failed, 1899 passed.",
+      "consequence": "Unrelated to the diff, but a non-zero gate exit that needs recording so it is not read as a phase defect.",
+      "minimal_fix": "Record as an environment artifact, or skip the test when running as root (separate from this phase)."
+    }
+  ],
+  "raw_reply_sha256": "9adec56ce3d4236c80fcdb50bf9931b93f42e9636b69447961e0acdc39a7bcbe",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), same brief as the gating reviewer plus the runner manifest; no checkout. Its reject rests on F01, a credible unverified scroll-reset regression; the coordinator carried it to the builder's fix round regardless of the gating verdict. Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}

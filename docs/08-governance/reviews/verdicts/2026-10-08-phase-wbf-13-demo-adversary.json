@@ -1,0 +1,42 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-13-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-13",
+  "reviewed_commit": "0cdab8d8f6c4f63c12b5ad721b10962c6f74b332",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "Scrolling inside any popover body snaps back to scrollTop 0 because the capture scroll listener re-runs the natural-height measurement",
+      "evidence": "Popover.tsx registers reposition as a capture scroll listener; reposition now calls measureNaturalHeight, which sets maxHeight none and reads offsetHeight, so the browser clamps body scrollTop to 0. Live, layout-1 1280x720, 140 files: body.scrollTop=500 reads 500 synchronously then 0 after 300ms; mouse wheel x3 gives 0,0,0 in all four layout/size cells. With naturalHeight forced to undefined (reverted mutation) the same script gives 500 retained and wheel 700, 900, 1100.",
+      "consequence": "REQ-012 R25 'scrolls inside the popup for the rest' is false: users see about 12 of 140 entries and cannot scroll to the others. Every consumer with a scrolling body regresses (Prompts, Agents, layout-2 Skills). The audit note's 'scrolls inside to the last of 140 entries' is unsupported.",
+      "minimal_fix": "Ignore scroll events whose target is inside the bubble in the scroll handler (or save and restore body.scrollTop around the measurement), measure only on open and resize, add a test that scrolls the body, and verify with a real wheel in Playwright."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Popover tests do not exercise scrolling or repeated reposition, so F01 passed all gates",
+      "evidence": "Restoring the 120 px floor fails 2 of 12 Popover tests, so that guard is covered; but no test dispatches scroll on the body or checks scrollTop or a second measurement. npm test 96 passed, build and lint clean with F01 present.",
+      "consequence": "The regression is invisible to the test suite and to the R25 count-at-rest measurement.",
+      "minimal_fix": "Add a test that fires scroll on .stage-popover__body after open and asserts offsetHeight is not re-read or scrollTop is preserved."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Sticky filter box pins 8 px below the scrollport top, so entries show above it while scrolling",
+      "evidence": "With measurement disabled and scrollTop 600: bodyTop 223.9, searchTop 231.9, elementFromPoint 3 px below body top is a .stage-html-viewer__file-option. At rest the search ends at 258.5 and the first entry starts at 264.9 (no overlap).",
+      "consequence": "Cosmetic: entries pass through the 0.5rem padding strip above the pinned field.",
+      "minimal_fix": "top: -0.5rem on .stage-html-viewer__search, or move the body padding into the picker."
+    }
+  ],
+  "raw_reply_sha256": "e650e51d896f6e8a140b0b019e53dc3abdd92354c7f742f224a852b0f6b524eb",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager (subagent run, 2026-10-08). Brief: phase entry from dev's backlog.yaml, range 1755096..0cdab8d, diff with the session record and backlog bookkeeping excluded, scratch clone at the reviewed commit, runner manifest at _working/review-checks/phase-wbf-13/0cdab8d8f6c4/. The adversary reproduced F01 live in Chromium (ports 5192/8022) with a real mouse wheel and a reverted mutation. First gating reject of the run; a fix and a new REVIEW-REQUEST follow. No builder-written input."
+}
