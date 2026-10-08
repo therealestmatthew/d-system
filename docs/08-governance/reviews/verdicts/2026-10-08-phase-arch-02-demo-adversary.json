@@ -1,0 +1,42 @@
+{
+  "verdict_id": "2026-10-08-phase-arch-02-demo-adversary",
+  "date": "2026-10-08",
+  "phase": "phase-arch-02",
+  "reviewed_commit": "e2edb8d68f28a1e3f7d2ac26a983d88084afc290",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet (demo-adversary definition default)",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "schema_version bump to 3 is not guarded by any test",
+      "evidence": "test/test_workbench_layout_schema.py:99-100 asserts schema_version >= 2; schemas/workbench-layout.schema.json minimum 2; reverting both layouts to 2 passes all tests",
+      "consequence": "Dropping the bump the migration ruling (class 4) requires would go undetected; limited harm because useWorkbenchLayouts re-validates stored slot ids",
+      "minimal_fix": "Tighten the test to >= 3 or == 3"
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "No mechanical check for R03 (slot id never equals a panel id) or R05 (pre-migration localStorage loads defaults)",
+      "evidence": "Diff adds only renamed literals to test_workbench_layout_schema.py; no test loads a v2-shaped stored state; 7 vitest tests do not cover storage",
+      "consequence": "A future layout could reintroduce a slot id equal to a panel id without any check failing; R05 rests on code reading only",
+      "minimal_fix": "Add a pytest asserting slot_ids and panel_ids are disjoint per layout, and optionally a vitest on loadStoredState(3) with only a v2 key present"
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "workbench-layout.schema.json prose still describes schema_version 2",
+      "evidence": "schemas/workbench-layout.schema.json description 'schema_version 2: eligibility moved ...' and version description 'Bumped from 1'; file untouched, outside declared deliverables",
+      "consequence": "Schema documentation disagrees with the shipped version 3 files; validation unaffected",
+      "minimal_fix": "Update the description in a follow-up, or accept as out of scope"
+    }
+  ],
+  "raw_reply_sha256": "594b70421e0fb0be8195568a897bfcb314dd7835f21d64bbdcd30f1862ea2f74",
+  "outcomes": [],
+  "notes": "Dispatched and briefed by the Session Manager (subagent run, 2026-10-08). Brief: phase entry from dev's backlog.yaml, range fc7e42f..e2edb8d, diff with the session record and backlog bookkeeping excluded, scratch clone at the reviewed commit, runner manifest at _working/review-checks/phase-arch-02/e2edb8d68f28/ (pytest 1 failed: test_an_unwritable_worktree_parent_is_refused, root-only environment). No builder-written input."
+}
