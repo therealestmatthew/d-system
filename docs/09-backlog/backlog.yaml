@@ -9456,6 +9456,29 @@ items:
   - schemas/workbench-bookmark-category.schema.json
   - _data/workbench/bookmarks/
   - test/test_workbench_bookmarks.py
+  session: doc-session-bookmark-category-surface
+  completion_evidence:
+  - src/api/routes/workbench_bookmarks.py
+  - src/api/__init__.py
+  - schemas/workbench-bookmark-category.schema.json
+  - _data/workbench/bookmarks/demo-tour.json
+  - test/test_workbench_bookmarks.py
+  - ts/src/stage/bookmarks.ts
+  - ts/src/stage/useBookmarks.ts
+  - ts/src/stage/BookmarkCategories.tsx
+  - ts/src/stage/viewerPlacement.ts
+  - ts/src/stage/HtmlViewerRegion.tsx
+  - ts/src/stage/bookmarks.test.tsx
+  - ts/src/stage/viewerPlacement.test.tsx
+  - ts/src/stage/HtmlViewerRegion.openFiles.test.tsx
+  - docs/03-sessions/SESS-2026-10-08-08-bookmark-category-surface.md
+  result: 'Built against proposed ADR-029 (awaiting the owner''s ratification). uv run pytest 1788
+    passed, 1 skipped, 1 failed (test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused,
+    root ignores directory permissions, unrelated, same failure recorded for phase-wbf-04); 120
+    tests in test_workbench_bookmarks.py. cd ts && npm run build succeeded; cd ts && npm test 7
+    files, 83 tests passed. Governance OK, ruff and mypy clean. Playwright on ports 8014/5184: a
+    three-file set opened in three tabs, a deleted file named in the receipt (opened 3 of 4);
+    viewer-absent and flag-unset states not exercised in the browser.'
   next_action: Build the storage and the six operations before any consuming surface. Opening a
     category as a set is the feature, but it has nothing to open until categories can be created
     and populated.
