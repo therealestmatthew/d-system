@@ -17715,7 +17715,8 @@ items:
   systems:
   - sys-wb-explorers
   owner: repository-owner
-  status: queued
+  agent: agent-batch-runner
+  status: active
   priority: 3
   session_budget: 1
   depends_on: []
