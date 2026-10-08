@@ -1,0 +1,42 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-18-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-18",
+  "reviewed_commit": "725cd562fc1963633d3ffd4c792fb2b3fd1a0554",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "reject",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "Runner manifest.json missing",
+      "evidence": "No manifest.json at _working/review-checks/phase-wbf-18/725cd562fc19/; glob of review-checks finds manifests only for phase-arch-02, phase-arch-11 and phase-wbf-03. Evidence files 01-04 exist.",
+      "consequence": "Exit codes and run status of the verification entries and gate cannot be confirmed from the runner's record; they were inferred from file names and content.",
+      "minimal_fix": "Re-run the runner so manifest.json is written beside the evidence files, then re-judge."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Toggle description is one dense paragraph",
+      "evidence": "docs/00-working/demo-runbook.md line 256 packs states, reversal, persistence, placeholders and the ladder mismatch into one block.",
+      "consequence": "A presenter scanning mid-demo must hunt for the reversal sentence.",
+      "minimal_fix": "Split the ladder-mismatch note into its own sentence block or use short bullets."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Ambiguous 'Clicking the label again'",
+      "evidence": "Runbook line 256; the clickable element is the button, whose text is the label (HtmlViewerRegion.tsx:398-405).",
+      "consequence": "Slight ambiguity only; behaviour described is correct.",
+      "minimal_fix": "Write 'Clicking the button again switches back to Embedded.'"
+    }
+  ],
+  "raw_reply_sha256": "49516b2de9778bfe148d1f889cdf39715e0a0ffe8f7e6b493160acc9f2e822f1",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false). Coordinator error: the judge was dispatched while the runner was re-running for this commit (after the phase's verification entry was corrected on the trunk), so manifest.json was absent when it read; its reject is on that missing input alone and it states the substance holds. A second judge record follows once the manifest exists. Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}

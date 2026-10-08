@@ -1,0 +1,42 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-18-review-judge-2",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-18",
+  "reviewed_commit": "725cd562fc1963633d3ffd4c792fb2b3fd1a0554",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "uv run pytest gate exits 1 on an environment-dependent test unrelated to the diff",
+      "evidence": "05-gate.txt lines 99-100: FAILED test/test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused (Failed: DID NOT RAISE Refused); 1 failed, 1657 passed, 1 skipped. The test uses chmod 0o500 and the run used /tmp/pytest-of-root, so the process is root, which ignores directory write bits (my reading of the output). The diff changes only docs/00-working/demo-runbook.md.",
+      "consequence": "Manifest result is 'failed' though the deliverable is correct. Whether the test also fails on the base commit is unconfirmed because no baseline run exists.",
+      "minimal_fix": "Outside this phase: skip that test when running as root. Coordinator to confirm the same failure on trunk."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Toggle description is one dense paragraph",
+      "evidence": "docs/00-working/demo-runbook.md line 256 packs states, reversal, persistence, placeholders and the ladder mismatch into one block.",
+      "consequence": "A presenter scanning mid-demo must hunt for the reversal sentence.",
+      "minimal_fix": "Move the ladder-mismatch note into its own block or use short bullets."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Ambiguous 'Clicking the label again'",
+      "evidence": "Runbook line 256; the clickable element is the button (HtmlViewerRegion.tsx:398-405) and the label is its text.",
+      "consequence": "Slight ambiguity only; the behaviour described is correct.",
+      "minimal_fix": "Write 'Clicking the button again switches back to Embedded.'"
+    }
+  ],
+  "raw_reply_sha256": "82f75fbe1ed5e0690a25e505b472b1e3a63cfebd231f8532e7a2ced6d82a9256",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), second dispatch after the runner manifest existed; replaces the first record's missing-input reject on the same brief. F01 is the known root-only pytest failure, confirmed on the trunk base by the coordinator's baseline runs (1 failed in every gate run). F02 and F03 are shadow findings, not acted on in this phase. Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}
