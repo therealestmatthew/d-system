@@ -8778,8 +8778,7 @@ items:
   - sys-wb-layout
   - sys-wb-styles
   owner: repository-owner
-  agent: agent-builder-b
-  status: active
+  status: queued
   priority: 2
   session_budget: 1
   depends_on:
