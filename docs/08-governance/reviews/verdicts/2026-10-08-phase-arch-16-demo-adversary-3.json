@@ -1,0 +1,41 @@
+{
+  "verdict_id": "2026-10-08-phase-arch-16-demo-adversary-3",
+  "date": "2026-10-08",
+  "phase": "phase-arch-16",
+  "reviewed_commit": "8eba39f9dd8bb0243fd8812ee2da299b88887b8e",
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "model": "sonnet",
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "F13 cites the DEFAULT_WINDOWS_SHELL import at src/demo/factory.py line 20; it is line 21",
+      "evidence": "Document line 417: 'imported as DEFAULT_WINDOWS_SHELL at src/demo/factory.py line 20'. grep -n shows src/demo/factory.py:21: 'from src.demo.windows import DEFAULT_SHELL as DEFAULT_WINDOWS_SHELL' (line 20 is blank/other). windows.py line 16 (DEFAULT_SHELL = \"cmd\"), demo_terminal.py line 465 and TerminalRegion.tsx lines 210-211 are correct.",
+      "consequence": "A reader following the citation lands one line off; the claim itself (the Windows default is cmd and reaches resolve_shell(None)) is correct. Round 2 flagged a wrong citation here, so the residue is cosmetic only.",
+      "minimal_fix": "Change 'line 20' to 'line 21' in F13."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "Owner-check baselines in O6 and O7 are not the figures the appendix script itself produces",
+      "evidence": "O6 says 'Linux bash: open 3 to 5 ms, prompt 18 to 21 ms'; O7 says 'median 1.9 ms'. The appendix preamble (the script the owner will run) reports open median 5.6 and 4.8, first byte median 23.2 and 21.0, echo median 2.1 and 2.1; 6.2 headline says 1.8. My two runs of the extracted script: open median 4.8 and 5.3, first byte 20.5 and 22.2, echo 2.0 and 1.9. The O6/O7 numbers come from the headline run, a different script form, and 1.9 appears nowhere else in the document.",
+      "consequence": "The owner compares Windows output of measure-terminal.js with a Linux baseline that the same script does not quite reproduce (first byte 23.2 is outside '18 to 21'); small, but a comparison column should use the same instrument.",
+      "minimal_fix": "In O6 and O7 quote the appendix-script runs (open about 5, first byte about 21 to 23, echo median about 2.1) or say the baseline is the 6.1/6.2 headline run."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Section 5 and section 2 say every event experiment was repeated on the production build, but the 5.4 state table is development-only",
+      "evidence": "Line 139-140: 'Each experiment ran on the development server ... and was repeated on the production build with the same outcome'; line 78-79: 'every event experiment was run on both'. Line 206 and 214: the state-survival table and its steps 6 and 7 are 'development build'; line 385 'not repeated' for the freed-slots row; 5.6 does not state a build.",
+      "consequence": "A reader takes the collapsed/dropped/tab-count persistence table as verified on both builds when the document itself records it on development only. Behaviour is unlikely to differ (component-local state) but the blanket statement is stronger than the evidence.",
+      "minimal_fix": "Qualify the sentence in section 2 and 5: 'except the state-survival table of 5.4 (development build only) and the cases marked not repeated'."
+    }
+  ],
+  "raw_reply_sha256": "4e86dc0453a1506bfe29cf14afca0d20428459d77052a41d8c273885124b4fa9",
+  "outcomes": []
+}

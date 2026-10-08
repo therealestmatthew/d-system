@@ -162,6 +162,27 @@ line per finding:
   edit when I looked in round three, so the round-two figures cannot be tied to a file I still have;
   this round's figures are tied to the document's own text.
 
+## Final round after the third reviews
+
+The third gating adversary and the third review judge passed `8eba39f` (minor findings only); the
+round-2 judge verdict (reject, on the appendix script point fixed in the third round) is recorded as
+well. The three verdicts (`review-judge-2`, `demo-adversary-3`, `review-judge-3`) are in
+`docs/08-governance/reviews/verdicts/` unchanged. The remaining fixes are text only, one line each:
+
+- **F13 citations.** The alias is at `src/demo/factory.py` line 21 (verified with `grep -n`), and
+  `resolve_shell` is cited as lines 36-48.
+- **O6 and O7 baselines.** They now quote the appendix script's own two runs (open about 5 ms, first
+  byte about 21 to 23 ms, echo median about 2.1 ms) as the like-for-like baseline and say the 6.1
+  and 6.2 tables came from a different, differently warmed run with lower medians. The "1.9" figure
+  and the "only" claim in the appendix preamble are removed, and the preamble names the
+  client-warming difference.
+- **Production-build claim.** Sections 2 and 5 now exclude the 5.4 state-survival table (development
+  build only) and the cases marked not repeated.
+- **Residue.** The dangling "The script discards one warm-up connection." sentence in 6.1 and the
+  doubled punctuation in the appendix preamble are removed.
+- **Gates.** Governance, ruff, mypy and `npm test` were re-run; the full pytest was not, because this
+  round's diff is markdown and JSON only (the last full run is in the gate table below).
+
 ## Acceptance
 
 - **`REQ-011` R23 (three-shell by five-event matrix with survival, intent and communication in every
@@ -222,3 +243,13 @@ No independent review has run on this record. Review is dispatched by the Sessio
 
 Catalog conflicts in both rebases were resolved by regeneration only. The backend started for the
 third round (port 8029) was stopped by pid; no frontend was needed.
+
+## Gate results after the final round
+
+| Command | Result |
+|---|---|
+| `uv run python -m src.governance` | `Governance OK: 45 systems, 476 documents, 37 memories, 354 backlog phases` |
+| `uv run ruff check src/ test/ tools/` | `All checks passed!` |
+| `uv run mypy src/` | `Success: no issues found in 52 source files` |
+| `cd ts && npm test` | `Tests  159 passed (159)` |
+| `uv run pytest` | not re-run (markdown and JSON only); last full run above: `1 failed, 2074 passed, 1 skipped` with the known root-only failure |

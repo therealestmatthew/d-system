@@ -1,0 +1,57 @@
+{
+  "verdict_id": "2026-10-08-phase-arch-16-review-judge-3",
+  "date": "2026-10-08",
+  "phase": "phase-arch-16",
+  "reviewed_commit": "8eba39f9dd8bb0243fd8812ee2da299b88887b8e",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Script run does not reproduce the headline medians, and O6/O7 baselines sit below the script's own output",
+      "evidence": "Appendix A preamble says the script differs from the headline run 'only' in reporting last-byte time and not polling the sessions list. The two extracted-script runs gave open median 5.6 and 4.8 ms and first-byte median 23.2 and 21.0 ms, with echo median 2.1 ms. The headline direct row in 6.1 is 3.2 and 17.5, and 6.2 is 1.8. O6 says 'Linux bash: open 3 to 5 ms, prompt 18 to 21 ms' and O7 says 'median 1.9 ms', matching neither the headline nor the script runs (1.8, 2.1, 2.1). 6.1 also says the headline was taken after an HTTP request had warmed the client, which is another difference the 'only' sentence omits.",
+      "consequence": "An owner running the script on Linux to calibrate gets about 5 and 21 to 23 ms against a stated baseline of 3 to 5 and 18 to 21. The preamble's 'only' claim is stronger than the evidence.",
+      "minimal_fix": "In the preamble and O6/O7, quote the script's own two runs as the baseline for like-for-like comparison, and say the headline tables came from a different run (warmed by an earlier HTTP request) whose medians were lower."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "F13 cites the alias import at src/demo/factory.py line 20; it is line 21",
+      "evidence": "Checkout at the reviewed commit, src/demo/factory.py:21 reads 'from src.demo.windows import DEFAULT_SHELL as DEFAULT_WINDOWS_SHELL'. Line 20 is 'from src.demo.adapter import TerminalAdapter'. The earlier review cited 21. The F13 text says 'resolve_shell ... lines 43-48' while the function is at 36-48 and the lines 42-48 carry the relevant logic.",
+      "consequence": "A reader following the citation lands one line off in a document whose value is citation accuracy. No conclusion changes.",
+      "minimal_fix": "Change 'line 20' to 'line 21' and cite resolve_shell as lines 36-48."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "Residue from editing in 6.1 and the appendix A preamble",
+      "evidence": "6.1 ends the first-connection paragraph with 'The script discards one warm-up connection.', which repeats the appendix and sits after a sentence about backend start-up. The appendix A first parenthetical ends '... echo 2.1 (3.8, 9.7).).' with a doubled closing punctuation.",
+      "consequence": "Cosmetic only; a reader may take the dangling sentence as a claim about the headline runs.",
+      "minimal_fix": "Delete the dangling sentence in 6.1 and fix the punctuation."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "Three reviewer verdict JSON files are in the phase diff outside the deliverable",
+      "evidence": "The diff adds docs/08-governance/reviews/verdicts/2026-10-08-phase-arch-16-demo-adversary.json, ...-demo-adversary-2.json and ...-review-judge.json. The phase deliverable is only docs/00-working/terminal-persistence-audit.md.",
+      "consequence": "Paths outside the stated deliverable. Governance passes (04), so this is a scope-hygiene note and not a defect in the audit.",
+      "minimal_fix": "Confirm these records are expected on the branch; otherwise keep them out of the phase's commit range."
+    },
+    {
+      "id": "F05",
+      "severity": "minor",
+      "title": "Note: two pytest failures in the runner, both pre-identified and unrelated to the markdown-only diff",
+      "evidence": "03-verification+gate.txt lines 146-148: test/test_demo_terminal_api.py::test_control_characters_reach_the_shell (load-sensitive; line 120 shows 'after-ctrl-c-4' never appeared) and test/test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused (root-only, idea 000604). 2 failed, 2073 passed, 1 skipped.",
+      "consequence": "uv run pytest exits 1. The phase changes no code or tests, so the diff cannot have caused it.",
+      "minimal_fix": "None for this phase."
+    }
+  ],
+  "raw_reply_sha256": "e829baa29184e98053470c9761886872a45c17b67403125135d54afa4664ed5c",
+  "outcomes": []
+}
