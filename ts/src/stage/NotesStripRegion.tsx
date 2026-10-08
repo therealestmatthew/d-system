@@ -144,7 +144,10 @@ function isNotesFileEntryList(value: unknown): value is NotesFileEntry[] {
 const ENTRY_BOX_STYLE = { alignSelf: 'stretch', overflow: 'hidden', minHeight: '1.4em' } as const
 
 // The invisible copy of a text entry laid out wrapped, at the entry box's width. Its height says
-// whether the plain variant fits. `position: fixed` keeps it out of the box's scrollable overflow.
+// whether the plain variant fits, and its scroll width whether one unbroken word is wider than the
+// box. It is a sibling of the entry box, not inside it, so the entry's own text is never doubled;
+// `position: fixed` keeps it out of the row's layout and of every scrollable overflow. The entry
+// box's font is copied onto it when it is measured.
 const MEASURER_STYLE = {
   position: 'fixed',
   top: 0,
@@ -156,12 +159,14 @@ const MEASURER_STYLE = {
 
 interface TextEntryViewProps {
   text: string
-  // True when nothing will rotate the entry away: the scroll then repeats, not once.
+  // True when nothing will rotate the entry away (the timed advance is off, or there is no other
+  // entry to rotate to): the scroll then repeats, not once.
   loop: boolean
   // The running scroll animation, or `null` when there is none. The rotation reads it to wait.
   onScroll: (animation: Animation | null) => void
-  // True while the pointer is over the entry or it has keyboard focus.
-  onHold: (held: boolean) => void
+  // True while the pointer is over the entry or it has keyboard focus. `resume` is false only for
+  // the release that comes from the entry being removed.
+  onHold: (held: boolean, resume?: boolean) => void
   // The scroll's single pass ended.
   onPassFinished: () => void
 }
@@ -201,7 +206,9 @@ function TextEntryView({ text, loop, onScroll, onHold, onPassFinished }: TextEnt
     const contentWidth =
       box.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0)
     measurer.style.width = `${Math.max(contentWidth, 0)}px`
-    if (measurer.offsetHeight <= box.clientHeight + 1) {
+    measurer.style.font = style.font
+    // Fits when the wrapped text is no taller than the box and no unbroken word is wider than it.
+    if (measurer.offsetHeight <= box.clientHeight + 1 && measurer.scrollWidth <= contentWidth + 1) {
       setVariant('plain')
       setTravel(0)
       return
@@ -256,8 +263,10 @@ function TextEntryView({ text, loop, onScroll, onHold, onPassFinished }: TextEnt
     }
   }, [variant, travel, reducedMotion, loop, onScroll, onPassFinished])
 
-  // An entry that goes away while held must not leave the rotation held.
-  useEffect(() => () => onHold(false), [onHold])
+  // An entry that goes away while held must not leave the rotation held. Releasing here must not
+  // also advance: the entry is already going away (a manual Previous or Next, say), and a second
+  // step on top of the reader's would skip an entry.
+  useEffect(() => () => onHold(false, false), [onHold])
 
   const setHold = (part: 'hover' | 'focus', on: boolean) => {
     holdRef.current[part] = on
@@ -272,32 +281,58 @@ function TextEntryView({ text, loop, onScroll, onHold, onPassFinished }: TextEnt
 
   const scrolls = variant === 'ticker' && travel > 0
   return (
-    <p
-      ref={boxRef}
-      className="stage-notes-strip__current"
-      data-notes-part="entry"
-      data-notes-variant={variant}
-      style={{ ...ENTRY_BOX_STYLE, ...(reducedMotion && scrolls ? { overflowX: 'auto' } : null) }}
-      tabIndex={scrolls ? 0 : undefined}
-      onPointerEnter={() => setHold('hover', true)}
-      onPointerLeave={() => setHold('hover', false)}
-      onFocus={() => setHold('focus', true)}
-      onBlur={() => setHold('focus', false)}
-    >
+    <>
+      <p
+        ref={boxRef}
+        className="stage-notes-strip__current"
+        data-notes-part="entry"
+        data-notes-variant={variant}
+        style={{
+          ...ENTRY_BOX_STYLE,
+          // Scrolled by hand, with the scrollbar hidden: a classic 15 px scrollbar would take the
+          // height the line needs in a strip as short as layout 1's. Wheel, drag, touch and the
+          // arrow keys (the entry is a tab stop) still move it.
+          ...(reducedMotion && scrolls ? { overflowX: 'auto', scrollbarWidth: 'none' } : null),
+        }}
+        tabIndex={scrolls ? 0 : undefined}
+        onPointerEnter={() => setHold('hover', true)}
+        onPointerLeave={() => setHold('hover', false)}
+        onFocus={() => setHold('focus', true)}
+        onBlur={() => setHold('focus', false)}
+      >
+        {variant === 'plain' ? (
+          text
+        ) : (
+          <span
+            ref={trackRef}
+            data-notes-part="track"
+            style={{ display: 'inline-block', whiteSpace: 'nowrap' }}
+          >
+            {asOneLine(text)}
+          </span>
+        )}
+      </p>
       <span ref={measurerRef} aria-hidden="true" data-notes-part="measurer" style={MEASURER_STYLE}>
         {text}
       </span>
-      {variant === 'plain' ? (
-        text
-      ) : (
-        <span
-          ref={trackRef}
-          data-notes-part="track"
-          style={{ display: 'inline-block', whiteSpace: 'nowrap' }}
-        >
-          {asOneLine(text)}
-        </span>
-      )}
+    </>
+  )
+}
+
+/**
+ * A message in the entry's place (loading, a missing file, a rejected file). It does not scroll:
+ * it is the strip saying why there is nothing to rotate, and the full text is on hover. The
+ * stylesheet's own overflow rule (vertical scroll) is left to apply, in a box bounded by the strip.
+ */
+function NoticeView({ text }: { text: string }) {
+  return (
+    <p
+      className="stage-notes-strip__current"
+      data-notes-part="notice"
+      title={text}
+      style={{ alignSelf: 'stretch', minHeight: '1.4em' }}
+    >
+      {text}
     </p>
   )
 }
@@ -307,6 +342,10 @@ function TextEntryView({ text, loop, onScroll, onHold, onPassFinished }: TextEnt
  * less its padding, and the width left between the `?` and the dropdown — scaled to sit entirely
  * inside it with its proportions kept (`object-fit: contain`). It is letterboxed, never cropped,
  * stretched or overflowing, and a small image is scaled up to fill.
+ *
+ * Image entries are meant for a strip at least 100 px tall (layout 2's is 205 px; measured). In
+ * layout 1 the strip is 28 to 57 px high and the same rule yields an image about 18 px high, a
+ * thumbnail, not a figure a reader can read. The rule holds there; the strip is what limits it.
  */
 function ImageEntryView({ src, alt }: { src: string; alt: string }) {
   // The source that failed to load, so a different entry starts fresh without an effect.
@@ -537,9 +576,9 @@ export default function NotesStripRegion() {
   }, [autoAdvance, entryCount, current, advanceIfDue])
 
   const holdEntry = useCallback(
-    (held: boolean) => {
+    (held: boolean, resume = true) => {
       heldRef.current = held
-      if (!held) advanceIfDue()
+      if (!held && resume) advanceIfDue()
     },
     [advanceIfDue],
   )
@@ -572,13 +611,17 @@ export default function NotesStripRegion() {
           <code>ts/public/</code>. Every control — cycling, the timed advance, and the file
           picker — lives in the dropdown at the right.
         </Tooltip>
-        {entry?.kind === 'image' ? (
+        {entry === null ? (
+          <NoticeView key={contentState} text={notice ?? ''} />
+        ) : entry.kind === 'image' ? (
           <ImageEntryView key={current} src={entry.src} alt={entry.alt} />
         ) : (
           <TextEntryView
-            key={entry === null ? contentState : current}
-            text={entry?.kind === 'text' ? entry.text : (notice ?? '')}
-            loop={!autoAdvance || entry === null}
+            key={current}
+            text={entry.text}
+            // Nothing rotates the entry away unless the timed advance is on and there is somewhere
+            // to go; the advance control is disabled below two entries but keeps its setting.
+            loop={!(autoAdvance && entryCount >= 2)}
             onScroll={trackScroll}
             onHold={holdEntry}
             onPassFinished={advanceIfDue}

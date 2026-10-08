@@ -22,7 +22,7 @@ interface FakeAnimation {
   options: KeyframeAnimationOptions
 }
 
-const measure = { boxWidth: 400, boxHeight: 18, wrappedHeight: 18, lineWidth: 400 }
+const measure = { boxWidth: 400, boxHeight: 18, wrappedHeight: 18, wrappedWidth: 0, lineWidth: 400 }
 const animations: FakeAnimation[] = []
 
 function partOf(element: Element): string | null {
@@ -30,7 +30,7 @@ function partOf(element: Element): string | null {
 }
 
 function defineMeasure(
-  property: 'clientWidth' | 'clientHeight' | 'offsetHeight' | 'offsetWidth',
+  property: 'clientWidth' | 'clientHeight' | 'offsetHeight' | 'offsetWidth' | 'scrollWidth',
   read: (part: string | null) => number,
 ) {
   Object.defineProperty(HTMLElement.prototype, property, {
@@ -46,6 +46,7 @@ function installLayoutDoubles() {
   defineMeasure('clientHeight', (part) => (part === 'entry' ? measure.boxHeight : 0))
   defineMeasure('offsetHeight', (part) => (part === 'measurer' ? measure.wrappedHeight : 0))
   defineMeasure('offsetWidth', (part) => (part === 'track' ? measure.lineWidth : 0))
+  defineMeasure('scrollWidth', (part) => (part === 'measurer' ? measure.wrappedWidth : 0))
   Object.defineProperty(HTMLElement.prototype, 'animate', {
     configurable: true,
     writable: true,
@@ -76,19 +77,21 @@ function installLayoutDoubles() {
 }
 
 function removeLayoutDoubles() {
-  for (const property of ['clientWidth', 'clientHeight', 'offsetHeight', 'offsetWidth', 'animate']) {
+  for (const property of ['clientWidth', 'clientHeight', 'offsetHeight', 'offsetWidth', 'scrollWidth', 'animate']) {
     delete (HTMLElement.prototype as unknown as Record<string, unknown>)[property]
   }
 }
 
 interface Served {
   notes: unknown
+  // Other notes files in the directory, by name, for choosing in the picker.
+  others?: Record<string, unknown>
   images?: unknown
   imagesStatus?: number
 }
 
 // A fetch that serves the notes file at the default name, the listing route, and the probe.
-function serve({ notes, images = [], imagesStatus = 200 }: Served) {
+function serve({ notes, others = {}, images = [], imagesStatus = 200 }: Served) {
   const requested: string[] = []
   vi.stubGlobal(
     'fetch',
@@ -99,10 +102,18 @@ function serve({ notes, images = [], imagesStatus = 200 }: Served) {
         new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
       if (url.includes('terminal-enabled')) return json({ terminal_enabled: true })
       if (url.includes('/workbench/list?path=ts%2Fpublic') || url.includes('path=ts/public')) {
-        return json([{ name: 'talking-points.json', path: 'ts/public/talking-points.json', is_dir: false }])
+        return json(
+          ['talking-points.json', ...Object.keys(others)].map((name) => ({
+            name,
+            path: `ts/public/${name}`,
+            is_dir: false,
+          })),
+        )
       }
       if (url.includes('/workbench/list')) return json(images, imagesStatus)
       if (url.endsWith('/talking-points.json')) return json(notes)
+      const other = Object.entries(others).find(([name]) => url.endsWith(`/${name}`))
+      if (other) return json(other[1])
       return json({}, 404)
     }),
   )
@@ -114,6 +125,7 @@ function serve({ notes, images = [], imagesStatus = 200 }: Served) {
 const live = () => animations.filter((animation) => animation.cancel.mock.calls.length === 0)
 
 const entryBox = () => document.querySelector('[data-notes-part="entry"]') as HTMLElement
+const noticeBox = () => document.querySelector('[data-notes-part="notice"]') as HTMLElement
 const track = () => document.querySelector('[data-notes-part="track"]') as HTMLElement | null
 
 async function renderStrip(served: Served) {
@@ -125,7 +137,7 @@ async function renderStrip(served: Served) {
 
 beforeEach(() => {
   animations.length = 0
-  Object.assign(measure, { boxWidth: 400, boxHeight: 18, wrappedHeight: 18, lineWidth: 400 })
+  Object.assign(measure, { boxWidth: 400, boxHeight: 18, wrappedHeight: 18, wrappedWidth: 0, lineWidth: 400 })
   installLayoutDoubles()
 })
 
@@ -162,6 +174,30 @@ describe('text entries: plain or scrolling (R12)', () => {
       'translateX(-600px)',
     ])
     expect(animation.options.iterations).toBe(Infinity)
+  })
+
+  it('scrolls a single unbroken word wider than the box instead of clipping it', async () => {
+    // One line tall, so the height test alone would call it plain.
+    measure.wrappedHeight = 18
+    measure.wrappedWidth = 900
+    measure.lineWidth = 900
+    await renderStrip({ notes: { points: ['https://example.test/a-very-long-unbroken-address'] } })
+    expect(entryBox().getAttribute('data-notes-variant')).toBe('ticker')
+    expect(live()).toHaveLength(1)
+  })
+
+  it('keeps the entry text out of the measurement copy, so it is not doubled', async () => {
+    await renderStrip({ notes: { points: ['A short note.'] } })
+    expect(entryBox().textContent).toBe('A short note.')
+  })
+
+  it('shows a message in the entry place without scrolling it', async () => {
+    measure.wrappedHeight = 72
+    measure.lineWidth = 1000
+    await renderStrip({ notes: { points: [] } })
+    expect(noticeBox().getAttribute('title')).toContain('Could not load')
+    expect(document.querySelector('[data-notes-variant]')).toBeNull()
+    expect(live()).toHaveLength(0)
   })
 
   it('does not animate a long entry whose one line fits the box', async () => {
@@ -214,6 +250,25 @@ describe('pausing a scrolling entry (R12)', () => {
   })
 })
 
+describe('reduced motion (R12)', () => {
+  it('scrolls by hand with the scrollbar hidden, and animates nothing', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: query.includes('prefers-reduced-motion'),
+      media: query,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+    }))
+    measure.wrappedHeight = 72
+    measure.lineWidth = 1000
+    await renderStrip({ notes: { points: ['A long entry'] } })
+    expect(live()).toHaveLength(0)
+    expect(entryBox().style.overflowX).toBe('auto')
+    // A visible 15 px scrollbar would leave a 3 px line in layout 1's 18 px entry box.
+    expect(entryBox().getAttribute('style')).toContain('scrollbar-width: none')
+    expect(entryBox().getAttribute('tabindex')).toBe('0')
+  })
+})
+
 describe('image entries (R14)', () => {
   const listing = [
     { name: 'b-chart.png', path: '_public/pics/b-chart.png', is_dir: false },
@@ -259,7 +314,7 @@ describe('image entries (R14)', () => {
 
   it('names a directory that holds no images', async () => {
     await renderStrip({ notes: { imageDirectory: '_public/empty' }, images: [] })
-    expect(entryBox().textContent).toContain('No images in _public/empty.')
+    expect(noticeBox().textContent).toContain('No images in _public/empty.')
   })
 
   it('names a directory the listing route cannot serve', async () => {
@@ -268,7 +323,7 @@ describe('image entries (R14)', () => {
       images: { detail: 'Not a directory' },
       imagesStatus: 404,
     })
-    expect(entryBox().textContent).toContain('Image directory not available: _public/nowhere.')
+    expect(noticeBox().textContent).toContain('Image directory not available: _public/nowhere.')
   })
 
   it('falls back to the image name when the file does not load', async () => {
@@ -284,18 +339,18 @@ describe('the mixing ruling (R14)', () => {
       notes: { points: ['A note'], imageDirectory: '_public/pics' },
       images: [{ name: 'a.png', path: '_public/pics/a.png', is_dir: false }],
     })
-    expect(entryBox().textContent).toContain('one rotation shows only one kind')
-    expect(entryBox().querySelector('img')).toBeNull()
+    expect(noticeBox().textContent).toContain('one rotation shows only one kind')
+    expect(document.querySelector('img')).toBeNull()
     // Rejected before the directory is read, so nothing was half-loaded.
     expect(requested.some((url) => url.includes('path=_public%2Fpics'))).toBe(false)
   })
 
   it('still rejects an empty or malformed file with the original message', async () => {
     await renderStrip({ notes: { points: [] } })
-    expect(entryBox().textContent).toContain('Could not load "talking-points.json" as a notes file.')
+    expect(noticeBox().textContent).toContain('Could not load "talking-points.json" as a notes file.')
     cleanup()
     await renderStrip({ notes: { points: [1, 2] } })
-    expect(entryBox().textContent).toContain('Could not load "talking-points.json" as a notes file.')
+    expect(noticeBox().textContent).toContain('Could not load "talking-points.json" as a notes file.')
   })
 })
 
@@ -355,6 +410,43 @@ describe('rotating between entries never interrupts a scroll (R13)', () => {
     await startAutoAdvance()
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(entryBox().textContent).toContain('Next')
+  })
+
+  it('steps once for each Previous or Next after the interval has elapsed mid-scroll', async () => {
+    measure.wrappedHeight = 72
+    measure.lineWidth = 1000
+    await renderStrip({ notes: { points: ['A long entry', 'Two', 'Three'] } })
+    fireEvent.click(screen.getByRole('button', { name: '▾' }))
+    vi.useFakeTimers()
+    fireEvent.click(screen.getByRole('button', { name: /Auto-advance/ }))
+    // The interval ends while the first entry is still scrolling, so the advance is waiting on it.
+    act(() => {
+      vi.advanceTimersByTime(7000)
+    })
+    expect(entryBox().textContent).toBe('A long entry')
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    expect(entryBox().textContent).toBe('Two')
+    fireEvent.click(screen.getByRole('button', { name: 'Previous' }))
+    expect(entryBox().textContent).toBe('A long entry')
+  })
+
+  it('keeps a lone long entry looping after the timed advance was on for a longer file', async () => {
+    measure.wrappedHeight = 72
+    measure.lineWidth = 1000
+    await renderStrip({
+      notes: { points: ['One', 'Two', 'Three'] },
+      others: { 'single.json': { points: ['A single long entry'] } },
+    })
+    fireEvent.click(screen.getByRole('button', { name: '▾' }))
+    fireEvent.click(screen.getByRole('button', { name: /Auto-advance/ }))
+    expect(live()[0].options.iterations).toBe(1)
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'single.json' } })
+    await waitFor(() => expect(entryBox().textContent).toBe('A single long entry'))
+    // The control is disabled below two entries but still reads On; nothing can rotate this entry
+    // away, so its scroll must repeat rather than stop at the end.
+    expect((screen.getByRole('button', { name: /Auto-advance/ }) as HTMLButtonElement).disabled).toBe(true)
+    expect(live()).toHaveLength(1)
+    expect(live()[0].options.iterations).toBe(Infinity)
   })
 
   it('rotates a plain entry on the interval alone', async () => {
