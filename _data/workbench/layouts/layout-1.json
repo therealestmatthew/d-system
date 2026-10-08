@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "layout_id": "layout-1",
   "name": "Layout 1 — Terminal Left",
   "slots": [
@@ -9,14 +9,14 @@
     { "slot_id": "explorer", "display_name": "Explorer" }
   ],
   "panels": [
-    { "panel_id": "terminal", "eligible_slots": ["secondary", "primary"] },
-    { "panel_id": "terminal-cmd", "eligible_slots": ["secondary", "primary"] },
-    { "panel_id": "terminal-powershell", "eligible_slots": ["secondary", "primary"] },
-    { "panel_id": "html-viewer", "eligible_slots": ["secondary", "primary"] },
-    { "panel_id": "notes-strip", "eligible_slots": ["strip"] },
-    { "panel_id": "file-browser", "eligible_slots": ["explorer"] },
-    { "panel_id": "idea-explorer", "eligible_slots": ["explorer"] },
-    { "panel_id": "backlog-explorer", "eligible_slots": ["explorer"] }
+    { "panel_id": "terminal" },
+    { "panel_id": "terminal-cmd" },
+    { "panel_id": "terminal-powershell" },
+    { "panel_id": "html-viewer" },
+    { "panel_id": "notes-strip" },
+    { "panel_id": "file-browser" },
+    { "panel_id": "idea-explorer" },
+    { "panel_id": "backlog-explorer" }
   ],
   "default_assignment": {
     "terminal": "secondary",

@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "workbench-panel-elements.schema.json",
+  "title": "Workbench panel element configurations",
+  "description": "Each panel type's element configuration (_data/workbench/panel-elements.json, ADR-031 decision 4, REQ-011 R12): the body kind its content is, and the ordered list of bar elements it supplies, one entry per place the element takes in a slot's top bar. Structural eligibility is computed from this and slot-schemas.json; nothing lists the slots a panel may occupy. The relational rules (a body kind or bar type exists in the slot-schema vocabulary; every PANEL_REGISTRY type has an entry) are asserted by test/test_workbench_slot_matcher.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "panels"],
+  "properties": {
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "panels": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["body", "bar"],
+        "properties": {
+          "body": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+          "bar": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "panels": {
+    "terminal": {
+      "body": "terminal-screen",
+      "bar": ["help", "choice", "choice", "choice", "choice", "choice"]
+    },
+    "terminal-cmd": {
+      "body": "terminal-screen",
+      "bar": ["help", "choice", "choice", "choice", "choice", "choice"]
+    },
+    "terminal-powershell": {
+      "body": "terminal-screen",
+      "bar": ["help", "choice", "choice", "choice", "choice", "choice"]
+    },
+    "notes-strip": { "body": "ticker", "bar": ["help", "choice"] },
+    "overview": { "body": "document-frame", "bar": ["help", "toggle"] },
+    "html-viewer": {
+      "body": "document-frame",
+      "bar": ["status", "action", "choice", "choice", "toggle"]
+    },
+    "file-browser": { "body": "tree", "bar": ["choice", "choice"] },
+    "idea-explorer": { "body": "table", "bar": ["toggle", "toggle"] },
+    "backlog-explorer": { "body": "table", "bar": ["toggle", "toggle"] }
+  }
+}

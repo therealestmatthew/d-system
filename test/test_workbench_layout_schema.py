@@ -1,11 +1,14 @@
 """Schema and invariant tests for the workbench layout data files
-(`_data/workbench/layouts/*.json`, REQ-007 W16, ADR-016, idea `000098`).
+(`_data/workbench/layouts/*.json`, REQ-007 W16, ADR-016, ADR-031, idea `000098`).
 
 `schemas/workbench-layout.schema.json` asserts structural shape via a Draft7 validator: a
-malformed file (missing a required key, wrong type) fails here before it ships. JSON Schema
-cannot express the relational invariants the W16 delta actually depends on — every panel's
-`eligible_slots` naming real slots, the default assignment being *total* (every declared panel
-assigned exactly once) and landing inside that panel's own eligibility, every
+malformed file (missing a required key, wrong type) fails here before it ships. A layout carries no
+eligibility list (REQ-011 R12): which slots a panel may occupy is computed by the structural matcher
+(`src/workbench/slot_matcher.py`) from `panel-elements.json` and `slot-schemas.json`, so a layout
+that carries `eligible_slots` fails the schema. JSON Schema cannot express the relational
+invariants the layout depends on — every slot id naming a role in the slot schemas, every panel
+having at least one structurally eligible slot in this layout, the default assignment being
+*total* (every declared panel assigned exactly once) and landing inside that eligibility, every
 `default_visible_panel` entry naming a panel actually assigned to that slot, and every
 `grid.areas` token naming a real slot — so those are asserted directly against the parsed JSON,
 against both the two shipped layouts and deliberately-broken mutations of them.
@@ -20,6 +23,13 @@ from typing import Any
 
 import pytest
 from jsonschema import Draft7Validator
+
+from src.workbench.slot_matcher import (
+    eligible_slot_ids,
+    load_panel_elements,
+    load_slot_schemas,
+    role_frame_has_identity,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schemas" / "workbench-layout.schema.json"
@@ -42,15 +52,37 @@ def _load(path: Path) -> dict[str, Any]:
 
 
 def _panel_eligibility(layout: dict[str, Any]) -> dict[str, set[str]]:
-    return {panel["panel_id"]: set(panel["eligible_slots"]) for panel in layout["panels"]}
+    """Panel id -> the slots of this layout it is structurally eligible for (REQ-011 R12)."""
+    slot_ids = [slot["slot_id"] for slot in layout["slots"]]
+    return {
+        panel["panel_id"]: set(eligible_slot_ids(panel["panel_id"], slot_ids))
+        for panel in layout["panels"]
+    }
 
 
 def _assert_every_panel_has_a_real_eligible_slot(layout: dict[str, Any]) -> None:
-    slot_ids = {slot["slot_id"] for slot in layout["slots"]}
-    for panel in layout["panels"]:
-        assert panel["eligible_slots"], f"{panel['panel_id']} has no eligible slot"
-        unknown = set(panel["eligible_slots"]) - slot_ids
-        assert not unknown, f"{panel['panel_id']} names unknown slot(s) {unknown}"
+    elements = load_panel_elements()
+    for panel_id, eligible in _panel_eligibility(layout).items():
+        assert panel_id in elements, f"{panel_id} has no entry in panel-elements.json"
+        assert eligible, f"{panel_id} has no structurally eligible slot in {layout['layout_id']}"
+
+
+def _assert_every_slot_names_a_role(layout: dict[str, Any]) -> None:
+    roles = set(load_slot_schemas()["roles"])
+    unknown = {slot["slot_id"] for slot in layout["slots"]} - roles
+    assert not unknown, f"slot id(s) {sorted(unknown)} name no role in slot-schemas.json"
+
+
+def _assert_identityless_roles_hold_one_panel(layout: dict[str, Any]) -> None:
+    """A frame with no `identity` sub-slot has no panel switcher (ADR-031 decision 2), so a layout
+    may not assign more than one panel to its role."""
+    schemas = load_slot_schemas()
+    counts: dict[str, int] = {}
+    for slot_id in layout["default_assignment"].values():
+        counts[slot_id] = counts.get(slot_id, 0) + 1
+    for slot_id, count in counts.items():
+        if not role_frame_has_identity(slot_id, schemas):
+            assert count <= 1, f"{slot_id} has no panel switcher but is assigned {count} panels"
 
 
 def _assert_default_assignment_is_total_and_eligible(layout: dict[str, Any]) -> None:
@@ -97,9 +129,10 @@ def test_shipped_layout_matches_schema(path: Path) -> None:
 
 @pytest.mark.parametrize("path", LAYOUT_FILES, ids=lambda p: p.stem)
 def test_shipped_layout_schema_version_is_bumped(path: Path) -> None:
-    """Version 3 is the one that renamed the slot ids to role names. Dropping the bump would leave
-    browsers holding version-2 assignments that name slots which no longer exist."""
-    assert _load(path)["schema_version"] >= 3
+    """Version 3 renamed the slot ids to role names; version 4 removed `eligible_slots` (ADR-031
+    decision 10). The version is part of the browser storage key, so dropping a bump would leave
+    browsers reading selections written against a shape the files no longer have."""
+    assert _load(path)["schema_version"] >= 4
 
 
 @pytest.mark.parametrize("path", LAYOUT_FILES, ids=lambda p: p.stem)
@@ -121,6 +154,16 @@ def test_shipped_layout_every_panel_has_a_real_eligible_slot(path: Path) -> None
 
 
 @pytest.mark.parametrize("path", LAYOUT_FILES, ids=lambda p: p.stem)
+def test_shipped_layout_every_slot_names_a_role(path: Path) -> None:
+    _assert_every_slot_names_a_role(_load(path))
+
+
+@pytest.mark.parametrize("path", LAYOUT_FILES, ids=lambda p: p.stem)
+def test_shipped_layout_identityless_roles_hold_one_panel(path: Path) -> None:
+    _assert_identityless_roles_hold_one_panel(_load(path))
+
+
+@pytest.mark.parametrize("path", LAYOUT_FILES, ids=lambda p: p.stem)
 def test_shipped_layout_default_assignment_is_total_and_eligible(path: Path) -> None:
     _assert_default_assignment_is_total_and_eligible(_load(path))
 
@@ -136,10 +179,11 @@ def test_shipped_layout_grid_areas_name_real_slots(path: Path) -> None:
 
 
 def test_shipped_eligibility_matches_req_007_w16() -> None:
-    """Terminal (bash), CMD, PowerShell and HTML Viewer are each eligible for both the secondary
-    and primary slots in both layouts; Overview is eligible for the primary slot only, where it
-    exists (layout 1 never shipped an overview panel and W16 does not add one); the notes strip
-    and the explorer slot's three panels keep their single-slot homes unchanged."""
+    """The structural rule reproduces REQ-007 W16 as amended by ADR-031: Terminal (bash), CMD,
+    PowerShell and HTML Viewer are each eligible for both the secondary and primary slots in both
+    layouts; Overview, an embedded document like the HTML Viewer, is eligible for both as well
+    where it exists (layout 1 never shipped an overview panel); the notes strip and the explorer
+    slot's three panels keep their single-slot homes unchanged."""
     shared_shell_and_viewer_ids = {"terminal", "terminal-cmd", "terminal-powershell", "html-viewer"}
     for path in LAYOUT_FILES:
         layout = _load(path)
@@ -150,8 +194,8 @@ def test_shipped_eligibility_matches_req_007_w16() -> None:
                 "slots"
             )
         if "overview" in eligibility:
-            assert eligibility["overview"] == {"primary"}, (
-                f"{path.name}: overview must be eligible for the primary slot only"
+            assert eligibility["overview"] == {"secondary", "primary"}, (
+                f"{path.name}: overview must be eligible for the secondary and primary slots"
             )
         assert eligibility["notes-strip"] == {"strip"}
         for panel_id in ("file-browser", "idea-explorer", "backlog-explorer"):
@@ -187,27 +231,52 @@ def test_malformed_layout_file_fails_schema() -> None:
     assert errors
 
 
-def test_panel_with_no_eligible_slot_fails_schema() -> None:
-    layout = copy.deepcopy(_load(LAYOUT_FILES[0]))
-    layout["panels"][0]["eligible_slots"] = []
+@pytest.mark.parametrize("path", LAYOUT_FILES, ids=lambda p: p.stem)
+def test_layout_carrying_an_eligibility_list_fails_the_schema(path: Path) -> None:
+    """REQ-011 R12: there is no per-panel allow-list anywhere, so a layout that carries one is
+    rejected rather than ignored (ADR-031 decision 4)."""
+    layout = copy.deepcopy(_load(path))
+    layout["panels"][0]["eligible_slots"] = ["primary"]
     errors = list(_validator().iter_errors(layout))
     assert errors
+    assert any("eligible_slots" in error.message for error in errors)
+
+
+def test_a_version_3_layout_fails_the_schema() -> None:
+    layout = copy.deepcopy(_load(LAYOUT_FILES[0]))
+    layout["schema_version"] = 3
+    assert list(_validator().iter_errors(layout))
 
 
 def test_panel_with_no_eligible_slot_fails_invariant() -> None:
     layout = copy.deepcopy(_load(LAYOUT_FILES[0]))
-    layout["panels"][0]["eligible_slots"] = []
+    # Without a primary or secondary slot no terminal has a structurally eligible home.
+    layout["slots"] = [s for s in layout["slots"] if s["slot_id"] in {"strip", "explorer"}]
     with pytest.raises(AssertionError):
         _assert_every_panel_has_a_real_eligible_slot(layout)
+
+
+def test_slot_id_naming_no_role_fails_invariant() -> None:
+    layout = copy.deepcopy(_load(LAYOUT_FILES[0]))
+    layout["slots"][0]["slot_id"] = "sidebar"
+    with pytest.raises(AssertionError):
+        _assert_every_slot_names_a_role(layout)
+
+
+def test_two_panels_in_a_role_without_a_switcher_fails_invariant() -> None:
+    layout = copy.deepcopy(_load(LAYOUT_FILES[0]))
+    layout["default_assignment"]["file-browser"] = "strip"
+    layout["default_assignment"]["idea-explorer"] = "strip"
+    with pytest.raises(AssertionError):
+        _assert_identityless_roles_hold_one_panel(layout)
 
 
 def test_default_assignment_to_an_ineligible_slot_fails_invariant() -> None:
     layout = copy.deepcopy(_load(LAYOUT_FILES[0]))
     target_panel = layout["panels"][0]
+    eligible = _panel_eligibility(layout)[target_panel["panel_id"]]
     ineligible_slot = next(
-        slot["slot_id"]
-        for slot in layout["slots"]
-        if slot["slot_id"] not in target_panel["eligible_slots"]
+        slot["slot_id"] for slot in layout["slots"] if slot["slot_id"] not in eligible
     )
     layout["default_assignment"][target_panel["panel_id"]] = ineligible_slot
     with pytest.raises(AssertionError):

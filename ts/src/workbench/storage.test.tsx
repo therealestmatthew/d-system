@@ -38,3 +38,30 @@ describe('stored workbench state across the slot id rename', () => {
     expect(loadStoredState(3)).toBeNull()
   })
 })
+
+// ADR-031 decision 10: version 4 removed `eligible_slots` from the layout files. Selections written
+// under version 3 are never read by version 4, and nothing migrates them.
+const V4_KEY = 'd-system:workbench-state:v4'
+
+describe('stored workbench state across the removal of the eligibility list', () => {
+  it('ignores a version-3 key, leaving layout defaults to apply, and leaves it unread in place', () => {
+    window.localStorage.setItem(
+      V3_KEY,
+      JSON.stringify({
+        schema_version: 3,
+        active_layout: 'layout-2',
+        panel_assignments: { 'layout-2': { overview: 'primary' } },
+        slot_visible_panel: { 'layout-2': { primary: 'overview' } },
+      }),
+    )
+    expect(loadStoredState(4)).toBeNull()
+    expect(window.localStorage.getItem(V4_KEY)).toBeNull()
+    expect(window.localStorage.getItem(V3_KEY)).not.toBeNull()
+  })
+
+  it('does not carry version-3 fields into a version-4 write', () => {
+    window.localStorage.setItem(V3_KEY, JSON.stringify({ schema_version: 3, active_layout: 'layout-2' }))
+    patchStoredState(4, { active_layout: 'layout-1' })
+    expect(loadStoredState(4)).toEqual({ schema_version: 4, active_layout: 'layout-1' })
+  })
+})

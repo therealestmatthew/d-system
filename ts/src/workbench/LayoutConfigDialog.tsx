@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import Popover from '../stage/Popover'
 import { PANEL_REGISTRY, panelDisplayName } from './panelRegistry'
+import { slotsEligibleFor } from './slotEligibility'
 import type { LayoutDefinition } from './types'
 
 const CONFIG_DIALOG_WIDTH_PX = 320
 
 /** The slot id `layout` currently assigns `panelId` to, or `null` if (unexpectedly) nothing
- * assigns it — every declared panel is assigned to exactly one of its own eligible slots by
- * construction (`useWorkbenchLayouts`'s total-mapping resolution), so this is a lookup, not a
- * search for an edge case the data model allows. */
+ * assigns it — every declared panel is assigned to exactly one slot it is structurally eligible
+ * for by construction (`useWorkbenchLayouts`'s total-mapping resolution), so this is a lookup, not
+ * a search for an edge case the data model allows. */
 function findAssignedSlotId(layout: LayoutDefinition, panelId: string): string | null {
   const slot = layout.slots.find((candidate) => candidate.admits.includes(panelId))
   return slot ? slot.slot_id : null
@@ -21,9 +22,9 @@ function slotDisplayName(layout: LayoutDefinition, slotId: string): string {
 /**
  * The layout-configuration surface (REQ-007 W05, reworked by W16/W17): a button at the page's top
  * right opening a dismissible popup (reusing `Popover`, so it inherits REQ-006 R03's click-
- * dismiss behavior) that selects the active layout and, per panel, assigns it to one of its own
- * eligible slots — a total mapping, one `<select>` per panel. No geometry control is offered here
- * — ADR-016 rule 2: "the configuration surface selects the active layout and assigns panels to
+ * dismiss behavior) that selects the active layout and, per panel, assigns it to one of the slots
+ * it is structurally eligible for (`slotsEligibleFor`, ADR-031) — a total mapping, one `<select>`
+ * per panel. No geometry control is offered here — ADR-016 rule 2: "the configuration surface selects the active layout and assigns panels to
  * slots; changing a slot's geometry ... is a reviewed commit of a JSON file."
  *
  * This is deliberately *not* the pre-W16 shape, which offered one `<select>` per *slot* choosing
@@ -121,6 +122,10 @@ export default function LayoutConfigDialog({
             {activeLayout.panels
               .filter((panel) => PANEL_REGISTRY[panel.panel_id]?.Component)
               .map((panel) => {
+                const eligibleSlotIds = slotsEligibleFor(
+                  panel.panel_id,
+                  activeLayout.slots.map((slot) => slot.slot_id),
+                )
                 const assignedSlotId = findAssignedSlotId(activeLayout, panel.panel_id)
                 const pendingHere = pendingMove?.panelId === panel.panel_id ? pendingMove : null
                 return (
@@ -131,12 +136,12 @@ export default function LayoutConfigDialog({
                         // While a move is pending confirmation the selector shows the slot the
                         // presenter picked, not the one still in force — otherwise the control
                         // would snap back under the notice asking them to confirm it.
-                        value={pendingHere?.slotId ?? assignedSlotId ?? panel.eligible_slots[0]}
+                        value={pendingHere?.slotId ?? assignedSlotId ?? eligibleSlotIds[0]}
                         onChange={(event) =>
                           requestMove(activeLayout.layout_id, panel.panel_id, event.target.value)
                         }
                       >
-                        {panel.eligible_slots.map((slotId) => (
+                        {eligibleSlotIds.map((slotId) => (
                           <option key={slotId} value={slotId}>
                             {slotDisplayName(activeLayout, slotId)}
                           </option>

@@ -7,13 +7,16 @@ import {
 } from './types'
 import { loadStoredState, patchStoredState } from './storage'
 import { PANEL_REGISTRY } from './panelRegistry'
+import { frameForSlot, slotsEligibleFor } from './slotEligibility'
+import { frameHasIdentity } from './slotMatcher'
 import { fetchWorkbench } from '../stage/useTerminalEnabled'
 
 // The two shipped layout files (REQ-007 W05, ADR-016 rule 1) — served at runtime by the Vite dev
 // plugin `serveWorkbenchLayouts` (`ts/vite.config.ts`) from `_data/workbench/layouts/`, never
-// bundled, so editing a layout file's geometry, panel eligibility or default assignment needs no
-// frontend rebuild. Only the filenames are named here; every other detail (slot ids, geometry,
-// per-panel eligibility, default assignment) is the JSON files' content, not this code's.
+// bundled, so editing a layout file's geometry or default assignment needs no frontend rebuild.
+// Only the filenames are named here; every other detail (slot ids, geometry, default assignment)
+// is the JSON files' content, not this code's. Which slots a panel may occupy is not in them: it is
+// computed from the element-configuration and slot-schema data files (`slotEligibility.ts`).
 const LAYOUT_FILE_IDS = ['layout-1', 'layout-2'] as const
 
 export type WorkbenchLoadState = 'loading' | 'loaded' | 'error'
@@ -86,27 +89,44 @@ async function fetchTerminalPlatformDefaultPanel(): Promise<string> {
   }
 }
 
+/** True when `slotId` may take `panelId` in addition to what `assignment` already places there.
+ * A slot whose frame has no `identity` sub-slot has no panel switcher (ADR-031 decision 2), so it
+ * holds at most one panel. */
+function slotHasRoomFor(
+  assignment: Record<string, string>,
+  slotId: string,
+  panelId: string,
+): boolean {
+  const frame = frameForSlot(slotId)
+  if (!frame || frameHasIdentity(frame)) return true
+  return !Object.entries(assignment).some(
+    ([otherPanelId, otherSlotId]) => otherSlotId === slotId && otherPanelId !== panelId,
+  )
+}
+
 /** Resolves one raw layout file's default total assignment (panel_id -> slot_id) overridden by
  * any valid stored per-panel reassignment (REQ-007 W16). Invalid stored entries — an unknown
- * panel, an unknown slot, or a slot the panel is not eligible for — are dropped silently in
- * favor of the file's own default for that panel (ADR-016 rule 4), never an error. Returns both
- * the resolved assignment and the subset of the stored overrides that were actually valid, so the
- * persistence effect below only ever writes back entries `useWorkbenchLayouts` itself already
- * validated once. */
+ * panel, an unknown slot, a slot the panel is not structurally eligible for (ADR-031 decision 4),
+ * or a slot with no panel switcher that is already taken — are dropped silently in favor of the
+ * file's own default for that panel (ADR-016 rule 4), never an error. Returns both the resolved
+ * assignment and the subset of the stored overrides that were actually valid, so the persistence
+ * effect below only ever writes back entries `useWorkbenchLayouts` itself already validated
+ * once. */
 function resolveAssignment(
   layout: RawLayoutFile,
   storedForLayout: Record<string, string> | undefined,
 ): { assignment: Record<string, string>; validOverrides: Record<string, string> } {
-  const eligibleSlotsByPanel = new Map(layout.panels.map((panel) => [panel.panel_id, panel.eligible_slots]))
+  const declaredPanelIds = new Set(layout.panels.map((panel) => panel.panel_id))
+  const slotIds = layout.slots.map((slot) => slot.slot_id)
   const assignment: Record<string, string> = { ...layout.default_assignment }
   const validOverrides: Record<string, string> = {}
   if (storedForLayout) {
     for (const [panelId, slotId] of Object.entries(storedForLayout)) {
-      const eligibleSlots = eligibleSlotsByPanel.get(panelId)
-      if (eligibleSlots && eligibleSlots.includes(slotId)) {
-        assignment[panelId] = slotId
-        validOverrides[panelId] = slotId
-      }
+      if (!declaredPanelIds.has(panelId)) continue
+      if (!slotsEligibleFor(panelId, slotIds).includes(slotId)) continue
+      if (!slotHasRoomFor(assignment, slotId, panelId)) continue
+      assignment[panelId] = slotId
+      validOverrides[panelId] = slotId
     }
   }
   return { assignment, validOverrides }
@@ -147,7 +167,7 @@ function buildSlots(
  * Loads the shipped layout files, hydrates the active layout, per-panel slot assignment and
  * per-slot visible-panel choice from localStorage (ADR-016 rule 3, reshaped by REQ-007 W16), and
  * persists changes back. Stored data referencing an unknown layout, panel or slot — or assigning
- * a panel to a slot it is not eligible for, or naming a visible panel not currently assigned to
+ * a panel to a slot it is not structurally eligible for, or naming a visible panel not currently assigned to
  * that slot — or written under a different schema-version key entirely — is dropped silently in
  * favor of each layout's own defaults (ADR-016 rule 4), never surfaced as an error and never
  * migrated.
@@ -274,7 +294,7 @@ export function useWorkbenchLayouts() {
 
   // The single ADR-016 schema version, resolved from the loaded layout files — the one source of
   // truth `NotesStripRegion` also reads, via `StagePage`'s `ActiveSchemaVersionProvider`, rather
-  // than a hardcoded constant of its own (both files ship `schema_version: 3` today, but only
+  // than a hardcoded constant of its own (both files ship `schema_version: 4` today, but only
   // this derivation is authoritative once a later data-only bump lands).
   const schemaVersion = rawLayouts[0]?.schema_version ?? null
 
@@ -289,10 +309,10 @@ export function useWorkbenchLayouts() {
       layout_id: layout.layout_id,
       name: layout.name,
       slots: buildSlots(layout, assignment),
-      // REQ-007 W17: the raw file's own per-panel eligibility, unchanged by resolution — the
-      // assignment-only configuration dialog reads this to build "one selector per panel over
-      // its eligible slots" (`LayoutConfigDialog.tsx`), independent of which slot each panel is
-      // *currently* assigned to (that is `slots[].admits`, above).
+      // REQ-007 W17: the panels the layout declares, unchanged by resolution — the assignment-only
+      // configuration dialog reads this to build "one selector per panel over the slots it is
+      // eligible for" (`LayoutConfigDialog.tsx`, `slotsEligibleFor`), independent of which slot
+      // each panel is *currently* assigned to (that is `slots[].admits`, above).
       panels: layout.panels,
       grid: layout.grid,
     }
@@ -361,9 +381,10 @@ export function useWorkbenchLayouts() {
   }
 
   /** Moves `panelId` to `slotId` within `layoutId` — the REQ-007 W16 primitive the W17
-   * assignment-only configuration dialog calls ("one selector per panel over its eligible
-   * slots"). Silently a no-op if `slotId` is not one of the panel's eligible slots in the loaded
-   * layout, matching this hook's existing "invalid input is dropped, never an error" posture.
+   * assignment-only configuration dialog calls ("one selector per panel over the slots it is
+   * eligible for"). Silently a no-op if `slotId` is not a slot the panel is structurally eligible
+   * for in the loaded layout, matching this hook's existing "invalid input is dropped, never an
+   * error" posture.
    *
    * It writes three things in one batched event-handler call, and each one is required:
    *
@@ -392,9 +413,15 @@ export function useWorkbenchLayouts() {
   const setPanelSlot = (layoutId: string, panelId: string, slotId: string) => {
     const rawLayout = rawLayouts.find((candidate) => candidate.layout_id === layoutId)
     const panel = rawLayout?.panels.find((candidate) => candidate.panel_id === panelId)
-    if (!panel || !panel.eligible_slots.includes(slotId)) return
+    if (!rawLayout || !panel) return
+    const slotIds = rawLayout.slots.map((slot) => slot.slot_id)
+    if (!slotsEligibleFor(panelId, slotIds).includes(slotId)) return
     const layout = layouts.find((candidate) => candidate.layout_id === layoutId)
     if (!layout) return
+    const currentAssignment = Object.fromEntries(
+      layout.slots.flatMap((slot) => slot.admits.map((admitted) => [admitted, slot.slot_id])),
+    )
+    if (!slotHasRoomFor(currentAssignment, slotId, panelId)) return
     const sourceSlot = layout.slots.find((candidate) => candidate.admits.includes(panelId)) ?? null
     if (sourceSlot?.slot_id === slotId) return // already there — nothing to move, nothing to write.
     const sourceSlotLosesItsVisiblePanel =
