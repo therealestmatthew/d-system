@@ -1,0 +1,42 @@
+{
+  "verdict_id": "2026-10-08-phase-wbf-01-review-judge",
+  "date": "2026-10-08",
+  "phase": "phase-wbf-01",
+  "reviewed_commit": "6dc36563591b1b2c080e55ae74fdccdc3f15f57f",
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "model": "sonnet (review-judge definition default)",
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "uv run pytest gate exited 1 on an unrelated runner test",
+      "evidence": "05-gate.txt lines 92-94, 102-103: test_an_unwritable_worktree_parent_is_refused 'DID NOT RAISE Refused'; chmod 0o500 expectation fails, probably because the runner ran as root; the test file is untouched by this diff",
+      "consequence": "The manifest reports result: failed, though the phase diff does not touch the failing test",
+      "minimal_fix": "Confirm the failure on the base commit or as non-root; optionally skip the test when euid == 0 (outside this phase)"
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "No test pins route-side markdown/image rendering or the CSP sandbox header that R01 parity and R02 depend on",
+      "evidence": "HtmlViewerRegion.doubleClick.test.tsx stubs fetch and window.open and only checks the URL passed; the header is set at ts/vite.config.ts:264 and verified here only by reading",
+      "consequence": "A later route change could break new-tab rendering or sandboxing without failing these tests",
+      "minimal_fix": "Add a route-level test or record a manual browser check; optional for this phase"
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "fileHref does not URL-encode the path",
+      "evidence": "HtmlViewerRegion.tsx fileHref returns WORKBENCH_FILE_PREFIX + path; same as the existing openTabHref link",
+      "consequence": "A file name containing # or ? opens the wrong URL; no regression since the existing link behaves the same",
+      "minimal_fix": "Encode each path segment in fileHref"
+    }
+  ],
+  "raw_reply_sha256": "f4546a67cb79bff05eaea7cbd2c8857f479c07f2fda9d2726b5282a8e1c8027c",
+  "outcomes": [],
+  "notes": "Shadow judge (gating: false), same brief as the gating reviewer plus the runner manifest; no checkout. Its F02 and F03 are carried as ideas (the Playwright check the builder ran is in the session record; the path-encoding gap is shared with the existing link). Evidence file is the judge's final message transcribed by the coordinator (the judge has no write tool); findings and JSON verbatim, narrative condensed."
+}
