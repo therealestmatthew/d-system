@@ -492,6 +492,11 @@ export default function HtmlViewerRegion() {
                     openTabInBrowser(tab)
                   }
                 }}
+                // A native button activates on Space at keyup, which Firefox does not cancel from
+                // the keydown's preventDefault; cancel it here so Shift+Space only opens the file.
+                onKeyUp={(event) => {
+                  if (event.shiftKey && event.key === ' ') event.preventDefault()
+                }}
                 aria-keyshortcuts="Shift+Enter Shift+Space"
                 title="Double-click, or press Shift+Enter, to open this tab's file in a new browser tab"
               >

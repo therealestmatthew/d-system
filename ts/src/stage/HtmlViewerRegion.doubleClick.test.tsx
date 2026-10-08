@@ -105,6 +105,11 @@ describe('HtmlViewerRegion double-click to open in a browser tab', () => {
     fireEvent.keyDown(tab('Tab 2'), { key: 'Enter', shiftKey: true })
     expect(openSpy).toHaveBeenLastCalledWith('/workbench-file/docs/b.md', '_blank', 'noopener,noreferrer')
     fireEvent.keyDown(tab('Tab 3'), { key: ' ', shiftKey: true })
+    // The keyup that follows must not also activate the button (Firefox activates on keyup).
+    expect(fireEvent.keyUp(tab('Tab 3'), { key: ' ', shiftKey: true })).toBe(false)
+    expect(fireEvent.keyUp(tab('Tab 3'), { key: ' ' })).toBe(true)
+    expect(tab('Tab 1').getAttribute('aria-selected')).toBe('true')
+    expect(tab('Tab 3').getAttribute('aria-selected')).toBe('false')
     expect(openSpy).toHaveBeenLastCalledWith('/workbench-file/docs/c.png', '_blank', 'noopener,noreferrer')
     expect(openSpy).toHaveBeenCalledTimes(2)
   })
