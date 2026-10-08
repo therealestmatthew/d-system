@@ -96,3 +96,7 @@ re-read against a changed header.
 The phase contract named the co-author as Claude Fable 5.1. The commit carries Claude Haiku 5.5,
 the model that did the work, per the session's attribution instruction. This is a mismatch to
 confirm with the Session Manager.
+
+## Review
+
+Verdict `2026-10-08-phase-wbf-18-demo-adversary` (`docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-18-demo-adversary.json`): pass, gating, one minor finding (F01, placeholder list omitted the no-tabs and still-locating messages). F01 was fixed in the runbook entry.
