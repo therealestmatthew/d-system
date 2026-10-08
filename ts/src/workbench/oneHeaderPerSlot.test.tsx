@@ -1,6 +1,7 @@
 import { cleanup, render, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import StagePage from '../stage/StagePage'
+import { slotsEligibleFor } from './slotEligibility'
 import layout1 from '../../../_data/workbench/layouts/layout-1.json'
 import layout2 from '../../../_data/workbench/layouts/layout-2.json'
 
@@ -14,7 +15,7 @@ interface LayoutFile {
   schema_version: number
   layout_id: string
   slots: { slot_id: string }[]
-  panels: { panel_id: string; eligible_slots: string[] }[]
+  panels: { panel_id: string }[]
 }
 
 const LAYOUTS: LayoutFile[] = [layout1 as LayoutFile, layout2 as LayoutFile]
@@ -61,9 +62,14 @@ function barsIn(element: Element): number {
   return element.querySelectorAll('header, [role="banner"]').length
 }
 
+// Every panel type the layout declares, in every slot of the layout it is structurally eligible
+// for (the matcher, not a list in the layout file).
 const CASES = LAYOUTS.flatMap((layout) =>
   layout.panels.flatMap((panel) =>
-    panel.eligible_slots.map((slotId) => ({ layout, panelId: panel.panel_id, slotId })),
+    slotsEligibleFor(
+      panel.panel_id,
+      layout.slots.map((slot) => slot.slot_id),
+    ).map((slotId) => ({ layout, panelId: panel.panel_id, slotId })),
   ),
 )
 

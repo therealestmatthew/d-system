@@ -6,6 +6,8 @@ import HtmlViewerRegion from '../stage/HtmlViewerRegion'
 import FileBrowserRegion from '../stage/FileBrowserRegion'
 import IdeaExplorerRegion from '../stage/IdeaExplorerRegion'
 import BacklogExplorerRegion from '../stage/BacklogExplorerRegion'
+import { panelElements } from './slotEligibility'
+import type { PanelElements } from './slotMatcher'
 
 /**
  * The panel type registry (REQ-007 W05/W06): every panel type id a layout's slots may name, and
@@ -38,10 +40,7 @@ import BacklogExplorerRegion from '../stage/BacklogExplorerRegion'
  * implemented.
  *
  * `terminal`, `notes-strip` and `overview` are this phase's three existing regions (REQ-007
- * dispatch item 5: "existing regions become panels of this engine") — each already renders its
- * own `.stage-region` section, which is what satisfies a single-panel slot's "plain header"
- * (REQ-007 W06) with no extra wrapper needed (the notes strip's own header carries no title,
- * per REQ-007 W01, but is still that same single `.stage-region` box).
+ * dispatch item 5: "existing regions become panels of this engine").
  *
  * `html-viewer` (`phase-wb-04`, `HtmlViewerRegion`) generalizes and replaces `overview` as
  * layout 1's primary slot default (`_data/workbench/layouts/layout-1.json`): the generated overview
@@ -56,35 +55,73 @@ import BacklogExplorerRegion from '../stage/BacklogExplorerRegion'
  * three terminal ids, so the secondary slot is this repo's first slot to actually reach `Slot.tsx`'s
  * "more than one implemented panel" branch below: a slot-level header showing the current panel's
  * name beside a dropdown listing the other two, wrapping whichever terminal panel is selected in
- * an outer box. The wrapped panel still renders its own inner header too (the double-header
- * cosmetic case flagged below) — left as-is, per the note this comment already carried before
- * this slot became the one to exercise it. All three ids share the one `TerminalRegion`
- * component, parameterized by its `shell` prop — never three copies of the terminal panel's
- * logic.
+ * an outer box. All three ids share the one `TerminalRegion` component, parameterized by its
+ * `shell` prop — never three copies of the terminal panel's logic.
  *
  * A slot resolving to more than one *implemented* panel is wrapped by `Slot.tsx` in an outer
  * dropdown header instead; the secondary slot (above) was the first to reach that branch, and the
  * explorer slot is now the second, once `phase-wb-06` filled in `idea-explorer` and
  * `backlog-explorer` alongside `phase-wb-05`'s `file-browser` — the explorer slot's dropdown now
- * lists all three, per REQ-007 W06. The wrapped panel still renders its own inner header too (the
- * same double-header cosmetic case the secondary slot already carries) — left as-is here too, out
- * of this phase's declared scope (`ts/src`), not because it is otherwise desirable.
+ * lists all three, per REQ-007 W06.
+ *
+ * `elements` is the panel type's element configuration (ADR-031 decision 4): the body kind its
+ * content is and the bar elements it supplies. It is read from `_data/workbench/panel-elements.json`
+ * under the same key, never restated here, and it is what decides which slot roles the type may
+ * occupy (`slotMatcher.ts`). A panel never draws a top bar of its own: it renders each bar element
+ * inside a `BarElement`, and the slot that holds it draws the one bar (REQ-011 R13).
  */
 export interface PanelDefinition {
   displayName: string
   Component: ComponentType | null
+  elements: PanelElements
 }
 
 export const PANEL_REGISTRY: Record<string, PanelDefinition> = {
-  terminal: { displayName: 'Terminal (bash)', Component: TerminalRegion },
-  'terminal-cmd': { displayName: 'CMD', Component: TerminalRegionCmd },
-  'terminal-powershell': { displayName: 'PowerShell', Component: TerminalRegionPowerShell },
-  'notes-strip': { displayName: 'Notes', Component: NotesStripRegion },
-  overview: { displayName: 'Overview', Component: OverviewRegion },
-  'html-viewer': { displayName: 'HTML Viewer', Component: HtmlViewerRegion },
-  'file-browser': { displayName: 'File Browser', Component: FileBrowserRegion },
-  'idea-explorer': { displayName: 'Idea Explorer', Component: IdeaExplorerRegion },
-  'backlog-explorer': { displayName: 'Backlog Explorer', Component: BacklogExplorerRegion },
+  terminal: {
+    displayName: 'Terminal (bash)',
+    Component: TerminalRegion,
+    elements: panelElements['terminal'],
+  },
+  'terminal-cmd': {
+    displayName: 'CMD',
+    Component: TerminalRegionCmd,
+    elements: panelElements['terminal-cmd'],
+  },
+  'terminal-powershell': {
+    displayName: 'PowerShell',
+    Component: TerminalRegionPowerShell,
+    elements: panelElements['terminal-powershell'],
+  },
+  'notes-strip': {
+    displayName: 'Notes',
+    Component: NotesStripRegion,
+    elements: panelElements['notes-strip'],
+  },
+  overview: {
+    displayName: 'Overview',
+    Component: OverviewRegion,
+    elements: panelElements['overview'],
+  },
+  'html-viewer': {
+    displayName: 'HTML Viewer',
+    Component: HtmlViewerRegion,
+    elements: panelElements['html-viewer'],
+  },
+  'file-browser': {
+    displayName: 'File Browser',
+    Component: FileBrowserRegion,
+    elements: panelElements['file-browser'],
+  },
+  'idea-explorer': {
+    displayName: 'Idea Explorer',
+    Component: IdeaExplorerRegion,
+    elements: panelElements['idea-explorer'],
+  },
+  'backlog-explorer': {
+    displayName: 'Backlog Explorer',
+    Component: BacklogExplorerRegion,
+    elements: panelElements['backlog-explorer'],
+  },
 }
 
 export function panelDisplayName(panelId: string): string {

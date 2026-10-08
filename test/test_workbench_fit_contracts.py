@@ -18,9 +18,10 @@ the five instances the contract exists to catch.
 
 **Live half (a command, not a pytest test).** `python test/test_workbench_fit_contracts.py --live
 <url>` drives Chromium through Playwright, seeds every layout x registered panel x eligible slot x
-required window size, measures every contract region, and judges the measurements with the same
-judge. `--self-test` additionally breaks each panel's own contract with injected CSS and requires
-the judge to notice. It is not a pytest test because it needs a running workbench, Chromium and
+required window size (eligible by the structural matcher, `src/workbench/slot_matcher.py`, REQ-011
+R12), measures every contract region, and judges the measurements with the same judge.
+`--self-test` additionally breaks each panel's own contract with injected CSS and requires the
+judge to notice. It is not a pytest test because it needs a running workbench, Chromium and
 Node Playwright; a pytest test that silently passes without them would be the vacuous pass this
 module exists to prevent. The live half exits non-zero on any violation, and on any scroll rule
 that no cell exercised.
@@ -48,6 +49,8 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+
+from src.workbench.slot_matcher import eligible_slot_ids
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "docs" / "06-requirements" / "REQ-037-workbench-content-fit-contracts.md"
@@ -1077,11 +1080,12 @@ def live_cells(
         layout = json.loads(path.read_text(encoding="utf-8"))
         if layout_filter and layout["layout_id"] != layout_filter:
             continue
+        slot_ids = [slot["slot_id"] for slot in layout["slots"]]
         for panel in layout["panels"]:
             if panel_filter and panel["panel_id"] != panel_filter:
                 continue
             rules = contract.panels.get(panel["panel_id"], [])
-            for slot in panel["eligible_slots"]:
+            for slot in eligible_slot_ids(panel["panel_id"], slot_ids):
                 for size in sizes:
                     cells.append(
                         {
@@ -1851,7 +1855,10 @@ def test_live_matrix_covers_every_registered_panel_in_every_eligible_slot() -> N
     assert {c["panel"] for c in cells} == ids
     for layout in LAYOUTS_DIR.glob("*.json"):
         data = json.loads(layout.read_text(encoding="utf-8"))
-        expected = sum(len(p["eligible_slots"]) for p in data["panels"]) * len(REQUIRED_SIZES)
+        slot_ids = [s["slot_id"] for s in data["slots"]]
+        expected = sum(
+            len(eligible_slot_ids(p["panel_id"], slot_ids)) for p in data["panels"]
+        ) * len(REQUIRED_SIZES)
         assert sum(1 for c in cells if c["layout"] == data["layout_id"]) == expected
 
 

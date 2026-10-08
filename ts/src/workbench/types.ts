@@ -1,15 +1,17 @@
 /**
- * The layout engine's data shapes (REQ-007 W05/W06/W16, ADR-016). A layout is loaded at runtime
- * from `_data/workbench/layouts/<id>.json` (never bundled — see `useWorkbenchLayouts`) and
- * describes stable slot ids, fractional/grid geometry (no pixels), and — since the W16 delta —
- * per-*panel* eligibility (the set of slots each panel type may occupy) plus a default total
- * assignment of every panel to exactly one eligible slot. Geometry is data, not code: this file
- * defines the shape only, never a layout's actual numbers.
+ * The layout engine's data shapes (REQ-007 W05/W06/W16, ADR-016, ADR-031). A layout is loaded at
+ * runtime from `_data/workbench/layouts/<id>.json` (never bundled — see `useWorkbenchLayouts`) and
+ * describes stable slot ids (each one a slot role), fractional/grid geometry (no pixels), the panel
+ * types it uses, and a default total assignment of every panel to exactly one slot the panel is
+ * structurally eligible for. A layout carries no eligibility list: which slots a panel type may
+ * occupy is computed by `slotMatcher.ts` from the element configuration and slot-schema data files
+ * (ADR-031 decision 4). Geometry is data, not code: this file defines the shape only, never a
+ * layout's actual numbers.
  *
  * Two shapes live here:
  * - `RawLayoutFile`/`RawLayoutSlot`/`RawLayoutPanel` mirror the JSON files on disk exactly
  *   (`isRawLayoutFile` validates a fetched file against this shape) and are consumed only by
- *   `useWorkbenchLayouts`, which resolves per-panel eligibility plus any valid stored assignment
+ *   `useWorkbenchLayouts`, which resolves structural eligibility plus any valid stored assignment
  *   into a concrete "what does each slot currently hold" view.
  * - `LayoutDefinition`/`LayoutSlotDefinition` are that resolved, app-facing view: each slot's
  *   `admits` is now the panel type ids *currently assigned* to it (computed from the file's
@@ -26,7 +28,7 @@
  *   exposed.
  */
 
-// --- the raw, on-disk layout file shape (schema_version 3; shape from W16) -------------------
+// --- the raw, on-disk layout file shape (schema_version 4; shape from W16 and ADR-031) -------
 
 export interface RawLayoutSlot {
   /** Stable within this layout file — persisted assignments and visible-panel choices key off
@@ -37,15 +39,13 @@ export interface RawLayoutSlot {
   display_name: string
 }
 
-/** One panel type's eligibility within this layout (REQ-007 W16: "each panel declares the set of
- * slots it may occupy"). A panel type not listed here is not usable in this layout at all — the
- * pre-W16 per-slot `admits` list is superseded by this per-panel declaration. */
+/** One panel type this layout uses. A panel type not listed here is not usable in this layout at
+ * all. Which of the layout's slots it may occupy is not declared here: it is computed from the
+ * panel's element configuration and each slot's role schema (`slotMatcher.ts`, ADR-031 decision 4).
+ * A panel with no eligible slot in the layout cannot ship (asserted by the layout-schema test,
+ * idea `000098`). */
 export interface RawLayoutPanel {
   panel_id: string
-  /** Slot ids (must all name a slot in this layout's `slots` list) this panel may be assigned
-   * to. Never empty — a panel with no eligible slot cannot ship (asserted by the layout-schema
-   * test, idea `000098`). */
-  eligible_slots: string[]
 }
 
 export interface LayoutGridDefinition {
@@ -61,7 +61,7 @@ export interface LayoutGridDefinition {
 }
 
 /** The layout file's on-disk shape: a total default assignment (`default_assignment`, every
- * declared panel mapped to exactly one of its own eligible slots) plus the default visible panel
+ * declared panel mapped to exactly one slot it is structurally eligible for) plus the default visible panel
  * for any slot a default assignment leaves holding more than one panel (`default_visible_panel`,
  * REQ-007 W16). */
 export interface RawLayoutFile {
@@ -70,8 +70,8 @@ export interface RawLayoutFile {
   name: string
   slots: RawLayoutSlot[]
   panels: RawLayoutPanel[]
-  /** panel_id -> slot_id, one entry per panel in `panels`, each value one of that panel's own
-   * `eligible_slots`. */
+  /** panel_id -> slot_id, one entry per panel in `panels`, each value a slot the panel is
+   * structurally eligible for. */
   default_assignment: Record<string, string>
   /** slot_id -> panel_id, for slots whose default assignment gives them more than one panel;
    * the named panel must itself be assigned to that slot in `default_assignment`. */
@@ -97,11 +97,7 @@ function isRawLayoutSlot(value: unknown): value is RawLayoutSlot {
 function isRawLayoutPanel(value: unknown): value is RawLayoutPanel {
   if (typeof value !== 'object' || value === null) return false
   const record = value as Record<string, unknown>
-  return (
-    typeof record.panel_id === 'string' &&
-    isStringArray(record.eligible_slots) &&
-    record.eligible_slots.length > 0
-  )
+  return typeof record.panel_id === 'string'
 }
 
 function isLayoutGridDefinition(value: unknown): value is LayoutGridDefinition {
@@ -115,9 +111,9 @@ function isLayoutGridDefinition(value: unknown): value is LayoutGridDefinition {
 /** Defensive runtime validation of a fetched layout file — mirrors this codebase's existing
  * pattern for other runtime-loaded data (`NotesStripRegion`'s `isNotesFile`, `CommandPanel`'s
  * `isCommandsFile`): a malformed file is reported as absent, never a crash. Structural shape
- * only; the relational invariants (every panel's eligible slots real, the default assignment
- * total and eligible, every default-visible-panel entry actually assigned there, every grid-area
- * token a real slot) are asserted by the repository-side layout-schema test (idea `000098`) and,
+ * only; the relational invariants (every panel structurally eligible somewhere, the default
+ * assignment total and eligible, every default-visible-panel entry actually assigned there, every
+ * grid-area token a real slot) are asserted by the repository-side layout-schema test (idea `000098`) and,
  * defensively, by `useWorkbenchLayouts`'s own resolution, which drops anything that fails them
  * rather than trusting the file blindly. */
 export function isRawLayoutFile(value: unknown): value is RawLayoutFile {
@@ -138,8 +134,9 @@ export function isRawLayoutFile(value: unknown): value is RawLayoutFile {
 }
 
 // The layout files' `schema_version` (ADR-016 rule 1: each layout file "carries a
-// `schema_version` integer"; both shipped files declare `3`: 2 since the W16 delta moved
-// eligibility from the slot to the panel, 3 since the slot ids became role names) is not
+// `schema_version` integer"; both shipped files declare `4`: 2 since the W16 delta moved
+// eligibility from the slot to the panel, 3 since the slot ids became role names, 4 since the
+// per-panel eligibility list was removed in favor of structural eligibility, ADR-031) is not
 // duplicated as a constant here. It is resolved once, at runtime, from the fetched layout files
 // by `useWorkbenchLayouts` (its `schemaVersion` return value) and shared with every other
 // consumer of the single namespaced storage key ADR-016 rule 3 describes — the notes strip
@@ -158,8 +155,7 @@ export interface LayoutSlotDefinition {
   display_name: string
   /** Panel type ids *currently assigned* to this slot — the file's default assignment for this
    * slot, overridden by any valid stored per-panel reassignment (REQ-007 W16). Computed by
-   * `useWorkbenchLayouts`, not a raw file field: eligibility now lives on the panel
-   * (`RawLayoutPanel.eligible_slots`), not the slot. */
+   * `useWorkbenchLayouts`, not a raw file field. */
   admits: string[]
   /** The panel type id resolved as this slot's default-visible choice among `admits` — the
    * file's `default_visible_panel` entry when it names a panel actually assigned here, else the
@@ -173,11 +169,11 @@ export interface LayoutDefinition {
   layout_id: string
   name: string
   slots: LayoutSlotDefinition[]
-  /** Every panel type declared in this layout file and the slot ids it may be assigned to
-   * (mirrors `RawLayoutPanel` unchanged) — exposed on the resolved shape, alongside `slots`,
-   * so the assignment-only configuration dialog (REQ-007 W16/W17, `LayoutConfigDialog.tsx`)
-   * can build "one selector per panel over its eligible slots" without reaching into the raw
-   * file shape `useWorkbenchLayouts` otherwise keeps private. */
+  /** Every panel type declared in this layout file (mirrors `RawLayoutPanel` unchanged) —
+   * exposed on the resolved shape, alongside `slots`, so the assignment-only configuration
+   * dialog (REQ-007 W16/W17, `LayoutConfigDialog.tsx`) can build "one selector per panel over the
+   * slots it is eligible for" (`slotEligibility.ts`) without reaching into the raw file shape
+   * `useWorkbenchLayouts` otherwise keeps private. */
   panels: RawLayoutPanel[]
   grid: LayoutGridDefinition
 }
@@ -215,8 +211,8 @@ export interface StoredHtmlViewerTab {
 export interface StoredWorkbenchState {
   schema_version: number
   active_layout?: string
-  /** layout_id -> panel_id -> slot_id. Only entries where the slot is one of that panel's own
-   * eligible slots in the loaded layout survive validation (`useWorkbenchLayouts`). */
+  /** layout_id -> panel_id -> slot_id. Only entries where the slot is one the panel is
+   * structurally eligible for in the loaded layout survive validation (`useWorkbenchLayouts`). */
   panel_assignments?: Record<string, Record<string, string>>
   /** layout_id -> slot_id -> panel_id. Only entries naming a panel currently assigned to that
    * slot survive validation (`useWorkbenchLayouts`). */

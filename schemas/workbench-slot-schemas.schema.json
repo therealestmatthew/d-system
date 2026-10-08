@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "workbench-slot-schemas.schema.json",
+  "title": "Workbench slot schemas",
+  "description": "The structure of every workbench slot role (_data/workbench/slot-schemas.json, ADR-031 decision 2, REQ-011 R12/R13). Three parts: an element-type vocabulary (the bar element types a panel may supply and the body kinds a slot body may host), named frames (a top bar of sub-slots plus a body, as a tree of depth two: frame, group, leaf), and one entry per role naming its frame and the body kinds its body admits. A layout lists slots by slot_id, which is the role, and never restates this. This schema asserts shape only; the relational rules (a role names a real frame, admitted element types exist in the vocabulary, a frame has exactly one body leaf) are asserted by test/test_workbench_slot_matcher.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "element_types", "frames", "roles"],
+  "properties": {
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "element_types": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bar", "body"],
+      "properties": {
+        "bar": { "$ref": "#/definitions/vocabulary" },
+        "body": { "$ref": "#/definitions/vocabulary" }
+      }
+    },
+    "frames": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/definitions/frame" }
+    },
+    "roles": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/definitions/role" }
+    }
+  },
+  "definitions": {
+    "name": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+    "vocabulary": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "$ref": "#/definitions/name" },
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "slotFilledLeaf": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "filled_by"],
+      "properties": {
+        "id": { "$ref": "#/definitions/name" },
+        "filled_by": { "const": "slot" }
+      }
+    },
+    "barLeaf": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "filled_by", "holds", "admits", "capacity"],
+      "properties": {
+        "id": { "$ref": "#/definitions/name" },
+        "filled_by": { "const": "panel" },
+        "holds": { "const": "bar" },
+        "admits": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/definitions/name" }
+        },
+        "capacity": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "bodyLeaf": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "filled_by", "holds"],
+      "properties": {
+        "id": { "$ref": "#/definitions/name" },
+        "filled_by": { "const": "panel" },
+        "holds": { "const": "body" },
+        "required": { "type": "boolean" }
+      }
+    },
+    "leaf": {
+      "oneOf": [
+        { "$ref": "#/definitions/slotFilledLeaf" },
+        { "$ref": "#/definitions/barLeaf" },
+        { "$ref": "#/definitions/bodyLeaf" }
+      ]
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "children"],
+      "properties": {
+        "id": { "$ref": "#/definitions/name" },
+        "children": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/leaf" }
+        }
+      }
+    },
+    "frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["arrangement", "children"],
+      "properties": {
+        "arrangement": { "enum": ["stacked", "inline"] },
+        "children": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "oneOf": [{ "$ref": "#/definitions/group" }, { "$ref": "#/definitions/leaf" }] }
+        }
+      }
+    },
+    "role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frame", "body"],
+      "properties": {
+        "frame": { "$ref": "#/definitions/name" },
+        "body": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/definitions/name" }
+        }
+      }
+    }
+  }
+}

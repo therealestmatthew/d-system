@@ -11,6 +11,10 @@ import { marked } from 'marked'
 const repoRoot = resolve(__dirname, '..')
 const publicDir = join(repoRoot, '_public')
 const workbenchLayoutsDir = join(repoRoot, '_data', 'workbench', 'layouts')
+// The workbench data files the page imports rather than fetches (`slot-schemas.json` and
+// `panel-elements.json`, ADR-031 decision 4): they sit one directory above the layouts, and the
+// dev server may serve this directory and nothing else outside `ts/` (see `server.fs.allow`).
+const workbenchDataDir = join(repoRoot, '_data', 'workbench')
 // The symlink-resolved repo root — `serveRepositoryFiles`'s boundary check below must compare
 // against this, not the textual `repoRoot`, so a symlinked worktree checkout itself doesn't
 // widen the boundary it is meant to enforce.
@@ -472,6 +476,10 @@ export default defineConfig(({ mode }) => {
       ...(env.D_SYSTEM_DEMO_TERMINAL === '1' ? [serveRepositoryFiles()] : []),
     ],
     server: {
+      // `ts/` itself (the default) plus the workbench data directory: the page imports the slot
+      // schema and panel element files from `_data/workbench/`. Naming that one directory, not the
+      // repository root, keeps `_private/` and every other path unreachable through `/@fs/`.
+      fs: { allow: [__dirname, workbenchDataDir] },
       proxy: {
         '/api': {
           target: apiTarget,

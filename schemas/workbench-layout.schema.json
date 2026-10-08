@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "workbench-layout.schema.json",
   "title": "Workbench layout definition",
-  "description": "One named workbench layout (_data/workbench/layouts/<id>.json, REQ-007 W05/W16, ADR-016). schema_version 2: eligibility moved from the slot to the panel — each panel declares the slots it may occupy, and the file carries a default total assignment (every panel assigned to exactly one of its own eligible slots) plus the default visible panel for any slot a default assignment leaves holding more than one panel. This schema asserts structural shape only; the relational invariants (eligible_slots/default_assignment/default_visible_panel/grid.areas all referring to real slots and panels, and the assignment being total and eligible) are asserted directly against the parsed JSON by test/test_workbench_layout_schema.py, which JSON Schema alone cannot express.",
+  "description": "One named workbench layout (_data/workbench/layouts/<id>.json, REQ-007 W05/W16, ADR-016 kept by ADR-031). schema_version 4: the per-panel eligibility list is gone. A layout declares its slots (slot_id is the slot's role), the panel types it uses, a default total assignment and the default visible panel for any slot that holds more than one panel; which slot roles a panel type may occupy is computed from _data/workbench/panel-elements.json and _data/workbench/slot-schemas.json (ADR-031 decision 4, REQ-011 R12), so a `panels` entry carrying `eligible_slots` fails this schema. This schema asserts structural shape only; the relational invariants (default_assignment/default_visible_panel/grid.areas referring to real slots and panels, the assignment being total and structurally eligible, every slot_id naming a role in slot-schemas.json) are asserted directly against the parsed JSON by test/test_workbench_layout_schema.py, which JSON Schema alone cannot express.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -18,8 +18,8 @@
   "properties": {
     "schema_version": {
       "type": "integer",
-      "minimum": 2,
-      "description": "Bumped from 1 by the REQ-007 W16 delta that moved eligibility from the slot to the panel."
+      "minimum": 4,
+      "description": "Bumped from 3 to 4 when eligible_slots was removed from panels (ADR-031 decision 10). Earlier bumps: 2 moved eligibility from the slot to the panel (REQ-007 W16); 3 renamed the slot ids to role names."
     },
     "layout_id": {
       "type": "string",
@@ -48,21 +48,15 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["panel_id", "eligible_slots"],
+        "required": ["panel_id"],
         "properties": {
-          "panel_id": { "type": "string", "minLength": 1 },
-          "eligible_slots": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": { "type": "string", "minLength": 1 }
-          }
+          "panel_id": { "type": "string", "minLength": 1 }
         }
       }
     },
     "default_assignment": {
       "type": "object",
-      "description": "panel_id -> slot_id, a total mapping over every panel declared in `panels`.",
+      "description": "panel_id -> slot_id, a total mapping over every panel declared in `panels`; the slot must be one the panel type is structurally eligible for.",
       "additionalProperties": { "type": "string", "minLength": 1 }
     },
     "default_visible_panel": {

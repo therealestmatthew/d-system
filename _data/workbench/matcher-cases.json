@@ -1,0 +1,338 @@
+{
+  "description": "Hand-written expected eligibility, read by test/test_workbench_slot_matcher.py (Python matcher, src/workbench/slot_matcher.py) and ts/src/workbench/slotMatcher.test.tsx (TypeScript matcher, ts/src/workbench/slotMatcher.ts). Every shipped panel type in every role, plus synthetic panels (defined here, not in panel-elements.json) that probe bar capacity, body kind and unadmitted element types. Edit a case only to change what the rule is meant to decide.",
+  "synthetic_panels": {
+    "synthetic-strip-with-two-controls": {
+      "body": "ticker",
+      "bar": [
+        "help",
+        "choice",
+        "choice"
+      ]
+    },
+    "synthetic-strip-with-two-helps": {
+      "body": "ticker",
+      "bar": [
+        "help",
+        "help"
+      ]
+    },
+    "synthetic-strip-at-capacity": {
+      "body": "ticker",
+      "bar": [
+        "help",
+        "choice"
+      ]
+    },
+    "synthetic-strip-bare": {
+      "body": "ticker",
+      "bar": []
+    },
+    "synthetic-standard-at-capacity": {
+      "body": "table",
+      "bar": [
+        "help",
+        "status",
+        "action",
+        "choice",
+        "toggle",
+        "choice"
+      ]
+    },
+    "synthetic-standard-over-capacity": {
+      "body": "table",
+      "bar": [
+        "help",
+        "status",
+        "action",
+        "choice",
+        "toggle",
+        "choice",
+        "choice"
+      ]
+    },
+    "synthetic-unadmitted-bar-type": {
+      "body": "table",
+      "bar": [
+        "slider"
+      ]
+    },
+    "synthetic-unknown-body-kind": {
+      "body": "canvas",
+      "bar": []
+    },
+    "synthetic-two-helps-in-standard": {
+      "body": "tree",
+      "bar": [
+        "help",
+        "help"
+      ]
+    }
+  },
+  "cases": [
+    {
+      "panel": "terminal",
+      "role": "primary",
+      "eligible": true
+    },
+    {
+      "panel": "terminal",
+      "role": "secondary",
+      "eligible": true
+    },
+    {
+      "panel": "terminal",
+      "role": "explorer",
+      "eligible": false
+    },
+    {
+      "panel": "terminal",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "terminal-cmd",
+      "role": "primary",
+      "eligible": true
+    },
+    {
+      "panel": "terminal-cmd",
+      "role": "secondary",
+      "eligible": true
+    },
+    {
+      "panel": "terminal-cmd",
+      "role": "explorer",
+      "eligible": false
+    },
+    {
+      "panel": "terminal-cmd",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "terminal-powershell",
+      "role": "primary",
+      "eligible": true
+    },
+    {
+      "panel": "terminal-powershell",
+      "role": "secondary",
+      "eligible": true
+    },
+    {
+      "panel": "terminal-powershell",
+      "role": "explorer",
+      "eligible": false
+    },
+    {
+      "panel": "terminal-powershell",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "html-viewer",
+      "role": "primary",
+      "eligible": true
+    },
+    {
+      "panel": "html-viewer",
+      "role": "secondary",
+      "eligible": true
+    },
+    {
+      "panel": "html-viewer",
+      "role": "explorer",
+      "eligible": false
+    },
+    {
+      "panel": "html-viewer",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "overview",
+      "role": "primary",
+      "eligible": true
+    },
+    {
+      "panel": "overview",
+      "role": "secondary",
+      "eligible": true
+    },
+    {
+      "panel": "overview",
+      "role": "explorer",
+      "eligible": false
+    },
+    {
+      "panel": "overview",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "file-browser",
+      "role": "primary",
+      "eligible": false
+    },
+    {
+      "panel": "file-browser",
+      "role": "secondary",
+      "eligible": false
+    },
+    {
+      "panel": "file-browser",
+      "role": "explorer",
+      "eligible": true
+    },
+    {
+      "panel": "file-browser",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "idea-explorer",
+      "role": "primary",
+      "eligible": false
+    },
+    {
+      "panel": "idea-explorer",
+      "role": "secondary",
+      "eligible": false
+    },
+    {
+      "panel": "idea-explorer",
+      "role": "explorer",
+      "eligible": true
+    },
+    {
+      "panel": "idea-explorer",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "backlog-explorer",
+      "role": "primary",
+      "eligible": false
+    },
+    {
+      "panel": "backlog-explorer",
+      "role": "secondary",
+      "eligible": false
+    },
+    {
+      "panel": "backlog-explorer",
+      "role": "explorer",
+      "eligible": true
+    },
+    {
+      "panel": "backlog-explorer",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "notes-strip",
+      "role": "primary",
+      "eligible": false
+    },
+    {
+      "panel": "notes-strip",
+      "role": "secondary",
+      "eligible": false
+    },
+    {
+      "panel": "notes-strip",
+      "role": "explorer",
+      "eligible": false
+    },
+    {
+      "panel": "notes-strip",
+      "role": "strip",
+      "eligible": true
+    },
+    {
+      "panel": "synthetic-strip-with-two-controls",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-strip-with-two-controls",
+      "role": "primary",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-strip-with-two-helps",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-strip-at-capacity",
+      "role": "strip",
+      "eligible": true
+    },
+    {
+      "panel": "synthetic-strip-at-capacity",
+      "role": "primary",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-strip-bare",
+      "role": "strip",
+      "eligible": true
+    },
+    {
+      "panel": "synthetic-strip-bare",
+      "role": "explorer",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-standard-at-capacity",
+      "role": "explorer",
+      "eligible": true
+    },
+    {
+      "panel": "synthetic-standard-at-capacity",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-standard-at-capacity",
+      "role": "primary",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-standard-over-capacity",
+      "role": "explorer",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-unadmitted-bar-type",
+      "role": "explorer",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-unadmitted-bar-type",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-unknown-body-kind",
+      "role": "explorer",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-unknown-body-kind",
+      "role": "strip",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-unknown-body-kind",
+      "role": "primary",
+      "eligible": false
+    },
+    {
+      "panel": "synthetic-two-helps-in-standard",
+      "role": "explorer",
+      "eligible": false
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "element_types": {
+    "bar": {
+      "help": "A help tooltip that explains the hosted panel.",
+      "action": "A button that does something once when pressed (refresh, run).",
+      "choice": "A dropdown, picker or menu that offers the user a set of options.",
+      "toggle": "A control that holds a pressed or selected state (a view or mode switch).",
+      "status": "Read-only text about the hosted panel's content (a last-modified badge)."
+    },
+    "body": {
+      "terminal-screen": "A terminal emulator screen with its own session tabs.",
+      "document-frame": "An embedded document or page that scrolls itself.",
+      "tree": "A scrollable tree of entries.",
+      "table": "A scrollable, sortable table of rows.",
+      "ticker": "A short, wide strip of text that rotates or scrolls."
+    }
+  },
+  "frames": {
+    "standard": {
+      "arrangement": "stacked",
+      "children": [
+        {
+          "id": "top_bar",
+          "children": [
+            { "id": "identity", "filled_by": "slot" },
+            { "id": "help", "filled_by": "panel", "holds": "bar", "admits": ["help"], "capacity": 1 },
+            {
+              "id": "controls",
+              "filled_by": "panel",
+              "holds": "bar",
+              "admits": ["action", "choice", "toggle", "status"],
+              "capacity": 5
+            },
+            { "id": "frame_actions", "filled_by": "slot" }
+          ]
+        },
+        { "id": "body", "filled_by": "panel", "holds": "body", "required": true }
+      ]
+    },
+    "compact": {
+      "arrangement": "inline",
+      "children": [
+        {
+          "id": "top_bar",
+          "children": [
+            { "id": "help", "filled_by": "panel", "holds": "bar", "admits": ["help"], "capacity": 1 },
+            {
+              "id": "controls",
+              "filled_by": "panel",
+              "holds": "bar",
+              "admits": ["action", "choice", "toggle", "status"],
+              "capacity": 1
+            }
+          ]
+        },
+        { "id": "body", "filled_by": "panel", "holds": "body", "required": true }
+      ]
+    }
+  },
+  "roles": {
+    "primary": { "frame": "standard", "body": ["terminal-screen", "document-frame"] },
+    "secondary": { "frame": "standard", "body": ["terminal-screen", "document-frame"] },
+    "explorer": { "frame": "standard", "body": ["tree", "table"] },
+    "strip": { "frame": "compact", "body": ["ticker"] }
+  }
+}
