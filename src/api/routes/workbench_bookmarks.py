@@ -51,10 +51,12 @@ Request bodies must be `application/json` and at most 64 KB, a category holds at
 the data root at most 200 categories, and a path at most 1024 characters with no segment over 255.
 
 Over-long names: a segment whose encoded byte length exceeds the filesystem's name limit
-(`os.pathconf` `PC_NAME_MAX` on the repository root, 255 where that cannot be read) is refused on
-write (400) and reads as `excluded`. The check is explicit and made before any filesystem call,
-because whether `resolve()` or `is_file()` raises on such a name depends on the Python version
-(3.14's `is_file()` returns `False`, which would read as `missing`).
+(`os.pathconf` `PC_NAME_MAX` on the repository root, 255 where that cannot be read), or a resolved
+path whose encoded byte length reaches the path limit (`PC_PATH_MAX`, 4096 where that cannot be
+read; the limit counts the terminating NUL), is refused on write (400) and reads as `excluded`.
+The checks are explicit and made before `is_file()` or `exists()`, because whether those raise on
+such a name depends on the Python version (3.14's `is_file()` returns `False`, which would read
+as `missing`).
 
 Symlinks: git cannot check a path that passes through a symlinked directory (it aborts the whole
 batch), so an entry whose lexical path differs from its resolved path is refused on write and read
@@ -91,8 +93,10 @@ MAX_ENTRIES_PER_CATEGORY: Final[int] = 500
 MAX_CATEGORIES: Final[int] = 200
 MAX_PATH_LENGTH: Final[int] = 1024
 MAX_SEGMENT_LENGTH: Final[int] = 255
-#: The segment byte limit used when `os.pathconf` cannot report one (Windows has no `pathconf`).
+#: The segment and whole-path byte limits used when `os.pathconf` cannot report one (Windows
+#: has no `pathconf`).
 FALLBACK_NAME_MAX: Final[int] = 255
+FALLBACK_PATH_MAX: Final[int] = 4096
 _BODY_METHODS: Final[frozenset[str]] = frozenset({"POST", "PATCH", "DELETE"})
 
 
@@ -383,14 +387,26 @@ def normalize_entry_path(raw: str) -> str:
     return normalized
 
 
-def name_max() -> int:
-    """The longest file name, in bytes, the filesystem holding `REPO_ROOT` allows: `PC_NAME_MAX`
-    from `os.pathconf`, or `FALLBACK_NAME_MAX` where the platform or filesystem cannot report it."""
+def _pathconf_limit(name: str, fallback: int) -> int:
+    """`os.pathconf(REPO_ROOT, name)`, or `fallback` where the platform or filesystem cannot
+    report a positive value."""
     try:
-        limit = os.pathconf(REPO_ROOT, "PC_NAME_MAX")
+        limit = os.pathconf(REPO_ROOT, name)
     except (AttributeError, OSError, ValueError):
-        return FALLBACK_NAME_MAX
-    return limit if limit > 0 else FALLBACK_NAME_MAX
+        return fallback
+    return limit if limit > 0 else fallback
+
+
+def name_max() -> int:
+    """The longest file name, in bytes, the filesystem holding `REPO_ROOT` allows: `PC_NAME_MAX`,
+    or `FALLBACK_NAME_MAX`."""
+    return _pathconf_limit("PC_NAME_MAX", FALLBACK_NAME_MAX)
+
+
+def path_max() -> int:
+    """The filesystem's path limit in bytes, terminating NUL included: `PC_PATH_MAX`, or
+    `FALLBACK_PATH_MAX`."""
+    return _pathconf_limit("PC_PATH_MAX", FALLBACK_PATH_MAX)
 
 
 def _has_overlong_segment(parts: tuple[str, ...] | list[str]) -> bool:
@@ -398,6 +414,11 @@ def _has_overlong_segment(parts: tuple[str, ...] | list[str]) -> bool:
     by a filesystem call raising, so the answer does not depend on the Python version."""
     limit = name_max()
     return any(len(os.fsencode(part)) > limit for part in parts)
+
+
+def _is_overlong_path(resolved: Path) -> bool:
+    """Whether the encoded resolved path, plus its terminating NUL, exceeds `path_max()`."""
+    return len(os.fsencode(str(resolved))) >= path_max()
 
 
 _BARRED_SEGMENTS: Final[frozenset[str]] = frozenset(
@@ -446,8 +467,8 @@ def _inspect(path: str) -> tuple[EntryStatus | None, Path | None]:
     """Where `path` (a stored entry, possibly hand-edited) stands before the ignore check:
     `("excluded" | "missing", None)` when that is already decided, else `(None, resolved)` for a
     regular file whose path does not pass through a symlink and holds no private or `.git` segment.
-    A segment longer than the filesystem allows is `excluded` by `_has_overlong_segment`, checked
-    before any filesystem call. Anything that raises while the path is examined (NUL, invalid
+    A segment or a resolved path longer than the filesystem allows is `excluded`, checked before
+    `is_file()`. Anything that raises while the path is examined (NUL, invalid
     text) is `excluded`; nothing here raises."""
     try:
         segments = path.replace("\\", "/").split("/")
@@ -459,6 +480,8 @@ def _inspect(path: str) -> tuple[EntryStatus | None, Path | None]:
             return "excluded", None
         if os.path.normcase(relative.as_posix()) != os.path.normcase(path):
             # A symlink (or a non-normalised hand edit): git cannot vouch for such a path.
+            return "excluded", None
+        if _is_overlong_path(resolved):
             return "excluded", None
         if not resolved.is_file():
             return "missing", None
@@ -483,7 +506,8 @@ def validate_entry_file(raw: str) -> str:
     """The stored form of `raw`, after the ADR-015 rules for a path that is about to be written:
     it must exist, be a file, not pass through a symlink, stay inside the repository, and not be
     private, internal or ignored. Raises 400 for a path that can never be valid (including a
-    segment longer than the filesystem allows) and 404 for one that does not exist."""
+    segment or a whole path longer than the filesystem allows) and 404 for one that does not
+    exist."""
     normalized = normalize_entry_path(raw)
     if _has_overlong_segment(normalized.split("/")):
         raise HTTPException(
@@ -498,6 +522,11 @@ def validate_entry_file(raw: str) -> str:
     try:
         resolved = resolve_repo_relative_path(normalized)
         relative = resolved.relative_to(REPO_ROOT)
+        if _is_overlong_path(resolved):
+            raise HTTPException(
+                status_code=400,
+                detail=f"A file path is longer than the filesystem allows ({path_max()} bytes).",
+            )
         exists = resolved.exists()
         is_file = resolved.is_file()
     except PathEscapesRepositoryError:

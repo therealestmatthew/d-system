@@ -11,9 +11,9 @@ representation each one changes; the id rules (slug, empty-slug fallback, Window
 collision suffixes, length cap, immutability across rename); name rules; the ADR-015 path rules on
 write (absolute, `..`, symlink escape, directory, `_private/`, gitignored, missing); resolution of
 every entry to present, missing or excluded on read, with nothing pruned; a segment over the
-filesystem's byte limit refused on write and read as excluded without relying on a filesystem call
-raising; concurrent adds losing nothing; and the schema against both the tracked example and
-deliberately broken records.
+filesystem's byte limit, or a whole path over the path limit, refused on write and read as
+excluded without relying on a filesystem call raising; concurrent adds losing nothing; and the
+schema against both the tracked example and deliberately broken records.
 """
 
 from __future__ import annotations
@@ -798,6 +798,8 @@ def test_hand_edited_unusable_entries_read_excluded_and_the_rest_still_read(
     assert statuses["ok.md"] == "present"
     assert statuses["bad\x00.md"] == "excluded"
     assert statuses["q" * 300] == "excluded"
+    # About 1.4 KB once resolved: under the filesystem's path limit, so simply not on disk.
+    assert statuses["w/" * 700 + "z"] == "missing"
     # The unusable entry can still be removed, by its stored text.
     removed = sandbox.remove("set", "bad\x00.md")
     assert removed.status_code == 200
@@ -807,17 +809,20 @@ def test_hand_edited_unusable_entries_read_excluded_and_the_rest_still_read(
 def test_an_over_long_entry_reads_excluded_without_relying_on_a_raise(
     sandbox: Sandbox, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    # Python 3.14's `is_file()` returns False for a name longer than the filesystem allows, and
-    # older versions raise. With `is_file()` forced to return False for such a name on every
-    # version, only an explicit length check can still read the entry as excluded, not missing.
+    # Python 3.14's `is_file()` returns False for a name or path longer than the filesystem
+    # allows, and older versions raise. With `is_file()` forced to return False for such a path on
+    # every version, only an explicit length check can still read the entry as excluded.
+    long_path = "w/" * 2100 + "z"  # short segments, over 4096 bytes in total
     sandbox.create("Set")
     record = sandbox.record("set")
-    record["entries"] = ["q" * 300, "docs/" + "\u00e9" * 200]
+    record["entries"] = ["q" * 300, "docs/" + "\u00e9" * 200, long_path]
     (sandbox.records_dir / "set.json").write_text(json.dumps(record), encoding="utf-8")
     real_is_file = Path.is_file
 
     def is_file_without_raising(self: Path) -> bool:
-        if any(len(os.fsencode(part)) > 255 for part in self.parts):
+        if len(os.fsencode(str(self))) >= 4096 or any(
+            len(os.fsencode(part)) > 255 for part in self.parts
+        ):
             return False
         return real_is_file(self)
 
@@ -825,6 +830,7 @@ def test_an_over_long_entry_reads_excluded_without_relying_on_a_raise(
     assert _statuses(sandbox, "set") == {
         "q" * 300: "excluded",
         "docs/" + "\u00e9" * 200: "excluded",
+        long_path: "excluded",
     }
 
 
@@ -837,6 +843,16 @@ def test_a_segment_over_the_filesystem_byte_limit_is_refused_on_write(sandbox: S
     assert sandbox.record("set")["entries"] == []
 
 
+def test_a_path_over_the_filesystem_byte_limit_is_refused_on_write(sandbox: Sandbox) -> None:
+    # 1023 characters passes the 1024-character shape check, and each 63-character segment is 252
+    # bytes, but the whole path is over 4096 bytes in UTF-8.
+    sandbox.create("Set")
+    response = sandbox.add("set", "/".join(["\U0001d538" * 63] * 16))
+    assert response.status_code == 400
+    assert "file path is longer than the filesystem allows" in response.json()["detail"]
+    assert sandbox.record("set")["entries"] == []
+
+
 def test_the_segment_limit_comes_from_pathconf_and_falls_back_to_255(
     sandbox: Sandbox, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -844,7 +860,9 @@ def test_the_segment_limit_comes_from_pathconf_and_falls_back_to_255(
     sandbox.write_file("abcdefghijk.md")
     sandbox.create("Set")
     # A file the real filesystem holds is still refused when its name exceeds the reported limit.
-    monkeypatch.setattr(os, "pathconf", lambda path, name: 10, raising=False)
+    monkeypatch.setattr(
+        os, "pathconf", lambda path, name: 10 if name == "PC_NAME_MAX" else 4096, raising=False
+    )
     assert module.name_max() == 10
     assert sandbox.add("set", "abcdefghijk.md").status_code == 400
     record = sandbox.record("set")
@@ -860,6 +878,40 @@ def test_the_segment_limit_comes_from_pathconf_and_falls_back_to_255(
     monkeypatch.delattr(os, "pathconf", raising=False)
     assert module.name_max() == 255
     assert _statuses(sandbox, "set") == {"abcdefghijk.md": "present"}
+
+
+def test_the_path_limit_comes_from_pathconf_and_falls_back_to_4096(
+    sandbox: Sandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    module = _bookmarks_module()
+    sandbox.write_file("abcdefghijk.md")
+    sandbox.create("Set")
+    # The limit counts the terminating NUL, so a path exactly this many bytes long is too long.
+    limit = len(os.fsencode(str(sandbox.repo / "abcdefghijk.md")))
+    monkeypatch.setattr(
+        os, "pathconf", lambda path, name: limit if name == "PC_PATH_MAX" else 255, raising=False
+    )
+    assert module.path_max() == limit
+    assert sandbox.add("set", "abcdefghijk.md").status_code == 400
+    record = sandbox.record("set")
+    record["entries"] = ["abcdefghijk.md"]
+    (sandbox.records_dir / "set.json").write_text(json.dumps(record), encoding="utf-8")
+    assert _statuses(sandbox, "set") == {"abcdefghijk.md": "excluded"}
+    monkeypatch.setattr(
+        os,
+        "pathconf",
+        lambda path, name: limit + 1 if name == "PC_PATH_MAX" else 255,
+        raising=False,
+    )
+    assert _statuses(sandbox, "set") == {"abcdefghijk.md": "present"}
+
+    def unavailable(path: object, name: str) -> int:
+        raise OSError("no limit reported")
+
+    monkeypatch.setattr(os, "pathconf", unavailable, raising=False)
+    assert module.path_max() == 4096
+    monkeypatch.delattr(os, "pathconf", raising=False)
+    assert module.path_max() == 4096
 
 
 def test_a_record_holding_a_lone_surrogate_is_unreadable_not_a_crash(sandbox: Sandbox) -> None:
