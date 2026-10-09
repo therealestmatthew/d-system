@@ -17,7 +17,7 @@ provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-
   is not left in_progress behind an unscheduled chain.'
 verified:
   date: '2026-10-09'
-  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 4cfb05e8, using collisions() and dependency_closure()
     from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
     Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
     in external_depends_on (phase-mem-10 is queued). Stages were cut greedily in the listed build order,
@@ -51,6 +51,6 @@ notes: 'phase-ret-01 waits on phase-mem-10, which no table holds. phase-mem-10 d
   which waits on phase-mem-07, phase-mem-08 and phase-rel-06 (and through them phase-mem-01, phase-rel-04
   and phase-rel-05). This table cannot open until that chain has its own table and completes. Parallel-safe
   as a whole with batch-016, batch-017 (no collision or dependency link between any two of their phases,
-  computed at dev 2cccfff6); the claim validator still decides at claim time. Against the work already
+  computed at dev 4cfb05e8); the claim validator still decides at claim time. Against the work already
   in flight: no phase is clear of batch-004''s remaining phases (phase-idg-12, phase-irs-05, phase-irs-07);
   every phase is clear of phase-arch-07.'

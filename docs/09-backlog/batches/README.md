@@ -16,8 +16,8 @@ readability; the backlog is authoritative when the two disagree.
 |---|---|---|---|
 | `batch-001` | complete | 1 | Partition close, portfolio move, session lifecycle, first two realization foundations |
 | `batch-002` | complete | 2 | Two governance guards, the autonomous-operations broker, the orchestrator skeleton |
-| `batch-003` | queued | 3 | Where a promoted plan lives (its other phases were split out or completed elsewhere on 2026-09-27) |
-| `batch-004` | queued | 4 | Mandatory-requirement ruling, idea planner agent, first three pipeline phases |
+| `batch-003` | complete | 3 | Where a promoted plan lives (its other phases were split out or completed elsewhere on 2026-09-27) |
+| `batch-004` | in_progress | 4 | Mandatory-requirement ruling, idea planner agent, first three pipeline phases |
 | `batch-007` | queued | 5 | Run budgets, hard caps and the kill switch, then the batch graph (split from `batch-003`) |
 | `batch-005` | queued | 6 | Gate queue, execution-loop harness, delivered status, anti-pattern store |
 | `batch-006` | queued | 7 | Learning loop, Gate 2 consolidation, trace baselines, forced-failure drill |

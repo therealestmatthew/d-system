@@ -15,7 +15,7 @@ provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-
   listed in external_depends_on. Track 2 (Agent engineering and idea graph), first of two tables for doc-idea-graph-lifecycle.'
 verified:
   date: '2026-10-09'
-  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 4cfb05e8, using collisions() and dependency_closure()
     from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
     Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
     in external_depends_on (phase-idg-01 is complete). Stages were cut greedily in the listed build order,
@@ -116,7 +116,7 @@ stages:
     - phase-idg-17
 notes: 'The five backfill phases have no dependency on each other; they are serial because all write _data/ideas.jsonl
   and declare sys-portfolio. Parallel-safe as a whole with batch-016, batch-017, batch-022 (no collision
-  or dependency link between any two of their phases, computed at dev 2cccfff6); the claim validator still
+  or dependency link between any two of their phases, computed at dev 4cfb05e8); the claim validator still
   decides at claim time. Against the work already in flight: only phase-idg-13, phase-idg-15, phase-idg-16,
   phase-idg-17, phase-idg-18 are clear of batch-004''s remaining phases (phase-idg-12, phase-irs-05, phase-irs-07);
   only phase-idg-13, phase-idg-15, phase-idg-16, phase-idg-17, phase-idg-18 are clear of phase-arch-07.'

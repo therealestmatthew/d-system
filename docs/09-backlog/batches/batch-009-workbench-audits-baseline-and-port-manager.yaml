@@ -16,7 +16,7 @@ provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-
   the phases that do not wait on phase-arch-07.'
 verified:
   date: '2026-10-09'
-  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 4cfb05e8, using collisions() and dependency_closure()
     from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
     Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
     in external_depends_on (phase-arch-11 is complete; phase-arch-01 is complete). Stages were cut greedily
@@ -98,7 +98,7 @@ stages:
     - phase-arch-03
 notes: 'phase-arch-12 is an external dependency of batch-010 (phase-arch-13), so this table runs first.
   Parallel-safe as a whole with batch-015, batch-016, batch-017, batch-023 (no collision or dependency
-  link between any two of their phases, computed at dev 2cccfff6); the claim validator still decides at
+  link between any two of their phases, computed at dev 4cfb05e8); the claim validator still decides at
   claim time. Against the work already in flight: only phase-arch-14, phase-arch-03, phase-arch-04 are
   clear of batch-004''s remaining phases (phase-idg-12, phase-irs-05, phase-irs-07); only phase-arch-12
   is clear of phase-arch-07.'

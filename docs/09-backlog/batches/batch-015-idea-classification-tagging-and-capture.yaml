@@ -16,7 +16,7 @@ provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-
   doc-idea-graph-lifecycle. phase-idg-12 is in batch-004 and is not repeated here.'
 verified:
   date: '2026-10-09'
-  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 4cfb05e8, using collisions() and dependency_closure()
     from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
     Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
     in external_depends_on (phase-idg-01 is complete). Stages were cut greedily in the listed build order,
@@ -150,7 +150,7 @@ stages:
 notes: 'phase-idg-04 shares sys-contracts, schemas/idea.schema.json and tools/append_idea.py with phase-idg-14
   in batch-014, so the two tables cannot run at the same time. Parallel-safe as a whole with batch-009,
   batch-011, batch-016, batch-017 (no collision or dependency link between any two of their phases, computed
-  at dev 2cccfff6); the claim validator still decides at claim time. Against the work already in flight:
+  at dev 4cfb05e8); the claim validator still decides at claim time. Against the work already in flight:
   only phase-idg-04, phase-idg-03 are clear of batch-004''s remaining phases (phase-idg-12, phase-irs-05,
   phase-irs-07); only phase-idg-06, phase-idg-08, phase-idg-02, phase-idg-03, phase-idg-05, phase-idg-07,
   phase-idg-09 are clear of phase-arch-07.'

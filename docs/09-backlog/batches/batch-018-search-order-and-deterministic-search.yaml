@@ -14,7 +14,7 @@ provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-
   listed in external_depends_on. Track 3 (Framework and retrieval), first of four tables for doc-retrieval-knowledge-infrastructure.'
 verified:
   date: '2026-10-09'
-  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 4cfb05e8, using collisions() and dependency_closure()
     from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
     Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
     in external_depends_on (). Stages were cut greedily in the listed build order, opening a new stage
@@ -40,6 +40,6 @@ stages:
     conflicts_with:
     - phase-ret-03
 notes: 'Parallel-safe as a whole with batch-016, batch-017 (no collision or dependency link between any
-  two of their phases, computed at dev 2cccfff6); the claim validator still decides at claim time. Against
+  two of their phases, computed at dev 4cfb05e8); the claim validator still decides at claim time. Against
   the work already in flight: no phase is clear of batch-004''s remaining phases (phase-idg-12, phase-irs-05,
   phase-irs-07); only phase-ret-03 is clear of phase-arch-07.'

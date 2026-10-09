@@ -14,10 +14,11 @@ provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-
   every queued phase of the named plans that no other table holds, with each dependency outside the table
   listed in external_depends_on. Track 1 (Workbench), second of two tables for doc-workbench-architecture-quality,
   plus phase-wbf-20 from doc-workbench-features-defects because it also waits on phase-arch-07. phase-arch-18
-  was moved here from the first draft of batch-009 after the Scout''s collision check (2026-10-09).'
+  was moved here from the first draft of batch-009 after the Scout''s collision check (2026-10-09), and
+  its depends_on edge to phase-arch-07 was added to backlog.yaml by owner ruling the same day.'
 verified:
   date: '2026-10-09'
-  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 4cfb05e8, using collisions() and dependency_closure()
     from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
     Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
     in external_depends_on (phase-arch-00 is complete; phase-arch-07 is active; phase-arch-05 is complete;
@@ -31,8 +32,8 @@ external_depends_on:
     Now complete.
 - id: phase-arch-07
   expected_status: complete
-  note: Implement schema-owned slots and sub-slots with structural eligibility — depended on by phase-arch-08,
-    phase-wbf-20, phase-arch-09, phase-arch-10 and phase-arch-17. Now active.
+  note: Implement schema-owned slots and sub-slots with structural eligibility — depended on by phase-arch-18,
+    phase-arch-08, phase-wbf-20, phase-arch-09, phase-arch-10 and phase-arch-17. Now active.
 - id: phase-arch-05
   expected_status: complete
   note: Per-panel content-fit contracts and their mechanised checks — depended on by phase-arch-09. Now
@@ -122,13 +123,13 @@ stages:
     - phase-arch-09
     - phase-arch-10
     - phase-arch-17
-notes: 'Not runnable until phase-arch-07 (active, agent-builder-a) completes, and phase-arch-13 also needs
-  phase-arch-12 from batch-009. phase-arch-18 has no depends_on edge to phase-arch-07, but it must not
-  be claimed while phase-arch-07 is open: it retires sys-ui from systems.yaml, the governance check errors
-  on any item that declares a system missing from systems.yaml, and phase-arch-07 declares sys-ui. Its
-  systems (sys-governance only) do not show that collision. It sits in this table because every other
-  phase here already waits on phase-arch-07. Parallel-safe as a whole with batch-016, batch-017, batch-021
-  (no collision or dependency link between any two of their phases, computed at dev 2cccfff6); the claim
-  validator still decides at claim time. Against the work already in flight: only phase-arch-08, phase-wbf-20,
-  phase-arch-09, phase-arch-10, phase-arch-13 are clear of batch-004''s remaining phases (phase-idg-12,
-  phase-irs-05, phase-irs-07); only phase-arch-18 is clear of phase-arch-07.'
+notes: 'Not runnable until phase-arch-07 (active) completes, and phase-arch-13 also needs phase-arch-12
+  from batch-009. phase-arch-18 retires sys-ui from systems.yaml, and the governance check errors on any
+  item that declares a system missing from systems.yaml while phase-arch-07 declares sys-ui. Its systems
+  (sys-governance only) do not show that collision, so the owner added the backlog edge phase-arch-18
+  depends_on phase-arch-07 on 2026-10-09; it sits in this table because every other phase here already
+  waits on phase-arch-07. Parallel-safe as a whole with batch-016, batch-017, batch-021 (no collision
+  or dependency link between any two of their phases, computed at dev 4cfb05e8); the claim validator still
+  decides at claim time. Against the work already in flight: only phase-arch-08, phase-wbf-20, phase-arch-09,
+  phase-arch-10, phase-arch-13 are clear of batch-004''s remaining phases (phase-idg-12, phase-irs-05,
+  phase-irs-07); no phase is clear of phase-arch-07.'
