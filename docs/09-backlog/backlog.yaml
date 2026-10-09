@@ -14881,7 +14881,8 @@ items:
   systems:
   - sys-fw-templates
   owner: repository-owner
-  status: queued
+  agent: agent-builder-a
+  status: active
   priority: 2
   session_budget: 1
   depends_on: []
@@ -14901,6 +14902,7 @@ items:
   deliverables:
   - docs/00-working/framework/05-schemas/phase.template.md
   - docs/00-working/framework/05-schemas/phase.schema.json
+  - docs/00-working/framework/05-schemas/check_schemas.py
   next_action: Extract phase-conc-01 from backlog.yaml as the reference shape before drafting the
     schema, so the schema is built to fit an item already in use rather than an invented one.
 
