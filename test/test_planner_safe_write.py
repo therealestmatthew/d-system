@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import os
 import re
+import signal
 import subprocess
 from pathlib import Path
 
@@ -75,10 +76,26 @@ def _write_path_file(workdir: Path, code: str, content: str) -> None:
     scratch.write_text(content)
 
 
-def _run(workdir: Path) -> subprocess.CompletedProcess[str]:
+def _run(workdir: Path, timeout: float | None = None) -> subprocess.CompletedProcess[str]:
     command = _extract_check_command()
     command = command.replace("depends_on=[...], documents={...}", "depends_on=[], documents={}")
-    return subprocess.run(["bash", "-c", command], cwd=workdir, capture_output=True, text=True)
+    # Own process group, so a timeout kills `uv` and the Python child too, not just `bash`: a
+    # check blocked on a draft path would otherwise outlive the test.
+    with subprocess.Popen(
+        ["bash", "-c", command],
+        cwd=workdir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        start_new_session=True,
+    ) as proc:
+        try:
+            stdout, stderr = proc.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            os.killpg(proc.pid, signal.SIGKILL)
+            proc.communicate()
+            raise
+    return subprocess.CompletedProcess(proc.args, proc.returncode, stdout, stderr)
 
 
 def _stage_draft(workdir: Path, code: str, relative_path: str, content: str) -> None:
@@ -388,3 +405,20 @@ def test_non_utf8_draft_is_unreadable_without_hiding_the_current_draft(tmp_path:
     _stage_current(tmp_path)
 
     _assert_unreadable_reported(_run(tmp_path), "PLAN-960")
+
+
+@pytest.mark.skipif(not hasattr(os, "mkfifo"), reason="the platform has no named pipes")
+def test_fifo_at_draft_path_is_unreadable_without_hanging_or_hiding_the_current_draft(
+    tmp_path: Path,
+) -> None:
+    """Fix cycle 10 (validator follow-up): a named pipe at the draft path made a plain `open()`
+    block forever, printing nothing and never reaching the current draft's line. The draft is now
+    opened non-blocking and only a regular file is read, so the FIFO fails closed on its own line.
+    The timeout turns a regression into a failure instead of a hung suite."""
+    fifo = tmp_path / "docs/00-working/promoted/PLAN-960-a-fifo.md"
+    fifo.parent.mkdir(parents=True)
+    os.mkfifo(fifo)
+    _write_path_file(tmp_path, "PLAN-960", "docs/00-working/promoted/PLAN-960-a-fifo.md\n")
+    _stage_current(tmp_path)
+
+    _assert_unreadable_reported(_run(tmp_path, timeout=30), "PLAN-960")

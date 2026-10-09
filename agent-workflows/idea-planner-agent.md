@@ -151,9 +151,11 @@ or byte is ever substituted into the command's own source by the shell or by you
 
 ```bash
 uv run python -c "
+import errno
 import glob
 import os
 import re
+import stat
 import sys
 from src.governance.plan_quality import check_plan_conformance
 
@@ -184,7 +186,15 @@ for path_file in sorted(glob.glob('_working/idea-planner/*.path')):
         had_error = True
         continue
     try:
-        with open(draft_path) as f:
+        fd = os.open(draft_path, os.O_RDONLY | os.O_NONBLOCK)
+        try:
+            f = os.fdopen(fd, encoding='utf-8')
+        except BaseException:
+            os.close(fd)
+            raise
+        with f:
+            if not stat.S_ISREG(os.fstat(f.fileno()).st_mode):
+                raise OSError(errno.EINVAL, 'not a regular file')
             text = f.read()
     except FileNotFoundError:
         print(f'stale {path_file}: draft path {draft_path!r} no longer exists', file=sys.stderr)
@@ -220,7 +230,9 @@ to `docs/01-plans/`) prints a `stale ...` line on stderr saying the draft path n
 it does not stop the other files' lines from printing. A file that passed both checks but whose
 draft path could not be read — a directory, a file without read permission, a symlink loop, or a
 draft that is not valid UTF-8 — prints an `unreadable ...` line on stderr naming the error; it
-likewise does not stop the other files' lines from printing. **Read only the line naming your own
+likewise does not stop the other files' lines from printing. A draft path that is not a regular file (a FIFO,
+socket or device) is reported as unreadable rather than waited on: the draft is opened without
+blocking and read only after the same open file is confirmed to be a regular file. **Read only the line naming your own
 draft's path**; other lines belong to other concurrent dispatches sharing the same
 `_working/idea-planner/` directory, not to you. The command exits nonzero if *any* staged file was
 refused or its draft was unreadable; only a stale (missing) draft leaves the exit code unchanged.
