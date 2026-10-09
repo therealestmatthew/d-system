@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-09-phase-idg-12-demo-adversary",
+  "date": "2026-10-09",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "b8d2c6f312b3f46672bc88502de22b7944d65241",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "The cycle-9 fix catches only FileNotFoundError; any other OSError on open(draft_path) (IsADirectoryError, PermissionError, symlink loop) crashes the check and hides every later draft's result line, which the cycle-9 ruling forbids.",
+      "evidence": ".claude/agents/idea-planner.md:197-202; agent-workflows/idea-planner-agent.md:186-191. Reproduced against the generated command: a directory at the draft path, a chmod 000 draft, and a self-referential symlink each produce a traceback, empty stdout and exit 1 while a valid PLAN-200 draft sorts later.",
+      "consequence": "A realistic leftover in docs/00-working/promoted/ silently suppresses conformance results for other tracks."
+    }
+  ],
+  "raw_reply_sha256": "30bc2ed212ef2b8a0c948d9bc4d11d303a2643301d694c6bda12a16b31780071",
+  "notes": "Round 8, re-review of fix cycle 9 (owner ruling 2026-10-09 on stale .path files). Dispatched and briefed by the Session Manager in parallel with the runner, in its own scratch clone at b8d2c6f3. Brief: the phase entry from dev, the full branch diff vs c3b4d0a0 and the cycle-9 diff (docs/03-sessions excluded), the owner rulings in force. Runner manifest _working/review-checks/phase-idg-12/b8d2c6f312b3/ (8 entries, passed). Raw reply kept at _working/session-manager/review-replies/phase-idg-12-b8d2c6f3-demo-adversary.md."
+}

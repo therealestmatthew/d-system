@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-09-phase-idg-12-review-judge",
+  "date": "2026-10-09",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "b8d2c6f312b3f46672bc88502de22b7944d65241",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "Acceptance REQ-014 R19 (a recorded run) rests only on the session record, which a review may not read; it cannot be verified independently from the evidence a review can use.",
+      "evidence": "Runner manifest entry 5: not run, not a command.",
+      "consequence": "The acceptance condition stays unverifiable round after round unless the run output is routed through the runner path."
+    }
+  ],
+  "raw_reply_sha256": "107efe30c23a8ca55ec9b8b4ca9eb0c8c6f3acf7f222e0ded2356b422f57b4ae",
+  "notes": "Round 8 shadow review, dispatched by the Session Manager after the runner finished, with the phase entry, the full and cycle-9 diffs and the runner manifest path. No checkout. Raw reply kept at _working/session-manager/review-replies/phase-idg-12-b8d2c6f3-review-judge.md."
+}
