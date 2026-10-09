@@ -1076,7 +1076,7 @@ built against before the owner read them (`ADR-029` by `phase-wbf-04` and `phase
 set in this commit, and this entry is the one place that says the acceptance covered the Session
 Manager's fix choices and the per-phase rulings as well as the records themselves.
 
-## The Owner Terminal runs a queued command once the Session Manager marks it ready — 2026-10-09
+## The Owner Terminal runs queued commands without the owner saying run — 2026-10-09
 
 Owner ruling of 2026-10-09, given to the Session Manager and relayed to Session 2 (Builder B) in its
 `ASSIGN`. The quotation is the Session Manager's relay of the owner's words: "AI shouldn't need to

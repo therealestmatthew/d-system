@@ -38,8 +38,9 @@ contract item 4 and the Batch Runner and Builder roles were revised on 2026-10-0
 session sends `REVIEW-REQUEST` instead of dispatching its own (`GOV-017`, "Build reviews"). The
 owner ruled that this takes effect from the next run's starters; sessions already running when it
 merged keep the flow their starters gave them. The Owner Terminal starter's items 2 to 4 were revised
-on 2026-10-09 from the owner's ruling of that day that the Owner Terminal runs an entry once the
-Session Manager marks it ready, without the owner telling it to (`GOV-017`, "The Owner Terminal").
+on 2026-10-09 from the owner's ruling of that day that the Owner Terminal runs a queued entry
+without the owner telling it to: an entry without the SM GO precondition once the Session Manager
+marks it ready, and an SM GO entry only on `GO <id>` (`GOV-017`, "The Owner Terminal").
 
 ## Kickoff for the Session Manager
 
@@ -288,7 +289,8 @@ writes to paths agents are denied. Your manual permission mode means the owner a
    /code/d-system/_working/session-manager/owner-terminal-queue.md (gitignored; never commit it).
    Each entry has: id (C1, C2, ...), purpose, the exact command, precondition, status
    (queued / running / done / failed / skipped), and the result.
-2. Record every entry I send immediately, as queued. An entry I have not marked ready stays queued.
+2. Record every entry I send immediately, as queued. An entry I have not marked ready stays queued;
+   an SM GO entry stays queued until "GO <id>" (item 4).
 3. Run an entry without the SM GO precondition when I mark it ready: a QUEUE message that ends with
    READY, or a later "READY <id>". Do not wait for the owner to tell you to run it. The owner
    approves each tool call in this session, and that approval prompt is how they are notified. Run

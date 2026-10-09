@@ -429,9 +429,9 @@ sent to the name `Session Manager`.
 | `IDEA` / `IDEA-RECORDED <id> <title> from <session>` | any / Ideation | An idea to record / the id it was recorded under |
 | `BLOCKED <reason>` | any | Stuck on something outside the sender's worktree |
 | `FREE` | execution | No assignment |
-| `QUEUE <id>` | Session Manager | An owner-only command for the Owner Terminal to record: purpose, command, precondition. Ending with `READY` marks it ready to run |
+| `QUEUE <id>` | Session Manager | An owner-only command for the Owner Terminal to record: purpose, command, precondition. Ending with `READY` marks it ready to run, except an *SM GO* entry, which `READY` never makes ready (see `READY <id>`) |
 | `READY <id>` | Session Manager | The queued entry, which is not an *SM GO* entry, may run now. For an *SM GO* entry it is refused and answered with `GO? <id>`. Not `READY <branch>`, which a builder sends; the argument is a queue id |
-| `GO? <id>` / `GO <id>` | Owner Terminal / Session Manager | The precondition check before a command that touches `dev`, and its answer |
+| `GO? <id>` / `GO <id>` | Owner Terminal / Session Manager | The precondition check before a command that touches `dev`, and its answer. `GO <id>` is the only message that runs an *SM GO* entry |
 | `DONE <id>` / `FAILED <id>` | Owner Terminal | The command ran, with its output, or failed or was refused, with the message |
 
 ## State and resumption
