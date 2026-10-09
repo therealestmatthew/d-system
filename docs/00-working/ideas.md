@@ -5226,6 +5226,10 @@ The idea proposes two candidates: (1) document the D_SYSTEM_DEMO_SHELL override 
 
 </details>
 
+**Links**
+
+- relates_to ← `000663`
+
 ---
 
 ## 000097 · Session-failure tracking system that derives anti-pattern rules for future sessions
@@ -5316,6 +5320,10 @@ No existing plan, requirement, decision or other idea fully covers the concrete 
 
 </details>
 
+**Links**
+
+- relates_to ← `000602`
+
 ---
 
 ## 000099 · Three demo-terminal PTY tests fail on dev and on origin: the trunk is red
@@ -5377,6 +5385,7 @@ PROPOSED LINK: 000099 --relates_to--> 000097 (session-failure tracking is the pa
 
 - relates_to ← `000097`
 - relates_to ← `000129`
+- relates_to ← `000644`
 
 ---
 
@@ -5554,6 +5563,11 @@ Related work: the layout-assignment redesign (phase-wb-09, handoff in docs/00-wo
 No existing governed document covers the toggle's documentation status. The backlog.yaml already recorded this as a non-blocking W07-W finding. No related ideas found with overlapping scope.
 
 </details>
+
+**Links**
+
+- relates_to ← `000632`
+- extended_by ← `000670`
 
 ---
 
@@ -5793,6 +5807,8 @@ No related plan, requirement or ADR exists yet for the bookmark categories featu
 - relates_to ← `000112`
 - relates_to ← `000120`
 - relates_to ← `000132`
+- relates_to ← `000610`
+- relates_to ← `000618`
 
 ---
 
@@ -5833,6 +5849,7 @@ PROPOSED PROMOTION: 000112 -> PLAN-022 (File Browser right-click open-in-viewer 
 - relates_to → `000111`
 - relates_to ← `000118`
 - relates_to ← `000120`
+- relates_to ← `000617`
 
 ---
 
@@ -5871,6 +5888,8 @@ The workbench plan phases (wb-08 and wb-09) deliver features and include mechani
 - relates_to → `000107`
 - relates_to ← `000114`
 - relates_to ← `000246`
+- relates_to ← `000661`
+- extended_by ← `000662`
 
 ---
 
@@ -5906,6 +5925,7 @@ No related plan, requirement or ADR currently covers the performance audit itsel
 
 - relates_to → `000113`
 - extended_by ← `000121`
+- relates_to ← `000665`
 
 ---
 
@@ -5941,6 +5961,7 @@ Owner request, 2026-09-11, for the next workbench planning session (post-PROMPT-
 - relates_to ← `000134`
 - relates_to ← `000135`
 - relates_to ← `000526`
+- relates_to ← `000620`
 
 ---
 
@@ -6019,6 +6040,8 @@ This is a properly scoped refinement of 000108 that moves the owner's scheduling
 - extends → `000108`
 - relates_to ← `000130`
 - relates_to ← `000134`
+- relates_to ← `000638`
+- relates_to ← `000639`
 
 ---
 
@@ -6126,6 +6149,7 @@ PROPOSED LINK: 000120 --relates_to--> 000115 (batch operations requirement confl
 - relates_to → `000111`
 - relates_to → `000112`
 - relates_to → `000115`
+- relates_to ← `000610`
 
 ---
 
@@ -6161,6 +6185,7 @@ PROPOSED LINK: 000121 --relates_to--> 000106 (Both flag the need for drift testi
 
 - extends → `000114`
 - relates_to → `000106`
+- relates_to ← `000665`
 
 ---
 
@@ -6476,6 +6501,7 @@ This idea asks for concrete work to fix three recurring pytest failures in test_
 - relates_to → `000097`
 - relates_to → `000099`
 - relates_to ← `000236`
+- relates_to ← `000644`
 
 ---
 
@@ -6514,6 +6540,8 @@ No separate promotion candidate; this is an actionable bug report that ties to a
 - relates_to → `000117`
 - relates_to ← `000131`
 - relates_to ← `000132`
+- relates_to ← `000613`
+- relates_to ← `000668`
 
 ---
 
@@ -6830,6 +6858,7 @@ PROPOSED LINK: 000137 --relates_to--> 000140 (000140 explicitly uses 000137's cl
 - relates_to → `000140`
 - relates_to ← `000140`
 - relates_to ← `000246`
+- relates_to ← `000656`
 
 ---
 
@@ -7072,6 +7101,8 @@ The governance documents establish the current understanding of process/session 
 **Links**
 
 - extended_by ← `000143`
+- relates_to ← `000607`
+- relates_to ← `000608`
 
 ---
 
@@ -7099,6 +7130,7 @@ No existing plan, requirement, or decision document explicitly covers a port/pro
 
 - extends → `000142`
 - extended_by ← `000144`
+- relates_to ← `000608`
 
 ---
 
@@ -7613,6 +7645,8 @@ No governed plan or backlog phase exists for building this registry. The _tmpage
 - relates_to ← `000168`
 - relates_to ← `000285`
 - relates_to ← `000390`
+- relates_to ← `000608`
+- relates_to ← `000666`
 
 ---
 
@@ -24106,6 +24140,7 @@ Related IRE cards: 000533 (the Brain holds everything), 000547 (Brain tiers and 
 
 - relates_to → `000525`
 - relates_to → `000250`
+- relates_to ← `000599`
 
 ---
 
@@ -24442,6 +24477,10 @@ No requirement or decision states what the page-exists check should report when 
 PROPOSED LINK: 000555 --relates_to--> 000100 (both are flag-off workbench probe behaviour; phase-wbf-10 addressed 000100 and surfaced 000555)
 
 </details>
+
+**Links**
+
+- relates_to ← `000645`
 
 ---
 
@@ -25464,6 +25503,10 @@ PROPOSED LINK: 000594 --relates_to--> 000569 (000569 is error/loading status acr
 
 </details>
 
+**Links**
+
+- relates_to ← `000643`
+
 ---
 
 ## 000595 · Create a dedicated security-review agent type that takes a commit range and a checkout path
@@ -25600,6 +25643,10 @@ PROPOSED LINK: 000599 --relates_to--> 000543 (both address database scalability 
 
 </details>
 
+**Links**
+
+- relates_to → `000543`
+
 ---
 
 ## 000600 · Correct the "no engine code reads a slot id literal" sentence in the workbench vocabulary note.
@@ -25637,6 +25684,12 @@ PROPOSED LINK: 000600 --relates_to--> 000602 (both are documentation corrections
 PROPOSED LINK: 000600 --relates_to--> 000603 (all four post-phase-arch-02 discovery cluster)
 
 </details>
+
+**Links**
+
+- relates_to → `000601`
+- relates_to → `000602`
+- relates_to → `000603`
 
 ---
 
@@ -25683,6 +25736,10 @@ No phase or plan currently declares ownership of API route documentation or docs
 
 </details>
 
+**Links**
+
+- relates_to ← `000600`
+
 ---
 
 ## 000602 · Update the workbench layout schema prose and minimum to schema_version 3.
@@ -25710,6 +25767,11 @@ Related work: idea 000098 (status: reviewing, "Ship the layout-schema test ADR-0
 PROPOSED LINK: 000602 --relates_to--> 000098 (Both concern schemas/workbench-layout.schema.json; 000602 updates the schema prose, 000098 adds the validation test)
 
 </details>
+
+**Links**
+
+- relates_to → `000098`
+- relates_to ← `000600`
 
 ---
 
@@ -25740,6 +25802,10 @@ Related governed documents:
 The proposal in 000603 (separate keys with their own versions) differs from the chosen approach, which keeps a single versioned key but restructures what lives inside it. Both achieve the goal of preventing the fields from resetting on schema bumps — 000603 by isolation, ADR-031 by restructuring. The chosen design is already bound into dependent phases and an accepted decision record.
 
 </details>
+
+**Links**
+
+- relates_to ← `000600`
 
 ---
 
@@ -25810,6 +25876,10 @@ PROPOSED LINK: 000605 --relates_to--> 000659 (both identify the same PosixPtyAda
 
 </details>
 
+**Links**
+
+- relates_to → `000659`
+
 ---
 
 ## 000606 · The runbook's /orient port precondition uses ss, which is absent in some Linux environments.
@@ -25870,6 +25940,10 @@ PROPOSED LINK: 000607 --relates_to--> 000142 (both address port and process mana
 
 </details>
 
+**Links**
+
+- relates_to → `000142`
+
 ---
 
 ## 000608 · Record which worktree or session started each dev server.
@@ -25905,6 +25979,13 @@ PROPOSED LINK: 000608 --relates_to--> 000666 (both address dev server port/owner
 PROPOSED LINK: 000608 --relates_to--> 000152 (both address tracking which worktree owns a running process)
 
 </details>
+
+**Links**
+
+- relates_to → `000142`
+- relates_to → `000143`
+- relates_to → `000666`
+- relates_to → `000152`
 
 ---
 
@@ -25980,6 +26061,11 @@ PROPOSED LINK: 000610 --relates_to--> 000111 (file bookmark categories define se
 PROPOSED LINK: 000610 --relates_to--> 000120 (batch bridge for opening file sets must account for the four-tab cap constraint)
 
 </details>
+
+**Links**
+
+- relates_to → `000111`
+- relates_to → `000120`
 
 ---
 
@@ -26079,6 +26165,10 @@ Session reference: phase-wbf-14 was completed in doc-session-tooltip-bottom-clip
 PROPOSED LINK: 000613 --relates_to--> 000130 (second half of idea 000130, addressing unfinished font size and text capacity work)
 
 </details>
+
+**Links**
+
+- relates_to → `000130`
 
 ---
 
@@ -26184,6 +26274,10 @@ PROPOSED LINK: 000616 --relates_to--> 000633 (both ask for visual distinction of
 
 </details>
 
+**Links**
+
+- relates_to → `000633`
+
 ---
 
 ## 000617 · Route the File Browser's single-file "Open in HTML Viewer" through deliverBatch.
@@ -26220,6 +26314,10 @@ This refactoring was explicitly out of scope for phase-wbf-05, which focused on 
 PROPOSED LINK: 000617 --relates_to--> 000112 (same feature, refactoring to use batch delivery)
 
 </details>
+
+**Links**
+
+- relates_to → `000112`
 
 ---
 
@@ -26265,6 +26363,12 @@ PROPOSED LINK: 000618 --relates_to--> 000636 (Demonstrates Playwright test infra
 PROPOSED LINK: 000618 --relates_to--> 000645 (Complements viewer's absent-page check testing)
 
 </details>
+
+**Links**
+
+- relates_to → `000111`
+- relates_to → `000636`
+- relates_to → `000645`
 
 ---
 
@@ -26326,11 +26430,15 @@ PROPOSED LINK: 000620 --relates_to--> 000115 (Both identify and propose addressi
 
 </details>
 
+**Links**
+
+- relates_to → `000115`
+
 ---
 
 ## 000621 · Add the "extended by ADR-029" pointers on ratification.
 
-**Created 2026-10-08T04:28:36+00:00 · Status: `triaged`**
+**Created 2026-10-08T04:28:36+00:00 · Status: `promoted` · became ADR-029**
 
 ADR-015 rule 4 ("read-only") and the data_root() docstring in src/db/source_validation.py need a pointer to ADR-029 once it is ratified (ADR-029 open item 7); the bookmark routes are the first workbench write routes and the first workbench data honouring the data root.
 Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
@@ -26471,6 +26579,12 @@ PROPOSED LINK: 000625 --relates_to--> 000646 (arch-07 work will revisit .stage-r
 
 </details>
 
+**Links**
+
+- relates_to → `000626`
+- relates_to → `000627`
+- relates_to → `000646`
+
 ---
 
 ## 000626 · HTML Viewer header controls overflow their panel in layout 2 at 1024x768.
@@ -26504,6 +26618,12 @@ The overflow issue is a known defect with an accepted partial fix (header wrap a
 PROPOSED LINK: 000626 --relates_to--> 000637 (Both report HTML Viewer header overflow at layout 2, 1024x768; 000637 explicitly noted as remaining open after phase-wbf-02's partial fix)
 
 </details>
+
+**Links**
+
+- relates_to ← `000625`
+- relates_to ← `000627`
+- relates_to ← `000637`
 
 ---
 
@@ -26547,6 +26667,11 @@ PROPOSED LINK: 000627 --relates_to--> 000625 (identical header overflow pattern:
 PROPOSED LINK: 000627 --relates_to--> 000626 (identical header overflow pattern: HTML Viewer header, same resolution and box constraint, same root cause)
 
 </details>
+
+**Links**
+
+- relates_to → `000626`
+- relates_to ← `000625`
 
 ---
 
@@ -26635,6 +26760,10 @@ The xterm 6 scrollbar change is a known breaking change where xterm moved scroll
 
 </details>
 
+**Links**
+
+- relates_to ← `000660`
+
 ---
 
 ## 000631 · A double-click on a non-active viewer tab can miss because the first click moves the tab strip.
@@ -26661,6 +26790,10 @@ Related idea 000632 (The demo runbook's HTML Viewer entry should describe the do
 PROPOSED LINK: 000631 --relates_to--> 000632 (both concern double-click behavior on HTML Viewer tabs; 000631 is the interaction defect, 000632 is the documentation request)
 
 </details>
+
+**Links**
+
+- relates_to → `000632`
 
 ---
 
@@ -26692,6 +26825,11 @@ The double-click and Shift+Enter behavior is already documented in the code (tit
 PROPOSED LINK: 000632 --relates_to--> 000105 (Both request documentation of HTML Viewer interactions in the demo runbook; 000105 covers the toggle, 000632 covers the double-click/Shift+Enter behavior for opening files)
 
 </details>
+
+**Links**
+
+- relates_to → `000105`
+- relates_to ← `000631`
 
 ---
 
@@ -26725,6 +26863,10 @@ The idea is narrower than the broader stage-page display requirements already in
 PROPOSED LINK: 000633 --relates_to--> 000616 (Both address visibility of externally-driven input; 000633 targets stage page, 000616 targets terminal panel)
 
 </details>
+
+**Links**
+
+- relates_to ← `000616`
 
 ---
 
@@ -26798,6 +26940,10 @@ PROPOSED LINK: 000635 --extends--> 000636 (Fixture images enable gating the rota
 
 </details>
 
+**Links**
+
+- extends → `000636`
+
 ---
 
 ## 000636 · Gate the scratch Playwright rotator check as a repeatable test.
@@ -26838,6 +26984,8 @@ PROPOSED LINK: 000636 --extends--> 000635 (fixture images are a prerequisite for
 **Links**
 
 - relates_to → `000629`
+- relates_to ← `000618`
+- extended_by ← `000635`
 
 ---
 
@@ -26880,6 +27028,10 @@ PROPOSED LINK: 000637 --relates_to--> 000626 (Both describe HTML Viewer header o
 
 </details>
 
+**Links**
+
+- relates_to → `000626`
+
 ---
 
 ## 000638 · The layout 2 Skills popover needs 395 px where 360 to 379 px of room exists, so its last entries scroll.
@@ -26911,6 +27063,10 @@ The three ideas governing popover space constraints (000108, 000117) and the aud
 PROPOSED LINK: 000638 --relates_to--> 000117 (shared popover component height/space constraints, both audited in phase-wbf-13's consumer survey)
 
 </details>
+
+**Links**
+
+- relates_to → `000117`
 
 ---
 
@@ -26944,6 +27100,10 @@ The idea adds a legitimate test gap: a popover could have scrollHeight > clientH
 PROPOSED LINK: 000639 --relates_to--> 000117 (Both address popover scroll/display issues; 000117 focuses on height floor, 000639 proposes testing that scroll actually works)
 
 </details>
+
+**Links**
+
+- relates_to → `000117`
 
 ---
 
@@ -26981,6 +27141,11 @@ PROPOSED LINK: 000640 --relates_to--> 000646 (both require REQ-037 updates for a
 
 </details>
 
+**Links**
+
+- relates_to → `000641`
+- relates_to → `000646`
+
 ---
 
 ## 000641 · useWorkbenchLayouts.ts hardcodes the shell home slot and panel ids, the likeliest place for an arch-08 regression.
@@ -27012,6 +27177,10 @@ The role definition says to propose a promotion only when the work is done and s
 PROPOSED LINK: 000641 --relates_to--> 000640 (Both identify related panel id regression risks in phase-arch-07 and phase-arch-08 scope, raised in the same workbench run)
 
 </details>
+
+**Links**
+
+- relates_to ← `000640`
 
 ---
 
@@ -27053,6 +27222,10 @@ The test is likely to belong in phase-arch-08, which specifically addresses mult
 
 </details>
 
+**Links**
+
+- relates_to ← `000655`
+
 ---
 
 ## 000643 · The File Browser's could-not-search alert should show the API's error detail, since the listing fetch discards the response body.
@@ -27079,6 +27252,10 @@ Tangentially related to idea 000569 (Error boundary and accessible loading/error
 PROPOSED LINK: 000643 --relates_to--> 000594 (both File Browser error handling, but 000594 is listing fetch failures after folder change, 000643 is search fetch error detail)
 
 </details>
+
+**Links**
+
+- relates_to → `000594`
 
 ---
 
@@ -27119,6 +27296,11 @@ PROPOSED LINK: 000644 --relates_to--> 000129 (Both need terminal test robustness
 
 </details>
 
+**Links**
+
+- relates_to → `000099`
+- relates_to → `000129`
+
 ---
 
 ## 000645 · The viewer's absent-page check prints the same message for a missing route and a missing file.
@@ -27152,6 +27334,11 @@ PROPOSED LINK: 000645 --relates_to--> 000555 (both describe the absent-page chec
 
 </details>
 
+**Links**
+
+- relates_to → `000555`
+- relates_to ← `000618`
+
 ---
 
 ## 000646 · REQ-037 rows that name .stage-region__header need amending in arch-07's requirements work.
@@ -27181,11 +27368,16 @@ The amendment belongs in phase-arch-07's deliverables because it is part of the 
 
 </details>
 
+**Links**
+
+- relates_to ← `000625`
+- relates_to ← `000640`
+
 ---
 
 ## 000647 · The notes-strip mixing ruling should be recorded in REQ-012 or GOV-003 once the owner ratifies it.
 
-**Created 2026-10-08T07:16:58+00:00 · Status: `triaged`**
+**Created 2026-10-08T07:16:58+00:00 · Status: `promoted` · became REQ-012**
 
 Record the notes-strip mixing ruling (one rotation is all text or all images) in REQ-012 or GOV-003 once the owner ratifies it.
 Raised by Standby Builder (phase-wbf-06 fix round) during the 2026-10-08 workbench run.
@@ -27429,6 +27621,10 @@ PROPOSED LINK: 000654 --relates_to--> 000671 (Both address terminal session pers
 
 </details>
 
+**Links**
+
+- relates_to → `000671`
+
 ---
 
 ## 000655 · Under the dev server, StrictMode doubles each terminal mount and falsely refuses a new tab near the session cap.
@@ -27464,6 +27660,11 @@ PROPOSED LINK: 000655 --relates_to--> 000656 (false refusals and refused-tab per
 PROPOSED LINK: 000655 --relates_to--> 000642 (both related to terminal session cap allocation and instance-vs-global cap accounting)
 
 </details>
+
+**Links**
+
+- relates_to → `000656`
+- relates_to → `000642`
 
 ---
 
@@ -27501,6 +27702,12 @@ PROPOSED LINK: 000656 --relates_to--> 000657 (both concern session state recover
 
 </details>
 
+**Links**
+
+- relates_to → `000137`
+- relates_to → `000657`
+- relates_to ← `000655`
+
 ---
 
 ## 000657 · Restore after a drop reopens one session per previous tab, and no document says so.
@@ -27527,6 +27734,10 @@ Related document: The terminal persistence audit in `docs/00-working/terminal-pe
 The idea's core observation — that the behavior was not documented — is now addressed by `phase-arch-16`'s audit. The secondary observation — that the UI message gives no count — remains as a known communication gap explicitly noted in the audit.
 
 </details>
+
+**Links**
+
+- relates_to ← `000656`
 
 ---
 
@@ -27587,6 +27798,10 @@ PROPOSED LINK: 000659 --relates_to--> 000605 (both describe aspects of PosixPtyA
 
 </details>
 
+**Links**
+
+- relates_to ← `000605`
+
 ---
 
 ## 000660 · Client scrollback is xterm's unconfigured default of 1000 lines, and no document states it.
@@ -27618,6 +27833,10 @@ PROPOSED LINK: 000660 --relates_to--> 000630 (both describe xterm scrollback con
 
 </details>
 
+**Links**
+
+- relates_to → `000630`
+
 ---
 
 ## 000661 · The only persistence regression guard, REQ-007 W15, covers bash alone, and no check covers CMD or PowerShell.
@@ -27648,6 +27867,10 @@ The core issue raised by 000661 stands as documented: the bash-only regression g
 PROPOSED LINK: 000661 --relates_to--> 000113 (both address terminal persistence testing across bash, CMD and PowerShell; 000113 is the audit request that surfaced the bash-only limitation)
 
 </details>
+
+**Links**
+
+- relates_to → `000113`
 
 ---
 
@@ -27682,6 +27905,10 @@ Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
 PROPOSED LINK: 000662 --extends--> 000113 (formalize terminal persistence audit into a committed regression test)
 
 </details>
+
+**Links**
+
+- extends → `000113`
 
 ---
 
@@ -27719,6 +27946,10 @@ The audit is complete and the finding is documented. No existing plan, phase or 
 PROPOSED LINK: 000663 --relates_to--> 000096 (both concern D_SYSTEM_DEMO_SHELL override behavior and the mismatch between panel label and actual shell on Windows)
 
 </details>
+
+**Links**
+
+- relates_to → `000096`
 
 ---
 
@@ -27776,6 +28007,11 @@ PROPOSED LINK: 000665 --relates_to--> 000121 (Both concern cache invalidation an
 
 </details>
 
+**Links**
+
+- relates_to → `000114`
+- relates_to → `000121`
+
 ---
 
 ## 000666 · Dev-server ports are not exclusive across worktrees
@@ -27808,6 +28044,11 @@ PROPOSED LINK: 000666 --relates_to--> 000152 (worktree registry could track port
 PROPOSED LINK: 000666 --relates_to--> 000608 (dev-server ownership tracking needed to identify port conflicts)
 
 </details>
+
+**Links**
+
+- relates_to → `000152`
+- relates_to ← `000608`
 
 ---
 
@@ -27860,6 +28101,10 @@ Possible related work: PLAN-027 phase-wbf-14 closed 000130 but explicitly marked
 PROPOSED LINK: 000668 --relates_to--> 000130 (tooltip trigger reachability; 000130 fixed tooltip rendering, 000668 addresses trigger coverage at short viewport)
 
 </details>
+
+**Links**
+
+- relates_to → `000130`
 
 ---
 
@@ -27923,6 +28168,10 @@ PROPOSED LINK: 000670 --extends--> 000105 (follow-up to phase-wbf-18, sequenced 
 
 </details>
 
+**Links**
+
+- extends → `000105`
+
 ---
 
 ## 000671 · Preserve terminal sessions across panel and layout switches instead of warning
@@ -27964,6 +28213,7 @@ The idea correctly positions itself as requiring a decision phase (an ADR) befor
 - relates_to → `000651`
 - relates_to → `000652`
 - relates_to → `000087`
+- relates_to ← `000654`
 
 ---
 
