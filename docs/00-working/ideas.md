@@ -28243,3 +28243,339 @@ Each section includes source references, instructions ("What to do"), expectatio
 The document also references two related ungoverned documents for context: `demo-windows-setup.md` (prerequisite) and `demo-runbook.md` (launch commands and UI reference). The idea's content — a single, collected checklist of every 2026-10-08 Windows and owner-machine check with source, instructions, expectations and result columns — is already fully delivered. No related ideas found among the open set.
 
 </details>
+
+---
+
+## 000673 · Template: simple timeline of a project's dated events
+
+**Created 2026-10-09T17:46:00-04:00 · Status: `open`**
+
+A per-project vertical timeline of dated events: started, last_reviewed, each commitment's created, due_date and completed, each task's, target_date, and later interactions, decisions and milestone development events. A portfolio-wide view is the same component with a project column. CSS-only chronological list with a left rule; one new component in house-components.css, tokens only. slot-fill. Effort M. Data is ready today. Owner decisions: per-project, portfolio or person first; chronological or proportional; whether created dates count as events; whether a milestone development event is the milestone source; shared component or page-local CSS; as-of date from a parameter or the commit date.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:00-04:00): Recorded first as 000600 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:06+00:00; renumbered to 000673 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000600.
+
+</details>
+
+---
+
+## 000674 · Template: Gantt chart, project level first
+
+**Created 2026-10-09T17:46:01-04:00 · Status: `open`**
+
+One row per project from started to target_date, grouped by category or status, drawn with CSS grid (one column per week or month, bars placed by inline grid-column). Three of the five example projects draw today; one is open-ended and one unscheduled. Task-level bars are not a real Gantt: commitments and tasks have no start date, duration or dependency field, and a bar from created to due_date shows lead time, not a schedule. Minimal schema change for tasks: a nullable start_date on task and commitment, with the DDL column and loader change; dependencies are planned as a separate work-dependency record (ARCH-007), so an interim field conflicts with that direction. No script means no drag or zoom: zoom becomes separate renders at week, month and quarter, and the today line is the as-of date. slot-fill. Effort M at project level, L with tasks and dependencies.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:02-04:00): Recorded first as 000601 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:07+00:00; renumbered to 000674 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000601.
+
+</details>
+
+---
+
+## 000675 · Template: commitments ledger
+
+**Created 2026-10-09T17:46:02-04:00 · Status: `open`**
+
+What do I owe, to whom, by when, and what is overdue. Reads commitments: due_date, status, priority, promised_to, completed, against an as-of date. Table, pills and stat row only, so no new CSS. slot-fill. Effort S. Recommended first build: it proves the shared loader and the as-of handling. It is the page for the planned Accountability Ledger view (phase-sig-03), which is SQL only, not a duplicate of it.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:03-04:00): Recorded first as 000602 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:07+00:00; renumbered to 000675 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000602.
+
+</details>
+
+---
+
+## 000676 · Template: portfolio dashboard
+
+**Created 2026-10-09T17:46:04-04:00 · Status: `open`**
+
+Is my portfolio healthy. Project status, category, target_date and last_reviewed against review_cadence; open and overdue commitment counts. slot-fill. Effort M. Nothing blocks it today; later it reads the Stale Radar and Health Signal views (phase-sig-02, phase-sig-04). Overlaps the digest HTML export (phase-syn-05), which is itself stale (see the separate idea).
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:05-04:00): Recorded first as 000603 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:07+00:00; renumbered to 000676 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000603.
+
+</details>
+
+---
+
+## 000677 · Template: one-page project brief
+
+**Created 2026-10-09T17:46:06-04:00 · Status: `open`**
+
+The state of one project on one page: project fields, stakeholders, tags, open commitments and tasks. Population both, with a summary slot for an agent. Effort M. Adds the first new component, a card. Share a data function with the planned project context pack (phase-syn-01), which is Markdown, not HTML.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:06-04:00): Recorded first as 000604 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:08+00:00; renumbered to 000677 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000604.
+
+</details>
+
+---
+
+## 000678 · Template: person profile and stakeholder card
+
+**Created 2026-10-09T17:46:07-04:00 · Status: `open`**
+
+Who this person is and what is open with them: person fields, their projects, commitments promised_to them, waiting-on items owed_by them, later interactions. slot-fill. Effort S. Exclude email from shareable output by default. Build after phase-proj-01 answers whether people records exist in the real portfolio.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:08-04:00): Recorded first as 000605 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:08+00:00; renumbered to 000678 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000605.
+
+</details>
+
+---
+
+## 000679 · Template: kanban status board
+
+**Created 2026-10-09T17:46:09-04:00 · Status: `open`**
+
+What is in each state: tasks and commitments by status (five columns), projects by status (six). A static snapshot, not drag-and-drop; the workbench is the live view. Needs the card component. slot-fill. Effort S.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:09-04:00): Recorded first as 000606 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:08+00:00; renumbered to 000679 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000606.
+
+</details>
+
+---
+
+## 000680 · Template: agenda and calendar view
+
+**Created 2026-10-09T17:46:10-04:00 · Status: `open`**
+
+What is coming up: every due_date on commitments, tasks and waiting-on records, project target_date, interaction dates, and the next review derived from last_reviewed plus review_cadence. slot-fill. Effort S for an agenda list, M for a month grid.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:11-04:00): Recorded first as 000607 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:09+00:00; renumbered to 000680 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000607.
+
+</details>
+
+---
+
+## 000681 · Template: waiting-on board
+
+**Created 2026-10-09T17:46:11-04:00 · Status: `open`**
+
+What others owe me and who has gone quiet: waiting-on requested, last_chased, due_date, status and owed_by. slot-fill. Effort S. The example set has no waiting-on records, so it needs fixtures first.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:12-04:00): Recorded first as 000608 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:09+00:00; renumbered to 000681 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000608.
+
+</details>
+
+---
+
+## 000682 · Template: stale radar and review queue page
+
+**Created 2026-10-09T17:46:13-04:00 · Status: `open`**
+
+Which projects am I neglecting: last_reviewed, or the derived last_touched, against review_cadence. slot-fill. Effort S. phase-sig-02 builds the view (no page is queued); the figure can be computed inline until the view lands.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:13-04:00): Recorded first as 000609 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:09+00:00; renumbered to 000682 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000609.
+
+</details>
+
+---
+
+## 000683 · Template: weekly review page
+
+**Created 2026-10-09T17:46:14-04:00 · Status: `open`**
+
+What happened, what slipped, what is next: completed and created dates this week, due next week, the stale list. Population both, with a narrative slot. Effort M. Duplicates the planned weekly review workflow (phase-syn-03) in content; that phase writes Markdown to docs/03-sessions/ and depends on phase-syn-02 and phase-sig-08.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:15-04:00): Recorded first as 000610 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:09+00:00; renumbered to 000683 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000610.
+
+</details>
+
+---
+
+## 000684 · Template: decision register
+
+**Created 2026-10-09T17:46:16-04:00 · Status: `open`**
+
+What was decided and why: decision date, text, rationale, alternatives, status (active, superseded, reversed) and supersedes. slot-fill. Effort S. No example decisions exist, so it needs fixtures.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:16-04:00): Recorded first as 000611 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:10+00:00; renumbered to 000684 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000611.
+
+</details>
+
+---
+
+## 000685 · Template: commitment velocity trend
+
+**Created 2026-10-09T17:46:18-04:00 · Status: `open`**
+
+Am I creating faster than completing: weekly created versus completed counts as CSS bars or inline SVG. slot-fill. Effort M. Depends on the velocity view and persisted snapshots (phase-sig-06 to phase-sig-08).
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:19-04:00): Recorded first as 000612 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:10+00:00; renumbered to 000685 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000612.
+
+</details>
+
+---
+
+## 000686 · Template: RACI and role matrix
+
+**Created 2026-10-09T17:46:20-04:00 · Status: `open`**
+
+Who is responsible, accountable, consulted and informed on each project. Depends on the planned ProjectParty and role-definition records (ARCH-007), which have no schema and no queued phase, so it is blocked. Interim: a people-by-projects matrix from project.stakeholders and person.role, noting that role is a job title, not a project role. slot-fill. Effort M.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:23-04:00): Recorded first as 000613 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:10+00:00; renumbered to 000686 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000613.
+
+</details>
+
+---
+
+## 000687 · Shared portfolio data loader and a richer fictional fixture set
+
+**Created 2026-10-09T17:46:26-04:00 · Status: `open`**
+
+Not a template: the one-time cost every portfolio template shares. A loader that reads the data root through data_root() or the DuckDB layer and takes an explicit as-of date, so pages stay deterministic (REQ-036 R07, R08). With it, a richer tracked example set covering an overdue item, a blocked item, a milestone, an interaction and a waiting-on record: today the set holds 5 projects, 1 person, 1 commitment and 3 tasks, with exactly one overdue task and no supporting records. Suggested first step of the template build order.
+
+Source: the template exploration of the cloud session of 2026-10-08 (branch claude/productivity-system-templates-ie1x8d; the guide at _public/portfolio-guide.html, section 8). The owner named a simple timeline and a Gantt chart as template ideas and asked for the exploration to propose more; the owner chose to record each proposal as an idea. Constraints every entry shares: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, built against the tracked example set. No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root().
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:28-04:00): Recorded first as 000614 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:11+00:00; renumbered to 000687 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000614.
+
+</details>
+
+---
+
+## 000688 · phase-syn-05 depends on the cancelled phase-html-10 and a retired page pipeline
+
+**Created 2026-10-09T17:46:31-04:00 · Status: `open`**
+
+The digest HTML export phase (phase-syn-05) depends on phase-html-10 and its scope names the existing YAML-to-JSON page build pipeline. Both were cancelled when PLAN-003 was retired (ADR-027). The phase should be re-scoped to the house template family before anyone claims it. Found by the template exploration of the cloud session of 2026-10-08.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:33-04:00): Recorded first as 000615 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:11+00:00; renumbered to 000688 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000615.
+
+</details>
+
+---
+
+## 000689 · A command-line entry point for the capture structuring step
+
+**Created 2026-10-09T17:46:35-04:00 · Status: `open`**
+
+Today the structuring step between a raw capture and a staged record exists only as library functions: structure() and stage_capture() in src/capture/structure.py. tools/review.py imports only StructuringError, and no script under tools/ calls either function, so the owner cannot run structuring by hand; a session or an agent has to call it. Intake (tools/capture.py) and review and promotion (tools/review.py) both have commands. Owner ruling, 2026-10-08, in the cloud session on branch claude/productivity-system-templates-ie1x8d: there should be a command-line entry point for structuring. Found by the document digest for the portfolio guide (_public/portfolio-guide.html, section 4, "Review and promote staged records"). Related: 000361 (a quick-entry writer for people, commitments and tasks), which addresses the same friction from the other side.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-renumber (2026-10-09T17:46:37-04:00): Recorded first as 000616 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T14:59:17+00:00; renumbered to 000689 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000616.
+
+</details>
