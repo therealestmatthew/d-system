@@ -183,7 +183,12 @@ for path_file in sorted(glob.glob('_working/idea-planner/*.path')):
               f'file name {stem!r}', file=sys.stderr)
         had_error = True
         continue
-    text = open(draft_path).read()
+    try:
+        with open(draft_path) as f:
+            text = f.read()
+    except FileNotFoundError:
+        print(f'stale {path_file}: draft path {draft_path!r} no longer exists', file=sys.stderr)
+        continue
     result = check_plan_conformance(text, depends_on=[...], documents={...})
     print(f'{draft_path}: {result}')
 
@@ -202,9 +207,13 @@ copied from the draft or its path.
 The command prints **one result line per currently-staged `.path` file that passed both checks**,
 each line naming that draft's own path, and a `refusing ...` line on stderr for every file that
 failed either check (a non-code file name, or content whose path does not fully match the pattern
-or whose embedded code does not equal the file name) — a refused file is never opened. **Read only
-the line naming your own draft's path**; other lines belong to other concurrent dispatches sharing
-the same `_working/idea-planner/` directory, not to you. The command exits nonzero if *any* staged
-file was refused, even when your own draft's line printed cleanly — a sibling dispatch's bad file
+or whose embedded code does not equal the file name) — a refused file is never opened. A file that
+passed both checks but whose draft path no longer exists (for example, the draft was since moved
+to `docs/01-plans/`) prints a `stale ...` line on stderr saying the draft path no longer exists;
+it does not stop the other files' lines from printing. **Read only the line naming your own
+draft's path**; other lines belong to other concurrent dispatches sharing the same
+`_working/idea-planner/` directory, not to you. The command exits nonzero if *any* staged file was
+refused; a stale file on its own does not change the exit code. A refused file turns the exit
+nonzero even when your own draft's line printed cleanly — a sibling dispatch's bad file
 still turns the exit code red, so check the printed line for your own path rather than the exit
 code alone to learn whether your own draft specifically conforms.

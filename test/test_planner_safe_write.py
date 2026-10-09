@@ -272,3 +272,42 @@ def test_non_plan_req_series_is_refused(tmp_path: Path) -> None:
     result = _run(tmp_path)
     assert result.returncode != 0
     assert "refusing" in result.stderr.lower()
+
+
+def test_stale_path_file_is_reported_without_hiding_the_current_draft(tmp_path: Path) -> None:
+    """Fix cycle 9 (owner ruling): a `.path` file that passes both checks but whose draft no longer
+    exists (moved to docs/01-plans/, say) is reported on its own `stale ...` stderr line. Its name
+    sorts before the current draft's, so the old unhandled FileNotFoundError would have crashed
+    the loop before the current line printed. A stale file alone leaves the exit code at 0."""
+    _write_path_file(tmp_path, "PLAN-954", "docs/00-working/promoted/PLAN-954-moved-away.md\n")
+    _stage_draft(
+        tmp_path, "PLAN-955", "docs/00-working/promoted/PLAN-955-current-draft.md", _draft()
+    )
+
+    result = _run(tmp_path)
+
+    assert "Traceback" not in result.stderr, result.stderr
+    assert result.returncode == 0, result.stderr
+    assert "docs/00-working/promoted/PLAN-955-current-draft.md: " in result.stdout
+    assert "conformant=True" in result.stdout
+    assert "stale _working/idea-planner/PLAN-954.path: " in result.stderr
+    assert "no longer exists" in result.stderr
+    assert "PLAN-954" not in result.stdout
+
+
+def test_stale_path_file_does_not_mask_a_refused_mismatched_code(tmp_path: Path) -> None:
+    """A stale file next to a mismatched-code file: the mismatch is still refused and the exit is
+    still nonzero, and the stale file is still reported on its own line without a crash."""
+    _write_path_file(tmp_path, "PLAN-956", "docs/00-working/promoted/PLAN-956-moved-away.md\n")
+    draft = tmp_path / "docs/00-working/promoted/PLAN-958-track.md"
+    draft.parent.mkdir(parents=True, exist_ok=True)
+    draft.write_text(_draft())
+    _write_path_file(tmp_path, "PLAN-957", "docs/00-working/promoted/PLAN-958-track.md\n")
+
+    result = _run(tmp_path)
+
+    assert "Traceback" not in result.stderr, result.stderr
+    assert result.returncode != 0
+    assert "refusing _working/idea-planner/PLAN-957.path: " in result.stderr
+    assert "does not match" in result.stderr
+    assert "stale _working/idea-planner/PLAN-956.path: " in result.stderr
