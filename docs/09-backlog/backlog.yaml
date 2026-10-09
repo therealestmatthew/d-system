@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-10-08'
+updated: '2026-10-09'
 decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
@@ -11119,7 +11119,8 @@ items:
   systems:
   - sys-governance
   owner: repository-owner
-  status: queued
+  agent: agent-batch-runner
+  status: active
   priority: 3
   session_budget: 1
   depends_on:
@@ -11165,9 +11166,12 @@ items:
   - .claude/agents/
   - docs/08-governance/GOV-014-realization-role-contracts.md
   - src/governance/
-  - test/
-  next_action: 'Claim released on 2026-10-08 by the Session Manager on the owner''s instruction (no agent/phase-idg-12 branch existed; the 2026-10-05 agent-batch-runner claim was stale). Re-claim for batch-004 once the workbench run finishes. Then: write the agent against the GOV-014/ARCH-006 shape - track in, one draft per accepted
-    track, amendment case honoured - then build the REQ-022 R20 section checker in src/governance/.'
+  - test/test_plan_quality.py
+  - test/test_planner_safe_write.py
+  - agent-workflows/idea-planner-agent.md
+  - agent-workflows/workflows.yaml
+  next_action: Write the agent against the GOV-014/ARCH-006 shape - track in, one draft per accepted
+    track, amendment case honoured - then build the REQ-022 R20 section checker in src/governance/.
 - id: phase-dgov-01
   title: Rule when a requirement is mandatory, classify the corpus, enforce forward
   plan: doc-document-backlog-governance
