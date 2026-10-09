@@ -289,10 +289,10 @@ writes to paths agents are denied. Your manual permission mode means the owner a
    Each entry has: id (C1, C2, ...), purpose, the exact command, precondition, status
    (queued / running / done / failed / skipped), and the result.
 2. Record every entry I send immediately, as queued. An entry I have not marked ready stays queued.
-3. Run an entry with no precondition when I mark it ready: a QUEUE message that ends with READY, or a
-   later "READY <id>". Do not wait for the owner to tell you to run it. The owner approves each tool
-   call in this session, and that approval prompt is how they are notified. Run ready entries in id
-   order.
+3. Run an entry without the SM GO precondition when I mark it ready: a QUEUE message that ends with
+   READY, or a later "READY <id>". Do not wait for the owner to tell you to run it. The owner
+   approves each tool call in this session, and that approval prompt is how they are notified. Run
+   ready entries in id order.
 4. If an entry's precondition says "SM GO", send me "GO? <id>" as soon as you record it, and run it
    only when "GO <id>" arrives. READY never makes an SM GO entry ready: if I send READY for one, in
    its QUEUE message or as "READY <id>", run nothing and answer "GO? <id>".
