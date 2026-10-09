@@ -7,7 +7,7 @@ kind: session
 status: active
 owner: repository-owner
 created: '2026-10-08'
-updated: '2026-10-08'
+updated: '2026-10-09'
 systems: [sys-wb-layout, sys-wb-styles, sys-demo-stage, sys-wb-terminal, sys-wb-notes, sys-wb-explorers, sys-wb-viewer, sys-ui]
 depends_on: [doc-workbench-architecture-quality-requirements, doc-adr-slot-configuration-schema-model, doc-workbench-requirements, doc-workbench-content-fit-contracts-requirements]
 ---
@@ -25,6 +25,13 @@ run of 2026-10-08, branch `agent/phase-arch-07`, cut from the run's trunk `ccr-b
 `c281b7f`. The session code is 20 because the allocator returns a taken number from a worktree. An
 earlier attempt at this phase was blocked only by the deliverable boundary and left nothing behind;
 this one started from the trunk.
+
+The cloud run paused at a checkpoint (`8d1968f`, pushed to `origin/agent/phase-arch-07`) when the
+owner's cloud credits ran out. On 2026-10-09 the owner ruled that Session 2 (Builder B) finishes the
+phase locally, and the claim's `agent` moved to `agent-builder-b` on `dev` (`4cfb05e8`). The branch
+was rebased onto that commit with no conflicts; the run's trunk had by then been merged into `dev`.
+The checkpoint's remaining steps (gate, backlog entry, this record, the full live self-test) were
+done locally, and the owner ratified the nine items under "Ratification" the same day.
 
 ## The defect, reproduced first
 
@@ -131,12 +138,23 @@ and `overview` in layout 2 is now also eligible for `secondary`.
   run (`.stage-slot__controls .stage-popover__trigger` and `.stage-slot__help .stage-tooltip__trigger`
   moved out of the strip's slot, 1280x720, layout 1), and the judge reported a `visible` finding on
   each, which shows the frame-scoped selector, its CSS scope and its frame bound all work.
+- **Content-fit contracts, live, full matrix with the self-test** (local, 2026-10-09, after the
+  rebase; Vite 5791 and API 8731, both with `D_SYSTEM_DEMO_TERMINAL=1`):
+  `uv run python test/test_workbench_fit_contracts.py --live http://localhost:5791 --self-test`
+  printed `104 panel cells; floating surfaces measured {'context-menu': 8, 'popover': 108,
+  'tooltip': 16}; rules pass=520 fail=0 n/a(optional region absent)=0; scroll regions exercised in 7
+  of 7 (panel, region) pairs; shell unavailable on this host, scrollback not exercised
+  (owner-machine, C10): ['terminal-cmd', 'terminal-powershell']; 0 finding(s)` and exited 0. The
+  self-test printed `unbroken region passed` and `caught` for all nine panel types. This covers all
+  four required sizes; REQ-037's measured state of 2026-10-08 recorded 489 pass and 35 fail on the
+  trunk before this run's fix phases.
 - **Zero page scroll** held in the screenshots taken at 1280x720 and 1024x768 in both layouts
   (`scrollWidth` x `scrollHeight` equal to the viewport in all four).
 
 ## Amended wording
 
-The three amendments are this session's wording and are awaiting ratification below.
+The three amendments are this session's wording; the owner ratified them on 2026-10-09 (item 8
+below).
 
 - **`REQ-007` W01** (row id kept): the `?` is the strip's one `help` bar element and the dropdown its
   one `controls` bar element, placed by the slot's `compact` inline frame, so the strip is still one
@@ -158,10 +176,11 @@ The three amendments are this session's wording and are awaiting ratification be
   `is_frame_scoped`, a `frame` rectangle in the measurement) and builds its live matrix from the
   Python matcher.
 
-## Awaiting ratification
+## Ratification
 
-These are this session's choices where `ADR-031` left the call to the phase. Proposed; awaiting the
-owner's ratification (pre-approved run, 2026-10-08).
+These are this session's choices where `ADR-031` left the call to the phase, proposed in the
+pre-approved run of 2026-10-08. The owner ratified all nine as built on 2026-10-09, relayed by the
+Session Manager to Session 2 (Builder B), which finished the phase locally.
 
 1. **Capacities per frame.** `standard`: `help` 1, `controls` 5. `compact`: `help` 1, `controls` 1.
    They equal the measured maximum, so a panel with a sixth control on a standard slot is refused
@@ -210,19 +229,25 @@ owner's ratification (pre-approved run, 2026-10-08).
 - Body-kind content floors are not in `slot-schemas.json`; `phase-arch-09` builds that table.
 - CMD, PowerShell and Windows checks are owner-machine, not run. The CMD and PowerShell panels'
   scrollback regions were not exercised here either (the shells are unavailable on Linux); `C10`.
-- The 1366x768 and 1920x1080 columns of the content-fit matrix, and the full `--live --self-test`
-  run, were not repeated.
 - `brain/concepts/terms-workbench-ui.md` and `docs/08-governance/GLOSSARY.md` still describe a
-  per-panel `eligible_slots`; they are outside this phase's deliverables.
+  per-panel `eligible_slots`; they are outside this phase's deliverables. Sent to Ideation as an
+  idea on 2026-10-09; Ideation is holding it until the next free id.
 
 ## Gate checks
 
-WIP checkpoint, not a finished phase. Full `uv run pytest` printed `2 failed, 2167 passed, 1 skipped
-in 374.98s`; the two failures are the known ones, neither retried nor skipped:
-`test_demo_terminal_api.py::test_control_characters_reach_the_shell` (load-sensitive) and
-`test_run_review_checks.py::test_an_unwritable_worktree_parent_is_refused` (uid 0). `ruff check`
-and `mypy src/` were clean at the last check; `cd ts && npx tsc --noEmit`, `eslint` and `vitest run`
-(276 tests) passed and `npm run build` built before the final commit. Not run after the last
-commits: `npm test` and `npm run build` again, and `LayoutConfigDialog.test.tsx` (added at wind-down)
-has never been run. The phase entry in `backlog.yaml` is not updated (`session`,
-`completion_evidence`, `result` still to write). Status of this record stays `active`.
+Run locally on 2026-10-09 in `../d-system-worktrees/phase-arch-07`, after the rebase onto `4cfb05e8`:
+
+- `uv run python -m src.governance`: `Governance OK: 45 systems, 478 documents, 37 memories, 357
+  backlog phases`. `--catalog` regenerates with no diff.
+- `uv run pytest`: `2175 passed, 1 warning in 906.66s`. The two failures the cloud checkpoint
+  recorded (`test_control_characters_reach_the_shell` under load and
+  `test_an_unwritable_worktree_parent_is_refused` as uid 0) both pass on this machine.
+- `uv run ruff check src/ test/ tools/`: `All checks passed!`
+- `uv run mypy src/`: `Success: no issues found in 54 source files`
+- `cd ts && npm test`: `Test Files 18 passed (18)`, `Tests 277 passed (277)`, including
+  `LayoutConfigDialog.test.tsx`, which the checkpoint had not run.
+- `cd ts && npm run build`: built (chunk-size warning only). `npm run typecheck` and `npm run lint`
+  exit 0.
+
+The cloud checkpoint's last full run, before the final commit, was `2 failed, 2167 passed, 1 skipped
+in 374.98s`, with the two failures named above.

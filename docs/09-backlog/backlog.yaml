@@ -8830,6 +8830,34 @@ items:
   next_action: Assert the one-header count as a test before changing the rendering, so idea
     000101's defect is reproduced by the check first. Deliverables widened at claim time per
     ADR-031's "What each downstream phase builds" row (owner ruling 2026-10-08).
+  session: doc-session-schema-owned-slots-structural-eligibility
+  completion_evidence:
+  - _data/workbench/slot-schemas.json
+  - _data/workbench/panel-elements.json
+  - _data/workbench/matcher-cases.json
+  - schemas/workbench-slot-schemas.schema.json
+  - schemas/workbench-panel-elements.schema.json
+  - schemas/workbench-layout.schema.json
+  - src/workbench/slot_matcher.py
+  - ts/src/workbench/slotMatcher.ts
+  - ts/src/workbench/Slot.tsx
+  - ts/src/workbench/BarElement.tsx
+  - ts/src/workbench/oneHeaderPerSlot.test.tsx
+  - test/test_workbench_slot_matcher.py
+  - test/test_workbench_layout_schema.py
+  - docs/06-requirements/REQ-007-workbench.md
+  - docs/03-sessions/SESS-2026-10-08-20-schema-owned-slots-structural-eligibility.md
+  result: 'Each slot role has a schema (_data/workbench/slot-schemas.json) whose frame declares the
+    help and controls sub-slots and the element types each admits; panel types declare their body kind
+    and bar elements (panel-elements.json). Eligibility is computed by one matcher written twice
+    (slotMatcher.ts, slot_matcher.py) and held to 53 shared cases; eligible_slots is gone from the
+    layouts (schema_version 4, rejected by the schema) and REQ-007 W16 is rewritten in place (R12). The
+    slot draws the one top bar and panels place their controls through BarElement (R13): the
+    one-header test failed 25 of 25 cases on the trunk and passes all 26. Started in the 2026-10-08
+    cloud run, finished locally on 2026-10-09 after the rebase onto dev. uv run pytest: 2175 passed.
+    cd ts && npm test: 277 passed; npm run build built. Live REQ-037 check with --self-test, all four
+    sizes: 104 panel cells, rules pass=520 fail=0, nine of nine injected violations caught. The nine
+    ratification items were ratified by the owner on 2026-10-09.'
 - id: phase-arch-08
   title: Multi-instance panel identity across layout, storage, registry and sessions
   plan: doc-workbench-architecture-quality
