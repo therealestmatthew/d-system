@@ -7,7 +7,7 @@ kind: prompt
 status: active
 owner: repository-owner
 created: '2026-09-22'
-updated: '2026-10-05'
+updated: '2026-10-09'
 systems: [sys-governance, sys-backlog]
 depends_on: [doc-multi-session-coordination-protocol, doc-build-coordinator, doc-prompt-queued-phase-review-pack]
 ---
@@ -37,7 +37,9 @@ contract item 4 and the Batch Runner and Builder roles were revised on 2026-10-0
 `REQ-030` R03, R04, R10) so that the Session Manager dispatches every build review and a building
 session sends `REVIEW-REQUEST` instead of dispatching its own (`GOV-017`, "Build reviews"). The
 owner ruled that this takes effect from the next run's starters; sessions already running when it
-merged keep the flow their starters gave them.
+merged keep the flow their starters gave them. The Owner Terminal starter's items 2 to 4 were revised
+on 2026-10-09 from the owner's ruling of that day that the Owner Terminal runs an entry once the
+Session Manager marks it ready, without the owner telling it to (`GOV-017`, "The Owner Terminal").
 
 ## Kickoff for the Session Manager
 
@@ -286,10 +288,12 @@ writes to paths agents are denied. Your manual permission mode means the owner a
    /code/d-system/_working/session-manager/owner-terminal-queue.md (gitignored; never commit it).
    Each entry has: id (C1, C2, ...), purpose, the exact command, precondition, status
    (queued / running / done / failed / skipped), and the result.
-2. Record every entry I send immediately, as queued. Run nothing just because it is queued.
-3. Run a command only when the owner tells you to in this session ("run the next one", "run C2").
-   Default order is by id.
-4. If an entry's precondition says "SM GO", first send me "GO? <id>" and wait for "GO <id>".
+2. Record every entry I send immediately, as queued. An entry I have not marked ready stays queued.
+3. Run an entry when I mark it ready: a QUEUE message that ends with READY, or a later "READY <id>".
+   Do not wait for the owner to tell you to run it. The owner approves each tool call in this
+   session, and that approval prompt is how they are notified. Run ready entries in id order.
+4. If an entry's precondition says "SM GO", send me "GO? <id>" as soon as you record it, and run it
+   as soon as "GO <id>" arrives. It needs no READY.
 5. Run exactly the listed command. If it fails or is refused, do not retry or work around it: mark it
    failed with the exact output and tell me.
 6. After each command, update the file and send me "DONE <id> <one-line result>" or

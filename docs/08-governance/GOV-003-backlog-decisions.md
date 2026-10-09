@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-05'
-updated: '2026-10-08'
+updated: '2026-10-09'
 systems: [sys-backlog, sys-projection, sys-html, sys-memory-agents]
 depends_on: [doc-governance-protocol]
 ---
@@ -1075,3 +1075,32 @@ built against before the owner read them (`ADR-029` by `phase-wbf-04` and `phase
 `ADR-030` by `phase-wbf-08`, `ADR-031` by `phase-arch-07` onward). Their `accepted` status is
 set in this commit, and this entry is the one place that says the acceptance covered the Session
 Manager's fix choices and the per-phase rulings as well as the records themselves.
+
+## The Owner Terminal runs a queued command once the Session Manager marks it ready — 2026-10-09
+
+Owner ruling of 2026-10-09, given to the Session Manager and relayed to Session 2 (Builder B) in its
+`ASSIGN`. The quotation is the Session Manager's relay of the owner's words: "AI shouldn't need to
+say run every time. Just have it run when it gets the commands if they're ready to be run - when you
+know they're ready to be run. Then I will be notified it wants to run." **Standing.**
+
+The Owner Terminal no longer waits for the owner to tell it to run each queued command. It runs an
+entry when the Session Manager marks it ready: a `QUEUE` message that ends with `READY`, or a later
+`READY <id>`. An entry with the precondition *SM GO* needs no `READY`. The Owner Terminal sends
+`GO? <id>` as soon as it records the entry and runs the command as soon as `GO <id>` arrives. The
+owner's approval of each tool call in the Owner Terminal's manual permission mode is still the
+authorization for each command, and that approval prompt is how the owner is notified. The rest of
+the arrangement is unchanged: no retries and no workarounds, `DONE` or `FAILED` with the real
+output, and the Session Manager never queues a command the owner declined.
+
+Two details were settled by the owner in Builder B's session the same day. The message contract
+gains a `READY <id>` row, which context separates from a builder's `READY <branch>`. For an *SM GO*
+entry, the Owner Terminal asks `GO?` on recording it rather than waiting for the Session Manager to
+send `GO` unprompted.
+
+`GOV-017` "The Owner Terminal" and its message contract, and the Owner Terminal starter in
+[PROMPT-037](../02-prompts/PROMPT-037-session-manager-starter-messages.md) (items 2 to 4), carry the
+new flow.
+
+**Why recorded here:** before this date, `GOV-017` and the Owner Terminal starter said the Owner
+Terminal runs a command only when the owner tells it to. An Owner Terminal started from an earlier
+starter would wait for an instruction the owner has ruled they no longer give.
