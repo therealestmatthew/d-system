@@ -25574,157 +25574,517 @@ PROPOSED LINK: 000598 --relates_to--> 000453 (000598 needs the set-aside and dis
 
 ## 000599 · Consider Postgres or another server database in place of the private-root file layout for tags and records
 
-**Created 2026-10-06T08:25:59-04:00 · Status: `open`**
+**Created 2026-10-06T08:25:59-04:00 · Status: `triaged`**
 
 Consider Postgres or another server database for scalability and the future state, in place of the private-root file layout for tags and records.
 
 Owner, 2026-10-06, while ruling that project tags on ideas live under the private data root for now. Sent by Session 1 - Builder A, for the owner.
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:09-04:00): Idea 000599 proposes migrating from file-based JSON storage to Postgres or another server database for portfolio tags and records, addressing scalability and future-state durability.
+
+This directly relates to an existing deferred decision already recorded in REQ-002 (capture requirements), whose "Open questions" section discusses "Durable storage and backup" and notes that Postgres, Supabase and Firebase were raised but the owner deferred the decision pending sustained captured data that would justify the switch. The session log SESS-2026-09-06-01 confirms this deferral: "Postgres, Supabase and Firebase were raised. Deferred by owner; revisit once sustained captured data exists that would hurt to lose."
+
+The current architecture is governed by ADR-009 (structure/content boundary), which places the portfolio in _private/portfolio/ using D_SYSTEM_DATA_ROOT, and by ADR-001 (file-based governance), which chose file-based storage. Both documents speak to where content lives and how it is organized, not why files were chosen over databases for scalability or durability.
+
+Related but distinct ideas address database needs in other systems: 000543 (A Brain that can scale to a hosted database) proposes scaling the memory system for multi-user/multi-machine scenarios. Ideas 000004 (vector databases), 000005 (graph databases), and 000043-000045 (documentation knowledge retrieval) address specialized retrieval databases for particular layers, not core portfolio storage.
+
+No existing plan or backlog phase currently covers the database-choice decision for portfolio tags and records. The decision has been made to revisit once capture produces sustained data, which has not yet occurred.
+
+PROPOSED LINK: 000599 --relates_to--> 000543 (both address database scalability constraints, though at different system layers: portfolio storage vs. memory system)
+
+</details>
+
 ---
 
 ## 000600 · Correct the "no engine code reads a slot id literal" sentence in the workbench vocabulary note.
 
-**Created 2026-10-08T02:25:02+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:02+00:00 · Status: `triaged`**
 
 brain/concepts/terms-workbench-ui.md class 1 says no engine code reads a slot id literal; phase-arch-02 found useWorkbenchLayouts.ts held TERMINAL_SLOT_ID = 'terminal' (now SHELL_HOME_SLOT_ID = 'secondary'). The sentence needs the owner's approval to change; it was outside phase-arch-02's deliverables.
 
 Raised by Session 5 - Batch Runner (phase-arch-02) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:10-04:00): Phase-arch-02 (Execute the workbench identifier migration, governed by PLAN-028) completed and discovered an inaccuracy in the vocabulary note delivered by phase-arch-01.
+
+The statement on line 175 of `brain/concepts/terms-workbench-ui.md`, under section "### 1. Layout `slot_id` values — RENAME", reads "No engine code reads a slot id literal." This claim is contradicted by `useWorkbenchLayouts.ts`, which holds slot id literals as constants (`TERMINAL_SLOT_ID = 'terminal'`, now renamed to `SHELL_HOME_SLOT_ID = 'secondary'` after phase-arch-02). The typescript engine code does read these slot id literals.
+
+Related documents:
+- PLAN-028 (Workbench architecture and quality, P10) — established phase-arch-01 and phase-arch-02 as separate phases, with phase-arch-01 delivering the vocabulary and phase-arch-02 executing the migration
+- brain/concepts/terms-workbench-ui.md (class 1) — the document containing the inaccurate statement
+- REQ-011 (Workbench architecture quality requirements) — the requirement that governed the migration
+
+Related ideas discovered in the same session that present related corrections:
+- 000601 (Reword the "terminal slot" docstring in the workbench API route) — docstring correction for src/api/routes/workbench.py
+- 000602 (Update the workbench layout schema prose and minimum to schema_version 3) — schema JSON version documentation correction
+- 000603 (Separate the layout-selection storage key from notes-file and viewer-tab state) — architectural issue with shared storage keys
+
+All four ideas (000600-000603) were raised by Session 5 - Batch Runner (phase-arch-02) during the 2026-10-08 workbench run as follow-ups to the completed phase-arch-02 execution. They are all post-migration corrections to documentation and implementation that fell outside phase-arch-02's deliverables, per the session record.
+
+PROPOSED LINK: 000600 --relates_to--> 000601 (both are documentation corrections discovered after phase-arch-02)
+PROPOSED LINK: 000600 --relates_to--> 000602 (both are documentation corrections discovered after phase-arch-02)
+PROPOSED LINK: 000600 --relates_to--> 000603 (all four post-phase-arch-02 discovery cluster)
+
+</details>
+
 ---
 
 ## 000601 · Reword the "terminal slot" docstring in the workbench API route.
 
-**Created 2026-10-08T02:25:06+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:06+00:00 · Status: `triaged`**
 
 src/api/routes/workbench.py line 16 still says "default the terminal slot"; after the identifier migration the slot is the secondary slot. A phase that owns src/ should reword it.
 
 Raised by Session 5 - Batch Runner (phase-arch-02) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:11-04:00): ## Finding
+
+Idea 000601 is a documentation follow-up from `phase-arch-02` (PLAN-028's "Execute the workbench identifier migration"), which completed on 2026-10-08. The phase renamed slot identifiers across the workbench — specifically, the slot formerly called "terminal" became "secondary" — but the docstring in `src/api/routes/workbench.py` line 16 still refers to "default the terminal slot" and needs rewording to reflect this change.
+
+The phrase appears in the module's docstring, which documents the `/platform` route: it currently says "so a fresh browser can default the terminal slot to the shell that actually runs here" but should say "secondary slot" instead, following the identifier migration completed by `phase-arch-02`.
+
+## Related Documents and Ideas
+
+- **PLAN-028** (Workbench architecture and quality, P10) and its requirements document REQ-011 govern the identifier migration that prompted this change.
+- **Phase-arch-02** completed 2026-10-08 with status `complete`, but did not include API route documentation as a deliverable. The phase's deliverables were limited to `_data/workbench/layouts/`, `ts/src/workbench/`, and `ts/src/stage/`.
+- **ADR-015** (Workbench API surface) is referenced in this file's own docstring and governs the API design.
+- **REQ-007** W17 (Workbench requirements, the shipped product) is cited in the docstring and specifies the platform route's behavior.
+
+## Related Ideas
+
+Four other follow-up items were raised during the same 2026-10-08 phase-arch-02 run:
+- **000600** (Correct the "no engine code reads a slot id literal" sentence in brain/concepts/terms-workbench-ui.md)
+- **000602** (Update the workbench layout schema prose and minimum to schema_version 3)
+- **000603** (Separate the layout-selection storage key from notes-file and viewer-tab state)
+- **000604** (Make history-reading and root-sensitive tests skip with a stated reason)
+
+All five ideas (000600–000604) represent documentation and small follow-up fixes discovered during phase-arch-02 but outside its declared scope. None of these ideas currently have links to each other, and no governed phase yet owns them as a batch.
+
+## What Is Not Here
+
+No phase or plan currently declares ownership of API route documentation or docstring updates. The docstring lives in `src/api/routes/workbench.py`, which falls under `sys-api`, but PLAN-028's phases do not list `src/api/` deliverables except where API coverage is incidental to structure audits (phase-arch-03, "Duplication audit across the workbench and API", is queued but not yet running).
+
+</details>
+
 ---
 
 ## 000602 · Update the workbench layout schema prose and minimum to schema_version 3.
 
-**Created 2026-10-08T02:25:06+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:06+00:00 · Status: `triaged`**
 
 schemas/workbench-layout.schema.json still describes schema_version 2 ("Bumped from 1 by the W16 delta") with minimum 2; the shipped layouts are at 3 since phase-arch-02. A phase that owns schemas/ should update the description and minimum.
 
 Raised by Session 5 - Batch Runner (phase-arch-02) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:12-04:00): Idea 000602 proposes updating schemas/workbench-layout.schema.json to reflect that shipped layouts now carry schema_version 3, not 2. Confirmed by inspection: both _data/workbench/layouts/layout-1.json and layout-2.json carry `"schema_version": 3`, but the schema file at line 21 still sets `"minimum": 2` and at line 22 describes only the "Bumped from 1 by the REQ-007 W16 delta" — the transition to version 2 under ADR-016 (doc-workbench-layout-decision).
+
+The schema_version 3 bump was part of phase-wb-09 (status: complete), which executed the layout assignment model redesign described in PLAN-022 (doc-workbench) as "Move eligibility from the slot to the panel in the layout data files under a bumped schema_version". That phase shipped the updated layout files but left the schema prose stale.
+
+The workbench identifier migration (phase-arch-02, status: complete) observed and captured this mismatch as idea 000602 during the 2026-10-08 workbench run. No current phase owns bringing the schema file in sync: phase-arch-07 (status: active, "Implement schema-owned slots and sub-slots with structural eligibility") will introduce version 4 and new schemas (schemas/workbench-slot-schemas.schema.json and schemas/workbench-panel-elements.schema.json), but it does not address version 3's retroactive description.
+
+Related work: idea 000098 (status: reviewing, "Ship the layout-schema test ADR-016 promised") proposes the pytest assertions for the schema that ADR-016 promised; it is separate (testing the schema's invariants) from 000602 (updating the schema's own prose and version bound).
+
+PROPOSED LINK: 000602 --relates_to--> 000098 (Both concern schemas/workbench-layout.schema.json; 000602 updates the schema prose, 000098 adds the validation test)
+
+</details>
+
 ---
 
 ## 000603 · Separate the layout-selection storage key from notes-file and viewer-tab state.
 
-**Created 2026-10-08T02:25:06+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:06+00:00 · Status: `triaged`**
 
 ts/src/workbench/storage.ts keeps active_notes_file and html_viewer_tabs in the same versioned localStorage key as layout selections, so every layout schema_version bump resets the chosen notes file and open viewer tabs. Consider separate keys with their own versions.
 
 Raised by Session 5 - Batch Runner (phase-arch-02) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:14-04:00): **Idea 000603 is addressed by ADR-031's storage restructuring, not by separate keys.**
+
+Idea 000603 identifies a real problem: `ts/src/workbench/storage.ts` keeps `active_notes_file` and `html_viewer_tabs` in the same versioned localStorage key as layout selections. Every layout schema_version bump discards these fields, resetting the chosen notes file and open viewer tabs to defaults.
+
+Related governed documents:
+
+- **ADR-031** (Slots are schema-owned frames with sub-slots) accepted 2026-10-08 describes the solution. Decision 6 restructures storage so that `html_viewer_tabs` and `active_notes_file` are moved into an `instance_state` object keyed by instance id, replacing the single top-level fields. This achieves the same outcome — these fields survive version bumps — because the silent-discard rule only applies to unknown instance ids, not to the instance_state structure itself.
+- **PLAN-028** (Workbench architecture and quality) group G43 and design decision 3 govern this change.
+- **phase-arch-08** (Multi-instance panel identity) is the phase implementing the storage restructuring. Its scope includes replacing singleton panel identity and the storage shape at `_data/workbench/layouts/` and `ts/src/workbench/`. Status is queued; depends_on phase-arch-07.
+
+The proposal in 000603 (separate keys with their own versions) differs from the chosen approach, which keeps a single versioned key but restructures what lives inside it. Both achieve the goal of preventing the fields from resetting on schema bumps — 000603 by isolation, ADR-031 by restructuring. The chosen design is already bound into dependent phases and an accepted decision record.
+
+</details>
+
 ---
 
 ## 000604 · Make history-reading and root-sensitive tests skip with a stated reason in shallow or root environments.
 
-**Created 2026-10-08T02:25:07+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:07+00:00 · Status: `triaged`**
 
 Four pytest tests read git history (test_idea_classification x2, test_containment, test_engine_pages) and fail in a shallow clone; test_run_review_checks::test_an_unwritable_worktree_parent_is_refused fails when run as uid 0 because chmod 0o500 does not bind root. Seen on every branch of the 2026-10-08 run; the shallow clone was fixed with git fetch --unshallow, the root case remains. Skip with a reason, or have the gate run as non-root.
 
 Raised by Session 5 - Batch Runner (phase-arch-02) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:15-04:00): Related documents and patterns found:
+
+**Existing skip patterns in test suite:** The codebase already uses `pytest.skip()` and `@pytest.mark.skipif()` to conditionally skip tests. test_broker.py contains an example skipping a test when run as uid 0 with explicit reason: `@pytest.mark.skipif(hasattr(__import__("os"), "geteuid") and __import__("os").geteuid() == 0, reason="root bypasses the permission bits this test relies on")`. This demonstrates the pattern the idea requests.
+
+**Test failures documented across multiple backlog phases:** The four failing tests are noted repeatedly in backlog phase results (phase-arch-06, phase-arch-07, phase-wbf-03, phase-wbf-14, phase-wbf-16, and others) as "known environmental" failures. They are consistently:
+- test_run_review_checks::test_an_unwritable_worktree_parent_is_refused (fails when run as uid 0, ~15+ documented occurrences)
+- test_idea_classification (two tests, fail in shallow clone)
+- test_containment::test_repository_history_reports_the_known_phase_prog_cases (fails in shallow clone)
+- test_engine_pages::test_a_known_idea_traces_to_the_git_log_and_the_fold (fails in shallow clone)
+
+**Shallow clone root cause:** PLAN-038 addresses a related concern (git show failing in shallow clones during governance checks). The 2026-10-08 batch run worked around this with `git fetch --unshallow`. The tests themselves call `git show` to access historical commit contents (PRE_CHANGE = "0f142ce" in test_idea_classification.py).
+
+**Test baseline governance:** OPS-031 establishes that intentional test skipping/deletion requires explicit owner approval (REQ-028 R07, R10) before a branch can merge. This aligns with the idea's suggestion that environment-specific skips need to be formally stated.
+
+No related ideas or plans proposing conditional test skips for these specific environmental cases found. The idea addresses a real, recurring pattern in session results that today is only documented in prose rather than enforced in code.
+
+</details>
+
 ---
 
 ## 000605 · PosixPtyAdapter.close() has no wait, no SIGKILL escalation and no process-group signal.
 
-**Created 2026-10-08T02:25:11+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:11+00:00 · Status: `triaged`**
 
 close() sends SIGTERM and closes the master fd; SIGTERM alone does not stop an interactive bash, the fd hangup does. Children that ignore SIGHUP (nohup) or call setsid survive close() with parent pid 1. This is the unexamined half of the PTY reaping thread behind 000099, 000129 and 000246; see docs/00-working/ports-and-processes-lifecycle.md section 4.4.
 
 Raised by Session 1 - Builder A (phase-arch-11) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:16-04:00): Idea 000605 addresses a documented architectural defect in PosixPtyAdapter.close(): it sends only SIGTERM and closes the master fd without waiting, escalating to SIGKILL if needed, or signaling the process group.
+
+This issue has been thoroughly explored in `docs/00-working/ports-and-processes-lifecycle.md` (section 4.4), which is the input to `phase-arch-12` (building the port and process management application) and answers `REQ-011` R17. The exploration confirms:
+
+- SIGTERM alone has no effect on an interactive bash shell; the master fd close is what ends the session (sending SIGHUP)
+- Children that ignore SIGHUP (via `nohup`) or call `setsid` survive close() and are reparented to PID 1
+- The shell becomes a zombie briefly if the adapter object is not garbage-collected
+- The exploration recommends signaling the process group rather than only the shell, and escalating to SIGKILL if needed, but these are recommendations not yet incorporated into a phase
+
+The defect is referenced implicitly in `REQ-011` R28 ("A maximized shell panel keeps its PTY session") and connects to the broader PTY lifecycle issues tracked by ideas 000099 (failing PTY tests), 000129 (fix PTY test failures), and 000246 (terminal panel drops unprovoked).
+
+Idea 000659 ("PosixPtyAdapter.close() sends SIGTERM to bash only and never waits, so shells can outlive their session") describes the same issue from the perspective of process survival rather than termination protocol.
+
+No backlog phase currently owns the fix for this architectural defect. The exploration document establishes the problem and the evidence, but there is no plan phase yet to implement the recommended improvements to close() behavior.
+
+PROPOSED LINK: 000605 --relates_to--> 000659 (both identify the same PosixPtyAdapter.close() termination defect)
+
+</details>
+
 ---
 
 ## 000606 · The runbook's /orient port precondition uses ss, which is absent in some Linux environments.
 
-**Created 2026-10-08T02:25:11+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:11+00:00 · Status: `triaged`**
 
 docs/00-working/demo-runbook.md's precondition runs `ss -tlnp`; the 2026-10-08 cloud sandbox had no ss. lsof, fuser or a /proc-based check is the portable alternative.
 
 Raised by Session 1 - Builder A (phase-arch-11) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:17-04:00): Idea 000606 reports that the demo runbook's `/orient` step precondition uses `ss -tlnp` to verify ports 8010 and 5180 are free, but this command is absent in some Linux environments — specifically the 2026-10-08 cloud sandbox where the issue was discovered during the workbench rehearsal run. The idea proposes `lsof`, `fuser`, or `/proc`-based checks as portable alternatives.
+
+**Related documents found:**
+
+The precondition is documented in `/code/d-system/docs/00-working/demo-runbook.md` (lines 35 and 51 in the two dry-run rehearsal tables), which is part of the workbench demo deliverables. The runbook itself is a governed deliverable of `phase-wb-10` (runbook and Windows setup checklist refresh), which is documented in `PLAN-022` (the workbench plan). The `/orient` step and its precondition are central to the live-segment rehearsal structure, so any change to the precondition affects the documented rehearsal procedure.
+
+**Environment-specific behavior in existing governance:**
+
+`REQ-037` (workbench content fit contracts) explicitly acknowledges that some platform checks cannot run on Linux and must be owner-verified on the Windows presentation machine — this establishes a pattern in the codebase for distinguishing between portable and platform-specific checks. The runbook and `REQ-007` (W12, W13) document that terminal shells themselves are platform-dependent (PowerShell on Windows, bash on Linux), and the `/orient` step already handles this by checking the terminal slot's header to confirm a working shell before proceeding.
+
+**No specific plan or requirement addresses portable port-checking tooling.** The broader environment-compatibility theme appears in 000097 (environmental pyenv shim lock failures) and 000099 (platform-specific PTY test failures), both already recorded as environmental issues, but these concern shim infrastructure and PTY isolation, not tool portability.
+
+**Finding:** The `/orient` precondition's dependency on `ss`, which is not guaranteed to exist in all Linux environments, is a real portability issue confirmed by the cloud sandbox rehearsal. The runbook documents this precondition as critical for the demo's setup (preventing port conflicts before launching backend and frontend), so a solution that works across diverse environments would strengthen the rehearsal repeatability across Linux, macOS and Windows. No existing requirement or plan directly covers portable port-verification tooling. A solution would touch the runbook (docs/00-working/demo-runbook.md) and potentially the rehearsal/launch procedures documented within it.
+
+</details>
+
 ---
 
 ## 000607 · REQ-011 R18's "port is then bindable" verification should name the bind it means.
 
-**Created 2026-10-08T02:25:12+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:12+00:00 · Status: `triaged`**
 
 A plain bind fails for about 60 seconds after a listener exits because of TIME_WAIT sockets, while a bind with SO_REUSEADDR (as uvicorn does) succeeds at once. R18's verification should say which bind test applies.
 
 Raised by Session 1 - Builder A (phase-arch-11) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:19-04:00): Scouted 2026-10-09. Idea 000607 raises an ambiguity in REQ-011 R18's verification procedure: the requirement says "confirm the port is then bindable" but does not specify which kind of bind test applies — a plain bind (which fails for ~60 seconds after listener exits due to TIME_WAIT sockets) or a bind with SO_REUSEADDR (which succeeds at once, as uvicorn does).
+
+This exact ambiguity is already documented and analyzed in docs/00-working/ports-and-processes-lifecycle.md, the deliverable of phase-arch-11 (ports and processes lifecycle exploration). Section 4.1 (lines 209-214) reproduces both outcomes observed on 2026-10-08: plain bind fails with "Address already in use" while SO_REUSEADDR bind succeeds, then states: "REQ-011 R18's verification ('confirm the port is then bindable') is therefore ambiguous until it says which bind." The same document lists this as Question 7 for phase-arch-12 (the phase that will build the port and process management application): "What does 'free a port' mean: kill the listener, wait for release, or both? Is TIME_WAIT a failure? Which bind test counts?" (line 444).
+
+The idea was raised during phase-arch-11 on 2026-10-08, and the exploration phase has already captured it as a decision point for the downstream implementation phase. The resolution will be recorded in phase-arch-12's own ADR when the port management application is built and R18's verification is refined to name the bind it tests.
+
+Related plan: PLAN-028 (workbench architecture and quality), which governs both phase-arch-11 and phase-arch-12. Related phases: phase-arch-11 (completed, exploration), phase-arch-12 (upcoming, implementation). Related requirement: REQ-011 (workbench architecture and quality requirements), R17 and R18 specifically.
+
+PROPOSED LINK: 000607 --relates_to--> 000142 (both address port and process management lifecycle; 000142 is the source idea for phase-arch-11 exploration that documents this R18 ambiguity)
+
+</details>
+
 ---
 
 ## 000608 · Record which worktree or session started each dev server.
 
-**Created 2026-10-08T02:25:12+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:12+00:00 · Status: `triaged`**
 
 No launcher records the owner of a dev server; the only ownership signal is the venv path in argv, present only for servers started from a worktree venv. phase-arch-12 should decide whether a launch record is in scope.
 
 Raised by Session 1 - Builder A (phase-arch-11) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:20-04:00): Idea 000608 asks for recording which worktree or session started each dev server. The only ownership signal currently available is the venv path in a process's command line argv when the server is started from a worktree virtual environment.
+
+**Related exploration and application**: The ports-and-processes lifecycle exploration (`phase-arch-11`, complete) explicitly documents this gap: "Nothing in the repository records who launched a dev server or in which worktree." That exploration (`docs/00-working/ports-and-processes-lifecycle.md`) found that "a process's command line names its worktree when it was started from a worktree virtual environment" and identified it as "the one ownership signal available without a launcher." The companion implementation phase (`phase-arch-12`, queued) will "build the port and process management application" against what phase-arch-11 established; the idea explicitly flags that phase-arch-12 should decide whether a launch record is in scope.
+
+**Requirements coverage**: REQ-011 R17 and R18 specify the port and process management requirement. R17 asks that the exploration cover lifecycle and management, grounded in repository incidents including "the orphaned dev servers left by cut-off agents." R18 specifies the application itself. Both are foundational to phase-arch-12's scope.
+
+**Related ideas**: This idea overlaps with several pieces of the workbench architecture and agent coordination work:
+- 000142 (Explore ports and system processes and their management) — the source idea for the phase-arch-11 exploration
+- 000143 (Small application for managing and visualizing port usage) — the companion application idea, currently in phase-arch-12's scope
+- 000666 (Dev-server ports are not exclusive across worktrees) — another dev server ownership issue
+- 000152 (A registry of active worktrees that agents must register) — infrastructure for tracking which agent/worktree owns a resource
+- 000390 (Worktree and branch registry) — a more comprehensive ownership tracking system for all branches and worktrees
+
+PROPOSED LINK: 000608 --relates_to--> 000142 (000608 describes the recording gap that 000142's exploration addresses)
+PROPOSED LINK: 000608 --relates_to--> 000143 (000608's feature request is likely part of 000143's application scope)
+PROPOSED LINK: 000608 --relates_to--> 000666 (both address dev server port/ownership issues)
+PROPOSED LINK: 000608 --relates_to--> 000152 (both address tracking which worktree owns a running process)
+
+</details>
+
 ---
 
 ## 000609 · Decide shell quoting of paths with spaces for bash, CMD and PowerShell terminal injection.
 
-**Created 2026-10-08T02:25:17+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:17+00:00 · Status: `triaged`**
 
 Injecting a bookmark category into the terminal as a set needs a quoting rule per shell; ADR-029 defers the terminal consumer of the batch contract until it is decided.
 
 Raised by Session 2 - Builder B (phase-wbf-03, ADR-029) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:21-04:00): Idea 000609 directly addresses an open decision point explicitly identified in ADR-029 (Bookmark categories and batch bridge), written by phase-wbf-03 during the 2026-10-08 workbench run. In section 5 (Consuming surfaces), ADR-029 defers the "Terminal injection dropdowns" consumer with this reason: "a bookmarks group could inject a category's paths. Admitted by the contract, not built, because shell quoting of paths with spaces differs between bash, CMD and PowerShell and is undecided."
+
+This is exactly the decision 000609 asks for: deciding shell quoting rules for paths with spaces across the three supported terminal shells (bash, cmd, and PowerShell).
+
+**Related governed documents:**
+- ADR-029 (the bookmark category storage and reference model decision; names the three shells explicitly in section 5)
+- REQ-012 (workbench features and defects requirements; ADR-029 responds to its requirements for bookmark categories)
+- Phase-wbf-03 (writes ADR-029, explicitly raised this idea as a blocker for later work)
+- Phase-wbf-04 (extends the panel bridge to batch actions; complete, deliberately defers terminal injection per ADR-029's decision)
+- Phase-wbf-05 (builds the bookmark category surface; complete, explicitly excludes terminal injection pending this decision)
+
+**Status of the related feature:**
+The terminal injection consumer for bookmark categories is admitted by the batch contract in ADR-029 section 6, but construction is deferred and not included in phase-wbf-05's scope. Phase-wbf-04 and phase-wbf-05 are complete; they deliberately left terminal injection unbuilt because this decision was undecided at the time. No phase yet names terminal injection as its scope; this decision must precede any such phase.
+
+**Related ideas:**
+- 000111 (File bookmark categories) — the original feature request that raised the terminal injection question
+- 000120 (Extend the panel bridge to batch, multi-target actions) — depends on the batch contract ADR-029 decided
+
+No other ideas overlap with 000609's scope; this is a single, focused decision gate.
+
+</details>
+
 ---
 
 ## 000610 · Decide whether the HTML Viewer's four-tab cap should rise or be configurable.
 
-**Created 2026-10-08T02:25:17+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:17+00:00 · Status: `triaged`**
 
 Opening a bookmark category as a set is capped by MAX_TABS = 4 in HtmlViewerRegion.tsx; ADR-029's viewer policy declines overflow with reason capacity.
 
 Raised by Session 2 - Builder B (phase-wbf-03, ADR-029) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:22-04:00): Idea 000610 asks whether the HTML Viewer's four-tab cap (MAX_TABS = 4 in HtmlViewerRegion.tsx) should be raised or made configurable.
+
+**Related governing documents:**
+
+`ADR-029` (Bookmark categories and batch-bridge, accepted 2026-10-08) explicitly identifies this constraint. Section 6 point 8 (Viewer placement policy) states that `openFiles` fills the viewer's empty tabs up to the cap and declines files beyond capacity with reason `capacity`. The consequences section notes: "A category of more than four viewer-compatible files cannot be fully opened in the HTML Viewer until its tab cap changes. The receipt makes that visible; R10 is verified with a category of three files, as the requirement states."
+
+`REQ-007` (Workbench requirements) establishes "the per-panel session-tab cap stays four" as an owner decision from 2026-09-11, though this rule is stated primarily for terminal session tabs. phase-wb-09 (Layout assignment model), completed 2026-10-08, explicitly preserved this four-tab cap per panel while raising the global concurrent PTY cap from four to six.
+
+**Related ideas:**
+
+`000111` (File bookmark categories) asks for named groupings of files referenceable to open as a set. Opening a category directly hits the four-tab cap constraint when the category contains more than four viewer-compatible files.
+
+`000120` (Extend the panel bridge to batch, multi-target actions) proposes the batch contract mechanism for opening file sets. The batch receipt (`ADR-029` section 6) must account for files declined with reason `capacity` when they exceed the tab cap.
+
+**Context:** This idea was raised by Session 2 - Builder B during phase-wbf-03 (Decide the bookmark category storage model), which wrote ADR-029. The question emerges directly from that decision work: implementing the batch contract for opening bookmark categories requires the team to decide whether four tabs per viewer instance is the right bound, whether it should be configurable, or whether it should be raised.
+
+PROPOSED LINK: 000610 --relates_to--> 000111 (file bookmark categories define set-opening behavior that's bounded by the four-tab cap)
+PROPOSED LINK: 000610 --relates_to--> 000120 (batch bridge for opening file sets must account for the four-tab cap constraint)
+
+</details>
+
 ---
 
 ## 000611 · Decide whether a governed-document validator should resolve bookmark category ids cited in plans and notes.
 
-**Created 2026-10-08T02:25:17+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:17+00:00 · Status: `triaged`**
 
 ADR-029 leaves category citations in documents as prose; a validator could check that a cited category id exists.
 
 Raised by Session 2 - Builder B (phase-wbf-03, ADR-029) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:24-04:00): **Related governing document:** `ADR-029` ("Bookmark categories are data-root records referenced by stable id, opened as a set through a batch panel bridge") accepted on 2026-10-08, which explicitly defers this decision in section 2: "No governed-document validator integration is decided here. A plan or note that mentions a category does so in prose."
+
+**Established validator precedent:** The governance validator already checks that references to other entity types exist — specifically, it resolves tag and project references from `_data/tags.json` and `_data/projects/` to confirm they are valid (mentioned in PLAN-006). This creates a pattern: when governed documents cite entity ids, the validator verifies they exist.
+
+**Current status:** Bookmark categories are now a governed entity (ADR-029, accepted 2026-10-08) with stable `category_id` values stored under the data root as JSON files. The category system is designed for prose references to category ids across plans and notes. No current plans cite categories yet; the first surfaces (File Browser, HTML Viewer) shipped in phase-wbf-05 (status complete in backlog.yaml; corrected by the triage driver, the scout had it as not yet started).
+
+**The decision ahead:** Whether to add validator support for resolving `category_id` references in plan and note prose, following the established pattern for tags and projects. A positive decision would require:
+- Scanning governed documents for prose references to category ids (likely expressed as `<category_id>` or similar)
+- Reading the active category records from the data root
+- Reporting unresolved or stale references as a validation error
+
+A negative decision would preserve the current defer: plans cite categories by name as narrative text only, with no mechanical verification.
+
+**No competing ideas or overlap found.** This is a subsidiary decision point from ADR-029's acceptance, not a duplicate or related idea.
+
+</details>
+
 ---
 
 ## 000612 · Document together the two workbench data locations: REPO_ROOT/_data/workbench and the data root.
 
-**Created 2026-10-08T02:25:17+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:17+00:00 · Status: `triaged`**
 
 Workbench routes read _data/workbench via REPO_ROOT and ignore D_SYSTEM_DATA_ROOT; ADR-029 makes bookmark categories the first workbench data to honour the data root. The two locations need one explanation.
 
 Raised by Session 2 - Builder B (phase-wbf-03, ADR-029) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:25-04:00): The idea requests documentation unifying the two workbench data locations: REPO_ROOT/_data/workbench (tracked) and the data root (honors D_SYSTEM_DATA_ROOT). This need emerged because ADR-029 makes bookmark categories the first workbench data to honour the data root, creating a split where layouts and injection-overrides stay tracked, while bookmarks live in the user's private data root.
+
+Related documents:
+- ADR-009 (structure/content boundary and data root concept) establishes the distinction between tracked structure and private content, and the D_SYSTEM_DATA_ROOT mechanism
+- ADR-029 (bookmark categories and batch bridge, accepted 2026-10-08) explicitly extends the data root scope to include workbench records (bookmarks), not only entity directories; its "Open items for the owner" item 7 mentions updating ADR-015's data_root() docstring to reflect this scope change (marked "Done on 2026-10-08")
+- GLOSSARY.md has a workbench section that documents layouts and panels, mentioning `_data/workbench/layouts/*.json`, but does not explain the distinction between tracked and data-root workbench content
+- PLAN-022-workbench.md and PLAN-027-workbench-features-defects.md discuss workbench phases but not the data-location split
+
+Related ideas:
+- 000111 (File bookmark categories, triaged) — the feature request that triggered the need for data-root-aware workbench storage
+- 000120 (Extend the panel bridge to batch, triaged) — extends the bridge contract to handle categories, relates to 000111
+
+The documentation gap exists in practice because workbench data lives in two places with different rules: layouts at _data/workbench/layouts/ and injection-overrides at _data/workbench/ are tracked and fixed structure (reviewed commits), while bookmarks at <data root>/workbench/bookmarks/ are user content that never travels by git and honour the environment variable. No single place currently explains this two-location model or when each location is used.
+
+Potential homes for the documentation: GLOSSARY.md's workbench section could expand to name both locations and their purposes; CLAUDE.md's data root section could clarify that the scope now includes workbench records; or a new "Workbench data structure" section could be added to ADR-029 since the decision itself spans the two locations.
+
+</details>
+
 ---
 
 ## 000613 · Rule on the notes strip's font size and text capacity.
 
-**Created 2026-10-08T02:25:18+00:00 · Status: `open`**
+**Created 2026-10-08T02:25:18+00:00 · Status: `triaged`**
 
 The second half of idea 000130 (rethink the rotator font size) has no owner ruling and no phase; phase-wbf-14 fixes only the tooltip cutoff. Needs a ruling and should be sequenced with phase-wbf-06.
 
 Raised by Prompt Planner (plan amendment for phase-wbf-12..18) during the 2026-10-08 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:26-04:00): Idea 000613 explicitly identifies itself as the second half of idea 000130 ("Rotator help tooltip cut off at the panel bottom; rethink its font size and text capacity"), which was split between two phases: phase-wbf-14 (completed 2026-10-08, tooltip cutoff fix only) and unaddressed work on font size and text capacity.
+
+Related governed documents confirm the split:
+- PLAN-027, Amendment 2026-10-08, Group G66 states: "The font size and text capacity half of the idea is left to the owner"
+- phase-wbf-14's scope explicitly leaves this unchanged with note: "which is a design decision for the owner, and phase-wbf-06 already changes how the strip handles long entries"
+- REQ-037 (Workbench content-fit contracts) documents how the notes strip declares vertical scroll, horizontal scroll and a bounded marquee as alternatives for long entries (C07), establishing the fit framework this idea sits within
+- phase-wbf-06 ("Rotator variants: horizontally scrolling text and image entries", complete 2026-10-08) changed how the notes strip handles long entries; result notes a pending mixing ruling
+
+The idea is properly scoped: it requests an owner ruling on the font size and text capacity that phase-wbf-14 deliberately omitted, and correctly notes it should be sequenced with phase-wbf-06 (which already changed the strip's handling of long text). Both phases are now complete; the design decision for the ruling remains open.
+
+Session reference: phase-wbf-14 was completed in doc-session-tooltip-bottom-clip (SESS-2026-10-08-18-tooltip-bottom-clip.md), which would have recorded the open question about font size and text capacity per phase-wbf-14's scope.
+
+PROPOSED LINK: 000613 --relates_to--> 000130 (second half of idea 000130, addressing unfinished font size and text capacity work)
+
+</details>
+
 ---
 
 ## 000614 · Decide whether the demo terminal websocket needs a token or an Origin check.
 
-**Created 2026-10-08T04:28:32+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:32+00:00 · Status: `triaged`**
 
 The websocket route in src/api/routes/demo_terminal.py has no authentication and no Origin check (read from the code, not reproduced), so any local process or any web page the owner has open can start a shell. ADR-014 owns the route; ADR-030 lists this as its open item 7.
 Raised by Session 1 - Builder A (phase-wbf-07, ADR-030) during the 2026-10-08 workbench run (Session Manager relay).
@@ -25733,10 +26093,19 @@ Raised by Session 1 - Builder A (phase-wbf-07, ADR-030) during the 2026-10-08 wo
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-10-08T05:54:51+00:00): Raised again by Session 1 - Builder A (phase-wbf-08) during the 2026-10-08 workbench run: the terminal websocket route still has no authentication (ADR-030 open item 7). A per-session or token check there would close the gap that the new token does not.
 - **finding** by agent-ideation (2026-10-08T09:01:51+00:00): Owner ruling 2026-10-08: queue a defect phase that reuses the ADR-030 token on the websocket on connect; recorded as idea 000669.
+- **finding** by agent-idea-triage (2026-10-09T16:48:28-04:00): Decision on authentication for the demo terminal websocket is already established and queued for implementation.
+
+ADR-030 (Terminal interaction API, accepted 2026-10-08) raises this exact question as open item 7, recording that the websocket route (`src/api/routes/demo_terminal.py`) has no authentication or Origin check (fact 4). The ADR notes that closing the gap would require a change to the terminal panel code to send an Origin header or token on connect. On 2026-10-08, the Session Manager ruled to take the Origin-check branch over token reuse (PLAN-027 design assumption 1).
+
+The ruling is now recorded: PLAN-027 group G71 (Websocket origin) queues phase-wbf-19 to add an Origin check on the demo terminal websocket, with acceptance criteria in REQ-012 row R32. The phase refuses a connection from a non-loopback origin with close code 4004 before starting a shell or reserving a cap slot. The implementation is queued (sitting at the end of the backlog, outside `next_up`) and depends on `phase-wbf-17`.
+
+The idea is linked to 000669 (Defect phase: demo terminal websocket checks the ADR-030 token...), which was already established as the implementation track for this work, with a relates_to edge in the effective state. ADR-014 (Workbench terminal capability, decision 4) owns the websocket route and notes that the inject/read HTTP API "would start from a further record" — ADR-030 is that record and closes the websocket gap by triggering phase-wbf-19.
+
+The decision is finalized and the delivery phase is queued, not open for further triage.
 
 </details>
 
@@ -25748,126 +26117,340 @@ Raised by Session 1 - Builder A (phase-wbf-07, ADR-030) during the 2026-10-08 wo
 
 ## 000615 · Share one helper for reading feature flags in src/api/__init__.py.
 
-**Created 2026-10-08T04:28:35+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:35+00:00 · Status: `triaged`**
 
 The terminal routes are gated by an inline os.environ check; ADR-030's second flag D_SYSTEM_TERMINAL_API is a second copy of that pattern. One helper would make the gates uniform and testable.
 Raised by Session 1 - Builder A (phase-wbf-07, ADR-030) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:29-04:00): Idea 000615 proposes consolidating the two inline feature flag checks in `src/api/__init__.py` (lines 25 and 35) into a single testable helper function. Currently both the `D_SYSTEM_DEMO_TERMINAL` and `D_SYSTEM_TERMINAL_API` flags use the pattern `os.environ.get("FLAG_NAME") == "1"` inlined at import time to conditionally register route modules.
+
+**Related Governed Documents**
+
+ADR-030 (The external terminal interaction API is a second-flag, token-authenticated, loopback HTTP surface over one shared output buffer) explicitly mandates the second flag `D_SYSTEM_TERMINAL_API=1` (section 1, "Gating: a second flag, required in addition to the existing one"). It describes why the second flag exists but does not prescribe or exclude a shared implementation helper.
+
+**Implementation Context**
+
+Both flags follow an identical pattern: `if os.environ.get("FLAG") == "1":` followed by conditional module imports. The pattern is already tested in `test/test_demo_terminal_api.py` with tests like `test_routes_absent_unless_both_flags_are_exactly_one` and `test_flag_off_requests_have_no_side_effect`, which verify that absent or incorrectly-valued flags prevent module import and route registration. A shared helper would make these gates uniform and enable isolated unit tests of the flag-checking logic itself, currently embedded in routing configuration.
+
+PLAN-027 (Workbench features and defects, specifically phase-wbf-19) notes "no shared token helper and no launch change" in its description of that phase's scope, but this is documenting what that specific phase does NOT do, not a ruling against a shared flag helper.
+
+**No Related Ideas Found**
+
+No other open ideas link to or relate to this consolidation of the feature-flag pattern in `src/api/__init__.py`.
+
+</details>
 
 ---
 
 ## 000616 · Mark input injected through the HTTP terminal API in the panel.
 
-**Created 2026-10-08T04:28:35+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:35+00:00 · Status: `triaged`**
 
 The terminal panel marks nothing as externally injected; the injection dropdowns and the terminal bridge could show when input came from the HTTP API rather than the keyboard.
 Raised by Session 1 - Builder A (phase-wbf-07, ADR-030) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:30-04:00): Idea 000616 asks for visual marking of input injected through the HTTP terminal API in the workbench panel, so that viewers can distinguish injected commands from keyboard input.
+
+**Related plans and decisions**
+
+This idea is directly shaped by work recently delivered:
+- `PLAN-027` (Workbench features and defects) governs the terminal-related work
+- `ADR-030` (The external terminal interaction API), accepted 2026-10-08, decided the HTTP API design for terminal input injection and output buffering
+- Phases `phase-wbf-07` (terminal API decision) and `phase-wbf-08` (terminal API build) delivered the injectable API that this idea responds to
+
+ADR-030 explicitly acknowledges this gap (section "Consequences"): "An injected command is visible in the terminal panel as echo, but nothing in the panel marks it as coming from outside. A shell with echo off hides it." This idea directly addresses that observation.
+
+**Related idea**
+
+Idea 000633 (The stage page could show the session id or a visible driven-externally cue so a demo viewer can tell injected input from typed input) is a closely related and complementary idea, raised the same day (2026-10-08) by the same session during phase-wbf-08. The two ideas address the same underlying need—distinguishing external/injected input from keyboard input—but approach it differently: 000616 narrows to HTTP-API-injected input specifically, while 000633 proposes a broader visual or structural cue (session id display or "driven externally" indicator) for any external driving.
+
+**No existing phase**
+
+PLAN-027 and its amendment (2026-10-08) list no phase covering visual marking or indication of injected input. This is a follow-up feature that surfaced during the API's implementation but was not folded into phase-wbf-07 or phase-wbf-08.
+
+PROPOSED LINK: 000616 --relates_to--> 000633 (both ask for visual distinction of injected vs. keyboard input; 000616 is narrower to HTTP API, 000633 is broader to any external driving)
+
+</details>
 
 ---
 
 ## 000617 · Route the File Browser's single-file "Open in HTML Viewer" through deliverBatch.
 
-**Created 2026-10-08T04:28:35+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:35+00:00 · Status: `triaged`**
 
 With one path, single and batch opens would share one accounting path and one receipt shape (ts/src/stage/FileBrowserRegion.tsx, panelBridge.deliverBatch).
 Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:32-04:00): Idea 000617 asks to refactor FileBrowserRegion.tsx's "Open in HTML Viewer" single-file action to use deliverBatch instead of directly calling openInTab, so single and batch opens share one accounting path and receipt shape.
+
+**Related documents:**
+- ADR-029 (Bookmark categories are data-root records referenced by stable id, opened as a set through a batch panel bridge) specifies the batch bridge contract (section 6) and states: "Calling `openInTab` once per file from category code is not that contract, and a second file-passing path outside `panelBridge.ts` is a defect" (line 28-29). This establishes that the batch mechanism is the canonical path for file delivery.
+- phase-wbf-04 (Extend the panel bridge to batch, multi-target actions) delivered the batch infrastructure in panelBridge.ts, including `deliverBatch()` function and `BatchReceipt` type. The phase's grep check "finds no file-passing path outside panelBridge.ts" at completion.
+- phase-wbf-05 (Build the bookmark category surface and its consumers) implemented the batch consumer in HtmlViewerRegion.tsx (`openFiles` method) and BookmarkCategories for opening categories as sets through deliverBatch.
+- PLAN-027 (Workbench features and defects) groups decision 3 around consolidating single and batch opens.
+
+**Related ideas:**
+- 000112 (File Explorer: right-click option to open a file in the HTML Viewer) is the original feature idea that introduced the single-file open action now in FileBrowserRegion.tsx:487-490. The idea currently calls `viewerHandle.openInTab()` directly.
+- 000120 (Extend the panel bridge to batch, multi-target actions for bookmark categories) is the infrastructure idea that led to deliverBatch, relates to 000112.
+
+**Current implementation status:**
+FileBrowserRegion.tsx still uses the old single-file pathway. The `handleOpenInViewer` function (line 487) calls `viewerHandle.openInTab(tabId, node.path)` instead of routing through `deliverBatch([node.path], [{ channel: viewerBridge, call: callOpenFiles }])`.
+
+**Scope assessment:**
+This refactoring was explicitly out of scope for phase-wbf-05, which focused on building the category surface and its batch consumer rather than updating existing single-file callers. The idea proposes a post-delivery consolidation to eliminate the single-file code path and route all file opens through the uniform batch mechanism.
+
+PROPOSED LINK: 000617 --relates_to--> 000112 (same feature, refactoring to use batch delivery)
+
+</details>
 
 ---
 
 ## 000618 · Playwright coverage for the viewer-absent and flag-unset bookmark states.
 
-**Created 2026-10-08T04:28:35+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:35+00:00 · Status: `triaged`**
 
 phase-wbf-05's Playwright pass covered the main flows; the layout-without-viewer state and the flag-unset state are covered only by vitest and pytest. A small e2e script for a layout without the viewer would close that.
 Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:33-04:00): Idea 000618 proposes Playwright (browser automation) test coverage for two workbench edge cases that are currently covered only by unit tests (vitest/pytest): the viewer-absent state (when D_SYSTEM_DEMO_TERMINAL flag is unset) and related flag-unset bookmark states.
+
+## Related governed documents
+
+REQ-012 (Workbench features and defects requirements) specifies these exact test scenarios:
+
+- **R23** (flag-off 404 probes): "With D_SYSTEM_DEMO_TERMINAL unset, loading the workbench produces no 404 console entries, and the existing correct degradation is unchanged" — currently verified by counting console entries, not Playwright.
+- **R29** (viewer-absent page check): "With D_SYSTEM_DEMO_TERMINAL unset in the frontend process, an HTML Viewer tab holding a persisted file selection shows the absent-page message and does not frame the application shell" — currently requires vitest test setup, not browser-driven e2e.
+
+REQ-007 (Workbench architecture quality) row W15 includes Playwright assertions for HTML Viewer rendering with the flag set; the complementary case with the flag unset is not explicitly required but is a natural gap to close at the e2e level.
+
+PLAN-027 (Workbench features and defects) shows phase-wbf-05 "Build the bookmark category surface and its consumers" completed with pytest verification (test/test_workbench_bookmarks.py) but no Playwright pass mentioned in its completion evidence.
+
+## Related ideas
+
+- **000111** (File bookmark categories) — the feature this tests
+- **000120** (Extend panel bridge for bookmark batching) — the mechanism this tests  
+- **000635** (Tracked fixture directory for Playwright rotator check)
+- **000636** (Gate Playwright rotator check as repeatable test) — demonstrates the pattern of moving unit-tested features to Playwright
+
+## Finding
+
+The idea identifies a specific testing gap: viewer-absent and flag-unset states are specified in REQ-012 (R23, R29) and tested at the pytest/vitest level, but lack Playwright e2e coverage that exercises the full page load and UI degradation path. This is a natural follow-on to phase-wbf-05's pytest coverage (test/test_workbench_bookmarks.py) and complements the existing Playwright framework used elsewhere in the workbench testing (demo-validator-web). The idea is well-scoped and addresses a documented gap between unit coverage and end-to-end coverage.
+
+PROPOSED LINK: 000618 --relates_to--> 000111 (Playwright coverage for the bookmark feature phase-wbf-05 built)
+PROPOSED LINK: 000618 --relates_to--> 000636 (Demonstrates Playwright test infrastructure for workbench)
+PROPOSED LINK: 000618 --relates_to--> 000645 (Complements viewer's absent-page check testing)
+
+</details>
 
 ---
 
 ## 000619 · Decide whether sandboxed viewer pages may run scripts.
 
-**Created 2026-10-08T04:28:36+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:36+00:00 · Status: `triaged`**
 
 The HTML Viewer iframe uses sandbox="", which blocks scripts in _public/d-system-architecture.html and logs a console error each time it opens. Decide whether such pages should render with scripts or be excluded from the viewer.
 Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:34-04:00): Idea 000619 asks a policy decision about the HTML Viewer's security posture: the iframe is sandboxed with `sandbox=""`, which blocks scripts (including those in `_public/d-system-architecture.html`). The idea proposes two alternatives: allow scripts by removing or relaxing the sandbox attribute, or exclude pages with scripts from the viewer. No decision yet exists.
+
+**Related work in existing plans:**
+- `REQ-012` row R02 specifies that a new-tab open of a viewer file "carries the same sandbox posture as the panel: the response sets `Content-Security-Policy: sandbox`", confirming that the sandbox is intentional and documented. However, the requirement does not decide whether pages with scripts should be allowed at all or excluded.
+- `SESS-2026-10-08-08` (phase-wbf-05 bookmark category surface) encountered the same blocked-script console error in `_public/d-system-architecture.html` and noted "That sandbox predates this phase and is intended; it is not new behavior", confirming this is not a fresh defect but a standing policy question.
+- `ADR-015` (workbench API surface, 2026-09-10) establishes repository-bounded, read-only routes but does not address iframe sandbox restrictions or script handling.
+
+**Decision required:**
+This is a security and UX tradeoff: a strict sandbox (`allow-scripts` absent) protects against malicious scripts in served pages but prevents legitimate scripts in generated or tracked HTML from running. An answer should address:
+- What threat model the sandbox protects against (untrusted user content, third-party libraries, internal generated pages)
+- Whether scripts in tracked HTML files like `_public/d-system-architecture.html` are expected to run
+- How to handle files with scripts if they are excluded (UI message, filter, etc.)
+- Whether different categories of pages (generated overview vs tracked markdown vs architecture diagrams) should have different policies
+
+This decision likely belongs in an ADR before any phase builds against it, following the `PLAN-027` pattern for `G49` (bookmark categories): ADR-first gates implementation.
+
+</details>
 
 ---
 
 ## 000620 · Shared fixture for reloading flag-gated workbench route modules in tests.
 
-**Created 2026-10-08T04:28:36+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:36+00:00 · Status: `triaged`**
 
 test_workbench_api.py's _uncache_workbench_modules does not know about workbench_bookmarks; each test file copies the reload pattern. A shared fixture would stop the copying.
 Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:36-04:00): 000620 describes a genuine pattern duplication in the test suite: multiple test files — test_workbench_api.py, test_workbench_bookmarks.py, test_demo_terminal.py, and test_demo_terminal_api.py — each reimplement their own _uncache_*_modules() function to handle clearing module caches before reloading flag-gated route modules. The functions are functionally identical, differing only in which module names they clear.
+
+The idea proposes consolidating this into a shared pytest fixture in test/conftest.py, which is the standard location for shared test utilities and would reduce duplication across the four test files.
+
+The duplication was identified during phase-wbf-04 and phase-wbf-05, when workbench testing was active and the pattern became evident across test_workbench_bookmarks.py (which references test_workbench_api.py's implementation) and the broader test suite.
+
+No existing plan, requirement, or ADR explicitly addresses this test infrastructure refactoring opportunity. Idea 000115 (Duplication audit: find what is done multiple times and generalize toward modularity) is a broader effort that would naturally uncover and prioritize this kind of consolidation.
+
+PROPOSED LINK: 000620 --relates_to--> 000115 (Both identify and propose addressing duplication in the codebase; this shared fixture is a specific instance the broader duplication audit would encounter)
+
+</details>
 
 ---
 
 ## 000621 · Add the "extended by ADR-029" pointers on ratification.
 
-**Created 2026-10-08T04:28:36+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:36+00:00 · Status: `triaged`**
 
 ADR-015 rule 4 ("read-only") and the data_root() docstring in src/db/source_validation.py need a pointer to ADR-029 once it is ratified (ADR-029 open item 7); the bookmark routes are the first workbench write routes and the first workbench data honouring the data root.
 Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:37-04:00): The idea requests adding "extended by ADR-029" pointers to ADR-015 rule 4 and the data_root() docstring in src/db/source_validation.py upon ADR-029's ratification. Both updates have been completed:
+
+1. **ADR-015 rule 4** (docs/04-decisions/ADR-015-workbench-api-surface.md, lines 46-48): Now reads "Extended by `ADR-029` (accepted 2026-10-08): the six bookmark category routes built by `phase-wbf-05` write records under the data root behind the same gate, the first write routes in this API; rule 2's path validation applies to every entry they store."
+
+2. **data_root() docstring** (src/db/source_validation.py, lines 51-53): Now reads "Per ADR-029 (accepted 2026-10-08) the data root also holds workbench records: the bookmark category files under ``workbench/bookmarks/``, which the bookmark routes resolve through this function, so the same override moves them with the entity directories."
+
+These updates were specified in ADR-029's open item 7 ("Pointers on ratification"), which explicitly states they should be done upon ratification and marks them "Done on 2026-10-08". The work is fully delivered as part of ADR-029's acceptance.
+
+Related open ideas that address adjacent concerns: 000612 (document the two workbench data locations together) and 000622 (ignore bookmark temp files and record the shared-data-root limit) are separate follow-ups and remain open.
+
+PROPOSED PROMOTION: 000621 -> ADR-029 (work delivered as open item 7 upon ratification on 2026-10-08)
+
+</details>
 
 ---
 
 ## 000622 · Ignore bookmark temp files and record the shared-data-root limit.
 
-**Created 2026-10-08T04:28:36+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:36+00:00 · Status: `triaged`**
 
 Add _data/workbench/bookmarks/.*.tmp to .gitignore (a hard kill between mkstemp and os.replace leaves one in a tracked directory), and note in ADR-029 that one data root shared by several backends is unsupported because the write lock is per process.
 Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:40-04:00): Idea 000622 proposes two cleanup tasks deferred during phase-wbf-05 (build the bookmark category surface): (1) add `_data/workbench/bookmarks/.*.tmp` to .gitignore to ignore temporary files left by atomic replacements in the bookmark write routes, and (2) note in ADR-029 that a single data root shared across multiple backend processes is unsupported, because the write lock is per-process.
+
+**Related governed documents:**
+
+- `ADR-029` (accepted 2026-10-08, bookmark categories and batch bridge) describes the storage model: "Writes use a temporary file and an atomic replace. Each add or remove is a read-modify-write under a process lock" (section 4). The decision names the per-process lock but does not explicitly state that shared data roots across independent backends are unsupported.
+- Session record `SESS-2026-10-08-08-bookmark-category-surface.md` (phase-wbf-05) documents both items as explicitly deferred under security review finding SEC F06: "Not done, outside the deliverables: a `.gitignore` entry for `_data/workbench/bookmarks/.*.tmp`, and an ADR-029 note that a data root shared across backends is unsupported."
+- `.gitignore` currently has no rule for these temporary files; workbench paths are not mentioned.
+
+**Related ideas:**
+
+000621 (add the "extended by ADR-029" pointers on ratification) addresses a different clarification asked by ADR-029's open items (section 7), already noted as done on 2026-10-08. That idea is separate; this one targets documented security findings, not ratification housekeeping.
+
+**Assessment:**
+
+The items are straightforward deferred cleanups with clear justification. The temp-file rule is a standard practice to prevent tracking build artifacts. The ADR-029 note is important for any future work on multi-instance workbench architectures or shared storage scenarios, so documenting the limitation explicitly prevents silent data loss.
+
+</details>
 
 ---
 
 ## 000623 · workbench.py's _git_ignored_paths fails open on git errors.
 
-**Created 2026-10-08T04:28:37+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:37+00:00 · Status: `triaged`**
 
 git check-ignore exits 128 on a path through a symlinked directory ("beyond a symbolic link") and the helper reads the empty output as "nothing ignored". The list, search, reveal and Vite file routes share that gap and should treat an exit code other than 0 or 1 as ignored (fail closed). phase-wbf-05 fixed only its own module.
 Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:42-04:00): The issue describes a defect in `workbench.py`'s `_git_ignored_paths` helper function that fails open when `git check-ignore` exits with code 128. This exit code occurs when a path is accessed through a symlinked directory ("beyond a symbolic link"). The function reads empty output as "nothing ignored" when it should treat any non-zero, non-1 exit code as indicating the path is ignored (fail closed).
+
+**Related documents:**
+
+- `REQ-007` W14 specifies that "gitignored content [is] never listed" across the workbench read/action API's enumeration and directory-listing routes. This defect violates that requirement.
+- `PLAN-027` (Workbench features and defects) addresses workbench defects but does not yet cover the root-cause fix in `_git_ignored_paths`.
+- The security review verdict for `phase-wbf-05` (2026-10-08) documented this exact issue as finding F01: "Symlinked directory in an entry path defeats the private/ignored check; symlink to .git accepted." That phase's scope included workbench_bookmarks.py, which was modified to treat git check-ignore exit codes other than 0 or 1 as ignored; however, the root cause in `workbench.py` itself was not addressed.
+
+**Scope of the defect:**
+
+The idea notes that `phase-wbf-05` fixed only its own module (workbench_bookmarks.py). The `_git_ignored_paths` helper is called by the list, search, reveal and Vite file routes, all of which share the same gap. The security review explicitly stated that "the Vite /workbench-file route has the same fail-open."
+
+**Severity:**
+
+Private or .git paths can be recorded in tracked `_data/` records and read as present, breaking the "private files unsupported" invariant. The Vite route would serve the bytes. Requires a symlink already in the repository, so not web-exploitable, but a real security boundary violation.
+
+No related idea found addressing this root-cause defect specifically. The issue should be planned as a follow-up to PLAN-027 (likely an amendment or new defect phase) to fix `_git_ignored_paths` and audit all call sites, matching the minimal_fix specified in the security review: "make the bookmark call sites treat a git check-ignore return code other than 0 or 1 as ignored; add a symlinked-directory test."
+
+</details>
 
 ---
 
 ## 000624 · Stop reading oversized request bodies early on the workbench write routes.
 
-**Created 2026-10-08T04:28:37+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:37+00:00 · Status: `triaged`**
 
 The 64 KB limit added in phase-wbf-05 refuses after FastAPI has read the whole body; a streaming limit needs middleware.
 Raised by Session 2 - Builder B (phase-wbf-04 and phase-wbf-05) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:45-04:00): Idea 000624 is a direct follow-up to phase-wbf-05 (PLAN-027, completed 2026-10-08), which built the bookmark category surface and its consumers. Phase-wbf-05 added a 64 KB request body limit for the new bookmark write routes (POST, PATCH, DELETE on `/api/v1/workbench/bookmarks` and its sub-routes) as a security control. The session document SESS-2026-10-08-08 explicitly records this in its security review point SEC F05: "request bodies over 64 KB refused (413, by `Content-Length` and by the body read)." The same review notes the performance issue this idea raises: "The body is still read by FastAPI before the dependency runs, so this bounds what is accepted, not what is read; a streaming limit would need middleware, outside the deliverables." The idea requests that deferred optimization—middleware that would stop reading the request body early, before FastAPI buffers the entire payload, rather than reading all 64 KB and then rejecting it.
+
+No related requirement, plan or ADR covers early-streaming request limits. Related workbench performance audits (000114 on general performance, 000113 on terminal persistence and performance) are broader in scope and do not address this specific API optimization.
+
+</details>
 
 ---
 
 ## 000625 · Terminal panel header overflows and is clipped in a narrow slot.
 
-**Created 2026-10-08T04:28:37+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:37+00:00 · Status: `triaged`**
 
 The injection dropdowns measure 410 px (437 px for PowerShell) in a 393 px box in the primary slot, down to 307 px, at 1280x720 and 1024x768 in layouts 1 and 2; .stage-region__header has no flex-wrap and .stage-region is overflow hidden.
-Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
-
----
-
-## 000626 · HTML Viewer header controls overflow their panel in layout 2 at 1024x768.
-
-**Created 2026-10-08T04:28:37+00:00 · Status: `open`**
-
-377 px of controls in a 307 px box in layout 2's primary slot; phase-wbf-02 will add a badge to that header and should account for it.
-Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
-
----
-
-## 000627 · File Browser header controls overflow their panel in layout 2 at 1024x768.
-
-**Created 2026-10-08T04:28:38+00:00 · Status: `open`**
-
-349 px of controls in a 307 px box in layout 2's explorer slot.
-Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
-
----
-
-## 000628 · Notes strip dropdown trigger overruns the strip's bottom edge.
-
-**Created 2026-10-08T04:28:38+00:00 · Status: `open`**
-
-By 1 to 6 px in layout 1 at 1280x720, 1366x768 and 1024x768.
 Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
 
 **Annotations**
@@ -25876,7 +26459,119 @@ Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live che
 <details>
 <summary>1 finding(s)</summary>
 
+- **finding** by agent-idea-triage (2026-10-09T16:48:47-04:00): This defect is one of three header wrap failures discovered by the REQ-037 live check run on 2026-10-08 and is already documented in detail in that requirements document (REQ-037, "Measured state, 2026-10-08" section, row: "Terminal header does not wrap"). The live check measured the terminal header controls at 410 px wide (437 px for PowerShell) in a 393 px box, shrinking to 307 px at 1280x720 and 1024x768, and found that .stage-region__header has no flex-wrap while .stage-region enforces overflow hidden, clipping the controls.
+
+The defect affects three terminal variants (bash, cmd, PowerShell) across both layout configurations at multiple resolutions. Two sibling defects in the same family affect the HTML Viewer (000626) and File Browser (000627) headers at layout 2, 1024x768. REQ-037 states these three header-wrap findings "match no queued phase's title or scope in backlog.yaml" and lists them as measured defects for the owner to schedule, along with the notes-strip dropdown overflow (000628) and other form-fit violations. Idea 000646 names the ongoing architectural work (arch-07) that will need to revisit the .stage-region__header contract rows once these issues are fixed.
+
+The defect is real, measured, and documented; no work to discover or validate it remains. Scheduling a fix phase is the owner's decision.
+
+PROPOSED LINK: 000625 --relates_to--> 000626 (sibling header wrap defects in HTML Viewer, discovered together in REQ-037 live check)
+PROPOSED LINK: 000625 --relates_to--> 000627 (sibling header wrap defects in File Browser, discovered together in REQ-037 live check)
+PROPOSED LINK: 000625 --relates_to--> 000646 (arch-07 work will revisit .stage-region__header contract rows after these overflow issues are fixed)
+
+</details>
+
+---
+
+## 000626 · HTML Viewer header controls overflow their panel in layout 2 at 1024x768.
+
+**Created 2026-10-08T04:28:37+00:00 · Status: `triaged`**
+
+377 px of controls in a 307 px box in layout 2's primary slot; phase-wbf-02 will add a badge to that header and should account for it.
+Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:48-04:00): Idea 000626 reports an overflow of the HTML Viewer header controls (377 px of content in a 307 px box) at layout 2, 1024x768 resolution. This issue was identified by the REQ-037 live fit-contract check during the 2026-10-08 workbench run and is directly tracked in REQ-037's contract table as a "does not wrap" finding.
+
+Related governed documents and decisions:
+
+1. **REQ-037** (Workbench content-fit contracts) explicitly lists this as a defect: "HTML Viewer header does not wrap (`wrap`) | layout 2, primary slot, 1024x768 | 377 px of controls in a 307 px box." REQ-037 defines the contract that the HTML Viewer header should `wrap` when its content exceeds its box.
+
+2. **phase-wbf-02** (Show a last-modified badge on the HTML Viewer header, PLAN-027) measured this issue during execution and decided to add `flex-wrap: wrap` to the header. The session log (SESS-2026-10-08-19) records: "layout 2, primary, 1024x768 remains, now 324 px in 307 px (down from 377)" after adding the wrap. However, further wrapping the controls group itself would break the 60 px page-area floor requirement, so the overflow cannot be fully resolved.
+
+3. **GOV-003** (Backlog decisions) records the accepted choice: "| `phase-wbf-02` | The viewer header controls wrap to a second row to fit the last-modified badge; idea `000637` stays open | accepted |"
+
+Related ideas:
+- **000637** (The HTML Viewer header at layout 2, 1024x768, needs 377 px in a 307 px box, so its controls are clipped) reports the same overflow. An existing annotation on 000637 notes it overlaps 000626. This idea remains open despite phase-wbf-02's partial mitigation, as the controls group alone is still 324 px wide in the 307 px box.
+
+The overflow issue is a known defect with an accepted partial fix (header wrap added by phase-wbf-02). Full resolution would require either reducing the control set or expanding the panel width, both of which would require further phased work or layout changes.
+
+PROPOSED LINK: 000626 --relates_to--> 000637 (Both report HTML Viewer header overflow at layout 2, 1024x768; 000637 explicitly noted as remaining open after phase-wbf-02's partial fix)
+
+</details>
+
+---
+
+## 000627 · File Browser header controls overflow their panel in layout 2 at 1024x768.
+
+**Created 2026-10-08T04:28:38+00:00 · Status: `triaged`**
+
+349 px of controls in a 307 px box in layout 2's explorer slot.
+Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:50-04:00): ## Scout findings for 000627: File Browser header controls overflow their panel in layout 2 at 1024x768
+
+**What was found:**
+
+Idea 000627 documents a UI layout issue where the File Browser's header controls (preset and directory selectors) measure 349 px but are constrained to a 307 px box in layout 2's explorer slot at 1024x768 resolution. The controls are clipped by `overflow: hidden` on the `.stage-region` element.
+
+This issue is directly documented in REQ-037 (Workbench content-fit contracts, line 221 of the "Measured state" table). REQ-037 is the governing requirement for asserting how panels handle content overflow, and it names this finding as one of 35 failed fit rules discovered during the 2026-10-08 live check run.
+
+**Related documents:**
+
+- REQ-037 line 221: "File Browser header does not wrap (`wrap`) | layout 2, explorer slot, 1024x768 | 349 px of controls in a 307 px box." This is the authoritative record of the finding.
+- REQ-037 section "The five known instances" and "Measured state, 2026-10-08" establish that this is an unscheduled finding (not assigned to a queued phase for fixing).
+- REQ-037 line 128-129: The panel contract specifies that File Browser header controls in the `.stage-region__header` selector must declare mode `wrap`, meaning they should "reflow or wrap, never run past the panel edge."
+- Phase-arch-05 ran the REQ-037 live check and raised this and related findings during the 2026-10-08 workbench run.
+
+**Related ideas:**
+
+Idea 000625 (Terminal panel header overflows and is clipped in a narrow slot) and idea 000626 (HTML Viewer header controls overflow their panel in layout 2 at 1024x768) describe the identical root cause at different panel locations. All three ideas were created and raised by the same live check during phase-arch-05, all on 2026-10-08.
+
+**Assessment:**
+
+No existing plan, phase or document yet addresses header wrapping as a solution. REQ-037 lists this as an unscheduled finding for the owner to schedule, rather than assigning it to a queued phase. The issue is real, measured, and reproducible; it fails REQ-037's content-fit contract; but it awaits owner decision on prioritization.
+
+PROPOSED LINK: 000627 --relates_to--> 000625 (identical header overflow pattern: terminal header, same 307 px box constraint, same 1024x768 resolution affected)
+PROPOSED LINK: 000627 --relates_to--> 000626 (identical header overflow pattern: HTML Viewer header, same resolution and box constraint, same root cause)
+
+</details>
+
+---
+
+## 000628 · Notes strip dropdown trigger overruns the strip's bottom edge.
+
+**Created 2026-10-08T04:28:38+00:00 · Status: `triaged`**
+
+By 1 to 6 px in layout 1 at 1280x720, 1366x768 and 1024x768.
+Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>2 finding(s)</summary>
+
 - **finding** by agent-ideation (2026-10-08T05:54:51+00:00): Raised again by Session 3 - Standby Builder (phase-wbf-06) during the 2026-10-08 workbench run: the notes strip silent-clip finding is entirely this dropdown trigger, so fixing the trigger height clears both the visible and the silent-clip rows.
+- **finding** by agent-idea-triage (2026-10-09T16:48:51-04:00): Found in REQ-037 (Workbench content-fit contracts) as a "visible" mode contract violation: the notes strip dropdown trigger (26x27 px) overruns the strip's bottom edge by 1-6 px in layout 1 at 1280x720, 1366x768 and 1024x768 (measured during phase-arch-05 via the fit-check test).
+
+Related materials:
+- REQ-037 "Panel contract table" row for notes strip controls dropdown: the violation is named and measured
+- SESS-2026-10-08-09 (phase-arch-05): identified this as one of four findings with no queued phase; listed it for Ideation to record
+- SESS-2026-10-08-14 (phase-wbf-06): fit-contract rerun confirms the trigger still overruns (box 26x27, bottom 115 vs strip bottom 109); the same session notes that a silent-clip finding on the notes strip follows from the trigger being the only low content, so fixing the trigger clears both
+
+Related ideas: 000130 (rotator tooltip cutoff, phase-wbf-14 in progress) and 000117 (popover height fix, phase-wbf-13 in progress) both address other notes strip / dropdown issues but not the trigger dimensions themselves. No existing phase addresses this trigger-sizing issue.
 
 </details>
 
@@ -25884,10 +26579,26 @@ Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live che
 
 ## 000629 · Run the REQ-037 live fit check as a gate.
 
-**Created 2026-10-08T04:28:38+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:38+00:00 · Status: `triaged`**
 
 Needs a decision on adding Playwright to the Python dev dependencies in pyproject.toml and a fixture that starts the API and Vite servers on free ports; until then the live half of test/test_workbench_fit_contracts.py is a command, not a pytest gate, and exits 1 on the stock workbench because the defects it finds are real.
 Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:52-04:00): REQ-037 (workbench-content-fit-contracts) explicitly identifies this idea's ask as the blocker for gating the live fit check. In section "Boundaries and unresolved" (lines 240-255), REQ-037 states: "Running [the live fit check] from pytest would need Playwright added to the dev dependencies and a fixture that starts both servers; both are outside this phase's declared files." Phase-arch-05, which delivered REQ-037, closed R09 on the documented `--live` command while awaiting the owner's ratification of gating it. Idea 000629 is the gating proposal: add Playwright to pyproject.toml and build a server-startup fixture.
+
+Idea 000636 (Gate the scratch Playwright rotator check as a repeatable test) is already linked to this idea with a `relates_to` edge; its body states the rotator check should be gated "once the fit contract's live run has a gate (REQ-037 follow-up)". That link captures the dependency correctly — 000636 cannot proceed until 000629's Playwright infrastructure is available. No backlog phase currently addresses implementing the Playwright dependency or the fixture.
+
+Related documents:
+- REQ-037-workbench-content-fit-contracts.md (delivered by phase-arch-05; lines 187-203 describe the command invocation; lines 240-255 name the decision and blockers)
+- test/test_workbench_fit_contracts.py (exists; the live half runs as a command, not pytest)
+
+</details>
 
 **Links**
 
@@ -25897,34 +26608,96 @@ Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live che
 
 ## 000630 · xterm 6 moved scrolling to a virtual scrollbar.
 
-**Created 2026-10-08T04:28:38+00:00 · Status: `open`**
+**Created 2026-10-08T04:28:38+00:00 · Status: `triaged`**
 
 The .xterm-viewport overflow: scroll rule in the terminal CSS no longer scrolls anything; worth a look when the terminal CSS is next touched.
 Raised by Session 5 - Batch Runner (phase-arch-05, found by the REQ-037 live check) during the 2026-10-08 workbench run (Session Manager relay).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:55-04:00): Idea 000630 reports a specific xterm 6 CSS regression: the `.xterm-viewport overflow: scroll` rule no longer scrolls. The issue was raised during a live demo session (Session 5 - Batch Runner, session relay on 2026-10-08) and the idea notes "worth a look when the terminal CSS is next touched."
+
+Found related xterm and terminal issues in the backlog:
+- 000104 (Workbench terminal panel renders clipped to ~85px) — covers container height visibility, distinct from scrollbar behavior.
+- 000660 (Client scrollback is xterm's unconfigured default of 1000 lines) — covers scrollback configuration, not CSS scrollbar behavior.
+
+Searched governed documents:
+- PLAN-027 (Workbench features and defects) covers multiple terminal defects across phases phase-wbf-12, phase-wbf-17, phase-wbf-19, and phase-wbf-21, but none name xterm viewport scrolling specifically.
+- REQ-012 (Workbench features and defects requirements) mentions scrolling in UI contexts (notes strip, file selector popover, tooltips) but not xterm viewport CSS.
+- ADR-013 and ADR-014 (terminal capability decisions) reference xterm.js but do not address CSS configuration or the version 6 scrollbar change.
+- StagePage.css line 347 holds the current xterm-viewport rule: `.stage-terminal-mount .xterm-viewport { height: 100%; }` with no overflow property.
+
+The xterm 6 scrollbar change is a known breaking change where xterm moved scrolling to a virtual scrollbar component, making overflow: scroll ineffective. This is a technical defect specific to the dependency version and terminal CSS, not covered by existing phases. No proposal for links — related terminal issues do not overlap with this specific CSS regression.
+
+</details>
 
 ---
 
 ## 000631 · A double-click on a non-active viewer tab can miss because the first click moves the tab strip.
 
-**Created 2026-10-08T05:54:41+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:41+00:00 · Status: `triaged`**
 
 Double-clicking a non-active viewer tab can miss: the first click selects the tab and changes the header file button's label, the header row stops wrapping, and the tab strip moves up 14px at this panel width, so the second click lands on the strip. Observed in Playwright; predates the phase; the fix is CSS (a fixed-width file button or a non-wrapping header).
 Raised by Session 3 - Standby Builder (phase-wbf-01) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:48:57-04:00): Defect in HTML Viewer tab-strip double-click interaction. When double-clicking a non-active viewer tab, the first click selects the tab and changes the header file button's label, which causes the header row to stop wrapping. This shifts the tab strip up 14px at standard panel widths, causing the second click to land on the strip itself rather than the tab, so the double-click misses. The idea identifies this as predating phase-wbf-01 (which shipped the double-click open-in-new-tab feature) and proposes CSS as the fix (fixed-width file button or non-wrapping header).
+
+Found in PLAN-027 (Workbench features and defects) and REQ-012 (Workbench features and defects requirements): PLAN-027 amended on 2026-10-08 to add phases phase-wbf-12 through phase-wbf-18 for uncovered workbench defects; REQ-012 added rows R24–R31 to cover them. However, this defect was raised DURING phase-wbf-01 and does not appear in the amendment's defect audit (which checked 000556, 000516, 000463 and narrowed 000573). It is not covered by any phase — neither by phase-wbf-01 (which implements the new-tab feature without fixing the tab-strip movement bug) nor by any of the amendment phases phase-wbf-12–18 (which address terminal issues, popover height, tooltip clipping, file browser errors, viewer page checks, startup messages, and runbook documentation).
+
+Related to phase-wbf-01 (Open a viewer tab's file in a new browser tab on double-click), which shipped the feature this bug affects but does not address the tab-strip interaction defect. Also touches header layout and wrapping behavior; similar header overflow issues are raised in 000625 (Terminal panel header overflows), 000626 (HTML Viewer header controls overflow in layout 2), and 000627 (File Browser header controls overflow in layout 2), but those are panel-width overflows rather than this idea's wrapping-induced shift.
+
+Related idea 000632 (The demo runbook's HTML Viewer entry should describe the double-click and Shift+Enter open-in-browser-tab behaviour) documents the same double-click interaction; 000632 is also not covered by any phase.
+
+PROPOSED LINK: 000631 --relates_to--> 000632 (both concern double-click behavior on HTML Viewer tabs; 000631 is the interaction defect, 000632 is the documentation request)
+
+</details>
 
 ---
 
 ## 000632 · The demo runbook's HTML Viewer entry should describe the double-click and Shift+Enter open-in-browser-tab behaviour.
 
-**Created 2026-10-08T05:54:41+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:41+00:00 · Status: `triaged`**
 
 The demo runbook entry for the HTML Viewer (docs/00-working/demo-runbook.md, around line 254) says only "Has tabs like the terminal". It should gain the double-click and Shift+Enter open-in-browser-tab behaviour.
 Raised by Session 3 - Standby Builder (phase-wbf-01) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:00-04:00): Idea 000632 asks for the demo runbook's HTML Viewer entry to document the double-click and Shift+Enter behavior for opening files in new browser tabs. This feature was implemented in phase-wbf-01 (completed 2026-10-08) and verified with both double-click and Shift+Enter interactions in Playwright tests; the code includes a title attribute documenting the keyboard shortcut at ts/src/stage/HtmlViewerRegion.tsx. However, the runbook's HTML Viewer entry (docs/00-working/demo-runbook.md, line 254) does not yet describe this behavior, only noting "Has tabs like the terminal".
+
+**Related documents and ideas:**
+
+- **Idea 000109** (HTML Viewer: double-clicking a file tab opens it in a new browser tab) — triaged, requested the feature. Links relate_to 000108 and 000119. The feature is now delivered.
+- **Idea 000105** (Runbook does not document the HTML Viewer's Embedded/Open-in-tab toggle) — triaged, also requests documentation of HTML Viewer behavior in the runbook. Implemented by phase-wbf-18 (completed 2026-10-08), which added documentation of the toggle to the runbook (lines 256-257, including the rung 3 vs rung 7 mismatch).
+- **Requirement R01** (REQ-012) — specifies the double-click feature's behavior and verification, but does not call for runbook documentation. R31 covers runbook documentation, but only for the toggle, not the keyboard shortcut.
+
+**Documentation gap:**
+
+The double-click and Shift+Enter behavior is already documented in the code (title attribute) and was verified in phase-wbf-01, but the runbook has not been updated to describe this user-facing interaction to readers and demo presenters. This is structurally similar to what idea 000105 identified: a feature was built but not documented in the runbook entry where a presenter would look for it.
+
+PROPOSED LINK: 000632 --relates_to--> 000105 (Both request documentation of HTML Viewer interactions in the demo runbook; 000105 covers the toggle, 000632 covers the double-click/Shift+Enter behavior for opening files)
+
+</details>
 
 ---
 
 ## 000633 · The stage page could show the session id or a visible driven-externally cue so a demo viewer can tell injected input from typed input.
 
-**Created 2026-10-08T05:54:42+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:42+00:00 · Status: `triaged`**
 
 The stage page could show the session id, or a visible "driven externally" cue, so a person watching a demo can tell an injected command from typed input.
 Raised by Session 1 - Builder A (phase-wbf-08) during the 2026-10-08 workbench run.
@@ -25933,9 +26706,23 @@ Raised by Session 1 - Builder A (phase-wbf-08) during the 2026-10-08 workbench r
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-10-08T05:54:51+00:00): Overlaps 000616 (mark input injected through the HTTP terminal API in the panel). Recorded as given and left for triage.
+- **finding** by agent-idea-triage (2026-10-09T16:49:02-04:00): Idea 000633 proposes displaying the session id or a visible "driven externally" cue on the stage page to help demo viewers distinguish injected commands from typed input.
+
+**Related idea:** 000616 (Mark input injected through the HTTP terminal API in the panel) addresses the same underlying need — helping viewers recognize externally-driven input — but proposes marking it within the terminal panel itself rather than at the stage page level. Both ideas arose from the same 2026-10-08 workbench run (phase-wbf-08 for 000633, phase-wbf-07/ADR-030 for 000616) and together describe two possible approaches to the visibility problem.
+
+**Related plans and documents:**
+- PLAN-027 (Workbench features and defects) covers phases for workbench improvements under the phase-wbf-* prefix, though neither 000633 nor 000616 has a planned phase yet.
+- PLAN-022 (Workbench) is the main workbench implementation plan that built the stage page as the chartered management UI.
+- PLAN-021 (Live demo stage and overview build) defines the demo stage's observable contract (REQ-006).
+- REQ-012 (workbench features and defects requirements) and REQ-007 (workbench requirements) specify workbench behavior, though neither currently covers marking or displaying session identity for injected input.
+- ADR-014 (workbench terminal capability) and ADR-013 (demo terminal capability) establish the terminal design, including the session-registry model and injection-route gating.
+
+The idea is narrower than the broader stage-page display requirements already in work but touches UI feedback for the demo-driven execution model, which is central to the live-demo plan. No existing governed document currently specifies this feature as a requirement or phase.
+
+PROPOSED LINK: 000633 --relates_to--> 000616 (Both address visibility of externally-driven input; 000633 targets stage page, 000616 targets terminal panel)
 
 </details>
 
@@ -25943,28 +26730,110 @@ Raised by Session 1 - Builder A (phase-wbf-08) during the 2026-10-08 workbench r
 
 ## 000634 · REQ-037 should drop its now-stale defect sentences and name the notes-strip moving element.
 
-**Created 2026-10-08T05:54:42+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:42+00:00 · Status: `triaged`**
 
 Remove or reword REQ-037's "unbounded entry is the defect phase-wbf-06 addresses" sentences and the C-row defect table entry now that the notes-strip active-entry row passes; and name the moving element (data-notes-part=track) in the notes-strip row per REQ-037's own boundaries text.
 Raised by Session 3 - Standby Builder (phase-wbf-06) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:03-04:00): Idea 000634 requests cleanup of REQ-037 after phase-wbf-06 completion. Specifically:
+1. Remove/reword "unbounded entry is the defect phase-wbf-06 addresses" sentences from REQ-037's "Measured state" section (found at line 211, describing the notes-strip active-entry finding at lines 216-217)
+2. Remove the corresponding defect table row (the "Notes strip entry is not bounded by its panel" finding, lines 216-217)
+3. Name the moving element (data-notes-part=track) in the notes-strip row per REQ-037's stated guidance at line 262
+
+**Related documents:**
+
+REQ-037 (Workbench content-fit contracts) is the document being amended. It defines the mechanical fit contracts for every workbench panel and was delivered by phase-arch-05 (complete). Lines 211, 216-217, and 262 of REQ-037 contain the specific text that becomes stale after phase-wbf-06 ships.
+
+Phase-wbf-06 (Rotator variants: horizontally scrolling text and image entries, phase-arch-01 dependents) is complete as of 2026-10-08. The phase result reports: "Fit contract on the notes strip before: pass=12 fail=6, 10 findings, active entry unbounded (441x71 in a 28 px strip); after: pass=14 fail=4, 8 findings, active entry clean..." This confirms the "unbounded entry" defect described in REQ-037's findings table has been fixed.
+
+PLAN-027 (Workbench features defects) is the associated plan.
+
+**Related ideas:**
+
+000628 (Notes strip dropdown trigger overruns the strip's bottom edge) was also found by the REQ-037 live check run (mentioned in phase-wbf-06's result as a remaining finding: "the rest being 000628 (dropdown trigger and the strip clip it causes)..."). It addresses a different defect that remains in the findings table, not the active-entry unbounded issue this idea asks to remove.
+
+**No overlapping ideas found** that propose the same cleanup or amendment.
+
+REQ-037 itself explicitly states at line 262 the expected follow-up: "when `phase-wbf-06` lands it should name the moving element in the notes strip row if it is not `.stage-notes-strip__current`, and a marquee that translates its content must stay bounded by the strip to conform." This idea directly executes that stated commitment.
+
+</details>
 
 ---
 
 ## 000635 · The notes strip needs a tracked fixture directory of images so the Playwright rotator check can be committed and gated.
 
-**Created 2026-10-08T05:54:42+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:42+00:00 · Status: `triaged`**
 
 A notes-strip fixture directory of images under ts/public (or a tracked test image directory) would let the Playwright rotator check be committed and gated instead of relying on _public/images.
 Raised by Session 3 - Standby Builder (phase-wbf-06) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:04-04:00): Idea 000635 requests a tracked fixture directory of images (under ts/public or similar) to enable the Playwright rotator check to be committed and gated as a repeatable test.
+
+**Related plans and phases:**
+- `phase-wbf-06` (Rotator variants: horizontally scrolling text and image entries) completed on 2026-10-08. The phase report shows "Playwright on ports 8021/5191: 21 checks pass (scroll, hover and focus pause... image entry in layouts 1 and 2, mixed file rejected...)" — the rotator Playwright check already ran during that phase's delivery, but without a tracked fixture directory. The phase result confirms the check works but also confirms it is not yet committed to the test suite as a repeatable gate.
+- `REQ-037` (Workbench content-fit contracts, draft) describes the live Playwright check infrastructure: `test/test_workbench_fit_contracts.py --live <url> --self-test` runs content-fit checks including the notes strip rotator. The document also notes "The tracked directory `_public/engine/trace` must hold more than twenty `.html` or `.svg` files" for the file-selector fixture in the HTML Viewer's fit checks. It does not mention an image fixture for the rotator specifically, but the pattern is established.
+- `REQ-037` *Boundaries and unresolved* section: "The live run exits non-zero today... Gating it (Playwright as a dev dependency plus a server fixture, or a CI job that runs the command once phase-wbf-06, -13 and -14... make it green) is an open follow-up." This confirms that enabling the live check to run in CI is still a follow-up item.
+- `PLAN-027` (Workbench features and defects, amended 2026-10-08) documents phase-wbf-06 and the broader workbench testing story, but does not name a fixture-creation phase for the rotator images.
+
+**Related ideas (direct overlap):**
+- **000636** ("Gate the scratch Playwright rotator check as a repeatable test") explicitly builds on the assumption that fixtures exist and a gate mechanism is in place. Its body references "REQ-037 follow-up; link to 000629" and says to "Gate the scratch Playwright rotator check (scroll, pause, rotation rule, image entry) as a repeatable test once the fit contract's live run has a gate." This is a downstream dependency: 000636 cannot be gated without a tracked fixture directory for images to avoid relying on _public/images.
+- **000629** ("Run the REQ-037 live fit check as a gate") is broader in scope: it asks for Playwright as a Python dev dependency, a fixture that starts both API and Vite servers, and a pytest gate. The rotator check is a subset of that gated live check. Idea 000635's fixture directory is a prerequisite for 000629's gate to work durably on the rotator variant specifically.
+
+**Summary:**
+Idea 000635 has already been partially addressed by the successful Playwright check run during phase-wbf-06 (the check exists and works), but the key ask — a **tracked** fixture directory so the check is not reliant on gitignored _public/images — has not been fulfilled. Two related ideas (000636 and 000629) depend on this: 000636 asks to gate the rotator check once fixtures are available, and 000629 asks to gate the broader content-fit suite. The fixture directory creation is the unblocking dependency.
+
+PROPOSED LINK: 000635 --extends--> 000636 (Fixture images enable gating the rotator Playwright check)
+
+</details>
 
 ---
 
 ## 000636 · Gate the scratch Playwright rotator check as a repeatable test.
 
-**Created 2026-10-08T05:54:42+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:42+00:00 · Status: `triaged`**
 
 Gate the scratch Playwright rotator check (scroll, pause, rotation rule, image entry) as a repeatable test once the fit contract's live run has a gate (REQ-037 follow-up; link to 000629).
 Raised by Session 3 - Standby Builder (phase-wbf-06) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:05-04:00): Idea 000636 asks for the "scratch Playwright rotator check" (a browser-based test developed during phase-wbf-06) to be gated as part of the repeatable test suite, replacing the current manual `uv run python test/test_workbench_fit_contracts.py --live <url>` command.
+
+Related governed documents:
+
+- REQ-037 (workbench content-fit contracts) § "Boundaries and unresolved": explicitly identifies gating this Playwright check as an open follow-up. The live half of the fit contract test is currently not part of `uv run pytest` and exits non-zero on the stock workbench because the defects it finds are real. The document proposes gating options: "Playwright as a dev dependency plus a server fixture, or a CI job that runs the command once `phase-wbf-06`, `-13` and `-14` and the header-wrap findings make it green."
+
+- PLAN-027 (workbench features and defects, P11): describes phase-wbf-06 (rotator variants, complete 2026-10-08) which produced the Playwright check being asked to gate here; § "Boundaries and unresolved" in REQ-037 notes this check ran during phase-wbf-06 with 21 passing assertions.
+
+- REQ-012 (workbench features defects): defines the rotator requirements (R12: long entries scroll horizontally and can be paused; R14: the rotator rotates images with sizing and mixing rulings) that the Playwright check verifies.
+
+- test/test_workbench_fit_contracts.py: contains the live Playwright check that needs gating, currently outside pytest and requiring Node, Playwright and Chromium.
+
+Related ideas:
+
+- 000629 (already linked as relates_to): "Run the REQ-037 live fit check as a gate" — asks for the broader fit contracts check to be gated, of which the rotator check is a component.
+
+- 000635: "The notes strip needs a tracked fixture directory of images so the Playwright rotator check can be committed and gated" — describes a prerequisite: the rotator check currently relies on `_public/images` as its fixture directory, and needs a tracked fixture directory (under `ts/public` or similar) to be committed to the repository. This idea identifies 000635 as a blocker: the rotator check cannot be committed and gated until fixtures are in place.
+
+PROPOSED LINK: 000636 --extends--> 000635 (fixture images are a prerequisite for gating the rotator Playwright check)
+
+</details>
 
 **Links**
 
@@ -25974,7 +26843,7 @@ Raised by Session 3 - Standby Builder (phase-wbf-06) during the 2026-10-08 workb
 
 ## 000637 · The HTML Viewer header at layout 2, 1024x768, needs 377 px in a 307 px box, so its controls are clipped.
 
-**Created 2026-10-08T05:54:43+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:43+00:00 · Status: `triaged`**
 
 Layout 2 at 1024x768: the HTML Viewer region header is 377 px of content in a 307 px box (live-check wrap and silent-clip findings), so header controls are clipped.
 Raised by Session 2 - Builder B (phase-wbf-13) during the 2026-10-08 workbench run.
@@ -25983,10 +26852,31 @@ Raised by Session 2 - Builder B (phase-wbf-13) during the 2026-10-08 workbench r
 
 
 <details>
-<summary>2 finding(s)</summary>
+<summary>3 finding(s)</summary>
 
 - **finding** by agent-ideation (2026-10-08T05:54:51+00:00): Overlaps 000626 (HTML Viewer header controls overflow their panel in layout 2 at 1024x768). Recorded as given and left for triage.
 - **finding** by agent-ideation (2026-10-08T09:01:52+00:00): phase-wbf-02 measured the HTML Viewer header at layout 2, 1024x768: it still needs 324 px in a 307 px box after the last-modified badge; wrapping the controls group breaks the 60 px page-area floor, so the real fix is a shorter or collapsing control set.
+- **finding** by agent-idea-triage (2026-10-09T16:49:06-04:00): Idea 000637 describes a measured defect in the HTML Viewer panel header at layout 2, 1024x768, where the header controls (377 px) exceed the available box width (307 px), causing content to be clipped.
+
+**Related documents and measurements:**
+
+The exact same defect is documented in REQ-037 (workbench content-fit contracts, `Measured state` section, 2026-10-08), which records this as one of four unscheduled header-wrap violations discovered during fit-contract testing. The requirement names the HTML Viewer header defect with identical measurements: 377 px of controls in a 307 px box, layout 2, primary slot, 1024x768. The document states that these four measured violations "match no queued phase's title or scope in `backlog.yaml`, so they are listed for the owner to schedule rather than fixed here" (page 209).
+
+REQ-037 also documents related wrap violations in the Terminal panel header (410–437 px in a 307–393 px box across multiple sizes/layouts) and File Browser header (349 px in a 307 px box at the same size). These are covered by REQ-037's `wrap` mode rules and the `silent-clip` rule, which require headers to reflow or wrap rather than overflow.
+
+**Related ideas with overlapping scope:**
+
+Idea 000626 ("HTML Viewer header controls overflow their panel in layout 2 at 1024x768") describes the same defect with less specificity — no measurements provided. This is a candidate for a relates_to or extends link.
+
+Ideas 000625 (Terminal panel header overflow) and 000627 (File Browser header overflow) describe the same pattern affecting other panels at the same layout/size, and are also unmeasured relative to this idea.
+
+Ideas 000108, 000117, and 000130 address related overflow issues in the workbench (popover height, tooltip clipping) and are scheduled in phases wbf-13 and wbf-14 (per PLAN-027, amendment 2026-10-08).
+
+**Current status:**
+
+No implementation phase is scheduled in PLAN-027 or the backlog for the header-wrap violations at this time. REQ-037 and PLAN-027 both identify these as measured defects awaiting owner scheduling.
+
+PROPOSED LINK: 000637 --relates_to--> 000626 (Both describe HTML Viewer header overflow at layout 2, 1024x768; 000637 provides specific measurements)
 
 </details>
 
@@ -25994,127 +26884,451 @@ Raised by Session 2 - Builder B (phase-wbf-13) during the 2026-10-08 workbench r
 
 ## 000638 · The layout 2 Skills popover needs 395 px where 360 to 379 px of room exists, so its last entries scroll.
 
-**Created 2026-10-08T05:54:43+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:43+00:00 · Status: `triaged`**
 
 Layout 2 "Skills (11)" popover needs 395 px but only 360 to 379 px of room exists on the larger side at 1280x720, so its last entries scroll; the Skills/Prompts/Agents dropdowns could be made more compact.
 Raised by Session 2 - Builder B (phase-wbf-13) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:08-04:00): The Skills popover width constraint described in this idea was already examined during phase-wbf-13 (Open popovers toward the side with room so the file selector shows its list), which completed on 2026-10-08. The popover-consumer-audit.md (generated as part of that phase's deliverables) documents this exact issue:
+
+"InjectionDropdowns ("Skills (11)") ... layout-2: content needs 395 px and 352 to 371 px is the room on the larger side, so the last entries scroll inside the bubble. Cannot be larger; the viewport has no more room on either side."
+
+This finding appears in row 25 of the audit table, measuring the three InjectionDropdowns popovers (Skills, Prompts, Agents) against both layout-1 and layout-2 at 1280x720 and 1024x768 resolutions. The audit concludes that while the Skills popover needs 395 px of space, the viewport constraint at layout-2's 1280x720 resolution provides only 360-379 px on the larger side. This is a layout geometry constraint, not a defect in the shared Popover component itself.
+
+The related work is governed by:
+- PLAN-027 (Workbench features and defects), specifically phase-wbf-13 "Open popovers toward the side with room so the file selector shows its list"
+- REQ-012 (Workbench features and defects requirements), rows R25 and R26 covering popover placement and consumer audit
+- REQ-037 (Workbench content-fit contracts), which documents floating surface fit behavior including the popover's `not-starved` mode to open at the height its content allows
+
+The three ideas governing popover space constraints (000108, 000117) and the audit of all popover consumers (including InjectionDropdowns) are already captured in phase-wbf-13's scope, which closed on 2026-10-08.
+
+PROPOSED LINK: 000638 --relates_to--> 000117 (shared popover component height/space constraints, both audited in phase-wbf-13's consumer survey)
+
+</details>
 
 ---
 
 ## 000639 · Count-at-rest Playwright checks cannot catch a popover that fails to scroll, so the live check should scroll it.
 
-**Created 2026-10-08T05:54:43+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:43+00:00 · Status: `triaged`**
 
 Count-at-rest Playwright checks (including the fit contract's file-selector measurement) cannot catch a popover that fails to scroll; the live check could scroll the popover body with a real wheel and assert scrollTop moves.
 Raised by Session 2 - Builder B (phase-wbf-13) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:09-04:00): Idea 000639 proposes enhancing the live check in the workbench fit contract testing (test/test_workbench_fit_contracts.py) to verify that popover bodies with scroll content actually become scrollable when needed. The proposal is specifically to add a scroll action (real wheel or scrollTop set) with an assertion that scrollTop moves.
+
+Related governed documents:
+
+- REQ-037 (Workbench content-fit contracts): The requirements document that specifies the fit contract testing framework, including both count-at-rest checks (file-based) and live checks (browser-based with Playwright). Line 79 mentions the file selector popover specifically needs a long list; lines 543-546 describe the "reach" field that currently detects if scrolling moves content, but this validation is applied only in the synthetic judge tests, not in the live Playwright measurements of actual popovers.
+
+- PLAN-027 (Workbench features and defects P11): Phase-wbf-13 addresses the "Popover height floor" defect (group G65, covering ideas 000108 and 000117), ensuring popovers open toward the side with room. The plan notes that `phase-wbf-13` leaves out user-resizable popups (assumption section), which is a related but distinct concern.
+
+- Ideas 000108 and 000117: Directly related to popover display. Idea 000117 extends idea 000108; both address the HTML Viewer file selector showing only two entries because the shared Popover.tsx opens into a 142 px bubble. These ideas focus on the geometry/height issue, not on scroll validation.
+
+Current implementation gap: The fit contract test's live Playwright check (measureBubble function, ~line 920-944) measures the popover's scrollHeight and clientHeight to detect if content exceeds the box, but does not currently test whether that content is actually reachable via scrolling. The count-at-rest judge tests include scroll-reach validation (reaching for scrollTop > before), but this is synthetic, not applied to real browser popovers.
+
+The idea adds a legitimate test gap: a popover could have scrollHeight > clientHeight yet fail to scroll due to CSS or interaction issues. Detecting this in the live check would catch regressions the current approach misses.
+
+PROPOSED LINK: 000639 --relates_to--> 000117 (Both address popover scroll/display issues; 000117 focuses on height floor, 000639 proposes testing that scroll actually works)
+
+</details>
 
 ---
 
 ## 000640 · REQ-037's live runner keys panel assignments by bare panel id, which breaks arch-07 and arch-08.
 
-**Created 2026-10-08T05:54:44+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:44+00:00 · Status: `triaged`**
 
 REQ-037's live runner seeds panel_assignments by bare panel id and builds its matrix from eligible_slots, so arch-07 and arch-08 both break it; worth a note on those phases' deliverables.
 Raised by Session 5 - Batch Runner (phase-arch-06) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:10-04:00): REQ-037's fit-contract test file (`test/test_workbench_fit_contracts.py`) seeds browser state via bare panel_id when building its live-check matrix, and two concurrent architecture changes will break this approach.
+
+**The breaking changes:**
+- Phase-arch-07 (schema-owned slots and sub-slots) replaces per-panel allow-lists (`eligible_slots`) with structural eligibility determined by slot sub-slot schema.
+- Phase-arch-08 (multi-instance panel identity) replaces singleton `panel_id` throughout the layout data, storage shape, and panel registry with instance identities.
+
+**What breaks:**
+The test's seeding of `panel_assignments` (line: `state.panel_assignments = { [cell.layout]: { [cell.panel]: cell.slot } }`) currently works because bare `panel_id` uniquely identifies both the panel type and all its instances. When arch-08 ships, panel type and instance become distinct; a bare `panel_id` will no longer be a valid instance reference.
+
+**Deliverable locations:**
+`test/test_workbench_fit_contracts.py` currently reads eligibility from `panels[].eligible_slots` and builds its cell matrix from it. Phase-arch-07's requirements work (REQ-011 R12, per ADR-031 decision 4) removes the per-panel allow-list entirely, replacing it with structural matching. The test's matrix-building logic and its panel-assignment seeding will need coordinated updates during or after phase-arch-07 lands, and phase-arch-08 will require the panel-assignments seeding to use instance identity rather than bare panel_id.
+
+**Related work already recorded:**
+- 000641 (useWorkbenchLayouts.ts hardcodes shell home slot and panel ids): another bare-id regression vector for arch-08, in code rather than test
+- 000646 (REQ-037 rows that name .stage-region__header need amending in arch-07's requirements work): overlapping REQ-037 amendment scope for arch-07
+
+PROPOSED LINK: 000640 --relates_to--> 000641 (both identify bare-id regression risks from arch-08 multi-instance identity)
+PROPOSED LINK: 000640 --relates_to--> 000646 (both require REQ-037 updates for arch-07 structural eligibility work)
+
+</details>
 
 ---
 
 ## 000641 · useWorkbenchLayouts.ts hardcodes the shell home slot and panel ids, the likeliest place for an arch-08 regression.
 
-**Created 2026-10-08T05:54:44+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:44+00:00 · Status: `triaged`**
 
 useWorkbenchLayouts.ts hardcodes the shell home slot (secondary) and the bash and PowerShell panel ids; these are type ids standing where instance ids will be, and are the likeliest place for an arch-08 regression.
 Raised by Session 5 - Batch Runner (phase-arch-06) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:11-04:00): The regression risk identified in idea 000641 is directly addressed in the scope of phase-arch-08 and documented in ADR-031 (Slots are schema-owned frames with sub-slots, and panel instances are matched to slots by structure), which was accepted by the owner on 2026-10-08.
+
+ADR-031 explicitly names the exact issue this idea flags: in its phase-arch-08 row, it states that phase-arch-08 must convert "the dialog and the hard-coded ids in `useWorkbenchLayouts.ts` (the shell home slot, the bash and PowerShell panel ids) converted so no type id stands where an instance id is meant." This is part of the multi-instance panel identity work that replaces singleton `panel_id` with `instance_id` plus `panel_type`.
+
+The phase is currently queued (docs/09-backlog/backlog.yaml status: queued) and depends on phase-arch-07. The fix is scheduled but not yet delivered. The session log (SESS-2026-10-08-12) confirms this is the outcome of phase-arch-06's decision work, where idea 000641 itself was raised by Session 5 - Batch Runner during the workbench run.
+
+Related planning material:
+- PLAN-028 (Workbench Architecture Quality) group G43 gates phase-arch-08
+- Ideas 000135 (multi-instance system) and 000141 (slot configuration) are the foundational design ideas that phase-arch-08 implements
+- Idea 000640 (REQ-037's live runner keys panel assignments by bare panel id) identifies a related regression risk in the same context, also raised during the same session
+
+The role definition says to propose a promotion only when the work is done and shipped, never when merely related or planned. This idea identifies a regression risk that has been recognized and is already tracked in phase-arch-08's scope, so no promotion should be proposed yet.
+
+PROPOSED LINK: 000641 --relates_to--> 000640 (Both identify related panel id regression risks in phase-arch-07 and phase-arch-08 scope, raised in the same workbench run)
+
+</details>
 
 ---
 
 ## 000642 · Per-instance terminal tab caps of 4 against a global cap of 6 let two instances reach the cap with fewer than 8 tabs.
 
-**Created 2026-10-08T05:54:44+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:44+00:00 · Status: `triaged`**
 
 Per-instance terminal tab caps (4 each) against the global server cap (6): two terminal instances can reach the cap with fewer than 8 tabs; arch-08 should add a test for the refusal message with two instances.
 Raised by Session 5 - Batch Runner (phase-arch-06) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:12-04:00): ## Finding for 000642
+
+Idea 000642 raises a test-coverage gap for the terminal session-cap logic: with per-instance (per-panel) terminal tab caps of 4 and a global backend cap of 6, two terminal instances can each attempt to reach their local cap (8 tabs total) before the global cap is hit. The idea suggests arch-08 should add a test for the refusal message in this multi-instance scenario.
+
+### Related governed documents
+
+- **ADR-014** ("The workbench terminal is a gated product capability with a session registry and selectable shells"): Establishes the backend global cap at 6 (raised from 4 on 2026-09-11) and confirms the per-panel session-tab cap stays at 4 (enforced in the UI only), unaffected by the backend change.
+- **REQ-007 W17**: Requires the backend to bound concurrent PTY sessions to 6 globally; per-panel tab cap stays 4; server-side refusal remains clear and structured.
+- **REQ-012 R21**: Requires the global-cap refusal to reach the browser as a structured close frame with a quotable reason, and verification method specifies filling the cap and attempting one more connection. However, the requirement's verification does not explicitly name the multi-instance scenario.
+- **ADR-031**: Discusses multi-instance system for slots and panels (idea 000135), which relates to the same panel-identity problem the multi-instance terminal scenario touches.
+
+### Related ideas
+
+- **000137** ("Global-cap websocket refusal should reach the browser as a structured close reason"): Directly addresses the same refusal-message requirement; extends the same conversation.
+- **000655** ("Under the dev server, StrictMode doubles each terminal mount and falsely refuses a new tab near the session cap"): Names a distinct but related defect where StrictMode's double-mount falsely triggers cap refusal.
+- **000656** ("A tab refused at the session cap stays dead after slots free up"): Names a UI persistence defect after cap refusal; also related to session-cap messaging.
+
+### Assessment
+
+REQ-012 R21's verification method does test global-cap refusal, but does not explicitly exercise it with two terminal region instances simultaneously at or near their individual caps. The test coverage gap 000642 names is legitimate: with the per-instance cap at 4 and the global cap at 6, an instance-specific cap could create an inconsistent user experience where one panel appears to have space (its own counter at <4) while connections are still refused globally. The idea's suggestion that arch-08 add this test case is reasonable given arch-08's scope of multi-instance panel identity.
+
+The test is likely to belong in phase-arch-08, which specifically addresses multi-instance panel identity (idea 000135), rather than in the earlier phase-wb-* track because the issue is architectural (per-instance vs global cap interaction) rather than a feature or defect on a single panel.
+
+</details>
 
 ---
 
 ## 000643 · The File Browser's could-not-search alert should show the API's error detail, since the listing fetch discards the response body.
 
-**Created 2026-10-08T05:54:45+00:00 · Status: `open`**
+**Created 2026-10-08T05:54:45+00:00 · Status: `triaged`**
 
 File Browser could show the API's error detail (or status) in the could-not-search alert; the listing fetch discards the response body today.
 Raised by Session 5 - Batch Runner (phase-wbf-15) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:13-04:00): Related to File Browser error handling work in `PLAN-027` (Workbench features and defects, P11), which already addressed folder listing fetch failures via phase-wbf-15 (fixing idea 000594, "File Browser shows 'Loading…' forever when a folder's fetch fails after a folder change"). This idea proposes enhancing the error alert for a distinct case: when the `/api/v1/workbench/search` route fails, the alert should show the API's error details rather than just a generic "Could not search {folder}" message.
+
+Current implementation in `ts/src/stage/FileBrowserRegion.tsx:310-311` catches fetch errors but discards the response body, setting state to `{folder: contextFolder, state: 'error'}` without capturing status or error detail. The resulting alert at line 616 renders only "Could not search <code>{contextFolder}</code>." with no diagnostic information for the user.
+
+Error message formatting is specified in `REQ-012` (Workbench features and defects requirements) via R28, which prescribes the alert's existence but not its content detail level. The idea addresses a gap between what the requirement names (a "could-not-search message") and what detail users need to diagnose failures.
+
+Tangentially related to idea 000569 (Error boundary and accessible loading/error status for the React stage/workbench), which is a broader error-handling initiative but not specifically scoped to search errors.
+
+PROPOSED LINK: 000643 --relates_to--> 000594 (both File Browser error handling, but 000594 is listing fetch failures after folder change, 000643 is search fetch error detail)
+
+</details>
 
 ---
 
 ## 000644 · The control-characters terminal test sleeps a fixed 0.3 s before Ctrl-C and should wait for evidence instead.
 
-**Created 2026-10-08T07:16:57+00:00 · Status: `open`**
+**Created 2026-10-08T07:16:57+00:00 · Status: `triaged`**
 
 test/test_demo_terminal_api.py::test_control_characters_reach_the_shell failed once under machine load ("'after-ctrl-c-4' never appeared"; it sleeps 0.3 s before sending Ctrl-C and reads with an 8 s timeout) and passed in every other run of the day; make it wait for evidence that `sleep 30` started instead of a fixed delay.
 Raised by Session Manager (wbf-16 runner gate) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:15-04:00): Idea 000644 reports a flaky test in test_demo_terminal_api.py::test_control_characters_reach_the_shell that uses a fixed 0.3s sleep before sending Ctrl-C, causing it to fail intermittently under machine load when the shell startup takes longer than expected. The test reads output with an 8s timeout but has no mechanism to detect that the command (`sleep 30`) actually started.
+
+This is a specific instance of a broader pattern identified in related ideas about terminal test reliability:
+
+**Related ideas already linked:**
+- 000099 (Three demo-terminal PTY tests fail on dev and on origin): documents three failing PTY tests in test_demo_terminal.py with similar timing-related environmental failures; marked resolved in PLAN-027 as G56 (already delivered).
+- 000129 (Fix the three pre-existing environmental PTY test failures): the owner's explicit request to fix the PTY test failures by either making tests robust to timing variations or fixing host-level contention.
+- 000246 (Terminal panel drops its connection and restarts unprovoked): related terminal infrastructure reliability issue.
+
+**Related documents:**
+- PLAN-027 (Workbench Features and Defects) groups 000099/000129 as G56, marked "DELIVERED" with note that the suite is green.
+- REQ-012 (Workbench Features Defects) lists 000099 and 000129 in "Already delivered" section for fixing the three red PTY tests.
+- docs/00-working/ports-and-processes-lifecycle.md: discusses PTY child reaping and terminal test issues, citing 000099, 000129, and 000246.
+- test/test_demo_terminal_api.py: delivered as part of phase-idg-11 (Terminal interaction API build, SESS-2026-10-08-11). The test ran 150 times after review in that phase.
+- SESS-2026-10-08-18 (phase-wbf-14): Judge finding notes test_control_characters_reach_the_shell failed under runner gate load but passed in local runs, confirming the intermittent nature.
+
+**Additional pattern:**
+A similar timing-dependent pattern exists in test_broker.py::test_cli_check_exits_two_on_sigterm, which sleeps a fixed 300ms before sending SIGTERM. This suggests a class of timing-sensitive signal/subprocess tests that should wait for evidence (e.g., log output, state change) rather than fixed delays.
+
+PROPOSED LINK: 000644 --relates_to--> 000099 (Both are terminal tests with timing-related flakiness under load; 000099 documents the broader environmental failure class)
+PROPOSED LINK: 000644 --relates_to--> 000129 (Both need terminal test robustness improvements; 000129 owns the solution path for similar issues)
+
+</details>
 
 ---
 
 ## 000645 · The viewer's absent-page check prints the same message for a missing route and a missing file.
 
-**Created 2026-10-08T07:16:57+00:00 · Status: `open`**
+**Created 2026-10-08T07:16:57+00:00 · Status: `triaged`**
 
 The viewer's absent-page check cannot tell "route absent" from "file missing"; both print "does not exist". When the route is absent, a message such as "the file route is not enabled; start the frontend with D_SYSTEM_DEMO_TERMINAL=1" would be more accurate.
 Raised by Builder A (phase-wbf-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:16-04:00): Idea 000645 is a follow-up to the HTML Viewer's absent-page handling, which was completed in phase-wbf-16 (delivered 2026-10-08). The idea asks for better error messaging to distinguish "route absent" from "file missing" scenarios.
+
+Related documents and ideas:
+
+- **Idea 000555** ("HtmlViewerRegion's page-exists check is fooled by Vite's SPA fallback") is the technical diagnosis of the underlying problem, triaged. Both ideas describe the same defect from different angles — 000555 names the root cause (Vite's fallback answers 200 for missing files) and 000645 names the UX consequence (the error messages are not distinctive).
+
+- **PLAN-027** (Workbench features and defects, P11) and **REQ-012** (Workbench features and defects requirements) govern this work. Amendment 2026-10-08 added **phase-wbf-16** ("Report a missing HTML Viewer page when the file route is absent") to address idea 000555. The phase is now complete (status: complete).
+
+- **REQ-012 R29** specifies the requirement: "With `D_SYSTEM_DEMO_TERMINAL` unset in the frontend process, an HTML Viewer tab holding a persisted file selection shows the absent-page message and does not frame the application shell." Verification notes confirm the fix is working: the panel now reads "Selected page is absent" when the route is absent (flag unset) and renders normally when the route is present (flag set).
+
+The phase deliverables include `ts/src/stage/HtmlViewerRegion.tsx` and new test coverage in `HtmlViewerRegion.test.tsx`. The completion evidence shows the fix distinguishes responses based on the Content-Security-Policy header (present for route responses, absent for fallback responses), and the viewer now displays the distinct "Selected page is absent" message.
+
+Idea 000645's specific request — a message such as "the file route is not enabled; start the frontend with D_SYSTEM_DEMO_TERMINAL=1" — suggests additional context beyond what the current "Selected page is absent" message conveys. However, the core diagnostic problem (distinguishing route-absent from file-missing) is already resolved by the completed work. Whether the message needs further enhancement with D_SYSTEM_DEMO_TERMINAL context is an owner decision about the message text itself, not about the underlying feature.
+
+PROPOSED LINK: 000645 --relates_to--> 000555 (both describe the absent-page check's inability to distinguish route-absent from file-missing scenarios; 000555 diagnosed the root cause, 000645 names the UX consequence)
+
+</details>
 
 ---
 
 ## 000646 · REQ-037 rows that name .stage-region__header need amending in arch-07's requirements work.
 
-**Created 2026-10-08T07:16:58+00:00 · Status: `open`**
+**Created 2026-10-08T07:16:58+00:00 · Status: `triaged`**
 
 REQ-037 rows that name .stage-region__header, and the "Header controls" rows that measure bar controls against the panel box, need amending in arch-07's requirements work; test/test_workbench_fit_contracts.py references stage-region__header.
 Raised by Builder B (phase-arch-07) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:17-04:00): Idea 000646 identifies an amendment task for REQ-037 that phase-arch-07 must perform. 
+
+REQ-037 (Workbench content-fit contracts, created 2026-10-08 by phase-arch-05) defines a panel contract table with "Header controls" rows for eight panel types (terminal, terminal-cmd, terminal-powershell, html-viewer, overview, file-browser, idea-explorer, backlog-explorer). Each row specifies that the selector `.stage-region__header` must implement wrap mode — the controls must reflow and not overflow their box. The test file test/test_workbench_fit_contracts.py reads and applies these rows.
+
+ADR-031 (Slots are schema-owned frames with sub-slots, accepted 2026-10-08) establishes the architectural change that makes this amendment necessary. The decision states that every slot has a header and eight of the nine panel types render a second one with controls (terminal, html-viewer, overview, file-browser, idea-explorer, and backlog-explorer). The architectural model moves those per-panel headers into the slot's header frame instead, so panels no longer render `.stage-region__header` elements. ADR-031 names phase-arch-07 (Implement schema-owned slots and sub-slots with structural eligibility) as one of five phases that this decision gates.
+
+Phase-arch-07 is currently active (status: active, priority 2). Its scope includes making the slot schema own the top bar so a hosted panel cannot render a second one, and amending REQ-007 W16 (per-panel eligibility lists) to structural matching. When phase-arch-07 removes the per-panel headers and consolidates controls into the slot header, the REQ-037 rows that reference `.stage-region__header` will become stale and will need amendment to specify how the relocated controls fit the slot header frame instead.
+
+Related idea 000640 (REQ-037's live runner keys panel assignments by bare panel id, which breaks arch-07 and arch-08) explicitly flags that both arch-07 and arch-08 will break the current approach used by REQ-037's live runner. The idea confirms that phase-arch-07's structural changes are known to require updates to REQ-037.
+
+The amendment belongs in phase-arch-07's deliverables because it is part of the header architecture work and must verify that the relocated controls meet their fit contracts in the slot's frame.
+
+</details>
 
 ---
 
 ## 000647 · The notes-strip mixing ruling should be recorded in REQ-012 or GOV-003 once the owner ratifies it.
 
-**Created 2026-10-08T07:16:58+00:00 · Status: `open`**
+**Created 2026-10-08T07:16:58+00:00 · Status: `triaged`**
 
 Record the notes-strip mixing ruling (one rotation is all text or all images) in REQ-012 or GOV-003 once the owner ratifies it.
 Raised by Standby Builder (phase-wbf-06 fix round) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:18-04:00): Idea 000647 asks to record the notes-strip mixing ruling in REQ-012 or GOV-003 once the owner ratifies it. This has been fully delivered.
+
+**Recording status:**
+
+The notes-strip mixing ruling ("a rotation is all text or all images; mixing is not allowed") is now recorded in two governed documents:
+
+1. **REQ-012, requirement R14** — The requirement row explicitly states the ruling with its implementation detail: "The rotator can rotate image entries as well as text, with a stated sizing rule inside the small panel, and a stated ruling on whether text and image entries may mix in one rotation." The R14 row includes the footnote: "R14's mixing ruling (owner, 2026-10-08). A rotation is all text or all images; mixing is not allowed. A notes file that lists `points` and names an `imageDirectory` is rejected with a message before the directory is read. `phase-wbf-06` built the rotator on that ruling, idea `000647` asked for it to be recorded here, and the owner ratified it on 2026-10-08 (GOV-003)."
+
+2. **GOV-003, section "The 2026-10-08 workbench run's ratification table"** — The 2026-10-08 ratification table explicitly records: "phase-wbf-06 | A rotation is all text or all images; mixing is not allowed | accepted; recorded in `REQ-012` in this commit (idea `000647`)". This entry confirms the owner's 2026-10-08 ratification of the ruling.
+
+The ruling was implemented in phase-wbf-06, and the owner approved both the implementation and the recording on 2026-10-08. No other governing documents touch this specification; REQ-012 and GOV-003 are the authoritative records.
+
+No related idea overlaps with this specific ask. Ideas 000613 (notes strip font size), 000628 (dropdown trigger overflow), 000634–000635 (fixture directory and REQ-037 cleanup), and 000668 (help trigger unreachable) address separate notes-strip defects and enhancements from the same run.
+
+PROPOSED PROMOTION: 000647 -> REQ-012 (the mixing ruling is fully documented in requirement R14 with owner ratification recorded in GOV-003)
+
+</details>
 
 ---
 
 ## 000648 · The entry-box overflow rules should move out of the inline style and into StagePage.css.
 
-**Created 2026-10-08T07:16:58+00:00 · Status: `open`**
+**Created 2026-10-08T07:16:58+00:00 · Status: `triaged`**
 
 Move the entry-box overflow rules out of the inline style into StagePage.css in a later CSS pass (inline overflow: hidden overrides the stylesheet's overflow-y: auto).
 Raised by Standby Builder (phase-wbf-06 fix round) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:19-04:00): The entry-box overflow rules documented as a minor defect during phase-wbf-06 review (2026-10-08). Finding F06 in the demo-adversary verdict notes that ENTRY_BOX_STYLE sets overflow:hidden inline, overriding StagePage.css's overflow-y:auto rule; the verdict recommends deferring to "a later CSS pass." The same issue is referenced in the review-judge verdict finding F03.
+
+Related documents: PLAN-027-workbench-features-defects.md (the workbench programme containing phase-wbf-06); docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-06-demo-adversary.json (finding F06); docs/08-governance/reviews/verdicts/2026-10-08-phase-wbf-06-review-judge.json (finding F03, which cites the same issue).
+
+No other ideas overlap with this refactoring. No phase is currently assigned for this CSS cleanup work.
+
+</details>
 
 ---
 
 ## 000649 · The fit check never measures the overview panel's tooltip, because its cells never place that panel.
 
-**Created 2026-10-08T07:16:58+00:00 · Status: `open`**
+**Created 2026-10-08T07:16:58+00:00 · Status: `triaged`**
 
 The fit check only measures tooltips present in each layout's default panels, so the overview panel's tooltip (layout 2 main slot) is never measured; assign the overview panel to a slot in the fit check's cells.
 Raised by Batch Runner (phase-wbf-14) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:20-04:00): ## Finding: fit check cells do not systematically measure overview panel tooltip
+
+The fit check in REQ-037 ("Workbench content-fit contracts") defines a live test matrix that measures every panel type in every eligible slot across multiple layouts and window sizes. The overview panel, which exists only in layout-2's main slot, is not currently assigned to any cells in this test matrix, so its tooltip (a floating surface) is never measured by the systematic fit check command.
+
+During phase-wbf-14 (SESS-2026-10-08-18), when the tooltip fix was delivered and tested, the owner ran manual Playwright tests over 14 tooltip triggers (notes, terminal, and overview; two sizes; both layouts; layout-2 with overview in main slot) and confirmed the overview tooltip behaves correctly. However, the fit check's own cell matrix—which is the automated, repeatable verification mechanism described in REQ-037 C05—does not include the overview panel in layout-2's main slot, so the overview tooltip is not part of the matrix and is not re-verified on future changes.
+
+REQ-037's floating-surface table (line 156-158) lists the tooltip with three contract modes: `in-viewport`, `not-clipped`, and `text-fits`. All three apply equally to the overview panel's tooltip, but the live test matrix does not exercise them for this panel. The session record (SESS-2026-10-08-18, "Unresolved" section) explicitly notes this gap.
+
+**Related documents:** REQ-037 (the fit contracts requirement and the live test matrix definition), phase-wbf-14 (the tooltip fix), SESS-2026-10-08-18 (the session where the gap was discovered).
+
+**Related idea:** 000130 (the original rotator tooltip cutoff bug, fixed by phase-wbf-14).
+
+</details>
 
 ---
 
 ## 000650 · A tooltip bubble's roughly 8 px gap from its trigger collapses it before the pointer can reach it.
 
-**Created 2026-10-08T07:16:58+00:00 · Status: `open`**
+**Created 2026-10-08T07:16:58+00:00 · Status: `triaged`**
 
 A tooltip bubble has a roughly 8 px gap from its trigger, so a fast pointer move across the gap collapses it before it reaches the bubble; a transparent bridge or a short close delay would let the user reach and scroll a tall bubble.
 Raised by Batch Runner (phase-wbf-14) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:21-04:00): The issue described in idea 000650 — an 8 px gap between tooltip trigger and bubble that collapses the tooltip when the pointer moves quickly across the gap — has been fully resolved and is already shipped in the codebase.
+
+The transparent bridge element solution proposed in the idea was implemented during phase-wbf-14 testing (2026-10-08) as review finding F02, in commit 134ec7f8 ("Keep the tooltip's scroll position and bridge the gap to the trigger"). The Tooltip.tsx component wraps each tooltip bubble in a transparent `stage-tooltip__bridge` element positioned with `position: fixed` and carries the 8 px gap as CSS padding (VIEWPORT_MARGIN = 8 in the code). This keeps the pointer inside the tooltip's hover region while crossing the gap to the bubble. The solution is confirmed in place across ts/src/stage/Tooltip.tsx, StagePage.css, and Tooltip.test.tsx, with test coverage for hover behavior across multiple viewport sizes and tooltip positions.
+
+Related ideas raised during phase-wbf-14 testing cover other tooltip and trigger-interaction issues, though they are distinct problems: 000130 (notes strip tooltip clipped by overflow:hidden, addressed by portaling the bubble to document.body in phase-wbf-14), 000649 (fit check not measuring overview panel tooltip), and 000668 (notes strip help trigger unreachable at narrow viewports). This idea's specific gap-and-collapse problem is separate from those — they concern visibility and reachability, while 000650 concerns pointer tracking across the gap itself.
+
+The idea captures a finding discovered during phase-wbf-14 that was acted on immediately; like ideas 000110, 000118, and 000119 discussed in PLAN-027, it documents work delivered directly as code without producing a governed document. A `resolved` status (distinct from `promoted` and `discarded`) would be appropriate, but no such status exists in the schema; this finding records the resolution in place.
+
+</details>
 
 ---
 
 ## 000651 · The slot-header panel switcher silently ends every session of the panel it hides.
 
-**Created 2026-10-08T07:16:59+00:00 · Status: `open`**
+**Created 2026-10-08T07:16:59+00:00 · Status: `triaged`**
 
 The slot-header panel switcher silently ends every session of the panel it hides (3 tabs to 0 observed); no warning, and the region tooltip's "switching ... never ends a session" reads as covering it.
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:22-04:00): Idea 000651 reports that the slot-header panel switcher silently terminates all sessions of the panel it hides, with no warning or confirmation dialog. This is documented as Finding F1 in the terminal persistence and performance audit (`terminal-persistence-audit.md`, staging document for phase-arch-16), where the issue was discovered and measured: three tabs with markers went to zero server sessions when the slot header switched to a different shell, and returning gave one fresh tab with a new pid and lost marker.
+
+Related governed documents:
+- `REQ-012` R34 (Workbench features and defects requirements) requires a decision record stating how terminal sessions are preserved across visible-panel switches and layout switches, naming this as one of the five related ideas.
+- `PLAN-027` G73 (Workbench features and defects plan) maps this issue and four related ideas (000671, 000652, 000107, 000087) to phase-wbf-21 "Decide how terminal sessions survive panel and layout switches", with the note "Panel and layout switches end terminal sessions (audit findings F1 and F2). The owner ruled they should be preserved, not warned about. A decision record comes first; nothing is built."
+- `REQ-007` W16 (Workbench requirements) states that slot-header dropdowns "switch among a slot's assigned panels and never re-assign" but is silent on session termination.
+- `ADR-031` (Slot configuration schema model) describes the panel switcher component and the visible-panel switching mechanism.
+
+Related ideas:
+- 000107: Terminal session lost on layout switch when the stored visible panel differs between layouts (root cause and manifestation of the same family of issue, both covered by the same decision in 000671).
+- 000671: The placeholder idea for the decision record about session preservation across panel and layout switches (the owner ruled on 2026-10-08 that sessions should be preserved, not warned about, per GOV-003).
+- 000652: Related session preservation issue.
+
+Verification:
+- The issue is measured and documented with procedural steps reproducible in section 5.2 of `terminal-persistence-audit.md`.
+- Code paths in `ts/src/stage/Slot.tsx` and `ts/src/stage/StagePage.tsx` show that hidden panels are intentionally unmounted to stay within the six-session cap (ADR-014 decision 4), which is why the session ends.
+- The only text in the switcher popover is the panel names; the terminal region's tooltip says "Switching tabs or collapsing this region never ends a session", which a reader can misinterpret as covering this switcher, even though "tabs" refers to session tabs inside one panel.
+
+Status: The issue is triaged, documented in audit findings, and awaiting the decision record (000671) and implementation phase (phase-wbf-21). Nothing is built yet.
+
+PROPOSED LINK: 000651 --relates_to--> 000671 (both address session preservation across panel and layout switches; 000671 is the decision record covering this and related issues)
+
+</details>
 
 **Links**
 
@@ -26124,10 +27338,28 @@ Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
 
 ## 000652 · A layout switch can end a shell silently and bypasses the re-assignment dialog's confirmation.
 
-**Created 2026-10-08T07:16:59+00:00 · Status: `open`**
+**Created 2026-10-08T07:16:59+00:00 · Status: `triaged`**
 
 A layout switch can end a shell silently when the stored visible panel differs between layouts (000107 residual); it also bypasses the re-assignment dialog's confirmation. (Annotate 000107.)
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:23-04:00): **Covered in PLAN-027 programme P11, group G73 (Session persistence decision)**
+
+Idea 000652 is part of a group of related session-persistence findings from the terminal persistence audit (phase-arch-16). It is already linked to 000107 (relates_to) as the residual of that audit issue.
+
+The issue — that a layout switch can end a shell silently while bypassing the re-assignment dialog's confirmation — is directly addressed by requirement `R34` in REQ-012 (workbench features/defects requirements). That requirement specifies a decision record that must state how terminal sessions are preserved across panel and layout switches, answering six architectural questions.
+
+The group's five ideas (000671, 000651, 000652, 000107, 000087) are consolidated under phase-wbf-21 in the backlog, which is queued to produce a decision record (ADR) on session persistence and survival across switches. The phase depends on several foundational ADRs: ADR-031 (slot configuration schema, which redefines panel identity and session ownership per instance), ADR-014 (terminal capability), and ADR-030 (terminal interaction API). Related layout design is documented in ADR-016 (superseded by ADR-031).
+
+This is planned and queued; phase-wbf-21 will produce the governing decision record, after which implementation phases will follow.
+
+</details>
 
 **Links**
 
@@ -26138,10 +27370,29 @@ Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
 
 ## 000653 · The server closes any session with no client frame for 300 s, whatever it is running.
 
-**Created 2026-10-08T07:16:59+00:00 · Status: `open`**
+**Created 2026-10-08T07:16:59+00:00 · Status: `triaged`**
 
 The server closes any session with no client frame for 300 s whatever it is running (close code 1006, empty reason, no page keepalive); a long build is killed like an abandoned prompt (candidate cause for 000246; annotate 000246).
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:25-04:00): Idea 000653 identifies the root technical mechanism behind the terminal panel's unprovoked connection drop documented in idea 000246 (Terminal panel drops its connection and restarts unprovoked, and it cost a live demo). The 300-second idle timeout on websocket frames is a known architectural fact, documented in ADR-030 (The external terminal interaction API is a second-flag, token-authenticated, loopback HTTP surface over one shared output buffer) as part of the websocket session lifecycle.
+
+Related plans and documents:
+- PLAN-027 (Workbench features and defects) group G64 and phase-wbf-12 assign diagnosis of 000246 (the terminal unprovoked drop) to understand why sessions close; phase-wbf-12's deliverable is to name the cause and provide a note. The leading candidate explicitly cited in PLAN-027 is "the 300 s receive-idle bound, which shell output does not reset" — exactly the mechanism 000653 documents.
+- ADR-030 records this as a fact in section "Facts from the repository that bind the decision," point 3: "The idle bound counts websocket frames only. terminal_websocket wraps websocket.receive() in a 300 second timeout (D_SYSTEM_DEMO_TERMINAL_IDLE_TIMEOUT_SECONDS overrides it). Input arriving over HTTP would not reset it, so a session driven only by HTTP under an idle browser tab would be reaped after 300 seconds." The code reference is src/api/routes/demo_terminal.py.
+- Session records docs/03-sessions/SESS-2026-10-08-17-terminal-persistence-audit.md and working notes docs/00-working/terminal-persistence-audit.md both measure and document this timeout behavior in operation, confirming that "a session with no keystrokes for 300 seconds is closed by the server, whatever it is running, and the page has no keepalive."
+
+The link between 000653 and 000246 (relates_to) is already recorded. Both ideas relate to websocket close codes: idea 000137 (Global-cap websocket refusal should reach the browser as a structured close reason) addresses close code 1006 delivery and is already linked to 000246.
+
+No related plan, phase or document found that treats this as a delivered solution; the timeout remains an open issue under investigation and diagnosis.
+
+</details>
 
 **Links**
 
@@ -26151,138 +27402,500 @@ Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
 
 ## 000654 · The 'Terminal connection closed' message advises a reload that ends every other live session.
 
-**Created 2026-10-08T07:17:00+00:00 · Status: `open`**
+**Created 2026-10-08T07:17:00+00:00 · Status: `triaged`**
 
 The "Terminal connection closed. Reload the page to reconnect." message advises an action that ends every other live session in every panel; there is no per-tab reconnect.
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:26-04:00): The "Terminal connection closed. Reload the page to reconnect." message advises a reload that ends every other live terminal session in every panel, with no per-tab reconnect capability.
+
+This issue is already documented in the terminal persistence audit (docs/00-working/terminal-persistence-audit.md, finding F4), which confirms that page reload ends all terminal sessions without notice, as a designed consequence of ADR-014 decision 4 ("sessions still die with their websocket"). The audit's section 4.1 (bash row 5) records that the browser shows no notice of any kind when a page reloads, and the connection-closed message advice "Reload the page to reconnect" advises exactly the action that terminates every other live session in every panel.
+
+Related plan: PLAN-027 (Workbench features and defects), which documents the terminal persistence audit findings and sequences the fix phase.
+
+Related decision: ADR-014 (The workbench terminal is a gated product capability), which establishes the current rule that "one PTY per websocket stays; sessions still die with their websocket" (decision 4).
+
+Related ADR: ADR-030 (The external terminal interaction API), which defers detach and reattach to a further decision record (section 6 and open item 3).
+
+Related phases: phase-wbf-12 through phase-wbf-21 address terminal-related defects. Specifically, phase-wbf-21 ("Decide how terminal sessions survive panel and layout switches") is queued to write an ADR that decides how to preserve sessions across visible-panel and layout switches, with the goal of stopping the findings documented in the persistence audit (findings F1 and F2). That phase's scope explicitly names the audit and reopens ADR-014 decision 4 and ADR-030 open item 3.
+
+PROPOSED LINK: 000654 --relates_to--> 000671 (Both address terminal session persistence across user actions like reload or layout switch)
+
+</details>
 
 ---
 
 ## 000655 · Under the dev server, StrictMode doubles each terminal mount and falsely refuses a new tab near the session cap.
 
-**Created 2026-10-08T07:17:00+00:00 · Status: `open`**
+**Created 2026-10-08T07:17:00+00:00 · Status: `triaged`**
 
 Under the dev server, StrictMode opens two websockets and spawns two shells per terminal mount; at 5 live sessions a new tab was falsely refused with "Maximum of 6 ..." in 2 of 4 trials (production build 0 of 4); the runbook demos on the dev server.
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:27-04:00): **Related plan and audit:** This exact issue is documented as Finding F5 in the terminal persistence audit (`docs/00-working/terminal-persistence-audit.md`), the deliverable of `phase-arch-16` (Terminal persistence and performance audit across three shells, a phase of `PLAN-028`). The audit confirms the false refusals occur in the development server with React StrictMode—at five live sessions, new tabs were refused with "Maximum of 6 concurrent terminal sessions reached" in 2 of 4 trials and 4 of 8 trials, although a sixth slot remained free. The production build refused 0 of 4 under identical conditions.
+
+**Root cause (inferred, not traced):** The development server's StrictMode causes each terminal mount to open two websockets: the first closes as soon as its handshake completes, but while it holds the sixth session slot, the second websocket arrives and finds no slot available. The production build, which does not double-mount, refuses 0 of 4 attempts, confirming that the false refusal is a StrictMode artifact.
+
+**Related requirements and decisions:**
+- `REQ-011` R23 and R24 (terminal persistence matrix and five performance measurements) are answered by `phase-arch-16`
+- `ADR-014` decision 4 defines the `MAX_CONCURRENT_SESSIONS = 6` cap globally across all pages and panels
+
+**Related ideas:**
+- 000107 (terminal session lost on layout switch when the stored visible panel differs between layouts) — underlying architectural issue mentioned in phase-arch-16
+- 000656 (A tab refused at the session cap stays dead after slots free up) — direct consequence of the false refusal; a refused tab remains refused even after slots free
+- 000642 (Per-instance terminal tab caps of 4 against a global cap of 6 let two instances reach the cap with fewer than 8 tabs) — related to session cap accounting
+- 000654 ('Terminal connection closed' message advises a reload that ends every other live session) — related terminal/websocket issue
+
+**Current status:** The issue is documented but not yet fixed. Phase-arch-16 (complete as of 2026-10-08) identified this as one of thirteen findings for the idea log, none of which were fixed by that phase itself. The audit notes that the `StrictMode` explanation is inferred from the doubled mount and the contrast with the production build; the ordering of slot release and second-socket arrival was not traced.
+
+PROPOSED LINK: 000655 --relates_to--> 000656 (false refusals and refused-tab persistence are linked consequences of the dev-server StrictMode double-mount)
+PROPOSED LINK: 000655 --relates_to--> 000642 (both related to terminal session cap allocation and instance-vs-global cap accounting)
+
+</details>
 
 ---
 
 ## 000656 · A tab refused at the session cap stays dead after slots free up.
 
-**Created 2026-10-08T07:17:00+00:00 · Status: `open`**
+**Created 2026-10-08T07:17:00+00:00 · Status: `triaged`**
 
 A tab refused at the session cap stays dead after slots free; "+ New session" stays enabled at the cap; the tab shows only the server's reason, never the "close a session" instruction.
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:28-04:00): Idea 000656 describes a client-side UX issue when the terminal session cap (6 concurrent sessions) is reached: a tab refused at the cap stays dead even after slots free up, the "+ New session" button remains enabled at cap, and the tab shows only the server's reason without guidance to close an existing session.
+
+This issue is documented in the terminal-persistence-audit.md (finding F6) that audited terminal behavior across shells and events. The audit found the specific behaviors: a refused tab stays refused after slots free, the button stays enabled at the cap (its own 4-tab limit per panel), the server's reason is shown but not the instruction to close a session (which only appears on handshake failures).
+
+Related plans and issues:
+
+- **PLAN-027 phase-wbf-09** (Terminal route defects: cap race, shell override, close reason) covers idea 000095 (session-cap TOCTOU race, R20) and idea 000137 (structured close reason, R21). Idea 000137 addresses part of this by ensuring the browser receives a structured close frame with a quotable reason rather than code 1006 with an empty reason.
+
+- **REQ-012 R21** requires a cap refusal to reach the browser as a structured close frame and the panel to display that reason. This partially addresses 000656's "shows only the server's reason" concern but does not address the retry behavior, button state, or guidance message.
+
+- **Related defects**: Ideas 000657 (restore after drop reopens sessions, undocumented), 000658 (component-local state lost on reload), and other findings from the terminal-persistence-audit (F6-F11) are similar UX gaps around session and state persistence.
+
+Distinction: The session-cap race (000095) is a server-side concurrent-connection issue addressed by R20 (reserve slot before accept). The close-reason defect (000137) is about protocol/message format addressed by R21. Idea 000656 is a client-side UX/behavioral issue: after a cap refusal, the tab doesn't recover when slots free up, the retry button isn't disabled, and the user gets no actionable guidance. These are complementary but separate concerns—000095 and 000137 fix the infrastructure, 000656 addresses the experience after refusal.
+
+No existing phase explicitly covers the retry behavior, button state feedback, or "close a session" instruction guidance. Such work would likely follow after R20 and R21 land, as part of terminal panel UX polish or as part of the session persistence decision (PLAN-027 R34, phase-wbf-21) that the owner is ratifying.
+
+PROPOSED LINK: 000656 --relates_to--> 000137 (structured close reason enables showing server's refusal reason, but not retry guidance)
+PROPOSED LINK: 000656 --relates_to--> 000657 (both concern session state recovery and communication)
+
+</details>
 
 ---
 
 ## 000657 · Restore after a drop reopens one session per previous tab, and no document says so.
 
-**Created 2026-10-08T07:17:00+00:00 · Status: `open`**
+**Created 2026-10-08T07:17:00+00:00 · Status: `triaged`**
 
 Restore after drop reopens one session per previous tab (3 to 3; 4 to 4, which is 8 websockets on the dev server); no document says so and the dropped message gives no count.
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:29-04:00): Related plan and requirement: The behavior described in this idea is now documented in the terminal persistence audit completed by `phase-arch-16` (Terminal persistence and performance audit across three shells), which answers `REQ-011` R23. The audit is recorded in the session document `SESS-2026-10-08-17` and staged in `docs/00-working/terminal-persistence-audit.md`. The audit explicitly documents that "restore starts as many fresh sessions as there were tabs" and includes detailed evidence (section 5.4: "Three tabs before the drop gave three new sessions after restore (pid new, marker gone)").
+
+Related requirement details: `REQ-011` R23 requires a terminal persistence matrix covering drop/restore events with three columns: survival (whether the session survives), intent (whether that is intended), and communication (whether the user is told). The audit documents all three; in the communication column for restore it states: "It does not say how many sessions will start, and restore itself asks nothing."
+
+Documentation status: The behavior is now documented (audit completed 2026-10-08), but the issue the idea raised remains valid: the UI message "Terminal dropped ... choose "Restore terminal" to start fresh sessions" does not communicate the count of sessions that will be restored. The audit explicitly identifies this gap: "After drop the panel says 'Terminal dropped ... choose "Restore terminal" to start fresh sessions.' It does not say how many sessions will start."
+
+Related document: The terminal persistence audit in `docs/00-working/terminal-persistence-audit.md` is ungoverned staging (`ADR-010`), not yet promoted to a final governed document in `docs/`. The audit is the deliverable of `phase-arch-16`, whose result is recorded in `docs/09-backlog/backlog.yaml`.
+
+The idea's core observation — that the behavior was not documented — is now addressed by `phase-arch-16`'s audit. The secondary observation — that the UI message gives no count — remains as a known communication gap explicitly noted in the audit.
+
+</details>
 
 ---
 
 ## 000658 · Collapsed, dropped and tab-count state is component-local and lost on reload, with no stated intent.
 
-**Created 2026-10-08T07:17:01+00:00 · Status: `open`**
+**Created 2026-10-08T07:17:01+00:00 · Status: `triaged`**
 
 Collapsed state, dropped state and tab count are component-local: lost on reload and on a visible-panel round trip, and a reload of a dropped terminal returns a live terminal; no document says which is intended.
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:30-04:00): Idea 000658 is directly documented as finding F8 in the terminal persistence audit completed by phase-arch-16 on 2026-10-08 (PLAN-028, workbench architecture quality programme). The audit document (`docs/00-working/terminal-persistence-audit.md`, section 7) records:
+
+"F8: Collapse, drop and tab count are component-local and are lost on reload and on a visible-panel round trip. A reload of a dropped terminal returns a live terminal with a new session. No document says whether that is intended."
+
+This exactly matches the issue stated in 000658. The audit also documents related findings: F1 (visible-panel switch ending sessions silently), F2 (layout switch ending shells silently), and F7 (restore after drop reopening one session per previous tab with no stated count). All five of these behaviors are captured in the three-shell by five-event persistence matrix in REQ-011 R23, with intent and communication gaps identified.
+
+The terminal persistence audit is complete and meets REQ-011 R23 and R24 (section 4.1 and 6 of the audit). The audit records two unresolved design decisions: D1 (whether silent session endings on visible-panel and layout switches are intended) and D5 (the 300-second idle close diagnosis). These decisions await owner ruling and do not block the audit's completion—the findings are documented with their gaps, not filled in with guesses.
+
+The work 000658 asked for (documenting that state is lost and whether it is intended) has been performed and documented in the audit. Whether to carry the owner's eventual ruling (D1) into a new phase or requirement is a separate decision.
+
+</details>
 
 ---
 
 ## 000659 · PosixPtyAdapter.close() sends SIGTERM to bash only and never waits, so shells can outlive their session.
 
-**Created 2026-10-08T07:17:01+00:00 · Status: `open`**
+**Created 2026-10-08T07:17:01+00:00 · Status: `triaged`**
 
 PosixPtyAdapter.close() sends SIGTERM to bash only and never waits; shells inherit the backend's signal dispositions, so a backend started under nohup leaves foreground jobs running after the session ends; a defunct bash stayed a child of the backend.
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:31-04:00): Idea 000659 describes a specific manifestation of the PosixPtyAdapter.close() lifecycle issue: shells outliving their session when run under nohup, with defunct bash remaining as a child of the backend. The issue was raised by Builder B during phase-arch-16 (Terminal persistence and performance audit, PLAN-028 group G47) on 2026-10-08, the same day as the related findings below.
+
+Related existing ideas and materials:
+- 000605 (open, PosixPtyAdapter.close() has no wait, no SIGKILL escalation and no process-group signal): Describes the same underlying code issue from a broader perspective. Both mention that SIGTERM alone does not stop an interactive bash, that children ignoring SIGHUP or calling setsid survive close(), and that the root cause lies in close() not waiting or escalating signals.
+- 000113 (triaged, Audit terminal persistence and performance across three shells): The phase-arch-16 audit that produced 000659 as a finding.
+- 000099, 000129 (delivered, G56 PTY tests in PLAN-027): Earlier PTY test fixes mentioned in 000605 as the "PTY reaping thread" context.
+- 000246 (triaged, Terminal panel drops its connection and restarts unprovoked): Related terminal lifecycle issue raised the same week.
+- docs/00-working/ports-and-processes-lifecycle.md section 4.4 ("A PTY shell: what close() does"): Contains the detailed technical analysis and observations showing that SIGTERM has no effect on interactive bash, that the fd hangup is what ends the session, and that children ignoring SIGHUP survive with parent pid 1.
+
+PLAN-028 (Workbench architecture and quality) places the terminal persistence audit in phase-arch-16 with no dependencies, and REQ-011 R23 requires the audit to "state whether the session survives, whether that is intended, and whether it is communicated to the user" for shell, CMD and PowerShell across layout switches, visible-panel switches, and other state transitions. This idea feeds that requirement.
+
+000659 is a defect finding, not a planning idea. Its root cause appears fully documented in 000605 and the lifecycle exploration, pointing toward possible solutions (escalate to SIGKILL, signal the process group, wait for shell exit, or detach children deliberately). The issue spans session lifecycle, process reaping, and platform-specific signal handling (bash, CMD, PowerShell each behave differently), and likely requires coordination across PTY management and session persistence work.
+
+PROPOSED LINK: 000659 --relates_to--> 000605 (both describe aspects of PosixPtyAdapter.close() not properly terminating shells and their children)
+
+</details>
 
 ---
 
 ## 000660 · Client scrollback is xterm's unconfigured default of 1000 lines, and no document states it.
 
-**Created 2026-10-08T07:17:01+00:00 · Status: `open`**
+**Created 2026-10-08T07:17:01+00:00 · Status: `triaged`**
 
 Client scrollback is xterm's unconfigured default of 1000 lines and is stated nowhere; long build logs cannot be scrolled back through.
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:32-04:00): **Overlap with related idea:** Idea 000630 ("xterm 6 moved scrolling to a virtual scrollbar") addresses a related xterm scrollback issue — where xterm 6 changed how the `.xterm-viewport overflow: scroll` CSS rule behaves. The two ideas describe different problems in the same xterm scrollback area: 000630 focuses on xterm 6's scrollbar mechanism change, while 000660 focuses on the undocumented 1000-line buffer limit.
+
+**Documents referencing scrollback behavior:**
+- The terminal persistence audit (SESS-2026-10-08-17) explicitly documents the finding: "Scrollback | 1000 lines on the client (xterm default), 256 KiB ring on the server for the API only" — confirming the 1000-line default exists but validating it only in an ungoverned session document.
+- REQ-037 (workbench content-fit contracts) mentions scrollback handling in several contexts, including a note that "For xterm 6, whose scrollback moves through its own scrollbar while the native `.xterm-viewport` reports `overflow: scroll` and never scrolls."
+- REQ-006 R10 requires scrollback to survive tab switches and region collapse, but does not specify or configure the buffer size.
+- REQ-011 R24 requires the audit to report scrollback handling, and it does (see SESS-2026-10-08-17).
+
+**Code review:** The terminal initialization in `ts/src/stage/TerminalRegion.tsx` (lines 193–199) creates xterm instances without configuring the `scrollback` option, which means it uses xterm.js's documented default of 1000 lines. This default is never overridden.
+
+**Documentation gap:** The 1000-line limit is not mentioned anywhere in the governed documents (plans, requirements, decisions) — it appears only in the session audit. Builders have no way to know this constraint exists or how to configure it. The idea correctly identifies that this limitation and its configurability belong in the documented surface.
+
+PROPOSED LINK: 000660 --relates_to--> 000630 (both describe xterm scrollback constraints; 000630 addresses xterm 6's mechanism change, 000660 addresses the undocumented 1000-line buffer limit)
+
+</details>
 
 ---
 
 ## 000661 · The only persistence regression guard, REQ-007 W15, covers bash alone, and no check covers CMD or PowerShell.
 
-**Created 2026-10-08T07:17:02+00:00 · Status: `open`**
+**Created 2026-10-08T07:17:02+00:00 · Status: `triaged`**
 
 The only persistence regression guard (REQ-007 W15) is written with bash commands; no check covers CMD or PowerShell persistence.
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:33-04:00): **Related governance and audit findings**
+
+Idea 000661 identifies a gap in the terminal persistence regression guard: the only automated guard (REQ-007 W15) is written in bash commands and covers bash shell persistence only, leaving CMD and PowerShell persistence unchecked.
+
+The terminal persistence and performance audit (phase-arch-16, complete 2026-10-08) covers this exact concern. Phase-arch-16 delivered a three-shell by five-event persistence matrix per REQ-011 R23 and R24, documenting session survival, intent and communication for bash, CMD and PowerShell across five events (layout switch, visible-panel switch, re-assignment, collapse/drop/restore, page reload). The audit explicitly documents that bash persistence is measured with automated commands on Linux, while CMD and PowerShell persistence cannot be verified with automated checks on Linux — those cells are marked as owner-machine checks (O1 through O5) requiring the owner's Windows machine.
+
+The audit document (docs/00-working/terminal-persistence-audit.md) notes in section 4.2 that the REQ-007 W15 regression guard uses bash commands only (`MARKER=persist$RANDOM`, `echo check-$MARKER`), so no existing check covers CMD or PowerShell persistence. The document lists 11 numbered owner checks (O1–O11) including platform-specific persistence verifications.
+
+Idea 000113 (audit terminal persistence and performance across all three shells) is the request that led to this audit; it was raised on 2026-09-11 and explicitly calls for real coverage on the Windows machine since agent evidence on Linux cannot supply it.
+
+The core issue raised by 000661 stands as documented: the bash-only regression guard is a known limitation of the current automated test coverage, now explicitly recorded in REQ-011 and the completed phase-arch-16 audit. A follow-on task to implement automated CMD/PowerShell persistence checks (or to widen the regression guard) would depend on whether those checks can be automated in a CI/CD context rather than only on the owner's Windows machine.
+
+PROPOSED LINK: 000661 --relates_to--> 000113 (both address terminal persistence testing across bash, CMD and PowerShell; 000113 is the audit request that surfaced the bash-only limitation)
+
+</details>
 
 ---
 
 ## 000662 · The terminal persistence audit's Playwright event matrix should become a committed regression test.
 
-**Created 2026-10-08T07:17:02+00:00 · Status: `open`**
+**Created 2026-10-08T07:17:02+00:00 · Status: `triaged`**
 
 Turn the audit's Playwright event matrix and connect/echo/resize/cap measurements into a committed regression test; re-run the matrix after phase-arch-08 changes panel identity.
 Raised by Builder B (phase-arch-16) during the 2026-10-08 workbench run.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:34-04:00): This idea asks to formalize the terminal persistence audit from idea 000113 into a committed regression test, re-running it after phase-arch-08 changes panel identity.
+
+**Related audit work:** Idea 000113 ("Audit terminal persistence and performance across all three shells") is the completed audit work. The audit results are documented in `docs/00-working/terminal-persistence-audit.md`, which records:
+- A persistence matrix (section 3-4) covering bash, CMD and PowerShell across five events (layout switch, visible-panel switch, re-assignment, collapse/drop/restore, page reload)
+- Five performance measurements: connect latency, echo latency, resize behavior, scrollback handling, and behavior at the six-session cap
+- Thirteen findings (F1-F13) documenting defects and gaps
+
+**Governance context:** REQ-011 R23 and R24 require this audit to close out the workbench architecture and quality requirements. The audit measures persistence and performance against these requirements.
+
+**Pattern and infrastructure:** The codebase already has a Playwright-driven testing pattern in `test/test_workbench_fit_contracts.py` that shows how to structure browser-based regression tests with a `--live <url>` command mode, measuring contracts and failing on violations. The same pattern can be applied to the terminal persistence audit's matrix and measurements.
+
+**Phase-arch-08 trigger:** Idea 000662 notes that the audit should be re-run after phase-arch-08 (multi-instance panel identity across layout, storage, registry and sessions) changes panel identity, ensuring persistence behavior is not regressed by that structural change.
+
+**Outstanding work:** No regression test has been written yet from the audit. The audit document itself is ungoverned staging (docs/00-working/), and 000662 asks to move that work into a committed test.
+
+PROPOSED LINK: 000662 --extends--> 000113 (formalize terminal persistence audit into a committed regression test)
+
+</details>
 
 ---
 
 ## 000663 · Windows: the Terminal (bash) panel is expected to start cmd with no message
 
-**Created 2026-10-08T09:01:44+00:00 · Status: `open`**
+**Created 2026-10-08T09:01:44+00:00 · Status: `triaged`**
 
 (phase-arch-16 fix round, audit finding F13, owner check O11) On Windows the panel labelled Terminal (bash) is expected, from code reading, to start cmd (or the D_SYSTEM_DEMO_SHELL override) with no message, because the bash session sends no ?shell= parameter and the platform route's per-shell availability is not used to hide the panel. Source: docs/00-working/terminal-persistence-audit.md.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:35-04:00): Idea 000663 documents a specific finding from the completed terminal persistence audit (phase-arch-16, finding F13 and owner check O11). The audit was conducted per idea 000113's request and produced docs/00-working/terminal-persistence-audit.md.
+
+**Related governed documents:**
+- phase-arch-16 (Terminal persistence and performance audit across three shells) — COMPLETE, documented in docs/00-working/terminal-persistence-audit.md
+- ADR-014 (The workbench terminal is a gated product capability) — specifies per-session shell selection and platform defaults
+- ADR-013 (Demo terminal capability) — specifies D_SYSTEM_DEMO_SHELL override for backward compatibility
+- REQ-011 R23 — requires the three-shell by five-event persistence matrix that includes this finding
+- PLAN-028 (Workbench architecture quality) — the plan containing phase-arch-16
+
+**Finding from the audit (terminal-persistence-audit.md, F13):**
+On Windows, the Terminal (bash) panel does not refuse and is expected to start cmd (or the D_SYSTEM_DEMO_SHELL override). The code sends no ?shell= parameter for bash sessions (TerminalRegion.tsx line 210-211: `sessionShell === 'bash' ? '' : ...`), so the route's shell availability check is not used to hide the panel. The issue: the panel's label (Terminal bash) and its actual behavior (starts cmd) can disagree with no user message. Owner check O11 requires verification of this behavior on Windows.
+
+**Related ideas:**
+- 000096 (Document or reconcile D_SYSTEM_DEMO_SHELL override vs per-session shell selection) — addresses the broader question of when the D_SYSTEM_DEMO_SHELL override applies and whether "select bash" should mean "run bash"
+- 000107 (Terminal session lost on layout switch) — separate finding from the same audit, about session persistence, not shell selection
+- 000113 (Audit terminal persistence and performance) — the request that prompted phase-arch-16, which produced this finding
+
+The audit is complete and the finding is documented. No existing plan, phase or document covers this specific Windows-platform shell mismatch, though ADR-014 and the Windows platform handling in src/demo/ govern the related code.
+
+PROPOSED LINK: 000663 --relates_to--> 000096 (both concern D_SYSTEM_DEMO_SHELL override behavior and the mismatch between panel label and actual shell on Windows)
+
+</details>
 
 ---
 
 ## 000664 · Requirement row for re-selecting the file already shown in the HTML Viewer
 
-**Created 2026-10-08T09:01:45+00:00 · Status: `open`**
+**Created 2026-10-08T09:01:45+00:00 · Status: `triaged`**
 
 (phase-wbf-02) Re-selecting the file already shown in the HTML Viewer used to do nothing (no reload, no re-check); it is now behaviour covered only by a unit test and is worth stating as a requirement row in REQ-012.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:36-04:00): Idea 000664 asks for the re-selection behavior of the HTML Viewer (showing updated file modification times when a file is re-selected) to be stated as a requirement row in REQ-012.
+
+This requirement is already documented in REQ-012 as row R04: "The badge tracks what is displayed: switching tabs updates it to the newly displayed file, and re-selecting a file that changed on disk shows the newer time." The verification method specifies testing this by re-selecting a regenerated file and confirming the badge advances. The requirement covers both the behavior and the test method for it.
+
+The implementing phase, phase-wbf-02 (Show a last-modified badge on the HTML Viewer header), has been completed (status on backlog.yaml shows "phase complete"). Its result confirms the implementation: "The viewer header shows Modified YYYY-MM-DD HH:mm:ss, re-read on tab switch, selection, re-selection of the displayed file and Refresh" and "advances after touch and re-select."
+
+The idea's actual ask — to have a requirement row documenting this behavior — is fully delivered in REQ-012.
+
+PROPOSED PROMOTION: 000664 -> REQ-012 (the re-selection behavior is already documented as R04)
+
+</details>
 
 ---
 
 ## 000665 · HTML Viewer file dropdown never refreshes until the directory changes
 
-**Created 2026-10-08T09:01:45+00:00 · Status: `open`**
+**Created 2026-10-08T09:01:45+00:00 · Status: `triaged`**
 
 (phase-wbf-02) The HTML Viewer file dropdown list is fetched once per tab and directory, so a file regenerated or newly created after load never appears until the directory changes; it needs a refresh path.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:37-04:00): The HTML Viewer's file dropdown not refreshing dynamically when files change is a legitimate UX issue distinct from the general performance audit work.
+
+REQ-007 W07 defines the HTML Viewer file dropdown functionality: it lists `.html` and `.svg` files recursively under a selected directory, searchable by text input, with a refresh button that re-fetches *the current page* but not the dropdown list itself. The requirement states the list re-scopes when the directory changes via the directory picker button, but does not describe automatic refresh when files are added or modified to the currently-selected directory.
+
+PLAN-027 and its amendments (2026-10-08) address many workbench UI defects and features, but do not cover this specific issue. The plan's `G65` amendment adds `phase-wbf-13` for the file selector showing too few entries (000108), and `phase-wbf-14` for tooltip clipping (000130), but not for dynamic list refresh.
+
+Related ideas: 000114 (General workbench performance audit, with caching as the primary improvement lever, status triaged) and 000121 (Cache invalidation must cover the regenerate-overview-during-demo-week flow, status triaged, extends 000114). Both are about caching and cache invalidation for the HTML Viewer's file dropdown route (GET /api/v1/workbench/search), but neither addresses the lack of a refresh mechanism for the dropdown list itself when the directory's contents change without the directory path changing.
+
+No related plan, phase or requirement found that reserves a refresh path for the HTML Viewer file dropdown after a file is regenerated or newly created in the currently-displayed directory.
+
+PROPOSED LINK: 000665 --relates_to--> 000114 (Both concern the HTML Viewer's file dropdown and workbench performance; 000114 audit should measure whether cache refresh is feasible)
+
+PROPOSED LINK: 000665 --relates_to--> 000121 (Both concern cache invalidation and freshness of the file dropdown list fed by GET /api/v1/workbench/search)
+
+</details>
 
 ---
 
 ## 000666 · Dev-server ports are not exclusive across worktrees
 
-**Created 2026-10-08T09:01:45+00:00 · Status: `open`**
+**Created 2026-10-08T09:01:45+00:00 · Status: `triaged`**
 
 (phase-wbf-02) Dev-server ports are not exclusive across worktrees: another worktree's uvicorn already held the API port assigned to this phase (8033); dispatches should check that ports are free or allocate them from a ledger.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:38-04:00): Idea 000666 identifies a concrete concurrency hazard: during phase-wbf-02's workbench development, another worktree's uvicorn already held port 8033 (or the intended dev-server port), preventing the phase from starting. The proposal is to either check port availability at dispatch time or allocate ports from a ledger.
+
+**Related governed documents:**
+- ADR-003 (ADR-003-multi-agent-concurrency.md) establishes worktree isolation for concurrent phases but focuses on filesystem and logical collision through systems declarations, not on dev-server resource allocation.
+- PROMPT-021 (workbench delegation pack) specifies backend port 8010 and frontend port 5180 but includes no check for port availability before starting uvicorn.
+
+**Related ideas:**
+- 000152 (A registry of active worktrees that agents must register in before starting work) — directly applicable; a worktree registry could track assigned ports and validate exclusivity at startup.
+- 000608 (Record which worktree or session started each dev server) — directly applicable; tracking dev-server ownership by worktree would identify conflicts immediately.
+- 000168 (Expand the claim and responsibility system: worktree lifecycle, per-worktree agent queues, orchestrator handoff) — broader concurrency improvements that could encompass resource allocation.
+- 000320 (An always-on broker that orders and routes conflicting action requests from concurrent agents) — could route or allocate port assignments across concurrent agents.
+
+The hazard is concrete and replicable: a fourth concurrent worktree attempting to claim the same ports as a third will fail without a check. Neither AGENTS.md nor the prompt packs currently require port availability validation, and no worktree registry exists yet to track assignments. This overlaps with the concurrent-phase infrastructure work already planned in 000152 and 000608.
+
+PROPOSED LINK: 000666 --relates_to--> 000152 (worktree registry could track port ownership to ensure exclusivity)
+PROPOSED LINK: 000666 --relates_to--> 000608 (dev-server ownership tracking needed to identify port conflicts)
+
+</details>
 
 ---
 
 ## 000667 · REQ-037 fit-contract script seeds no selected file, so header content is never measured
 
-**Created 2026-10-08T09:01:45+00:00 · Status: `open`**
+**Created 2026-10-08T09:01:45+00:00 · Status: `triaged`**
 
 (phase-wbf-02 fix round) The REQ-037 fit-contract script seeds selected_file null, so no live check measures any panel with a file shown; seed a selected file for the HTML Viewer cells so features that add header content (like the last-modified badge) are measured.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:39-04:00): REQ-037's fit-contract script (`test/test_workbench_fit_contracts.py`) seeds the HTML Viewer state with `selected_file: null`, so the live check never renders a file with header content. Phase-wbf-02 (Show a last-modified badge on the HTML Viewer header, `SESS-2026-10-08-19`) added the badge and wrapping to the header, but the test script was not updated to seed a file. The session notes explicitly: "The live fit check (`--panel html-viewer`) is unchanged at 39 pass, 2 fail, 4 findings because it seeds no selected file and never renders the badge" (line 162).
+
+This idea is a follow-up task for phase-wbf-02: seed a selected file (e.g., `_public/overview/index.html`) in the fit-contract script's HTML Viewer initialization so that subsequent runs of the live check measure header content like the badge, rather than leaving the measurements incomplete.
+
+The session's separately run Playwright measurement (with `selected_file` seeded through `localStorage`, line 141) showed header heights with the badge; integrating that into the script's standard live check would make future badge-related measurements part of the regular verification suite.
+
+No related plan, phase or document found beyond REQ-037 itself and the session record SESS-2026-10-08-19.
+
+</details>
 
 ---
 
 ## 000668 · Notes strip help trigger is unreachable at 1280x260 in layout 1
 
-**Created 2026-10-08T09:01:46+00:00 · Status: `open`**
+**Created 2026-10-08T09:01:46+00:00 · Status: `triaged`**
 
 (phase-wbf-14 fix round) At 1280x260 in layout 1 the notes strip "?" help trigger is covered by the slot header (Playwright hover intercepted by section[aria-label=Notes] and its h2), so the help tooltip is unreachable at very short viewport heights.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:40-04:00): Related to 000130 (rotator help tooltip cut off at the panel bottom), which phase-wbf-14 addressed by moving the tooltip outside the clipping ancestor. However, idea 000668 addresses a distinct problem discovered during phase-wbf-14's testing: at 1280x260 viewport height in layout 1, the notes strip's help trigger `?` itself is covered by the slot header and unreachable by mouse hover, making the help tooltip inaccessible even if the tooltip can render.
+
+The issue is documented in SESS-2026-10-08-18-tooltip-bottom-clip.md line 114-115: "At 1280x260 in layout-1 the notes strip's `?` is covered by the region header and cannot be hovered; that layout fault is outside this phase."
+
+REQ-037 (workbench content-fit contracts) already tracks a related finding: the notes strip controls dropdown is partly outside the strip at layout 1 with certain viewport sizes (line 218: "The 26x27 px trigger overruns the strip's bottom edge by 1-6 px" at 1280x720, 1366x768, 1024x768).
+
+No phase currently addresses this viewport-height-specific issue. The problem is a layout/geometry issue at very short viewport heights (1280x260), not a component rendering issue like 000130 was.
+
+Possible related work: PLAN-027 phase-wbf-14 closed 000130 but explicitly marked this as outside scope; the layout geometry at extreme viewport sizes may need a separate audit or defect phase.
+
+PROPOSED LINK: 000668 --relates_to--> 000130 (tooltip trigger reachability; 000130 fixed tooltip rendering, 000668 addresses trigger coverage at short viewport)
+
+</details>
 
 ---
 
 ## 000669 · Defect phase: demo terminal websocket checks the ADR-030 token on connect
 
-**Created 2026-10-08T09:01:46+00:00 · Status: `open`**
+**Created 2026-10-08T09:01:46+00:00 · Status: `triaged`**
 
 Add a defect phase to the workbench features and defects plan (PLAN-027 / REQ-012): the demo terminal websocket reuses the ADR-030 bearer token (or an Origin check) on connect, closing ADR-030 open item 7. The owner ruled this on 2026-10-08. ADR-014 owns the route.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:41-04:00): Idea 000669 addresses the security gap that idea 000614 identifies: whether the demo terminal websocket needs authentication. 
+
+**Existing related documents:**
+
+- **ADR-030** (The external terminal interaction API, open item 7, line 679): Explicitly references idea 000669 as the defect phase that should "reuse this record's token on the websocket on connect". ADR-030 was accepted 2026-10-08 and proposes the bearer token approach.
+
+- **PLAN-027** (Workbench features and defects, group G71, Websocket origin): Covers ideas 000669 and 000614 together. The plan maps to phase `phase-wbf-19` ("Refuse a demo terminal websocket from a non-loopback origin before it starts a shell"). However, PLAN-027 G71 notes: "The owner asked...for a phase that reuses the ADR-030 token on the demo terminal websocket on connect; the Origin check alternative comes from ADR-030 open item 7, not from the owner. The Session Manager ruled for the Origin branch on the measured evidence in Assumption 1." The work is queued but implements the Origin check, not the token check the idea proposes.
+
+- **REQ-012 R32** (Workbench features and defects requirements): Documents the websocket authentication decision, covering both ideas 000669 and 000614, with acceptance criteria for the Origin check approach.
+
+**Relationship to other ideas:**
+
+Idea 000614 ("Decide whether the demo terminal websocket needs a token or an Origin check") frames the decision question that 000669 answers by proposing implementation of the token option. Though the plan ultimately adopted the Origin check alternative, both ideas address the same security issue.
+
+**Status note:**
+
+The decision (ADR-030 open item 7) was ruled 2026-10-08 and phase-wbf-19 is queued in PLAN-027 to implement it. Phase-wbf-19's scope notes "Claim only after GOV-003 records the owner's ratification of Assumption 1", so the work is gated on a governance step before it can proceed.
+
+PROPOSED LINK: 000669 --relates_to--> 000614 (Both ideas address whether the websocket needs authentication; 000614 asks the decision, 000669 proposes the token-based implementation)
+
+</details>
 
 **Links**
 
@@ -26292,17 +27905,59 @@ Add a defect phase to the workbench features and defects plan (PLAN-027 / REQ-01
 
 ## 000670 · Renumber the HTML Viewer open-in-tab toggle label from rung 3 to rung 7
 
-**Created 2026-10-08T09:01:46+00:00 · Status: `open`**
+**Created 2026-10-08T09:01:46+00:00 · Status: `triaged`**
 
 Renumber the HTML Viewer "Open-in-tab link (rung 3)" toggle label (ts/src/stage/HtmlViewerRegion.tsx and OverviewRegion.tsx) to rung 7 so it matches the demo runbook's ladder; keep the toggle visible. Owner ruling 2026-10-08, follow-up to phase-wbf-18. Touches ts/, so a small phase.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:42-04:00): Idea 000670 is a follow-up to phase-wbf-18 (which documented the HTML Viewer's Embedded/Open-in-tab toggle) and asks for the toggle's label to be renumbered from "rung 3" to "rung 7" to match the demo runbook's ladder. The work is already fully planned and queued in the backlog as phase-wbf-20 under PLAN-027 (Workbench features and defects), with scope, acceptance criteria, verification steps, and a one-session budget. The phase references REQ-012 R33, the demo-runbook.md "Descope Ladder" as the authority for the rung numbering, docs/00-working/owner-machine-checklist.md section 5, and depends on phase-arch-07. The phase scope specifies changes to ts/src/stage/HtmlViewerRegion.tsx (line 575) and OverviewRegion.tsx (line 93), and updates to related documentation and tests, exactly matching the idea's ask.
+
+Related idea: idea 000105 (Runbook does not document the HTML Viewer's Embedded/Open-in-tab toggle) was handled by phase-wbf-18 and forms a logical predecessor to this work—000670 is the follow-up to add consistency between the toggle's label and the runbook's ladder.
+
+PROPOSED LINK: 000670 --extends--> 000105 (follow-up to phase-wbf-18, sequenced work to align label with runbook's ladder numbering)
+
+</details>
 
 ---
 
 ## 000671 · Preserve terminal sessions across panel and layout switches instead of warning
 
-**Created 2026-10-08T09:01:46+00:00 · Status: `open`**
+**Created 2026-10-08T09:01:46+00:00 · Status: `triaged`**
 
 Preserve terminal sessions across visible-panel and layout switches (detach and reattach) instead of warning before ending them. Owner ruling 2026-10-08 on audit judgment D1. This reopens ADR-014 decision 4 and ADR-030 open item 3 (no detach); a decision phase (an ADR) comes before any fix phase; warn-and-confirm is not to be built.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:44-04:00): Idea 000671 reopens the detach/reattach question for terminal sessions to preserve them across visible-panel and layout switches, following the owner's 2026-10-08 ruling on audit findings F1 and F2.
+
+**Governed documents and related work:**
+
+- **PLAN-027** (doc-workbench-features-defects), `phase-wbf-21`: The idea is explicitly scoped into the workbench features plan as a decision phase titled "Decide how terminal sessions survive panel and layout switches" (status: queued). This phase covers ideas 000671, 000651, 000652, 000107, and 000087, grouped as `G73` (Session persistence decision).
+
+- **ADR-014** (The workbench terminal is a gated product capability...): Decision 4 establishes the session registry and explicitly names idea 000671 as reopening the detach/reattach question. The ADR states "Detach/reattach stayed parked, and the owner's ruling of the same day that sessions should survive panel and layout switches reopens it for a further record (idea `000671`)."
+
+- **ADR-030** (The external terminal interaction API...): Open item 3 explicitly authorizes this idea's work and states "the owner wants sessions preserved across visible-panel and layout switches (detach and reattach), decided in a further record before any fix phase (idea `000671`)."
+
+- **REQ-012** (workbench features/defects requirements): Row R34 specifies "A decision record settles how sessions survive panel and layout switches."
+
+**Related linked ideas (already captured):**
+- 000651 (The slot-header panel switcher silently ends every session of the panel it hides)
+- 000652 (A layout switch can end a shell silently and bypasses the re-assignment dialog's confirmation)
+- 000087 (Terminal interaction API for driving demo shell sessions from outside the stage page)
+- 000107 (Terminal session lost on layout switch when the stored visible panel differs between layouts)
+
+The idea correctly positions itself as requiring a decision phase (an ADR) before any fix phase, explicitly rejecting the warn-and-confirm UI approach. All related work is already properly linked and scoped.
+
+</details>
 
 **Links**
 
@@ -26314,6 +27969,27 @@ Preserve terminal sessions across visible-panel and layout switches (detach and 
 
 ## 000672 · Owner-machine checklist for the Windows and owner-machine checks from the 2026-10-08 run
 
-**Created 2026-10-08T09:01:47+00:00 · Status: `open`**
+**Created 2026-10-08T09:01:47+00:00 · Status: `triaged`**
 
 Write one owner-machine checklist document under docs/00-working/ (ungoverned, ADR-010) that collects every Windows / owner-machine check raised by the 2026-10-08 run, each with its source phase, what to do, what to look for and a result column: the Windows secondary-slot default and the pre-migration browser profile (phase-arch-02), ConPTY and the token file mode (ADR-030), bookmark routes on Windows paths (ADR-029, phase-wbf-05), CMD and PowerShell fit (REQ-037), the R31 viewer-toggle click (phase-wbf-18), audit checks O1..O11 (phase-arch-16). Owner ruling 2026-10-08.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-09T16:49:45-04:00): The owner-machine checklist document the idea requests already exists and is fully stocked with the checks named: `docs/00-working/owner-machine-checklist.md` (ungoverned, per `ADR-010`). The document collects all Windows and owner-machine checks from the 2026-10-08 run:
+
+- Section 1: Workbench identifier migration checks (phase-arch-02, checks M1–M2)
+- Section 2: Terminal interaction API checks (ADR-030, checks T1–T4)
+- Section 3: Bookmark categories with Windows paths (ADR-029, phase-wbf-05, checks B1–B4)
+- Section 4: Content-fit contracts (REQ-037, checks F1–F3)
+- Section 5: HTML Viewer toggle label (phase-wbf-18, REQ-012 R31, check V1)
+- Section 6: Terminal persistence audit (phase-arch-16, checks O1–O11 and performance measurements O6–O10)
+
+Each section includes source references, instructions ("What to do"), expectations ("What to look for"), and result columns to fill during the owner-machine run. A result sheet at the end (line 210) summarizes all outcomes.
+
+The document also references two related ungoverned documents for context: `demo-windows-setup.md` (prerequisite) and `demo-runbook.md` (launch commands and UI reference). The idea's content — a single, collected checklist of every 2026-10-08 Windows and owner-machine check with source, instructions, expectations and result columns — is already fully delivered. No related ideas found among the open set.
+
+</details>
