@@ -8784,7 +8784,7 @@ items:
   - sys-wb-viewer
   - sys-ui
   owner: repository-owner
-  agent: agent-builder-a
+  agent: agent-builder-b
   status: active
   priority: 2
   session_budget: 1
