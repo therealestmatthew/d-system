@@ -1084,9 +1084,11 @@ say run every time. Just have it run when it gets the commands if they're ready 
 know they're ready to be run. Then I will be notified it wants to run." **Standing.**
 
 The Owner Terminal no longer waits for the owner to tell it to run each queued command. It runs an
-entry when the Session Manager marks it ready: a `QUEUE` message that ends with `READY`, or a later
-`READY <id>`. An entry with the precondition *SM GO* needs no `READY`. The Owner Terminal sends
-`GO? <id>` as soon as it records the entry and runs the command as soon as `GO <id>` arrives. The
+entry with no precondition when the Session Manager marks it ready: a `QUEUE` message that ends with
+`READY`, or a later `READY <id>`. An entry with the precondition *SM GO* runs only on `GO <id>` and
+is never made ready by `READY`. The Owner Terminal sends `GO? <id>` as soon as it records such an
+entry, runs it when `GO <id>` arrives, and refuses a `READY` for it by running nothing and answering
+`GO? <id>`. This keeps the clean-checkout and no-lock check in front of every push of `dev`. The
 owner's approval of each tool call in the Owner Terminal's manual permission mode is still the
 authorization for each command, and that approval prompt is how the owner is notified. The rest of
 the arrangement is unchanged: no retries and no workarounds, `DONE` or `FAILED` with the real

@@ -363,9 +363,9 @@ are. It is optional: the arrangement runs without it when the owner is at the te
 The owner's approval of each tool call in the Owner Terminal, given in its manual permission mode, is
 the authorization for each command. That approval prompt is also how the owner learns a command is
 about to run; the owner does not also tell the Owner Terminal to run it (owner ruling, 2026-10-09,
-`GOV-003`). The Session Manager queues only commands reserved to the owner, such as a push of `dev`, which agent sessions are refused
-by design. It never queues a command the owner declined, and never uses the queue to run work that
-belongs to an agent session.
+`GOV-003`). The Session Manager queues only commands reserved to the owner, such as a push of `dev`,
+which agent sessions are refused by design. It never queues a command the owner declined, and never
+uses the queue to run work that belongs to an agent session.
 
 **Starting it.** The owner starts it in a terminal on this machine:
 `claude --permission-mode manual --remote-control "Owner Terminal"`. When the owner is away from the
@@ -380,15 +380,17 @@ after any start.
 **The queue.** The Owner Terminal keeps a running list at
 `_working/session-manager/owner-terminal-queue.md` (gitignored). Each entry has an id (`C1`, `C2`, ...),
 a purpose, the exact command, a precondition, a status and the result. It records each entry the
-Session Manager sends as `queued`. It runs an entry when the Session Manager marks it ready: in the
-`QUEUE` message itself, which then ends with `READY`, or later with `READY <id>`. An entry not marked
-ready stays queued.
+Session Manager sends as `queued`. An entry with no precondition runs when the Session Manager marks
+it ready: in the `QUEUE` message itself, which then ends with `READY`, or later with `READY <id>`. An
+entry not marked ready stays queued. An entry with the *SM GO* precondition is never made ready by
+`READY`; it runs only on `GO <id>`, as below.
 
 **Commands that touch `dev`** (a push) carry the precondition *SM GO*. The Owner Terminal asks
 `GO? <id>` as soon as it records the entry, and the Session Manager answers `GO <id>` only when the
 primary checkout is clean and no session holds the lock, then grants nothing else until the result is
-reported. The Owner Terminal runs the command as soon as `GO <id>` arrives; the `GO` is the entry's
-readiness, and it needs no `READY`. Other ready entries run in id order.
+reported. The Owner Terminal runs the command as soon as `GO <id>` arrives, and only then. A `READY`
+for an *SM GO* entry, whether in its `QUEUE` message or as `READY <id>`, is refused: the Owner
+Terminal runs nothing and answers `GO? <id>`. Ready entries without a precondition run in id order.
 
 **Reporting.** After each command the Owner Terminal updates the queue file and sends the Session
 Manager `DONE <id>` or `FAILED <id>` with the real output. A failed or refused command is not retried
@@ -427,7 +429,7 @@ sent to the name `Session Manager`.
 | `BLOCKED <reason>` | any | Stuck on something outside the sender's worktree |
 | `FREE` | execution | No assignment |
 | `QUEUE <id>` | Session Manager | An owner-only command for the Owner Terminal to record: purpose, command, precondition. Ending with `READY` marks it ready to run |
-| `READY <id>` | Session Manager | The queued entry may run now. Not `READY <branch>`, which a builder sends; the argument is a queue id |
+| `READY <id>` | Session Manager | The queued entry, which has no precondition, may run now. For an *SM GO* entry it is refused and answered with `GO? <id>`. Not `READY <branch>`, which a builder sends; the argument is a queue id |
 | `GO? <id>` / `GO <id>` | Owner Terminal / Session Manager | The precondition check before a command that touches `dev`, and its answer |
 | `DONE <id>` / `FAILED <id>` | Owner Terminal | The command ran, with its output, or failed or was refused, with the message |
 
