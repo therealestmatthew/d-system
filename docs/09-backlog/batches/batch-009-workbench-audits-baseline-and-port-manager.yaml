@@ -1,0 +1,104 @@
+# Workbench audits, the performance baseline and caching, and the port manager
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-009
+title: Workbench duplication and structure audits, the performance baseline and caching, and the port
+  and process manager
+status: queued
+sequence: 8
+created: '2026-10-09'
+updated: '2026-10-09'
+coordinator: PROMPT-036
+provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-draft-batches, on the
+  Session Manager''s draft-batches assignment (owner-approved). Scope ruled by the owner the same day:
+  every queued phase of the named plans that no other table holds, with each dependency outside the table
+  listed in external_depends_on. Track 1 (Workbench), first of two tables for doc-workbench-architecture-quality:
+  the phases that do not wait on phase-arch-07.'
+verified:
+  date: '2026-10-09'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+    from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
+    Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
+    in external_depends_on (phase-arch-11 is complete; phase-arch-01 is complete). Stages were cut greedily
+    in the listed build order, opening a new stage at each dependency link or collision; conflicts_with
+    lists every in-batch phase that collides.'
+external_depends_on:
+- id: phase-arch-11
+  expected_status: complete
+  note: 'Ports and system processes: lifecycle exploration — depended on by phase-arch-12. Now complete.'
+- id: phase-arch-01
+  expected_status: complete
+  note: Settle the workbench vocabulary and rule on identifier migration — depended on by phase-arch-03
+    and phase-arch-04. Now complete.
+stages:
+- stage: 1
+  parallel: false
+  phases:
+  - id: phase-arch-14
+    title: Measure workbench performance before designing any cache
+    after: []
+    conflicts_with:
+    - phase-arch-12
+    - phase-arch-15
+    - phase-arch-03
+    - phase-arch-04
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-arch-12 collides with phase-arch-14 (share system sys-api).
+  phases:
+  - id: phase-arch-12
+    title: Build the port and process management application
+    after: []
+    conflicts_with:
+    - phase-arch-14
+    - phase-arch-15
+    - phase-arch-03
+    - phase-arch-04
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-arch-15 collides with phase-arch-12 (share deliverable path
+    src/api/routes/; share system sys-api).
+  phases:
+  - id: phase-arch-15
+    title: Design and ship caching with mtime-keyed invalidation
+    after:
+    - phase-arch-14
+    conflicts_with:
+    - phase-arch-14
+    - phase-arch-12
+    - phase-arch-03
+    - phase-arch-04
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-arch-03 collides with phase-arch-15 (share system sys-api;
+    share system sys-wb-viewer).
+  phases:
+  - id: phase-arch-03
+    title: Duplication audit across the workbench and API
+    after: []
+    conflicts_with:
+    - phase-arch-14
+    - phase-arch-12
+    - phase-arch-15
+    - phase-arch-04
+- stage: 5
+  parallel: false
+  rationale: Cut after stage 4 because phase-arch-04 depends on phase-arch-03, and phase-arch-04 collides
+    with phase-arch-03 (share system sys-api; share system sys-wb-explorers; share system sys-wb-layout;
+    and 5 more).
+  phases:
+  - id: phase-arch-04
+    title: Code structure and file-size audit with target structures
+    after:
+    - phase-arch-03
+    conflicts_with:
+    - phase-arch-14
+    - phase-arch-12
+    - phase-arch-15
+    - phase-arch-03
+notes: 'phase-arch-12 is an external dependency of batch-010 (phase-arch-13), so this table runs first.
+  Parallel-safe as a whole with batch-015, batch-016, batch-017, batch-023 (no collision or dependency
+  link between any two of their phases, computed at dev 2cccfff6); the claim validator still decides at
+  claim time. Against the work already in flight: only phase-arch-14, phase-arch-03, phase-arch-04 are
+  clear of batch-004''s remaining phases (phase-idg-12, phase-irs-05, phase-irs-07); only phase-arch-12
+  is clear of phase-arch-07.'

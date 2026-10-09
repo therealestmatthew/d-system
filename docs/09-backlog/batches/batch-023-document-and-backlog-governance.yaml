@@ -1,0 +1,78 @@
+# Index widths, document staleness, the backlog archive and the backlog review procedure
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-023
+title: Index-width audit, document staleness and retirement, the backlog archive split, and the backlog
+  review procedure
+status: queued
+sequence: 22
+created: '2026-10-09'
+updated: '2026-10-09'
+coordinator: PROMPT-036
+provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-draft-batches, on the
+  Session Manager''s draft-batches assignment (owner-approved). Scope ruled by the owner the same day:
+  every queued phase of the named plans that no other table holds, with each dependency outside the table
+  listed in external_depends_on. Track 4 (Concurrency and governance): doc-document-backlog-governance.'
+verified:
+  date: '2026-10-09'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+    from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
+    Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
+    in external_depends_on (phase-idg-10 is complete). Stages were cut greedily in the listed build order,
+    opening a new stage at each dependency link or collision; conflicts_with lists every in-batch phase
+    that collides.'
+external_depends_on:
+- id: phase-idg-10
+  expected_status: complete
+  note: Audit the plan corpus and write the plan-quality standard — depended on by phase-dgov-02. Now
+    complete.
+stages:
+- stage: 1
+  parallel: false
+  phases:
+  - id: phase-dgov-03
+    title: Audit every index width against a stated horizon and widen what is short
+    after: []
+    conflicts_with:
+    - phase-dgov-02
+    - phase-dgov-04
+    - phase-dgov-05
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-dgov-02 collides with phase-dgov-03 (share deliverable path
+    docs/08-governance/GOV-005-document-codes.md; share system sys-governance).
+  phases:
+  - id: phase-dgov-02
+    title: Define document staleness and the retirement path
+    after: []
+    conflicts_with:
+    - phase-dgov-03
+    - phase-dgov-04
+    - phase-dgov-05
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-dgov-04 collides with phase-dgov-02 (share system sys-governance).
+  phases:
+  - id: phase-dgov-04
+    title: Split completed phases into a backlog archive, and measure the saving
+    after: []
+    conflicts_with:
+    - phase-dgov-03
+    - phase-dgov-02
+    - phase-dgov-05
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-dgov-05 collides with phase-dgov-04 (share system sys-backlog;
+    share system sys-governance).
+  phases:
+  - id: phase-dgov-05
+    title: Write the backlog review and re-prioritisation procedure
+    after: []
+    conflicts_with:
+    - phase-dgov-03
+    - phase-dgov-02
+    - phase-dgov-04
+notes: 'Parallel-safe as a whole with batch-009, batch-011, batch-016, batch-017 (no collision or dependency
+  link between any two of their phases, computed at dev 2cccfff6); the claim validator still decides at
+  claim time. Against the work already in flight: no phase is clear of batch-004''s remaining phases (phase-idg-12,
+  phase-irs-05, phase-irs-07); every phase is clear of phase-arch-07.'

@@ -1,0 +1,56 @@
+# Retrieval-failure collection and the gate record correction
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-019
+title: Retrieval-failure collection seeded from the session corpus, then the gate record correction and
+  review date
+status: queued
+sequence: 18
+created: '2026-10-09'
+updated: '2026-10-09'
+coordinator: PROMPT-036
+provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-draft-batches, on the
+  Session Manager''s draft-batches assignment (owner-approved). Scope ruled by the owner the same day:
+  every queued phase of the named plans that no other table holds, with each dependency outside the table
+  listed in external_depends_on. Track 3 (Framework and retrieval), second of four tables for doc-retrieval-knowledge-infrastructure.
+  Split from the first draft of batch-018 after the Scout''s collision check (2026-10-09), so that table
+  is not left in_progress behind an unscheduled chain.'
+verified:
+  date: '2026-10-09'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+    from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
+    Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
+    in external_depends_on (phase-mem-10 is queued). Stages were cut greedily in the listed build order,
+    opening a new stage at each dependency link or collision; conflicts_with lists every in-batch phase
+    that collides.'
+external_depends_on:
+- id: phase-mem-10
+  expected_status: complete
+  note: Measure keyword and tag retrieval quality — depended on by phase-ret-01. Now queued.
+stages:
+- stage: 1
+  parallel: false
+  phases:
+  - id: phase-ret-01
+    title: Build retrieval-failure collection and seed it from the session corpus
+    after: []
+    conflicts_with:
+    - phase-ret-02
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-ret-02 depends on phase-ret-01, and phase-ret-02 collides
+    with phase-ret-01 (share system sys-governance; share system sys-retrieval).
+  phases:
+  - id: phase-ret-02
+    title: Correct the gate's record and add a review date
+    after:
+    - phase-ret-01
+    conflicts_with:
+    - phase-ret-01
+notes: 'phase-ret-01 waits on phase-mem-10, which no table holds. phase-mem-10 depends on phase-mem-09,
+  which waits on phase-mem-07, phase-mem-08 and phase-rel-06 (and through them phase-mem-01, phase-rel-04
+  and phase-rel-05). This table cannot open until that chain has its own table and completes. Parallel-safe
+  as a whole with batch-016, batch-017 (no collision or dependency link between any two of their phases,
+  computed at dev 2cccfff6); the claim validator still decides at claim time. Against the work already
+  in flight: no phase is clear of batch-004''s remaining phases (phase-idg-12, phase-irs-05, phase-irs-07);
+  every phase is clear of phase-arch-07.'

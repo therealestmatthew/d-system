@@ -21,6 +21,23 @@ readability; the backlog is authoritative when the two disagree.
 | `batch-007` | queued | 5 | Run budgets, hard caps and the kill switch, then the batch graph (split from `batch-003`) |
 | `batch-005` | queued | 6 | Gate queue, execution-loop harness, delivered status, anti-pattern store |
 | `batch-006` | queued | 7 | Learning loop, Gate 2 consolidation, trace baselines, forced-failure drill |
+| `batch-009` | queued | 8 | Workbench duplication and structure audits, performance baseline and caching, port and process manager |
+| `batch-010` | queued | 9 | Slot-model follow-ons: panel identity, slot geometry, sub-app contract and first sub-app, maximize and collapse, sys-ui retirement |
+| `batch-011` | queued | 10 | Terminal panel reliability: drop diagnosis, session survival, start-failure reasons, loopback origin check |
+| `batch-012` | queued | 11 | Truncation detection, transcript review, shared state model, delegation methodology, anti-pattern rules |
+| `batch-013` | queued | 12 | Agent engineering guides and orchestration, lifecycle roster, expander, minimalist and arbiter |
+| `batch-014` | queued | 13 | Idea terminal-state authority process, then the five idea-log backfills |
+| `batch-015` | queued | 14 | Idea capture subagent, classification, tagging, decomposition, connections, metrics command, sessionless capture |
+| `batch-016` | queued | 15 | Portable framework document templates and schemas |
+| `batch-017` | queued | 16 | Portable framework content extraction |
+| `batch-018` | queued | 17 | Prioritised search order, then deterministic search |
+| `batch-019` | queued | 18 | Retrieval-failure collection and the gate record correction (waits on the unscheduled phase-mem-10 chain) |
+| `batch-020` | queued | 19 | ADR-001 revisit, retrieval surveys, documentation-retrieval decision, code-graph evaluation |
+| `batch-021` | queued | 20 | Memory staleness and confidence, then provenance |
+| `batch-022` | queued | 21 | Claim recovery, branch protection, backup posture, enforcement placement, pull-request protocol rewrite |
+| `batch-023` | queued | 22 | Index widths, document staleness, backlog archive, backlog review procedure |
+
+`batch-008` is reserved for PLAN-053 and is not yet written.
 
 ## Status, and who moves it
 

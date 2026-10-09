@@ -1,0 +1,134 @@
+# The slot-model follow-ons and the sys-ui retirement
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-010
+title: 'The slot-model follow-ons: multi-instance panel identity, reconfigurable slot geometry, the sub-app
+  contract and its first sub-app, maximize and collapse, the viewer toggle renumber, and the sys-ui retirement'
+status: queued
+sequence: 9
+created: '2026-10-09'
+updated: '2026-10-09'
+coordinator: PROMPT-036
+provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-draft-batches, on the
+  Session Manager''s draft-batches assignment (owner-approved). Scope ruled by the owner the same day:
+  every queued phase of the named plans that no other table holds, with each dependency outside the table
+  listed in external_depends_on. Track 1 (Workbench), second of two tables for doc-workbench-architecture-quality,
+  plus phase-wbf-20 from doc-workbench-features-defects because it also waits on phase-arch-07. phase-arch-18
+  was moved here from the first draft of batch-009 after the Scout''s collision check (2026-10-09).'
+verified:
+  date: '2026-10-09'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+    from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
+    Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
+    in external_depends_on (phase-arch-00 is complete; phase-arch-07 is active; phase-arch-05 is complete;
+    phase-arch-06 is complete; phase-arch-12 is queued). Stages were cut greedily in the listed build
+    order, opening a new stage at each dependency link or collision; conflicts_with lists every in-batch
+    phase that collides.'
+external_depends_on:
+- id: phase-arch-00
+  expected_status: complete
+  note: Decompose sys-ui so frontend phases stop serializing on one lock — depended on by phase-arch-18.
+    Now complete.
+- id: phase-arch-07
+  expected_status: complete
+  note: Implement schema-owned slots and sub-slots with structural eligibility — depended on by phase-arch-08,
+    phase-wbf-20, phase-arch-09, phase-arch-10 and phase-arch-17. Now active.
+- id: phase-arch-05
+  expected_status: complete
+  note: Per-panel content-fit contracts and their mechanised checks — depended on by phase-arch-09. Now
+    complete.
+- id: phase-arch-06
+  expected_status: complete
+  note: Decide the slot configuration-schema model, superseding ADR-016 — depended on by phase-arch-10.
+    Now complete.
+- id: phase-arch-12
+  expected_status: complete
+  note: Build the port and process management application — depended on by phase-arch-13. Now queued.
+stages:
+- stage: 1
+  parallel: true
+  rationale: 'Opening stage: these phases carry no dependency on each other and no shared system or overlapping
+    deliverable path.'
+  phases:
+  - id: phase-arch-18
+    title: Retire sys-ui across the document and phase corpus
+    after: []
+  - id: phase-arch-08
+    title: Multi-instance panel identity across layout, storage, registry and sessions
+    after: []
+    conflicts_with:
+    - phase-arch-09
+    - phase-arch-10
+    - phase-arch-17
+    - phase-arch-13
+  - id: phase-wbf-20
+    title: Renumber the HTML Viewer open-in-tab toggle label to rung 7
+    after: []
+    conflicts_with:
+    - phase-arch-10
+    - phase-arch-13
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-arch-09 collides with phase-arch-08 (share deliverable path
+    _data/workbench/layouts/; share deliverable path ts/src/workbench/; share system sys-wb-layout).
+  phases:
+  - id: phase-arch-09
+    title: Reconfigurable slot geometry with per-role content constraints
+    after: []
+    conflicts_with:
+    - phase-arch-08
+    - phase-arch-10
+    - phase-arch-17
+    - phase-arch-13
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-arch-10 collides with phase-arch-09 (share system sys-wb-layout).
+  phases:
+  - id: phase-arch-10
+    title: Define the sub-app package contract
+    after: []
+    conflicts_with:
+    - phase-arch-08
+    - phase-wbf-20
+    - phase-arch-09
+    - phase-arch-17
+    - phase-arch-13
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-arch-17 collides with phase-arch-10 (share system sys-wb-layout).
+  phases:
+  - id: phase-arch-17
+    title: Panel maximize and collapse on the slot model
+    after:
+    - phase-arch-09
+    conflicts_with:
+    - phase-arch-08
+    - phase-arch-09
+    - phase-arch-10
+    - phase-arch-13
+- stage: 5
+  parallel: false
+  rationale: Cut after stage 4 because phase-arch-13 collides with phase-arch-17 (share deliverable path
+    ts/src/stage/StagePage.css; share deliverable path ts/src/workbench/panelRegistry.tsx; share system
+    sys-wb-layout).
+  phases:
+  - id: phase-arch-13
+    title: Package the port/process app as a workbench sub-app
+    after:
+    - phase-arch-10
+    conflicts_with:
+    - phase-arch-08
+    - phase-wbf-20
+    - phase-arch-09
+    - phase-arch-10
+    - phase-arch-17
+notes: 'Not runnable until phase-arch-07 (active, agent-builder-a) completes, and phase-arch-13 also needs
+  phase-arch-12 from batch-009. phase-arch-18 has no depends_on edge to phase-arch-07, but it must not
+  be claimed while phase-arch-07 is open: it retires sys-ui from systems.yaml, the governance check errors
+  on any item that declares a system missing from systems.yaml, and phase-arch-07 declares sys-ui. Its
+  systems (sys-governance only) do not show that collision. It sits in this table because every other
+  phase here already waits on phase-arch-07. Parallel-safe as a whole with batch-016, batch-017, batch-021
+  (no collision or dependency link between any two of their phases, computed at dev 2cccfff6); the claim
+  validator still decides at claim time. Against the work already in flight: only phase-arch-08, phase-wbf-20,
+  phase-arch-09, phase-arch-10, phase-arch-13 are clear of batch-004''s remaining phases (phase-idg-12,
+  phase-irs-05, phase-irs-07); only phase-arch-18 is clear of phase-arch-07.'

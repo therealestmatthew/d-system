@@ -1,0 +1,100 @@
+# Claim recovery, branch protection, backup posture, enforcement placement and the pull-request protocol
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-022
+title: The claim-recovery procedure, branch protection on main, the backup posture, the enforcement-placement
+  rule, and the multi-agent protocol rewrite for the pull-request gate
+status: queued
+sequence: 21
+created: '2026-10-09'
+updated: '2026-10-09'
+coordinator: PROMPT-036
+provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-draft-batches, on the
+  Session Manager''s draft-batches assignment (owner-approved). Scope ruled by the owner the same day:
+  every queued phase of the named plans that no other table holds, with each dependency outside the table
+  listed in external_depends_on. Track 4 (Concurrency and governance): doc-concurrency-git-safety. phase-conc-09
+  is excluded by owner ruling.'
+verified:
+  date: '2026-10-09'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+    from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
+    Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
+    in external_depends_on (phase-conc-01 is complete). Stages were cut greedily in the listed build order,
+    opening a new stage at each dependency link or collision; conflicts_with lists every in-batch phase
+    that collides.'
+external_depends_on:
+- id: phase-conc-01
+  expected_status: complete
+  note: Define the stale-claim signal and report it in --ready — depended on by phase-conc-04. Now complete.
+excluded:
+- id: phase-conc-09
+  reason: 'Owner-executed: it applies an AGENTS.md change, which only the owner may make, so a coordinator
+    cannot run it. Excluded by owner ruling on 2026-10-09.'
+stages:
+- stage: 1
+  parallel: false
+  phases:
+  - id: phase-conc-04
+    title: Write the claim-recovery procedure and record it in GOV-003
+    after: []
+    conflicts_with:
+    - phase-conc-05
+    - phase-conc-07
+    - phase-conc-08
+    - phase-conc-06
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-conc-05 collides with phase-conc-04 (share system sys-governance).
+  phases:
+  - id: phase-conc-05
+    title: Decide and apply branch protection on main, with the settings record
+    after: []
+    conflicts_with:
+    - phase-conc-04
+    - phase-conc-07
+    - phase-conc-08
+    - phase-conc-06
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-conc-07 collides with phase-conc-05 (share deliverable path
+    docs/04-decisions/; share system sys-governance).
+  phases:
+  - id: phase-conc-07
+    title: Decide the backup posture for non-git state and verify it by restoring
+    after: []
+    conflicts_with:
+    - phase-conc-04
+    - phase-conc-05
+    - phase-conc-08
+    - phase-conc-06
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-conc-08 collides with phase-conc-07 (share system sys-governance).
+  phases:
+  - id: phase-conc-08
+    title: Write the enforcement-placement rule, apply it, and audit .claude/ settings
+    after: []
+    conflicts_with:
+    - phase-conc-04
+    - phase-conc-05
+    - phase-conc-07
+    - phase-conc-06
+- stage: 5
+  parallel: false
+  rationale: Cut after stage 4 because phase-conc-06 collides with phase-conc-08 (share deliverable path
+    docs/08-governance/GOV-001-protocol.md; share deliverable path docs/08-governance/GOV-002-backlog-protocol.md;
+    share deliverable path docs/08-governance/OPS-001-operations.md; and 2 more).
+  phases:
+  - id: phase-conc-06
+    title: Rewrite the multi-agent protocol for the pull-request gate and reconcile the corpus
+    after:
+    - phase-conc-05
+    conflicts_with:
+    - phase-conc-04
+    - phase-conc-05
+    - phase-conc-07
+    - phase-conc-08
+notes: 'Parallel-safe as a whole with batch-014, batch-016, batch-017, batch-021 (no collision or dependency
+  link between any two of their phases, computed at dev 2cccfff6); the claim validator still decides at
+  claim time. Against the work already in flight: no phase is clear of batch-004''s remaining phases (phase-idg-12,
+  phase-irs-05, phase-irs-07); every phase is clear of phase-arch-07.'

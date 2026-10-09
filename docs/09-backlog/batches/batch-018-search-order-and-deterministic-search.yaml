@@ -1,0 +1,45 @@
+# The prioritised search order and deterministic search
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-018
+title: The prioritised search order and its conflict rule, then deterministic search across the surfaces
+status: queued
+sequence: 17
+created: '2026-10-09'
+updated: '2026-10-09'
+coordinator: PROMPT-036
+provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-draft-batches, on the
+  Session Manager''s draft-batches assignment (owner-approved). Scope ruled by the owner the same day:
+  every queued phase of the named plans that no other table holds, with each dependency outside the table
+  listed in external_depends_on. Track 3 (Framework and retrieval), first of four tables for doc-retrieval-knowledge-infrastructure.'
+verified:
+  date: '2026-10-09'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+    from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
+    Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
+    in external_depends_on (). Stages were cut greedily in the listed build order, opening a new stage
+    at each dependency link or collision; conflicts_with lists every in-batch phase that collides.'
+stages:
+- stage: 1
+  parallel: false
+  phases:
+  - id: phase-ret-03
+    title: State the prioritised search order and its conflict rule
+    after: []
+    conflicts_with:
+    - phase-ret-04
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-ret-04 depends on phase-ret-03, and phase-ret-04 collides
+    with phase-ret-03 (share system sys-retrieval).
+  phases:
+  - id: phase-ret-04
+    title: Design deterministic search across the surfaces
+    after:
+    - phase-ret-03
+    conflicts_with:
+    - phase-ret-03
+notes: 'Parallel-safe as a whole with batch-016, batch-017 (no collision or dependency link between any
+  two of their phases, computed at dev 2cccfff6); the claim validator still decides at claim time. Against
+  the work already in flight: no phase is clear of batch-004''s remaining phases (phase-idg-12, phase-irs-05,
+  phase-irs-07); only phase-ret-03 is clear of phase-arch-07.'

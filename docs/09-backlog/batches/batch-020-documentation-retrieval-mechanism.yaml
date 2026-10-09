@@ -1,0 +1,75 @@
+# The documentation-retrieval decision and the code-graph evaluation
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-020
+title: Revisit ADR-001, survey structured, graph and vector retrieval, decide the documentation-retrieval
+  mechanism, and evaluate a code-graph tool
+status: queued
+sequence: 19
+created: '2026-10-09'
+updated: '2026-10-09'
+coordinator: PROMPT-036
+provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-draft-batches, on the
+  Session Manager''s draft-batches assignment (owner-approved). Scope ruled by the owner the same day:
+  every queued phase of the named plans that no other table holds, with each dependency outside the table
+  listed in external_depends_on. Track 3 (Framework and retrieval), third of four tables for doc-retrieval-knowledge-infrastructure.'
+verified:
+  date: '2026-10-09'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+    from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
+    Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
+    in external_depends_on (). Stages were cut greedily in the listed build order, opening a new stage
+    at each dependency link or collision; conflicts_with lists every in-batch phase that collides.'
+stages:
+- stage: 1
+  parallel: false
+  phases:
+  - id: phase-ret-05
+    title: Revisit ADR-001 on a queryable document projection
+    after: []
+    conflicts_with:
+    - phase-ret-08
+    - phase-ret-06
+    - phase-ret-07
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-ret-08 collides with phase-ret-05 (share system sys-retrieval).
+  phases:
+  - id: phase-ret-08
+    title: Evaluate a code-graph tool against this repository's code
+    after: []
+    conflicts_with:
+    - phase-ret-05
+    - phase-ret-06
+    - phase-ret-07
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-ret-06 collides with phase-ret-08 (share deliverable path
+    docs/00-working/code-graph-retrieval-evaluation.md; share system sys-retrieval).
+  phases:
+  - id: phase-ret-06
+    title: Survey structured, graph and vector retrieval for the documentation corpus
+    after:
+    - phase-ret-05
+    conflicts_with:
+    - phase-ret-05
+    - phase-ret-08
+    - phase-ret-07
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-ret-07 depends on phase-ret-06, and phase-ret-07 collides
+    with phase-ret-06 (share deliverable path docs/07-architecture/; share system sys-governance; share
+    system sys-retrieval).
+  phases:
+  - id: phase-ret-07
+    title: Decide the documentation-retrieval mechanism from all three surveys
+    after:
+    - phase-ret-06
+    conflicts_with:
+    - phase-ret-05
+    - phase-ret-08
+    - phase-ret-06
+notes: 'Not parallel-safe as a whole with any other new table (no collision or dependency link between
+  any two of their phases, computed at dev 2cccfff6); the claim validator still decides at claim time.
+  Against the work already in flight: only phase-ret-08 is clear of batch-004''s remaining phases (phase-idg-12,
+  phase-irs-05, phase-irs-07); every phase is clear of phase-arch-07.'

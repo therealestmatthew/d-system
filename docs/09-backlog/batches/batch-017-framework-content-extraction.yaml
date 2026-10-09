@@ -1,0 +1,48 @@
+# Portable framework content extraction
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-017
+title: 'Portable framework content extraction: cross-document patterns, session-record decisions and commitments,
+  and session-protocol enhancements'
+status: queued
+sequence: 16
+created: '2026-10-09'
+updated: '2026-10-09'
+coordinator: PROMPT-036
+provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-draft-batches, on the
+  Session Manager''s draft-batches assignment (owner-approved). Scope ruled by the owner the same day:
+  every queued phase of the named plans that no other table holds, with each dependency outside the table
+  listed in external_depends_on. Track 3 (Framework and retrieval): doc-portable-framework-content-extraction.'
+verified:
+  date: '2026-10-09'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+    from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
+    Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
+    in external_depends_on (phase-tax-02 is complete). Stages were cut greedily in the listed build order,
+    opening a new stage at each dependency link or collision; conflicts_with lists every in-batch phase
+    that collides.'
+external_depends_on:
+- id: phase-tax-02
+  expected_status: complete
+  note: Session-type taxonomy Part 2 - empirical test against transcripts and records — depended on by
+    phase-fwa-03. Now complete.
+stages:
+- stage: 1
+  parallel: true
+  rationale: 'Opening stage: these phases carry no dependency on each other and no shared system or overlapping
+    deliverable path.'
+  phases:
+  - id: phase-fwa-01
+    title: Cross-document pattern extraction for the portable framework
+    after: []
+  - id: phase-fwa-02
+    title: Session-record decision and commitment extraction
+    after: []
+  - id: phase-fwa-03
+    title: Session and decision record form critique and protocol enhancement proposals
+    after: []
+notes: 'Parallel-safe as a whole with batch-009, batch-010, batch-011, batch-012, batch-013, batch-014,
+  batch-015, batch-016, batch-018, batch-019, batch-021, batch-022, batch-023 (no collision or dependency
+  link between any two of their phases, computed at dev 2cccfff6); the claim validator still decides at
+  claim time. Against the work already in flight: every phase is clear of batch-004''s remaining phases
+  (phase-idg-12, phase-irs-05, phase-irs-07); every phase is clear of phase-arch-07.'

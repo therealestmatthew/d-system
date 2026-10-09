@@ -1,0 +1,102 @@
+# Agent engineering guides, orchestration, the lifecycle roster, and the expander, minimalist and arbiter
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-013
+title: Agent engineering guides and orchestration, the lifecycle agent roster, the expander and minimalist,
+  and the arbiter
+status: queued
+sequence: 12
+created: '2026-10-09'
+updated: '2026-10-09'
+coordinator: PROMPT-036
+provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-draft-batches, on the
+  Session Manager''s draft-batches assignment (owner-approved). Scope ruled by the owner the same day:
+  every queued phase of the named plans that no other table holds, with each dependency outside the table
+  listed in external_depends_on. Track 2 (Agent engineering and idea graph), second of two tables for
+  doc-agent-engineering-delegation.'
+verified:
+  date: '2026-10-09'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+    from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
+    Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
+    in external_depends_on (phase-agx-02 is complete). Stages were cut greedily in the listed build order,
+    opening a new stage at each dependency link or collision; conflicts_with lists every in-batch phase
+    that collides.'
+external_depends_on:
+- id: phase-agx-02
+  expected_status: complete
+  note: Audit every command, skill and agent, and rule on the Claude Code dependency — depended on by
+    phase-agx-08, phase-agx-09 and phase-agx-10. Now complete.
+stages:
+- stage: 1
+  parallel: false
+  phases:
+  - id: phase-agx-08
+    title: 'Agent engineering: guides, grounded in this repository''s incidents'
+    after: []
+    conflicts_with:
+    - phase-agx-09
+    - phase-agx-10
+    - phase-agx-11
+    - phase-agx-12
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-agx-09 depends on phase-agx-08, and phase-agx-09 collides
+    with phase-agx-08 (share deliverable path docs/07-architecture/; share deliverable path docs/08-governance/;
+    share system sys-delivery; and 1 more).
+  phases:
+  - id: phase-agx-09
+    title: 'Agent engineering: orchestration, with the sensors and context-pipeline boundaries'
+    after:
+    - phase-agx-08
+    conflicts_with:
+    - phase-agx-08
+    - phase-agx-10
+    - phase-agx-11
+    - phase-agx-12
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-agx-10 collides with phase-agx-09 (share deliverable path
+    docs/08-governance/; share system sys-delivery; share system sys-governance).
+  phases:
+  - id: phase-agx-10
+    title: Build the lifecycle agent roster, without a planner role
+    after:
+    - phase-agx-08
+    conflicts_with:
+    - phase-agx-08
+    - phase-agx-09
+    - phase-agx-11
+    - phase-agx-12
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-agx-11 depends on phase-agx-10, and phase-agx-11 collides
+    with phase-agx-10 (share deliverable path .claude/agents/; share system sys-delivery).
+  phases:
+  - id: phase-agx-11
+    title: Build the expander and the minimalist, and prove they disagree
+    after:
+    - phase-agx-10
+    conflicts_with:
+    - phase-agx-08
+    - phase-agx-09
+    - phase-agx-10
+    - phase-agx-12
+- stage: 5
+  parallel: false
+  rationale: Cut after stage 4 because phase-agx-12 depends on phase-agx-11, and phase-agx-12 collides
+    with phase-agx-11 (share deliverable path .claude/agents/; share system sys-delivery).
+  phases:
+  - id: phase-agx-12
+    title: Rule the arbiter's authority boundary, then build it
+    after:
+    - phase-agx-11
+    conflicts_with:
+    - phase-agx-08
+    - phase-agx-09
+    - phase-agx-10
+    - phase-agx-11
+notes: 'Parallel-safe as a whole with batch-016, batch-017, batch-021 (no collision or dependency link
+  between any two of their phases, computed at dev 2cccfff6); the claim validator still decides at claim
+  time. Against the work already in flight: no phase is clear of batch-004''s remaining phases (phase-idg-12,
+  phase-irs-05, phase-irs-07); every phase is clear of phase-arch-07.'

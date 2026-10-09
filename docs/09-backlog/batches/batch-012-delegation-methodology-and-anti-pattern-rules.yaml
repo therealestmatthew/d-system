@@ -1,0 +1,123 @@
+# The delegation methodology, truncation detection, the shared state model and rules derived from anti-patterns
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-012
+title: Truncation detection, transcript review, the _tmpagent shared state model, the delegation-scoping
+  methodology, and authoring rules derived from anti-patterns
+status: queued
+sequence: 11
+created: '2026-10-09'
+updated: '2026-10-09'
+coordinator: PROMPT-036
+provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-draft-batches, on the
+  Session Manager''s draft-batches assignment (owner-approved). Scope ruled by the owner the same day:
+  every queued phase of the named plans that no other table holds, with each dependency outside the table
+  listed in external_depends_on. Track 2 (Agent engineering and idea graph), first of two tables for doc-agent-engineering-delegation.
+  phase-agx-03 is already in batch-005 and is listed as an external dependency.'
+verified:
+  date: '2026-10-09'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+    from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
+    Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
+    in external_depends_on (phase-agx-02 is complete; phase-agx-03 is queued). Stages were cut greedily
+    in the listed build order, opening a new stage at each dependency link or collision; conflicts_with
+    lists every in-batch phase that collides.'
+external_depends_on:
+- id: phase-agx-02
+  expected_status: complete
+  note: Audit every command, skill and agent, and rule on the Claude Code dependency — depended on by
+    phase-agx-07 and phase-agx-05. Now complete.
+- id: phase-agx-03
+  expected_status: complete
+  note: Build the anti-pattern store with recurrence detection, populated from what exists — depended
+    on by phase-agx-04. Now queued.
+stages:
+- stage: 1
+  parallel: false
+  phases:
+  - id: phase-agx-01
+    title: Document the truncation cap and make truncation detectable
+    after: []
+    conflicts_with:
+    - phase-agx-13
+    - phase-agx-07
+    - phase-agx-05
+    - phase-agx-04
+    - phase-agx-06
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-agx-13 collides with phase-agx-01 (share system sys-delivery).
+  phases:
+  - id: phase-agx-13
+    title: Independent transcript review against the participant's record
+    after: []
+    conflicts_with:
+    - phase-agx-01
+    - phase-agx-07
+    - phase-agx-05
+    - phase-agx-04
+    - phase-agx-06
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-agx-07 collides with phase-agx-13 (share system sys-delivery).
+  phases:
+  - id: phase-agx-07
+    title: Extend _tmpagent into a shared state model without a second lock table
+    after: []
+    conflicts_with:
+    - phase-agx-01
+    - phase-agx-13
+    - phase-agx-05
+    - phase-agx-04
+    - phase-agx-06
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-agx-05 collides with phase-agx-07 (share deliverable path
+    docs/08-governance/GOV-008-prompt-pack-protocol.md; share system sys-delivery; share system sys-governance).
+  phases:
+  - id: phase-agx-05
+    title: Write the delegation-scoping methodology, including the runtime-evidence convention
+    after:
+    - phase-agx-01
+    conflicts_with:
+    - phase-agx-01
+    - phase-agx-13
+    - phase-agx-07
+    - phase-agx-04
+    - phase-agx-06
+- stage: 5
+  parallel: false
+  rationale: Cut after stage 4 because phase-agx-04 collides with phase-agx-05 (share deliverable path
+    docs/08-governance/GOV-008-prompt-pack-protocol.md; share system sys-delivery; share system sys-governance).
+  phases:
+  - id: phase-agx-04
+    title: Derive authoring rules from accumulated anti-patterns, traceably
+    after: []
+    conflicts_with:
+    - phase-agx-01
+    - phase-agx-13
+    - phase-agx-07
+    - phase-agx-05
+    - phase-agx-06
+- stage: 6
+  parallel: false
+  rationale: Cut after stage 5 because phase-agx-06 depends on phase-agx-04, and phase-agx-06 collides
+    with phase-agx-04 (share deliverable path docs/08-governance/; share system sys-delivery; share system
+    sys-governance).
+  phases:
+  - id: phase-agx-06
+    title: Measure the methodology against outcomes and change at least one rule
+    after:
+    - phase-agx-05
+    - phase-agx-04
+    conflicts_with:
+    - phase-agx-01
+    - phase-agx-13
+    - phase-agx-07
+    - phase-agx-05
+    - phase-agx-04
+notes: 'phase-agx-04 and phase-agx-06 wait on phase-agx-03 (batch-005, sequence 6). Parallel-safe as a
+  whole with batch-011, batch-016, batch-017 (no collision or dependency link between any two of their
+  phases, computed at dev 2cccfff6); the claim validator still decides at claim time. Against the work
+  already in flight: no phase is clear of batch-004''s remaining phases (phase-idg-12, phase-irs-05, phase-irs-07);
+  every phase is clear of phase-arch-07.'

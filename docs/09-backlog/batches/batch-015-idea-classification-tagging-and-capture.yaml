@@ -1,0 +1,156 @@
+# Idea classification, tagging, decomposition, connections, metrics and sessionless capture
+# Contract: schemas/batch.schema.json. Run by PROMPT-036.
+schema_version: 1
+id: batch-015
+title: Idea capture in a subagent, the classification agent and backfill, the tagging registry, decomposition,
+  the connection builder, the metrics command and sessionless capture
+status: queued
+sequence: 14
+created: '2026-10-09'
+updated: '2026-10-09'
+coordinator: PROMPT-036
+provenance: 'Drafted on 2026-10-09 by the Prompt Planner on branch agent/prompt-draft-batches, on the
+  Session Manager''s draft-batches assignment (owner-approved). Scope ruled by the owner the same day:
+  every queued phase of the named plans that no other table holds, with each dependency outside the table
+  listed in external_depends_on. Track 2 (Agent engineering and idea graph), second of two tables for
+  doc-idea-graph-lifecycle. phase-idg-12 is in batch-004 and is not repeated here.'
+verified:
+  date: '2026-10-09'
+  method: 'Script over docs/09-backlog/backlog.yaml at dev 2cccfff6, using collisions() and dependency_closure()
+    from src/governance/backlog.py: every phase id resolves, and every phase is queued and unclaimed.
+    Every in-batch depends_on edge points to an earlier stage. Every other edge resolves to a phase listed
+    in external_depends_on (phase-idg-01 is complete). Stages were cut greedily in the listed build order,
+    opening a new stage at each dependency link or collision; conflicts_with lists every in-batch phase
+    that collides.'
+external_depends_on:
+- id: phase-idg-01
+  expected_status: complete
+  note: Ship the idea schema bundle and record the scope-fork decision — depended on by phase-idg-02,
+    phase-idg-04, phase-idg-05 and phase-idg-07. Now complete.
+stages:
+- stage: 1
+  parallel: false
+  phases:
+  - id: phase-idg-06
+    title: Move /idea capture into a subagent
+    after: []
+    conflicts_with:
+    - phase-idg-08
+    - phase-idg-02
+    - phase-idg-07
+    - phase-idg-09
+- stage: 2
+  parallel: false
+  rationale: Cut after stage 1 because phase-idg-08 collides with phase-idg-06 (share deliverable path
+    .claude/commands/idea.md).
+  phases:
+  - id: phase-idg-08
+    title: Wrap idea metrics as a command and rule on the generated page
+    after: []
+    conflicts_with:
+    - phase-idg-06
+    - phase-idg-02
+    - phase-idg-05
+    - phase-idg-07
+    - phase-idg-09
+- stage: 3
+  parallel: false
+  rationale: Cut after stage 2 because phase-idg-02 collides with phase-idg-08 (share deliverable path
+    docs/08-governance/GOV-012-idea-metrics-command.md).
+  phases:
+  - id: phase-idg-02
+    title: Build the pure classification agent
+    after: []
+    conflicts_with:
+    - phase-idg-06
+    - phase-idg-08
+    - phase-idg-04
+    - phase-idg-03
+    - phase-idg-05
+    - phase-idg-07
+    - phase-idg-09
+- stage: 4
+  parallel: false
+  rationale: Cut after stage 3 because phase-idg-04 collides with phase-idg-02 (share system sys-portfolio).
+  phases:
+  - id: phase-idg-04
+    title: Build the tagging registry and retroactive tag assignment
+    after: []
+    conflicts_with:
+    - phase-idg-02
+    - phase-idg-03
+    - phase-idg-05
+    - phase-idg-07
+    - phase-idg-09
+- stage: 5
+  parallel: false
+  rationale: Cut after stage 4 because phase-idg-03 collides with phase-idg-04 (share deliverable path
+    _data/ideas.jsonl; share system sys-portfolio).
+  phases:
+  - id: phase-idg-03
+    title: Backfill classification across the corpus and report coverage
+    after:
+    - phase-idg-02
+    conflicts_with:
+    - phase-idg-02
+    - phase-idg-04
+    - phase-idg-05
+    - phase-idg-07
+    - phase-idg-09
+- stage: 6
+  parallel: false
+  rationale: Cut after stage 5 because phase-idg-05 collides with phase-idg-03 (share deliverable path
+    _data/ideas.jsonl; share system sys-portfolio).
+  phases:
+  - id: phase-idg-05
+    title: Write the decomposition procedure for compound ideas
+    after:
+    - phase-idg-02
+    conflicts_with:
+    - phase-idg-08
+    - phase-idg-02
+    - phase-idg-04
+    - phase-idg-03
+    - phase-idg-07
+    - phase-idg-09
+- stage: 7
+  parallel: false
+  rationale: Cut after stage 6 because phase-idg-07 collides with phase-idg-05 (share deliverable path
+    docs/08-governance/; share system sys-portfolio).
+  phases:
+  - id: phase-idg-07
+    title: Build the connection-builder agent across all idea statuses
+    after:
+    - phase-idg-04
+    conflicts_with:
+    - phase-idg-06
+    - phase-idg-08
+    - phase-idg-02
+    - phase-idg-04
+    - phase-idg-03
+    - phase-idg-05
+    - phase-idg-09
+- stage: 8
+  parallel: false
+  rationale: Cut after stage 7 because phase-idg-09 collides with phase-idg-07 (share deliverable path
+    docs/08-governance/).
+  phases:
+  - id: phase-idg-09
+    title: Capture an idea with no session open
+    after:
+    - phase-idg-06
+    conflicts_with:
+    - phase-idg-06
+    - phase-idg-08
+    - phase-idg-02
+    - phase-idg-04
+    - phase-idg-03
+    - phase-idg-05
+    - phase-idg-07
+notes: 'phase-idg-04 shares sys-contracts, schemas/idea.schema.json and tools/append_idea.py with phase-idg-14
+  in batch-014, so the two tables cannot run at the same time. Parallel-safe as a whole with batch-009,
+  batch-011, batch-016, batch-017 (no collision or dependency link between any two of their phases, computed
+  at dev 2cccfff6); the claim validator still decides at claim time. Against the work already in flight:
+  only phase-idg-04, phase-idg-03 are clear of batch-004''s remaining phases (phase-idg-12, phase-irs-05,
+  phase-irs-07); only phase-idg-06, phase-idg-08, phase-idg-02, phase-idg-03, phase-idg-05, phase-idg-07,
+  phase-idg-09 are clear of phase-arch-07.'
