@@ -30,9 +30,12 @@ never happens.
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 AGENT_FILE = ROOT / ".claude" / "agents" / "idea-planner.md"
@@ -311,3 +314,77 @@ def test_stale_path_file_does_not_mask_a_refused_mismatched_code(tmp_path: Path)
     assert "refusing _working/idea-planner/PLAN-957.path: " in result.stderr
     assert "does not match" in result.stderr
     assert "stale _working/idea-planner/PLAN-956.path: " in result.stderr
+
+
+def _assert_unreadable_reported(result: subprocess.CompletedProcess[str], code: str) -> None:
+    """The unreadable draft is reported on its own stderr line, fails the exit closed, and does not
+    hide the current draft's result line, whose `.path` file sorts after it."""
+    assert "Traceback" not in result.stderr, result.stderr
+    assert result.returncode != 0, result.stderr
+    assert "docs/00-working/promoted/PLAN-961-current-draft.md: " in result.stdout, result.stderr
+    assert "conformant=True" in result.stdout
+    assert f"unreadable _working/idea-planner/{code}.path: " in result.stderr, result.stderr
+    assert code not in result.stdout
+
+
+def _stage_current(workdir: Path) -> None:
+    _stage_draft(
+        workdir, "PLAN-961", "docs/00-working/promoted/PLAN-961-current-draft.md", _draft()
+    )
+
+
+def test_directory_at_draft_path_is_unreadable_without_hiding_the_current_draft(
+    tmp_path: Path,
+) -> None:
+    """Fix cycle 10 (round 8 blocker): a directory at the draft path raised IsADirectoryError,
+    crashed the loop and hid the current draft's line. It now fails closed on its own line."""
+    (tmp_path / "docs/00-working/promoted/PLAN-960-a-directory.md").mkdir(parents=True)
+    _write_path_file(tmp_path, "PLAN-960", "docs/00-working/promoted/PLAN-960-a-directory.md\n")
+    _stage_current(tmp_path)
+
+    _assert_unreadable_reported(_run(tmp_path), "PLAN-960")
+
+
+@pytest.mark.skipif(
+    not hasattr(os, "geteuid") or os.geteuid() == 0,
+    reason="root ignores file permissions, and the platform needs geteuid to tell",
+)
+def test_permission_denied_draft_is_unreadable_without_hiding_the_current_draft(
+    tmp_path: Path,
+) -> None:
+    """A draft with mode 000 raised PermissionError; it now fails closed on its own line."""
+    _stage_draft(tmp_path, "PLAN-960", "docs/00-working/promoted/PLAN-960-locked.md", _draft())
+    locked = tmp_path / "docs/00-working/promoted/PLAN-960-locked.md"
+    _stage_current(tmp_path)
+    locked.chmod(0)
+    try:
+        result = _run(tmp_path)
+    finally:
+        locked.chmod(0o644)
+
+    _assert_unreadable_reported(result, "PLAN-960")
+
+
+def test_symlink_loop_at_draft_path_is_unreadable_without_hiding_the_current_draft(
+    tmp_path: Path,
+) -> None:
+    """A symlink pointing to itself raised OSError (ELOOP); it now fails closed on its own line."""
+    loop = tmp_path / "docs/00-working/promoted/PLAN-960-loop.md"
+    loop.parent.mkdir(parents=True)
+    loop.symlink_to(loop.name)
+    _write_path_file(tmp_path, "PLAN-960", "docs/00-working/promoted/PLAN-960-loop.md\n")
+    _stage_current(tmp_path)
+
+    _assert_unreadable_reported(_run(tmp_path), "PLAN-960")
+
+
+def test_non_utf8_draft_is_unreadable_without_hiding_the_current_draft(tmp_path: Path) -> None:
+    """A draft of invalid UTF-8 bytes raised UnicodeDecodeError; it now fails closed on its own
+    line."""
+    bad = tmp_path / "docs/00-working/promoted/PLAN-960-bad-bytes.md"
+    bad.parent.mkdir(parents=True)
+    bad.write_bytes(b"# Draft\n\xff\xfe\x80 not utf-8\n")
+    _write_path_file(tmp_path, "PLAN-960", "docs/00-working/promoted/PLAN-960-bad-bytes.md\n")
+    _stage_current(tmp_path)
+
+    _assert_unreadable_reported(_run(tmp_path), "PLAN-960")

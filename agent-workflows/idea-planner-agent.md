@@ -189,6 +189,12 @@ for path_file in sorted(glob.glob('_working/idea-planner/*.path')):
     except FileNotFoundError:
         print(f'stale {path_file}: draft path {draft_path!r} no longer exists', file=sys.stderr)
         continue
+    except (OSError, UnicodeDecodeError) as exc:
+        reason = getattr(exc, 'strerror', None) or exc
+        print(f'unreadable {path_file}: draft path {draft_path!r} could not be read '
+              f'({exc.__class__.__name__}: {reason})', file=sys.stderr)
+        had_error = True
+        continue
     result = check_plan_conformance(text, depends_on=[...], documents={...})
     print(f'{draft_path}: {result}')
 
@@ -204,16 +210,20 @@ decision, so this one substitution stays manual — **you must do it for every r
 one piece of this command that is not, and cannot be made, constant. Never fill it with text
 copied from the draft or its path.
 
-The command prints **one result line per currently-staged `.path` file that passed both checks**,
-each line naming that draft's own path, and a `refusing ...` line on stderr for every file that
-failed either check (a non-code file name, or content whose path does not fully match the pattern
-or whose embedded code does not equal the file name) — a refused file is never opened. A file that
+The command prints **one result line per currently-staged `.path` file that passed both checks
+and whose draft was read**, each line naming that draft's own path, and a `refusing ...` line on
+stderr for every file that failed either check (a non-code file name, or content whose path does
+not fully match the pattern or whose embedded code does not equal the file name) — a refused file
+is never opened. A file that
 passed both checks but whose draft path no longer exists (for example, the draft was since moved
 to `docs/01-plans/`) prints a `stale ...` line on stderr saying the draft path no longer exists;
-it does not stop the other files' lines from printing. **Read only the line naming your own
+it does not stop the other files' lines from printing. A file that passed both checks but whose
+draft path could not be read — a directory, a file without read permission, a symlink loop, or a
+draft that is not valid UTF-8 — prints an `unreadable ...` line on stderr naming the error; it
+likewise does not stop the other files' lines from printing. **Read only the line naming your own
 draft's path**; other lines belong to other concurrent dispatches sharing the same
 `_working/idea-planner/` directory, not to you. The command exits nonzero if *any* staged file was
-refused; a stale file on its own does not change the exit code. A refused file turns the exit
-nonzero even when your own draft's line printed cleanly — a sibling dispatch's bad file
-still turns the exit code red, so check the printed line for your own path rather than the exit
+refused or its draft was unreadable; only a stale (missing) draft leaves the exit code unchanged.
+A refused file or an unreadable draft turns the exit nonzero even when your own draft's line
+printed cleanly — a sibling dispatch's bad file still turns the exit code red, so check the printed line for your own path rather than the exit
 code alone to learn whether your own draft specifically conforms.
