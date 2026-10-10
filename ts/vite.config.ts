@@ -70,9 +70,6 @@ function isWithin(path: string, directories: string[]): boolean {
   return directories.some((directory) => path === directory || path.startsWith(directory + sep))
 }
 
-// A path with a `node_modules` directory in it, on either separator.
-const NODE_MODULES_SEGMENT = /[\\/]node_modules[\\/]/
-
 const PROC_FD = '/proc/self/fd'
 const hasProcFd = existsSync(PROC_FD)
 
@@ -89,9 +86,15 @@ export type OpenResult = CheckedFile | 'absent' | 'changed' | 'forbidden'
 // the result must be a regular file, not a symlink, with the descriptor's device and inode. A file
 // with more than one hard link is refused too: a hard link is a second name for the same file, so
 // one placed inside the directories can name a file that lives outside them, and neither its path
-// nor its inode shows that. Files under a `node_modules` directory are exempt, because package
-// managers hard-link packages there. The caller owns a returned descriptor and must close it.
-function openOnce(path: string, directories: string[]): OpenResult {
+// nor its inode shows that. Files under one of `packageDirectories` (already resolved; the guard
+// passes only the root's own `node_modules`) are exempt, because package managers hard-link
+// packages there. The exemption is anchored to those directories: a directory that merely has
+// that name elsewhere gets no exemption. The caller owns a returned descriptor and must close it.
+function openOnce(
+  path: string,
+  directories: string[],
+  packageDirectories: string[],
+): OpenResult {
   let fd: number
   try {
     fd = openSync(path, 'r')
@@ -121,7 +124,7 @@ function openOnce(path: string, directories: string[]): OpenResult {
       }
     }
     if (!isWithin(realPath, directories)) return refuse('forbidden')
-    if (opened.nlink > 1n && !NODE_MODULES_SEGMENT.test(realPath)) return refuse('forbidden')
+    if (opened.nlink > 1n && !isWithin(realPath, packageDirectories)) return refuse('forbidden')
     return { fd, realPath }
   } catch {
     return refuse('changed')
@@ -131,10 +134,14 @@ function openOnce(path: string, directories: string[]): OpenResult {
 // `openOnce`, tried again while the name keeps changing under it (an editor's save-by-rename, or
 // a deliberate swap). A file still changing after the last try stays `'changed'`; callers answer
 // that themselves and never hand the request on to code that would open the name again.
-export function openChecked(path: string, directories: string[]): OpenResult {
-  let result = openOnce(path, directories)
+export function openChecked(
+  path: string,
+  directories: string[],
+  packageDirectories: string[] = [],
+): OpenResult {
+  let result = openOnce(path, directories, packageDirectories)
   for (let attempt = 1; result === 'changed' && attempt < 5; attempt += 1) {
-    result = openOnce(path, directories)
+    result = openOnce(path, directories, packageDirectories)
   }
   return result
 }
@@ -215,8 +222,8 @@ const LOADED_EXTENSIONS = new Set([
 //   itself from a checked descriptor, so Vite never reopens the name. For anything else it opens
 //   and checks the file, refusing it with 403 if it leads outside, and then hands the request on.
 // - A `load` hook (`enforce: 'pre'`) that gives Vite's transform pipeline the bytes of a source
-//   module (`LOADED_EXTENSIONS`, outside `node_modules`) or of a `?raw` import from a checked
-//   descriptor, so a module cannot be swapped between that check and Vite's read either.
+//   module (`LOADED_EXTENSIONS`, outside the root's own `node_modules`) or of a `?raw` import from
+//   a checked descriptor, so a module cannot be swapped between that check and Vite's read either.
 // - A second middleware, after Vite's single-page fallback, that serves `.html` pages from a
 //   checked descriptor through Vite's HTML transform.
 // - `routes` maps this file's own URL prefixes that serve a directory inside the allow-list
@@ -224,12 +231,14 @@ const LOADED_EXTENSIONS = new Set([
 //   route also serves only from a checked descriptor itself, which covers `/generated-overview/`,
 //   whose `_public/` lies outside the list.
 //
-// Every request that names a file is checked by the first middleware, so a symlink or a hard link
-// leading outside is refused (403) on every route, `node_modules` and every import query
-// included. Two kinds of request are checked there but then read again by name by Vite or the
-// plugin that owns them, so they are not protected against a swap between the check and the read:
-// source modules under `node_modules` (`load` passes them through; npm writes that directory),
-// and import queries other than `?raw` (`?inline`, `?worker`, `?url`). A URL naming no existing
+// Every request that names a file is checked by the first middleware, so a symlink leading
+// outside is refused (403) on every route, `node_modules` and every import query included, and so
+// is a hard link anywhere but the root's own `node_modules` (`<root>/node_modules`, resolved; a
+// directory elsewhere that is merely named `node_modules` gets no exemption). Two kinds of request
+// are checked there but then read again by name by Vite or the plugin that owns them, so they are
+// not protected against a swap between the check and the read: source modules under the root's
+// own `node_modules` (`load` passes them through; npm writes that directory), and import queries
+// other than `?raw` (`?inline`, `?worker`, `?url`). A URL naming no existing
 // file passes through untouched, for Vite to answer as it would have. Exported for
 // `vite.config.test.ts`.
 // `test/test_workbench_slot_matcher.py` also refuses a tracked symlink under either directory, so
@@ -239,6 +248,10 @@ export function refuseSymlinkEscapes(
   allow: string[],
   routes: Record<string, string> = {},
 ): Plugin {
+  // The root's own package directory, the only place a hard-linked file is served from (see
+  // `openOnce`), and the only `node_modules` whose modules `load` leaves to Vite.
+  const packages = join(root, 'node_modules')
+  const packageDirectories = () => realDirectories([packages])
   // The files a request URL can name, in the order Vite looks: an absolute path after `/@fs`, a
   // route's own directory, or a path under the root's `public/` directory and then the root.
   const candidates = (urlPath: string): string[] => {
@@ -282,7 +295,7 @@ export function refuseSymlinkEscapes(
         }
         const directories = realDirectories(allow)
         for (const candidate of candidates(urlPath)) {
-          const file = openChecked(candidate, directories)
+          const file = openChecked(candidate, directories, packageDirectories())
           if (file === 'absent') continue
           if (file === 'forbidden') {
             res.statusCode = 403
@@ -330,7 +343,11 @@ export function refuseSymlinkEscapes(
             next()
             return
           }
-          const file = openChecked(join(root, urlPath), realDirectories(allow))
+          const file = openChecked(
+            join(root, urlPath),
+            realDirectories(allow),
+            packageDirectories(),
+          )
           if (file === 'absent') {
             next()
             return
@@ -359,9 +376,9 @@ export function refuseSymlinkEscapes(
       const raw = id.endsWith('?raw')
       const path = raw ? id.slice(0, -'?raw'.length) : id
       if (path.includes('\0') || path.includes('?') || !isAbsolute(path)) return null
-      if (NODE_MODULES_SEGMENT.test(path)) return null
+      if (isWithin(path, packageDirectories()) || isWithin(path, [packages])) return null
       if (!raw && !LOADED_EXTENSIONS.has(extname(path).toLowerCase())) return null
-      const file = openChecked(path, realDirectories(allow))
+      const file = openChecked(path, realDirectories(allow), packageDirectories())
       if (file === 'absent') return null
       if (file === 'forbidden') {
         throw new Error(`Refused: ${id} leads outside the directories the dev server may serve.`)
