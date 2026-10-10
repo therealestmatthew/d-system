@@ -8,6 +8,8 @@ _data/ideas.jsonl or idea 000072.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import pytest
 
 from src.governance.plan_quality import (
@@ -131,8 +133,9 @@ def test_depends_on_and_documents_are_required_not_optional() -> None:
     keyword arguments, so a caller must pass something - even `depends_on=[], documents={}` for
     an unpaired draft - rather than falling into a silent, wrong default.
     """
+    call: Callable[..., object] = check_plan_conformance
     with pytest.raises(TypeError):
-        check_plan_conformance(CONFORMANT_PLAN)  # type: ignore[call-arg]
+        call(CONFORMANT_PLAN)
 
 
 def test_concurrency_section_required_once_two_phase_ids_appear() -> None:
