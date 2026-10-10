@@ -187,15 +187,22 @@ describe("the config's own file routes check the real path", () => {
   })
 })
 
-// A child process that, until it is told to stop, renames a regular file and a symlink to an
-// outside file over one name, as fast as it can. It prints how many swaps it made.
+// A child process that renames a regular file and a symlink to an outside file over one name, as
+// fast as it can, until it is told to stop, then prints how many swaps it made. It also exits on
+// its own at its deadline, and as soon as its parent is gone (its stdin pipe ends, or its parent
+// process id changes), so a test run that is killed or crashes cannot leave it spinning.
 const TOGGLER = `
 const { renameSync, rmSync, symlinkSync, writeFileSync } = require('node:fs')
-const [target, secret, publicText] = process.argv.slice(1)
+const [target, secret, publicText, deadlineMs] = process.argv.slice(1)
+const deadline = Date.now() + Number(deadlineMs)
+const parent = process.ppid
 let swaps = 0
 let stop = false
 process.stdin.on('data', () => { stop = true })
+process.stdin.on('end', () => process.exit(0))
+process.stdin.on('error', () => process.exit(0))
 const step = () => {
+  if (process.ppid !== parent || Date.now() > deadline) process.exit(0)
   for (let i = 0; i < 200 && !stop; i += 1) {
     const temporary = target + '.swap' + (swaps % 2)
     rmSync(temporary, { force: true })
@@ -213,6 +220,132 @@ const step = () => {
 }
 step()
 `
+
+const TOGGLER_DEADLINE_MS = 10_000
+
+// Runs `body` while a toggler flips `target`; `stop` ends the toggler and returns its swap count.
+// Whatever `body` does, the toggler is killed and waited for before this returns or throws, and
+// `onSpawn` sees its process id, so a test can check that none survives.
+async function withToggler<T>(
+  args: { target: string; secret: string; publicText: string; deadlineMs?: number },
+  body: (stop: () => Promise<number>) => Promise<T>,
+  onSpawn: (pid: number) => void = () => {},
+): Promise<T> {
+  const deadline = String(args.deadlineMs ?? TOGGLER_DEADLINE_MS)
+  const toggler = spawn(process.execPath, [
+    '-e',
+    TOGGLER,
+    args.target,
+    args.secret,
+    args.publicText,
+    deadline,
+  ])
+  if (toggler.pid !== undefined) onSpawn(toggler.pid)
+  let output = ''
+  toggler.stdout.on('data', (chunk: Buffer) => (output += chunk.toString()))
+  const exited = new Promise<void>((resolve) => toggler.on('exit', () => resolve()))
+  const stop = async () => {
+    toggler.stdin.write('stop')
+    await exited
+    return Number(output)
+  }
+  try {
+    return await body(stop)
+  } finally {
+    if (toggler.exitCode === null && toggler.signalCode === null) toggler.kill('SIGKILL')
+    await exited
+  }
+}
+
+function isAlive(pid: number): boolean {
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch {
+    return false
+  }
+}
+
+async function waitUntilDead(pid: number, withinMs: number): Promise<boolean> {
+  const until = Date.now() + withinMs
+  while (Date.now() < until) {
+    if (!isAlive(pid)) return true
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  }
+  return !isAlive(pid)
+}
+
+describe('the race test cleans up after itself', () => {
+  it('leaves no toggler running when a case fails', async () => {
+    const target = join(data, 'flip.txt')
+    writeFileSync(target, 'PUBLIC')
+    let pid = 0
+    await expect(
+      withToggler(
+        { target, secret: join(base, 'outside', 'secret.txt'), publicText: 'PUBLIC' },
+        async () => {
+          throw new Error('a failing case')
+        },
+        (spawned) => (pid = spawned),
+      ),
+    ).rejects.toThrow('a failing case')
+    expect(pid).toBeGreaterThan(0)
+    expect(isAlive(pid)).toBe(false)
+  })
+
+  it('stops on its own at its deadline', async () => {
+    const target = join(data, 'flip.txt')
+    writeFileSync(target, 'PUBLIC')
+    // Never told to stop, and its stdin kept open: only the deadline can end it.
+    const toggler = spawn(process.execPath, [
+      '-e',
+      TOGGLER,
+      target,
+      join(base, 'outside', 'secret.txt'),
+      'PUBLIC',
+      '300',
+    ])
+    try {
+      const started = Date.now()
+      const pid = toggler.pid ?? 0
+      expect(await waitUntilDead(pid, 5_000)).toBe(true)
+      expect(Date.now() - started).toBeLessThan(5_000)
+    } finally {
+      toggler.kill('SIGKILL')
+    }
+  })
+
+  it('exits when the process that started it is killed', async () => {
+    const target = join(data, 'flip.txt')
+    writeFileSync(target, 'PUBLIC')
+    // A stand-in for a test worker: it starts a toggler with a long deadline, reports its pid,
+    // and waits. Killing it must take the toggler with it.
+    const worker = spawn(process.execPath, [
+      '-e',
+      `const { spawn } = require('node:child_process')
+       const t = spawn(process.execPath, ['-e', process.argv[1], ...process.argv.slice(2)],
+         { stdio: ['pipe', 'ignore', 'ignore'] })
+       process.stdout.write(String(t.pid) + '\\n')
+       setInterval(() => {}, 1000)`,
+      TOGGLER,
+      target,
+      join(base, 'outside', 'secret.txt'),
+      'PUBLIC',
+      '60000',
+    ])
+    const togglerPid = await new Promise<number>((resolve) =>
+      worker.stdout.once('data', (chunk: Buffer) => resolve(Number(chunk.toString().trim()))),
+    )
+    try {
+      expect(isAlive(togglerPid)).toBe(true)
+      worker.kill('SIGKILL')
+      expect(await waitUntilDead(togglerPid, 5_000)).toBe(true)
+    } finally {
+      worker.kill('SIGKILL')
+      if (isAlive(togglerPid)) process.kill(togglerPid, 'SIGKILL')
+    }
+  })
+})
 
 describe('hard links (security review, 2026-10-09)', () => {
   // A hard link is a second name for the same file: one inside a served directory can name a file
@@ -307,22 +440,23 @@ describe('serving under concurrent renames (check-then-serve race)', () => {
           ],
           raceSite,
         )
-        const toggler = spawn(process.execPath, ['-e', TOGGLER, target, secret, publicText])
-        let swaps = ''
-        toggler.stdout.on('data', (chunk: Buffer) => (swaps += chunk.toString()))
-        const exited = new Promise((resolve) => toggler.on('exit', resolve))
         const path = url.replace('<site>', raceSite)
-        const until = Date.now() + 1200
-        while (Date.now() < until) {
-          const bodies = await Promise.all(
-            Array.from({ length: 16 }, () => get(path).then((response) => response.text())),
-          )
-          for (const body of bodies) expect(body, url).not.toContain('SECRET')
+        try {
+          const swaps = await withToggler({ target, secret, publicText }, async (stop) => {
+            const until = Date.now() + 1200
+            while (Date.now() < until) {
+              const bodies = await Promise.all(
+                Array.from({ length: 16 }, () => get(path).then((response) => response.text())),
+              )
+              for (const body of bodies) expect(body, url).not.toContain('SECRET')
+            }
+            return stop()
+          })
+          expect(swaps, `${url}: the toggler ran`).toBeGreaterThan(50)
+          expect((await get('/')).status, `${url}: the server still answers`).toBe(200)
+        } finally {
+          rmSync(tree, { recursive: true, force: true })
         }
-        toggler.stdin.write('stop')
-        await exited
-        expect(Number(swaps), `${url}: the toggler ran`).toBeGreaterThan(50)
-        expect((await get('/')).status, `${url}: the server still answers`).toBe(200)
       }
       expect(uncaught).toEqual([])
     } finally {
