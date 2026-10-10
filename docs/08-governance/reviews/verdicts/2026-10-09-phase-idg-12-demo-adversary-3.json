@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-09-phase-idg-12-demo-adversary-3",
+  "date": "2026-10-09",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "303f00a6dc4cb42b0ac5b91a76e301dd62b52dad",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "pass",
+  "gating": true,
+  "findings": [],
+  "raw_reply_sha256": "6590962f2223a3391a0d80f6185778cb68f4959ff6306932c143d865c68f55fd",
+  "notes": "Round 10, short re-review of fix cycle 11 (owner ruling 2026-10-09: size cap on the draft read). Dispatched and briefed by the Session Manager in its own scratch clone at 303f00a6, in parallel with the runner. Runner manifest _working/review-checks/phase-idg-12/303f00a6dc4c/ (passed). Raw reply at _working/session-manager/review-replies/phase-idg-12-303f00a6-demo-adversary.md."
+}
