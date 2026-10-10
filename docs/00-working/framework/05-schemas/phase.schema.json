@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "phase.schema.json",
+  "title": "Backlog phase",
+  "description": "Validates one backlog phase on its own, as a YAML mapping extracted from the backlog file (no front matter or section conversion applies). A phase is one session of work: what it changes (scope), how completion is observed (acceptance, verification), and what it locks while claimed (systems, deliverables, depends_on). The required fields are the portable core. The optional fields are the ones d-system uses, listed so their shape is checked when present. Other fields are allowed, so an adopting repository can add its own without editing this schema.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "plan",
+    "status",
+    "systems",
+    "depends_on",
+    "scope",
+    "acceptance",
+    "verification",
+    "deliverables"
+  ],
+  "additionalProperties": true,
+  "$defs": {
+    "slug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "slugList": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/slug"},
+      "uniqueItems": true
+    },
+    "textList": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "text": {"type": "string", "pattern": "\\S"}
+  },
+  "properties": {
+    "id": {
+      "$ref": "#/$defs/slug",
+      "description": "Stable phase identifier, never renumbered. It names the branch and worktree of the session that claims it."
+    },
+    "title": {
+      "$ref": "#/$defs/text",
+      "description": "One concrete outcome achievable in one session."
+    },
+    "plan": {
+      "$ref": "#/$defs/slug",
+      "description": "Identifier of the plan document this phase belongs to."
+    },
+    "status": {
+      "enum": ["queued", "active", "blocked", "deferred", "complete", "cancelled"],
+      "description": "Execution state. Readiness is not a status: a queued phase is ready when every depends_on phase is complete."
+    },
+    "systems": {
+      "allOf": [{"$ref": "#/$defs/slugList"}, {"minItems": 1}],
+      "description": "System identifiers this phase changes. Two active phases sharing a system may not run at once."
+    },
+    "depends_on": {
+      "$ref": "#/$defs/slugList",
+      "description": "Phase identifiers that must be complete before this phase starts. Empty when there are none."
+    },
+    "scope": {
+      "allOf": [{"$ref": "#/$defs/textList"}, {"minItems": 1}],
+      "description": "Bounded steps the phase carries out."
+    },
+    "acceptance": {
+      "allOf": [{"$ref": "#/$defs/textList"}, {"minItems": 1}],
+      "description": "Observable conditions that must hold for the phase to be complete."
+    },
+    "verification": {
+      "allOf": [{"$ref": "#/$defs/textList"}, {"minItems": 1}],
+      "description": "Commands or concrete checks that show whether the acceptance conditions hold."
+    },
+    "deliverables": {
+      "allOf": [{"$ref": "#/$defs/textList"}, {"minItems": 1}],
+      "description": "Repository paths the phase plans to create or change. Two active phases sharing a path may not run at once."
+    },
+    "sources": {
+      "$ref": "#/$defs/slugList",
+      "description": "Other documents the phase draws on, such as the requirement it satisfies."
+    },
+    "owner": {
+      "$ref": "#/$defs/text",
+      "description": "Who answers for the phase. Not the agent that claims it."
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Queue order: lower runs first."
+    },
+    "session_budget": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Sessions the phase is expected to take. d-system fixes this at 1."
+    },
+    "next_action": {
+      "$ref": "#/$defs/text",
+      "description": "The first useful step for whoever picks the phase up next."
+    },
+    "agent": {
+      "$ref": "#/$defs/text",
+      "description": "Identity of the agent holding the claim. Present only while the phase is active or blocked, or as a record once complete."
+    },
+    "blocked_reason": {
+      "$ref": "#/$defs/text",
+      "description": "Why a blocked, deferred or cancelled phase is not running."
+    },
+    "resume_when": {
+      "$ref": "#/$defs/text",
+      "description": "The condition that releases a blocked or deferred phase."
+    },
+    "session": {
+      "$ref": "#/$defs/slug",
+      "description": "Identifier of the session record that completed the phase."
+    },
+    "completion_evidence": {
+      "allOf": [{"$ref": "#/$defs/textList"}, {"minItems": 1}],
+      "description": "Paths that exist and prove completion. Kept separate from deliverables, which are planned paths."
+    },
+    "result": {
+      "$ref": "#/$defs/text",
+      "description": "The verification outcome actually observed, written at completion."
+    },
+    "ideas": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true,
+      "description": "Identifiers of captured ideas this phase acts on (d-system-specific)."
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "active"}}, "required": ["status"]},
+      "then": {"required": ["agent"]}
+    },
+    {
+      "if": {"properties": {"status": {"enum": ["queued", "deferred", "cancelled"]}}, "required": ["status"]},
+      "then": {
+        "not": {
+          "anyOf": [
+            {"required": ["agent"]},
+            {"required": ["completion_evidence"]},
+            {"required": ["result"]}
+          ]
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"enum": ["blocked", "deferred", "cancelled"]}}, "required": ["status"]},
+      "then": {"required": ["blocked_reason"]}
+    },
+    {
+      "if": {"properties": {"status": {"enum": ["blocked", "deferred"]}}, "required": ["status"]},
+      "then": {"required": ["resume_when"]}
+    },
+    {
+      "if": {"properties": {"status": {"const": "complete"}}, "required": ["status"]},
+      "then": {"required": ["session", "completion_evidence", "result"]}
+    }
+  ]
+}

@@ -8,6 +8,12 @@ Each case in CASES names an example, a schema and whether the example must valid
 The script also checks that each template's headings satisfy its schema's section
 requirements, so a template and its schema cannot drift apart unnoticed.
 
+A backlog phase is a YAML item in backlog.yaml, not a Markdown document, so it is checked
+separately (REQ-024 R03): the item named by REFERENCE_PHASE is cut out of backlog.yaml as text,
+unchanged, and parsed as its own YAML document; it must validate, and copies with a required
+field removed must not. Every phase in backlog.yaml must also validate, and the keys in
+phase.template.md's YAML block must match the schema. backlog.yaml is only read.
+
 Run from the repository root:
 
     uv run python docs/00-working/framework/05-schemas/check_schemas.py
@@ -29,6 +35,8 @@ from jsonschema import Draft202012Validator
 
 HERE = Path(__file__).resolve().parent
 EXAMPLES = HERE / "examples"
+BACKLOG = HERE.parents[3] / "docs" / "09-backlog" / "backlog.yaml"
+REFERENCE_PHASE = "phase-conc-01"
 
 # (example file, schema file, must validate)
 CASES: list[tuple[str, str, bool]] = [
@@ -48,6 +56,12 @@ CASES: list[tuple[str, str, bool]] = [
 TEMPLATES: list[tuple[str, str]] = [
     ("governance.template.md", "governance.schema.json"),
     ("protocol.template.md", "protocol.schema.json"),
+]
+
+# (field removed from the reference phase, reason the copy must fail)
+PHASE_OMISSIONS: list[tuple[str, str]] = [
+    ("acceptance", "a required field"),
+    ("result", "required once status is complete"),
 ]
 
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
@@ -100,6 +114,71 @@ def load_schema(name: str) -> dict[str, Any]:
     return schema
 
 
+def extract_phase(backlog_text: str, phase_id: str) -> str:
+    """Cut one item out of backlog.yaml's `items:` list as text and return it as its own YAML
+    document: the `- ` that opens the item and the two-space list indent are removed, and no
+    other character is changed."""
+    lines = backlog_text.splitlines()
+    start = lines.index(f"- id: {phase_id}")
+    end = next((i for i in range(start + 1, len(lines)) if lines[i].startswith("- ")), len(lines))
+    item = [lines[start][2:]] + [line[2:] if line.startswith("  ") else line
+                                 for line in lines[start + 1:end]]
+    return "\n".join(item).rstrip() + "\n"
+
+
+def template_yaml_keys(text: str) -> set[str]:
+    """Keys of the first fenced YAML block in a template, which holds a one-item list."""
+    match = re.search(r"```yaml\n(.*?)```", text, re.DOTALL)
+    if not match:
+        return set()
+    block = yaml.safe_load(match.group(1))
+    return set(block[0]) if isinstance(block, list) and block else set()
+
+
+def check_phases() -> int:
+    """REQ-024 R03: phase.schema.json fits phases already in backlog.yaml, unchanged."""
+    failures = 0
+    schema = load_schema("phase.schema.json")
+    backlog_text = BACKLOG.read_text(encoding="utf-8")
+    items = yaml.safe_load(backlog_text)["items"]
+
+    def report(ok: bool, label: str, errors: list[str]) -> None:
+        nonlocal failures
+        failures += not ok
+        print(f"{'PASS' if ok else 'FAIL'}  {label}")
+        for message in errors:
+            print(f"        {message}")
+
+    extracted = yaml.safe_load(extract_phase(backlog_text, REFERENCE_PHASE))
+    in_backlog = next(item for item in items if item["id"] == REFERENCE_PHASE)
+    report(extracted == in_backlog,
+           f"{REFERENCE_PHASE} cut from backlog.yaml as text equals the parsed backlog item", [])
+    errors = describe_errors(schema, extracted)
+    report(not errors, f"{REFERENCE_PHASE} against phase.schema.json: "
+           f"{'valid' if not errors else 'invalid'} (expected valid)", errors)
+
+    for field, reason in PHASE_OMISSIONS:
+        copy = {k: v for k, v in extracted.items() if k != field}
+        errors = describe_errors(schema, copy)
+        report(bool(errors), f"{REFERENCE_PHASE} without {field} ({reason}) against "
+               f"phase.schema.json: {'invalid' if errors else 'valid'} (expected invalid)", errors)
+
+    invalid = [(item.get("id", "?"), describe_errors(schema, item)) for item in items]
+    invalid = [(phase_id, errors) for phase_id, errors in invalid if errors]
+    report(not invalid, f"all {len(items)} phases in backlog.yaml against phase.schema.json: "
+           f"{len(items) - len(invalid)} valid (expected all)",
+           [f"{phase_id}: {message}" for phase_id, errors in invalid for message in errors])
+
+    keys = template_yaml_keys((HERE / "phase.template.md").read_text(encoding="utf-8"))
+    unknown = sorted(keys - set(schema["properties"]))
+    missing = sorted(set(schema["required"]) - keys)
+    report(bool(keys) and not unknown and not missing,
+           "phase.template.md YAML keys against phase.schema.json properties",
+           [f"unknown key: {k!r}" for k in unknown]
+           + [f"missing required key: {k!r}" for k in missing])
+    return failures
+
+
 def main() -> int:
     failures = 0
 
@@ -124,6 +203,8 @@ def main() -> int:
         print(f"{'PASS' if ok else 'FAIL'}  {template} headings against {schema_name} sections")
         for message in errors:
             print(f"        {message}")
+
+    failures += check_phases()
 
     print(f"\n{failures} failure(s)")
     return 1 if failures else 0
