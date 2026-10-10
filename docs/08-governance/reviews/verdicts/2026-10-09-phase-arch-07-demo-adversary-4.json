@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-09-phase-arch-07-demo-adversary-4",
+  "date": "2026-10-09",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "5fe933fa4b0ad91904f940dc4994a5b8cffb7994",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "The /workbench-layouts/ route bypasses the symlink guard: serveWorkbenchLayouts checks containment textually and the guard does not map that URL prefix, so a symlink under _data/workbench/layouts/ pointing outside is served.",
+      "evidence": "ts/vite.config.ts:134-150 (serveWorkbenchLayouts, no realpath) and :71-78 (candidates() maps only /@fs/ and root-relative under ts/). Reproduced with an untracked symlink: GET /workbench-layouts/evil-layout.json -> 200 with the outside file; the same file via /@fs -> 403.",
+      "consequence": "The goal of the owner ruling (no symlink under the allow-listed directories is served) is not met for a live route."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "The guard checks a path and then hands the request on, so the check and the read are not atomic; swapping a file and a symlink under concurrent requests crashed the dev server with an unhandled stream error.",
+      "evidence": "Toggle of ts/public/race.txt between a regular file and a symlink under about 600 concurrent requests: Node v22.22.2 unhandled ReadStream error ENOENT; the server process exited. The builder later measured secret responses on guarded paths in the same race.",
+      "consequence": "Denial of service and, per the builder's follow-up probe, disclosure under a race, for anyone who can write under ts/ or _data/workbench/."
+    }
+  ],
+  "raw_reply_sha256": "fa9d8b1babc1d1846caae70d88c85ea154c7b09cd4e8fc809f110c116b3ca2a7",
+  "notes": "Round 2 security review standing in for /security-review (owner ruling 2026-10-06; idea 000595). Dispatched by the Session Manager in its own scratch clone at 5fe933fa; live probing of a dev server started from the clone. Owner rulings 2026-10-09: fix F01 at every serving route; fix F02 in this phase (serve from an opened and checked descriptor). Raw reply at _working/session-manager/review-replies/phase-arch-07-5fe933fa-security-demo-adversary.md."
+}
