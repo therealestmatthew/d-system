@@ -448,3 +448,26 @@ rule refuses nothing the workbench serves today. On the worktree's dev server, `
 The minor finding, that the comment in `vite.config.ts` overclaimed what is not covered, is fixed:
 the comment now says that every file-naming request is checked, and names the two kinds of
 request that are read again by name after the check.
+
+**Functional gating on `91580253`: pass with findings, one major.** The race test's toggler child
+was stopped and awaited only when a case succeeded. A case that failed an assertion, or a test run
+that was killed, left it running with no deadline. The reviewer found two such togglers at 82% CPU,
+about 47 minutes old, with their `/tmp/vite-fs-guard-*` trees, and removed them. They came from
+this session's own mutation runs, in which the race assertion failed inside the loop before the
+stop step. The same runs also left 70 probe trees (`/tmp/race-*`, `/tmp/jp-*`) from the scratch
+probe; those were removed as well.
+
+Fixed in `ts/vite.config.test.ts`. Every race case runs its toggler through `withToggler`, which
+kills it with `SIGKILL` and waits for it in a `finally`, and each case's tree is removed in its
+own `finally`. The toggler script exits at its own deadline (10 s by default) and as soon as its
+parent is gone, when its stdin pipe ends or its parent process id changes. Three new cases, 13 in
+all:
+- a failing body leaves no live toggler;
+- a toggler that is never stopped ends at its deadline;
+- killing the process that started a toggler, a stand-in for a test worker, ends the toggler
+  within 5 s.
+
+Checked by hand as well. A race case failing under the round 2 mutation left no toggler and no
+tree. Killing Vitest with `SIGKILL` mid-race ended its toggler within 3 s, but left that case's
+tree, since no cleanup code runs after `SIGKILL`; it was removed by hand. The file passed 3 runs
+out of 3.
