@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-09-phase-arch-07-demo-adversary-6",
+  "date": "2026-10-09",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "91580253d2e165920a2fa5b2b55445ed6f67464f",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "A hard link inside the allow-listed tree to an outside file passes the real-path check and is served on every route.",
+      "evidence": "ts/vite.config.ts openOnce. Live: hard links under ts/public/, _data/workbench/ (via /@fs) and docs/ (via /workbench-file/ with the demo flag) each returned the outside file.",
+      "consequence": "The guard's purpose is defeated through a different filesystem primitive with the same preconditions as the symlink case."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "The code comment listing what the guard does not cover overclaims: node_modules leaf symlinks and ?inline/?url/?worker on a symlinked file are refused by the outer middleware.",
+      "evidence": "ts/vite.config.ts ~219-221; live 403 for each case.",
+      "consequence": "A maintainer could add an early pass-through to fix a gap that does not exist and open a real one."
+    }
+  ],
+  "raw_reply_sha256": "fcca691409ea0e8210a945a64fe01e5927383a5b6095c38308117a80d1ada114",
+  "notes": "Rounds 3+4 security review standing in for /security-review, dispatched by the Session Manager in its own scratch clone at 91580253 with live probing. The reviewer called it pass-with-findings; recorded as pass with its findings. Owner ruling 2026-10-09: F01 fixed in this phase (refuse link count above 1, package directory exempt). Raw reply at _working/session-manager/review-replies/phase-arch-07-91580253-security-demo-adversary.md."
+}

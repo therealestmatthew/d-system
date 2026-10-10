@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-09-phase-arch-07-demo-adversary-7",
+  "date": "2026-10-09",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "6e29c8d0912be207bb6b34b7de2faf511c37034f",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "The node_modules exemption from the hard-link refusal is a free-floating path-segment regex, so any directory named node_modules anywhere in the tree re-opens the hard-link hole.",
+      "evidence": "ts/vite.config.ts:74 NODE_MODULES_SEGMENT and :124. Reproduced: data/node_modules/evil/hard.txt and ts/src/node_modules/evil/hard.txt, hard links to an outside secret, served 200 via /@fs and root-relative URLs.",
+      "consequence": "Anyone who can write under the allow-listed tree can read any file the dev server can read."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "Import queries other than ?raw are re-read by name by Vite plugins after the check, and the race window leaks.",
+      "evidence": "ts/vite.config.ts:362 load hook pass-through. /data/race.svg?import&url raced against a toggler: 122 of 544 responses carried the outside file.",
+      "consequence": "Disclosure under a race through ?url, ?inline or ?worker imports."
+    }
+  ],
+  "raw_reply_sha256": "e8aaa72368e4d637b7e07f62c480806c693265b7161d9d55202d8253df7d494b",
+  "notes": "Round 5 security review standing in for /security-review, dispatched by the Session Manager in its own scratch clone at 6e29c8d0. F01 fixed in round 6 (d2a3e4be); owner ruling 2026-10-10: F02 fixed in this phase. Round 5 had no separate functional review or shadow judge: it was superseded by round 6 before they were dispatched. Raw reply at _working/session-manager/review-replies/phase-arch-07-6e29c8d0-security-demo-adversary.md."
+}

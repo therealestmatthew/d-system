@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-09-phase-arch-07-demo-adversary-5",
+  "date": "2026-10-09",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "91580253d2e165920a2fa5b2b55445ed6f67464f",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "The race test's toggler child is stopped only on the success path, with no finally kill and no deadline, so an interrupted test run leaves it running and pinning a core.",
+      "evidence": "ts/vite.config.test.ts TOGGLER script and the concurrent-renames describe block. Two live orphans found (PPID 1, about 82% CPU, about 47 minutes old) with their /tmp/vite-fs-guard-* trees left behind; the reviewer killed them.",
+      "consequence": "Runaway processes on shared machines or CI after a timeout or crash."
+    }
+  ],
+  "raw_reply_sha256": "26e83452a4d4ea93be30ff66d40b966f673010eb79fbdda15537e25878893c78",
+  "notes": "Rounds 3+4 functional gating review (the guard's security probed separately), dispatched by the Session Manager in its own scratch clone at 91580253. The reviewer called it pass-with-findings; recorded as pass with its finding, fixed in round 6. Raw reply at _working/session-manager/review-replies/phase-arch-07-91580253-demo-adversary.md."
+}
