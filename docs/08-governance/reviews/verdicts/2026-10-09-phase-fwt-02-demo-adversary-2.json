@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-09-phase-fwt-02-demo-adversary-2",
+  "date": "2026-10-09",
+  "phase": "phase-fwt-02",
+  "reviewed_commit": "fb77906028ebe4f723d265916c21e7c6eaf6c80c",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "The cross-reference says d-system's backlog schema \"requires every field above\", which is untrue for ideas: schemas/backlog.schema.json lists ideas as a property but not as required.",
+      "evidence": "phase.schema.json:5 and phase.template.md:77-78 vs schemas/backlog.schema.json required list (lines 55-70).",
+      "consequence": "An inaccurate equivalence statement between the two schemas, the kind the round-1 ruling asked to keep accurate."
+    }
+  ],
+  "raw_reply_sha256": "0895aa48191d4c5c690e4a437e88d07d3d1482b61f176f8089980986c0139d09",
+  "notes": "Round 2 gating re-review of the owner-ruled fixes for round-1 F01 and F02, dispatched and briefed by the Session Manager in its own scratch clone at fb779060, in parallel with the runner (manifest _working/review-checks/phase-fwt-02/fb77906028eb/, passed). The reviewer called it pass-with-findings; recorded as pass with its finding. Raw reply at _working/session-manager/review-replies/phase-fwt-02-fb779060-demo-adversary.md."
+}
