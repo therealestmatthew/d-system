@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-09-phase-arch-07-demo-adversary-3",
+  "date": "2026-10-09",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "5fe933fa4b0ad91904f940dc4994a5b8cffb7994",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "pass",
+  "gating": true,
+  "findings": [],
+  "raw_reply_sha256": "f2fc2522c47e46476d4581ed5c839b67eb0489d4c8993b603fd73cb12cb671ea",
+  "notes": "Round 2 functional gating review (the security fix probed separately), dispatched and briefed by the Session Manager in its own scratch clone at 5fe933fa. Brief: the round diff 0f043854..5fe933fa, the phase entry with the owner-approved widened deliverables. Raw reply at _working/session-manager/review-replies/phase-arch-07-5fe933fa-demo-adversary.md."
+}
