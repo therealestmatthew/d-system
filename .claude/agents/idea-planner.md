@@ -175,6 +175,7 @@ path_re = re.compile(
     r'docs/00-working/promoted/(?P<code>(?:PLAN|REQ)-[0-9]{3}(?:\.[0-9]{2})?)'
     r'-[a-z0-9]+(?:-[a-z0-9]+)*\.md'
 )
+max_draft_bytes = 4 * 1024 * 1024  # 4 MiB
 
 had_error = False
 for path_file in sorted(glob.glob('_working/idea-planner/*.path')):
@@ -199,14 +200,22 @@ for path_file in sorted(glob.glob('_working/idea-planner/*.path')):
     try:
         fd = os.open(draft_path, os.O_RDONLY | os.O_NONBLOCK)
         try:
-            f = os.fdopen(fd, encoding='utf-8')
+            f = os.fdopen(fd, 'rb')
         except BaseException:
             os.close(fd)
             raise
         with f:
-            if not stat.S_ISREG(os.fstat(f.fileno()).st_mode):
+            st = os.fstat(f.fileno())
+            if not stat.S_ISREG(st.st_mode):
                 raise OSError(errno.EINVAL, 'not a regular file')
-            text = f.read()
+            if st.st_size > max_draft_bytes:
+                raise OSError(errno.EFBIG, f'too large: {st.st_size} bytes exceeds '
+                              f'max_draft_bytes={max_draft_bytes}')
+            data = f.read(max_draft_bytes + 1)
+            if len(data) > max_draft_bytes:
+                raise OSError(errno.EFBIG, f'too large: more than {max_draft_bytes} bytes '
+                              f'exceeds max_draft_bytes={max_draft_bytes}')
+        text = data.decode('utf-8')
     except FileNotFoundError:
         print(f'stale {path_file}: draft path {draft_path!r} no longer exists', file=sys.stderr)
         continue
@@ -243,7 +252,11 @@ draft path could not be read — a directory, a file without read permission, a 
 draft that is not valid UTF-8 — prints an `unreadable ...` line on stderr naming the error; it
 likewise does not stop the other files' lines from printing. A draft path that is not a regular file (a FIFO,
 socket or device) is reported as unreadable rather than waited on: the draft is opened without
-blocking and read only after the same open file is confirmed to be a regular file. **Read only the line naming your own
+blocking and read only after the same open file is confirmed to be a regular file. A draft larger
+than `max_draft_bytes` (4 MiB) is reported as unreadable (too large) and makes the exit nonzero:
+its size is checked from the same open file before it is read, and the read itself stops after
+`max_draft_bytes + 1` bytes, so a draft that grows after that check is still refused rather than
+read whole. **Read only the line naming your own
 draft's path**; other lines belong to other concurrent dispatches sharing the same
 `_working/idea-planner/` directory, not to you. The command exits nonzero if *any* staged file was
 refused or its draft was unreadable; only a stale (missing) draft leaves the exit code unchanged.

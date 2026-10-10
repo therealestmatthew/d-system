@@ -422,3 +422,56 @@ def test_fifo_at_draft_path_is_unreadable_without_hanging_or_hiding_the_current_
     _stage_current(tmp_path)
 
     _assert_unreadable_reported(_run(tmp_path, timeout=30), "PLAN-960")
+
+
+_MAX_DRAFT_BYTES = 4 * 1024 * 1024
+
+
+def test_generated_command_defines_max_draft_bytes_as_4_mib() -> None:
+    """The size cap the oversized-draft tests rely on is the one named constant in the command."""
+    assert "max_draft_bytes = 4 * 1024 * 1024  # 4 MiB" in _extract_check_command()
+
+
+def test_oversized_draft_is_unreadable_as_too_large_without_hiding_the_current_draft(
+    tmp_path: Path,
+) -> None:
+    """Fix cycle 11 (round 9 F01): with no size cap, a 2 GB draft took 51 s and about 4.2 GB of
+    memory. A draft over max_draft_bytes is now refused from its open file's size before any read.
+    The draft is sparse, so the test writes no content; the timeout turns a regression into a
+    failure rather than a slow suite."""
+    big = tmp_path / "docs/00-working/promoted/PLAN-960-too-big.md"
+    big.parent.mkdir(parents=True)
+    with big.open("wb") as f:
+        f.truncate(5 * 1024 * 1024)
+    _write_path_file(tmp_path, "PLAN-960", "docs/00-working/promoted/PLAN-960-too-big.md\n")
+    _stage_current(tmp_path)
+
+    result = _run(tmp_path, timeout=30)
+
+    _assert_unreadable_reported(result, "PLAN-960")
+    unreadable = [
+        line
+        for line in result.stderr.splitlines()
+        if line.startswith("unreadable _working/idea-planner/PLAN-960.path: ")
+    ]
+    assert len(unreadable) == 1, result.stderr
+    assert "too large" in unreadable[0], result.stderr
+
+
+def test_draft_of_exactly_max_draft_bytes_is_not_refused_as_too_large(tmp_path: Path) -> None:
+    """The boundary: a valid UTF-8 draft of exactly max_draft_bytes is read and checked, never
+    refused as too large. Its conformance result is whatever the check says."""
+    body = _draft()
+    padding = _MAX_DRAFT_BYTES - len(body.encode("utf-8"))
+    content = body + "x" * (padding - 1) + "\n"
+    assert len(content.encode("utf-8")) == _MAX_DRAFT_BYTES
+    _stage_draft(tmp_path, "PLAN-960", "docs/00-working/promoted/PLAN-960-at-cap.md", content)
+    _stage_current(tmp_path)
+
+    result = _run(tmp_path, timeout=60)
+
+    assert "Traceback" not in result.stderr, result.stderr
+    assert "too large" not in result.stderr, result.stderr
+    assert "unreadable _working/idea-planner/PLAN-960.path" not in result.stderr, result.stderr
+    assert "docs/00-working/promoted/PLAN-960-at-cap.md: " in result.stdout, result.stderr
+    assert "docs/00-working/promoted/PLAN-961-current-draft.md: " in result.stdout, result.stderr
