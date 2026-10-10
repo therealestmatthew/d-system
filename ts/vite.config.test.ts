@@ -364,6 +364,15 @@ describe('hard links (security review, 2026-10-09)', () => {
     linkSync(secret, join(data, 'layouts', 'hard.json'))
     linkSync(secret, join(pub, 'hard.html'))
     linkSync(secret, join(repo, 'docs', 'hard.txt'))
+    // Directories merely named `node_modules` get no exemption; only the root's own one does.
+    for (const fake of [
+      join(data, 'node_modules', 'evil'),
+      join(site, 'src', 'node_modules', 'evil'),
+      join(repo, 'node_modules', 'evil'),
+    ]) {
+      mkdirSync(fake, { recursive: true })
+      linkSync(secret, join(fake, 'hard.txt'))
+    }
     const get = await serve([
       refuseSymlinkEscapes(site, [site], { [LAYOUTS]: join(data, 'layouts') }),
       serveWorkbenchLayouts(join(data, 'layouts')),
@@ -378,6 +387,11 @@ describe('hard links (security review, 2026-10-09)', () => {
       `${LAYOUTS}hard.json`,
       '/generated-overview/hard.html',
       '/workbench-file/docs/hard.txt',
+      `/@fs${data}/node_modules/evil/hard.txt`,
+      '/data/node_modules/evil/hard.txt',
+      `/@fs${site}/src/node_modules/evil/hard.txt`,
+      '/src/node_modules/evil/hard.txt',
+      '/workbench-file/node_modules/evil/hard.txt',
     ]) {
       const response = await get(path)
       expect(response.status, path).toBe(403)
@@ -385,15 +399,17 @@ describe('hard links (security review, 2026-10-09)', () => {
     }
   })
 
-  it('still serves a hard-linked file under node_modules', async () => {
+  it("still serves a hard-linked file under the root's own node_modules", async () => {
     const pkg = join(site, 'node_modules', 'pkg')
     mkdirSync(pkg, { recursive: true })
     writeFileSync(join(pkg, 'asset.txt'), 'PACKAGE')
     linkSync(join(pkg, 'asset.txt'), join(pkg, 'asset-copy.txt'))
     const get = await serve([refuseSymlinkEscapes(site, [site])])
-    const response = await get('/node_modules/pkg/asset.txt')
-    expect(response.status).toBe(200)
-    expect(await response.text()).toBe('PACKAGE')
+    for (const path of ['/node_modules/pkg/asset.txt', `/@fs${pkg}/asset.txt`]) {
+      const response = await get(path)
+      expect(response.status, path).toBe(200)
+      expect(await response.text(), path).toBe('PACKAGE')
+    }
   })
 })
 

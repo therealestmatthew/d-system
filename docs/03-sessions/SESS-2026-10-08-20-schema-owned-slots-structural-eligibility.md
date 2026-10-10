@@ -428,10 +428,9 @@ reproduced it through `ts/public/`, through `/@fs/` on `_data/workbench/` and th
 `/proc/self/fd` path and its inode both look like an inside file.
 
 Fixed in `openOnce`: a regular file whose `fstat` link count is above 1 is refused with 403.
-Files whose real path has a `node_modules` directory component (`/[\\/]node_modules[\\/]/` on the
-real path) are exempt, because package managers hard-link packages there. A hard link placed under
-`node_modules` is therefore still served; npm writes that directory and nothing tracked lives
-there.
+Files under the root's own `node_modules` are exempt, because package managers hard-link packages
+there. The first version matched a `node_modules` segment anywhere in the real path; round 5 below
+anchors it.
 
 No tracked file in this worktree or the primary checkout has a link count above 1, and no file of
 any kind under `ts/` (outside `node_modules`), `_data/workbench/` or `_public/` has one, so the
@@ -471,3 +470,31 @@ Checked by hand as well. A race case failing under the round 2 mutation left no 
 tree. Killing Vitest with `SIGKILL` mid-race ended its toggler within 3 s, but left that case's
 tree, since no cleanup code runs after `SIGKILL`; it was removed by hand. The file passed 3 runs
 out of 3.
+
+## Review round 5 (2026-10-09)
+
+On `6e29c8d0` the security stand-in rejected with one blocker. The `node_modules` exemption was
+a regex matching that segment anywhere in the real path, so any directory named `node_modules`
+reopened the hard-link hole. The reviewer reproduced it with `data/node_modules/evil/hard.txt`
+and `ts/src/node_modules/evil/hard.txt`, both hard links to an outside file, served with 200
+through `/@fs/` and through a root-relative URL. `serveRepositoryFiles`, rooted at the whole
+repository, was the broadest case.
+
+Fixed by anchoring the exemption. `openChecked` takes an explicit list of resolved package
+directories in which a hard-linked file may be served:
+- The guard passes only `realpath(<root>/node_modules)`, that is `ts/node_modules`.
+- The three config routes pass none, so `/workbench-file/` refuses every hard-linked file.
+- The `load` hook leaves to Vite only modules inside that same directory, compared both textually
+  and resolved, instead of any path with the segment.
+
+The hard-link test now also requests `data/node_modules/evil/hard.txt` and
+`src/node_modules/evil/hard.txt`, through `/@fs/` and root-relative, and
+`/workbench-file/node_modules/evil/hard.txt`; all are 403. A hard-linked file under the root's own
+`node_modules` is still served through both `/node_modules/...` and `/@fs/`. With the old
+free-floating regex put back, the test fails on the reviewer's case
+(`/@fs/.../data/node_modules/evil/hard.txt: expected 200 to be 403`). The comments in
+`vite.config.ts` say which `node_modules` is meant.
+
+Waiting on the owner, not acted on: the reviewer's major finding that import queries other than
+`?raw` still leak under a race. `/data/race.svg?import&url` leaked the secret in 122 of 544
+requests. This is the residual the comment and this record already name.
