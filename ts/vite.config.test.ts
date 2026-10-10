@@ -10,6 +10,7 @@
 // rather than through Vite's.
 import { execFileSync, spawn } from 'node:child_process'
 import {
+  linkSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -212,6 +213,56 @@ const step = () => {
 }
 step()
 `
+
+describe('hard links (security review, 2026-10-09)', () => {
+  // A hard link is a second name for the same file: one inside a served directory can name a file
+  // that lives outside it, and neither the path nor the inode shows that. Every route refuses a
+  // file with more than one link, except under `node_modules`, where package managers make them.
+  it('refuses a hard link to an outside file on every route', async () => {
+    const secret = join(base, 'outside', 'secret.txt')
+    const pub = join(base, 'public-dir')
+    const repo = join(base, 'repo')
+    mkdirSync(join(site, 'public'))
+    mkdirSync(pub)
+    mkdirSync(join(repo, 'docs'), { recursive: true })
+    execFileSync('git', ['init', '--quiet'], { cwd: repo })
+    linkSync(secret, join(site, 'public', 'hard.txt'))
+    linkSync(secret, join(data, 'hard.txt'))
+    linkSync(secret, join(data, 'layouts', 'hard.json'))
+    linkSync(secret, join(pub, 'hard.html'))
+    linkSync(secret, join(repo, 'docs', 'hard.txt'))
+    const get = await serve([
+      refuseSymlinkEscapes(site, [site], { [LAYOUTS]: join(data, 'layouts') }),
+      serveWorkbenchLayouts(join(data, 'layouts')),
+      serveGeneratedOverview(pub),
+      serveRepositoryFiles(repo),
+    ])
+    for (const path of [
+      '/hard.txt',
+      `/@fs${data}/hard.txt`,
+      '/data/hard.txt',
+      '/data/hard.txt?raw',
+      `${LAYOUTS}hard.json`,
+      '/generated-overview/hard.html',
+      '/workbench-file/docs/hard.txt',
+    ]) {
+      const response = await get(path)
+      expect(response.status, path).toBe(403)
+      expect(await response.text(), path).not.toContain('SECRET')
+    }
+  })
+
+  it('still serves a hard-linked file under node_modules', async () => {
+    const pkg = join(site, 'node_modules', 'pkg')
+    mkdirSync(pkg, { recursive: true })
+    writeFileSync(join(pkg, 'asset.txt'), 'PACKAGE')
+    linkSync(join(pkg, 'asset.txt'), join(pkg, 'asset-copy.txt'))
+    const get = await serve([refuseSymlinkEscapes(site, [site])])
+    const response = await get('/node_modules/pkg/asset.txt')
+    expect(response.status).toBe(200)
+    expect(await response.text()).toBe('PACKAGE')
+  })
+})
 
 describe('serving under concurrent renames (check-then-serve race)', () => {
   // Each case gets its own tree and server, with no other symlink in it, and runs a toggler for a

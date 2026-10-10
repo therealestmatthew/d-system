@@ -8876,7 +8876,9 @@ items:
     each. Round 3 (owner ruling): every guarded file is opened, then checked, then read only from
     that descriptor, including the plain files and source modules Vite itself serves; a race probe
     that leaked the outside file hundreds of times under round 2 now gets it back zero times on ten
-    paths, and a bounded race test in vite.config.test.ts asserts it.'
+    paths, and a bounded race test in vite.config.test.ts asserts it. Round 4 (owner ruling): a file
+    with more than one hard link is refused (403), except under node_modules, where package
+    managers make them.'
 - id: phase-arch-08
   title: Multi-instance panel identity across layout, storage, registry and sessions
   plan: doc-workbench-architecture-quality
