@@ -18383,6 +18383,7 @@ items:
   - '000673'
   systems:
   - sys-portfolio
+  - sys-gov-docs
   owner: repository-owner
   status: queued
   priority: 2
@@ -18393,17 +18394,24 @@ items:
     write tools/idea_overlap.py. It takes one six-digit id, reads the log through
     src.db.ideas.fold, tokenises titles and computes Jaccard similarity as autoclaude-api's
     scout/dedup/overlap.py does (title_tokens, jaccard) with the 0.6 threshold from
-    scout/dedup/engine.py, and prints candidates as "<id> <score> <title>", highest first, or one
-    no-candidate line. It writes nothing. Its header names the source repository, path and commit
-    c7abe1389cd7593810dee345b5a3e2dd2b332540 (PLAN-053 D8). Idea 000673 (idea overlap pre-pass)
-    is the originating idea.
+    scout/dedup/engine.py line 35, and prints candidates as "<id> <score> <title>", highest first,
+    or one no-candidate line. It writes nothing. Its header names the source repository, path and
+    commit c7abe1389cd7593810dee345b5a3e2dd2b332540 (PLAN-053 D8). Idea 000673 (idea overlap
+    pre-pass) is the originating idea.
   - Ship the OPS document for the tool in docs/08-governance/ (code from --next-code operation) and
     fill its generated block with tools/generate_tool_docs.py.
   - Edit the triage driver source agent-workflows/idea-triage.md so step 2 runs the tool for the
-    idea and pastes its output into the dispatch, and the role source
-    agent-workflows/idea-triage-agent.md so step 2 cites the measured candidates in the finding.
-    Regenerate every target with tools/generate_agent_workflows.py. Change no status verb; the
+    idea and pastes its output into the dispatch. State the failure path there - when the tool
+    exits non-zero or is missing, the driver dispatches without the pre-pass and writes the line
+    "overlap pre-pass unavailable" with the tool's last stderr line into the dispatch, and the
+    role's finding repeats that line. Edit the role source agent-workflows/idea-triage-agent.md so
+    step 2 cites the measured candidates in the finding when present. Change no status verb; the
     workflow still stops at triaged.
+  - Amend the Triage inputs line of docs/08-governance/GOV-014-realization-role-contracts.md to
+    name the overlap pre-pass output as an advisory third input, present when the tool ran, so the
+    binding contract and the role file agree.
+  - Regenerate every target with tools/generate_agent_workflows.py, including
+    .codex/agents/idea-triage.toml and the .agents/ skill copies.
   - Run the tool over the real log for five ideas of the session's choosing and quote the output in
     the session record, so open question 2 of PLAN-053 (the threshold) has evidence.
   acceptance:
@@ -18411,12 +18419,15 @@ items:
     no-candidate line for an idea with none, and byte-identical output across two runs.
   - An unknown idea id exits non-zero naming the id (the case that must fail).
   - The SHA-256 of _data/ideas.jsonl is identical before and after a run, and no file is created.
-  - uv run pytest test/test_agent_workflows.py passes after regeneration, and a grep of both
-    workflow sources finds idea_overlap.py.
+  - uv run pytest test/test_agent_workflows.py passes after regeneration; a grep of both workflow
+    sources finds idea_overlap.py and the driver finds "overlap pre-pass unavailable"; a grep of
+    the driver finds no status value other than triaged after a status verb.
+  - GOV-014's Triage inputs name the pre-pass output as advisory.
   - The OPS document exists and its generated block is filled.
   verification:
   - uv run pytest test/test_idea_overlap.py test/test_agent_workflows.py test/test_tool_docs.py
   - uv run python tools/idea_overlap.py 000673
+  - grep -n "overlap pre-pass unavailable" agent-workflows/idea-triage.md
   - uv run python -m src.governance
   - uv run pytest
   - uv run ruff check src/ test/ tools/
@@ -18430,12 +18441,12 @@ items:
   - agent-workflows/idea-triage-agent.md
   - .claude/agents/idea-triage.md
   - .claude/commands/idea-triage.md
+  - .codex/agents/idea-triage.toml
   - .agents/
-  - docs/03-sessions/
-  next_action: Read autoclaude-api scout/dedup/overlap.py and engine.py lines 448-487 at the commit
-    in PLAN-053 D8, then write test/test_idea_overlap.py before the tool.
+  next_action: Read autoclaude-api scout/dedup/overlap.py and engine.py line 35 and lines 448-487 at
+    the commit in PLAN-053 D8, then write test/test_idea_overlap.py before the tool.
 - id: phase-mig-02
-  title: Sanitise capture text at structuring time, leaving the raw record byte-identical
+  title: Sanitise capture text where the structuring agent reads it, with provenance offsets kept in raw coordinates
   plan: doc-sibling-repo-feature-migration
   sources:
   - doc-sibling-repo-feature-migration-requirements
@@ -18452,28 +18463,38 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Write the test first (REQ-038 R04) with a raw capture whose text holds U+200B, U+202E, U+FEFF,
-    NUL and U+0007 beside a newline and a tab, asserting the structuring read path returns none of
-    the five and keeps the two, and that the raw file's SHA-256 is unchanged.
-  - Add src/capture/sanitize.py holding a copy of sanitize_text from autoclaude-api
-    scout/_security.py at commit c7abe1389cd7593810dee345b5a3e2dd2b332540, standard library only,
-    with the provenance header PLAN-053 D8 requires. Idea 000674 (sanitiser at structuring time)
-    is the originating idea.
-  - Apply it to the text fields the structuring step reads in src/capture/structure.py, after
-    load_raw returns and before any agent or structuring code sees the text. Change nothing in
-    src/capture/raw.py or tools/capture.py.
-  - Add the stdlib-only test (R05) that reads the module's import lines against
-    sys.stdlib_module_names.
+  - Write the tests first (REQ-038 R04, R05) with a raw capture whose content holds U+200B,
+    U+202E, U+FEFF, NUL, U+0007 and U+000D beside a newline, a tab, two consecutive spaces and a
+    precomposed e-acute. The sanitised view keeps the newline, the tab, both spaces and the
+    e-acute unchanged and drops the six; the raw file's SHA-256 is unchanged.
+  - Add src/capture/sanitize.py, adapted from (not copied from) sanitize_text in autoclaude-api
+    scout/_security.py lines 57-100 at commit c7abe1389cd7593810dee345b5a3e2dd2b332540, with its
+    provenance header naming the three behaviours dropped (NFC normalisation, collapsing runs of
+    spaces and tabs, keeping carriage return) and the rule kept (remove Unicode categories Cf and
+    Cc except newline and tab, strip outer whitespace). Standard library only. It exposes
+    sanitize(text) -> str and sanitize_with_map(text) -> (str, list[int]) where the list maps each
+    index of the sanitised text to its index in the raw text. Idea 000674 (sanitiser at
+    structuring time) is the originating idea.
+  - Give the structuring agent one read surface - tools/capture.py show <capture-id> prints the
+    sanitised content and nothing else - and state in OPS-008 that an agent structuring a capture
+    reads it through that command, never the raw file. Change nothing in how captures are written.
+  - In src/capture/structure.py, resolve each quote against the sanitised view and map the match
+    back through sanitize_with_map so provenance start and end still index the raw record (REQ-002
+    R6). A quote that spans a removed character resolves; the stored quote is the sanitised text.
   acceptance:
-  - The R04 test passes, and the same test fails when the sanitiser call is removed from the read
-    path (the case that must fail; quote the failing run in the session record).
-  - test/test_capture_contracts.py and test/test_capture_intake.py pass unchanged, so REQ-002 R1
-    and R2 still hold.
-  - The provenance header names autoclaude-api, scout/_security.py and the 40-character commit.
-  - No change under src/capture/raw.py or tools/capture.py in the phase's diff.
+  - The R04 test passes, and the same test fails when the sanitiser call is removed from the show
+    command (the case that must fail; quote the failing run in the session record).
+  - A quote spanning a removed U+200B resolves with raw offsets that cover the removed character;
+    a quote in a capture with nothing to remove yields the same offsets as before this phase
+    (control).
+  - test/test_capture_contracts.py, test/test_capture_intake.py, test/test_capture_routing.py and
+    test/test_capture_promotion.py pass, so REQ-002 R1, R2 and R6 still hold.
+  - The provenance header names autoclaude-api, scout/_security.py, the 40-character commit and
+    the three dropped behaviours; the stdlib-only test (R05) passes.
+  - No change under src/capture/raw.py, and tools/capture.py changes only by the show subcommand.
   verification:
-  - uv run pytest test/test_capture_sanitize.py test/test_capture_contracts.py test/test_capture_intake.py
-  - git diff --stat dev..HEAD -- src/capture/raw.py tools/capture.py
+  - uv run pytest test/test_capture_sanitize.py test/test_capture_contracts.py test/test_capture_intake.py test/test_capture_routing.py test/test_capture_promotion.py
+  - git diff --stat dev..HEAD -- src/capture/raw.py
   - uv run python -m src.governance
   - uv run pytest
   - uv run ruff check src/ test/ tools/
@@ -18482,10 +18503,12 @@ items:
   deliverables:
   - src/capture/sanitize.py
   - src/capture/structure.py
+  - tools/capture.py
   - test/test_capture_sanitize.py
-  - docs/03-sessions/
-  next_action: Read src/capture/structure.py load_raw and the field reads below it to find the one
-    place every text field passes through, then write test/test_capture_sanitize.py.
+  - docs/08-governance/OPS-008-capture.md
+  next_action: Read src/capture/structure.py _field_evidence (lines 160-180) and stage_capture, and
+    tools/capture.py _parser, then write test/test_capture_sanitize.py with the offset-map case
+    before any code.
 - id: phase-mig-03
   title: Timeline entity contract, projection and source validation with one fictional timeline
   plan: doc-sibling-repo-feature-migration
@@ -18511,13 +18534,13 @@ items:
     notes; additionalProperties false at both levels), with valid and invalid fixtures in
     test/test_schemas.py. Idea 000675 (timelines as a domain entity) is the originating idea.
   - Add CREATE TABLE timelines and timeline_entries to sql/001_schema.sql and a loader in
-    tools/rebuild_db.py that reads <data root>/timelines/*.json exactly as commitments are read,
-    so D_SYSTEM_DATA_ROOT is honoured.
+    tools/rebuild_db.py that reads <data root>/timelines/*.json exactly as commitments are read
+    (around line 181), so D_SYSTEM_DATA_ROOT is honoured.
   - Extend src/db/source_validation.py so an entry ref whose id does not exist in the same data
     root fails rebuild with a message naming the timeline, the entry and the id (R08).
   - Add one fictional timeline under _data/timelines/ with at least one milestone and one span,
-    referring to an existing fictional project. Register the new schema path on sys-contracts in
-    docs/08-governance/systems.yaml.
+    referring to an existing fictional project. In docs/08-governance/systems.yaml register
+    schemas/timeline.schema.json on sys-contracts and _data/timelines on sys-portfolio.
   acceptance:
   - test/test_schemas.py rejects a span without end, a milestone with end, kind event, and an
     unknown ref type (the cases that must fail), and accepts the fictional timeline.
@@ -18526,6 +18549,7 @@ items:
     returns 1.
   - A ref to p-999 in a root with no such project makes rebuild fail with p-999 in the message; the
     same timeline with a real project id loads.
+  - systems.yaml lists _data/timelines under sys-portfolio and the schema under sys-contracts.
   - uv run pytest test/test_rebuild.py test/test_source_validation.py passes.
   verification:
   - uv run pytest test/test_schemas.py test/test_rebuild.py test/test_source_validation.py
@@ -18545,12 +18569,11 @@ items:
   - test/test_rebuild.py
   - test/test_source_validation.py
   - docs/08-governance/systems.yaml
-  - docs/03-sessions/
   next_action: Read schemas/commitment.schema.json, the commitments loader in tools/rebuild_db.py
     (around line 181) and validate_entities in src/db/source_validation.py, then write the schema
     and its fixtures first.
 - id: phase-mig-04
-  title: Timeline read routes and response model under /api/v1/timelines
+  title: Timeline read routes and response model under /api/v1/timelines, behind the workbench gate
   plan: doc-sibling-repo-feature-migration
   sources:
   - doc-sibling-repo-feature-migration-requirements
@@ -18567,21 +18590,31 @@ items:
   - phase-mig-03
   scope:
   - Write the TestClient tests first (REQ-038 R09) for the list, the sorted order of entries by
-    start, the single lookup and the 404 for an unknown id.
+    start, the single lookup, the 404 for an unknown id, the 503 when the projection is unbuilt,
+    and the absence of the route when D_SYSTEM_DEMO_TERMINAL is unset. The tests point
+    src.db.connection.DB_PATH at a projection built in a temporary directory by
+    tools/rebuild_db.py, and never at data/.
   - Add the Pydantic response models under src/models/ and the route module
     src/api/routes/timelines.py with GET /api/v1/timelines and GET /api/v1/timelines/{id}, reading
-    the DuckDB projection through src.db.connection.get_db.
-  - Register the router unconditionally in src/api/__init__.py, beside the demo stage read
-    routes, with a comment saying why it is not behind D_SYSTEM_DEMO_TERMINAL (read-only, no
-    capability). Idea 000675 (timelines as a domain entity) is the originating idea.
+    the DuckDB projection through src.db.connection.get_db. When the projection file is missing
+    or lacks the timelines table, respond 503 with a body naming tools/rebuild_db.py; create no
+    file.
+  - Register the router in src/api/__init__.py under the same D_SYSTEM_DEMO_TERMINAL=1 gate and
+    loopback-bind check as the workbench read routes (ADR-015, one gate and one binding), with a
+    comment citing PLAN-053 D10. Idea 000675 (timelines as a domain entity) is the originating
+    idea.
   acceptance:
   - The list returns every timeline with entries sorted by start, and the single lookup returns
     one timeline.
-  - An unknown id returns 404 (the case that must fail).
-  - The route module contains no write, no subprocess and no new environment variable.
+  - An unknown id returns 404, and with the projection absent the route returns 503 and creates no
+    data/ directory (the cases that must fail).
+  - With D_SYSTEM_DEMO_TERMINAL unset the route is absent (404 on the path, not 403).
+  - grep -nE "subprocess|os\.environ|INSERT|UPDATE|DELETE" src/api/routes/timelines.py prints
+    nothing.
   - uv run ruff check src/ test/ tools/ and uv run mypy src/ are clean.
   verification:
   - uv run pytest test/test_timelines_api.py
+  - grep -nE "subprocess|os\.environ|INSERT|UPDATE|DELETE" src/api/routes/timelines.py
   - uv run python -m src.governance
   - uv run pytest
   - uv run ruff check src/ test/ tools/
@@ -18592,9 +18625,9 @@ items:
   - src/api/routes/timelines.py
   - src/api/__init__.py
   - test/test_timelines_api.py
-  - docs/03-sessions/
-  next_action: Wait for phase-mig-03 to complete; then read src/api/__init__.py and
-    src/api/routes/demo_stage.py for the registration pattern and write test/test_timelines_api.py.
+  next_action: Wait for phase-mig-03 to complete; then read src/api/__init__.py, ADR-015 and
+    src/api/routes/workbench.py for the gated registration and the loopback check, and write
+    test/test_timelines_api.py.
 - id: phase-mig-05
   title: Draft the ADR on whether the workbench may write to tracked files, against the audited write-back pattern
   plan: doc-sibling-repo-feature-migration
@@ -18616,10 +18649,11 @@ items:
     in docs/04-decisions/ with context, decision, alternatives, consequences and a revisit trigger
     (REQ-038 R10). Idea 000676 (decision on workbench write-back) is the originating idea.
   - State the three alternatives with their costs - keep per-log sanctioned writers only (OPS-005,
-    OPS-022, OPS-023); the audited write-back pattern from autoclaude-api web/apps/api/writes/ at
-    commit c7abe1389cd7593810dee345b5a3e2dd2b332540 (safe_path, atomic_write, optimistic lock on the
-    file hash returning 409, pending-then-commit audit row, orphan sweep); the broker as the single
-    write gate per ADR-022 - and name which the author leans to and why.
+    OPS-022, OPS-023); the audited write-back pattern from autoclaude-api web/apps/api/writes/
+    fs.py (safe_path, atomic_write), editor.py (optimistic lock on the file hash returning 409),
+    audit.py (pending-then-commit audit row, sweep_orphan_pending) and git.py (no-shell git with
+    commit_created and the dirty-tree handling) at commit c7abe1389cd7593810dee345b5a3e2dd2b332540;
+    the broker as the single write gate per ADR-022 - and name which the author leans to and why.
   - Leave status draft. The owner accepts or rejects. Build nothing.
   acceptance:
   - The ADR exists with the five sections and the three alternatives, each with a cost, and
@@ -18634,9 +18668,9 @@ items:
   - uv run python tools/check_no_private_content.py
   deliverables:
   - docs/04-decisions/
-  - docs/03-sessions/
   next_action: Read ADR-022, OPS-005, OPS-022, OPS-023 and AGENTS.md "Concurrent agents" sections,
-    then read the four autoclaude-api writes modules named in the scope before writing.
+    then read fs.py, editor.py, audit.py and git.py under autoclaude-api web/apps/api/writes/
+    before writing.
 - id: phase-mig-06
   title: Run-schema model and cache fields, and a deterministic run-cost report
   plan: doc-sibling-repo-feature-migration
@@ -18648,7 +18682,8 @@ items:
   - '000677'
   - '000349'
   systems:
-  - sys-auto-ledger
+  - sys-realization
+  - sys-gov-docs
   owner: repository-owner
   status: deferred
   priority: 3
@@ -18660,9 +18695,12 @@ items:
   resume_when: The owner has ruled idea 000349 and a ledger under that ruling holds at least one
     complete run with usage events.
   scope:
+  - The 000349 ruling may name the phase-auto-04 ledger instead of phase-irs-04's; this phase
+    targets whichever schema that ruling names, and schemas/run.schema.json is the target only if
+    the ruling keeps it. Idea 000677 (run-ledger cost fold) is the originating idea.
   - Add optional model, cache_creation_input_tokens and cache_read_input_tokens to the usage
-    object of schemas/run.schema.json (REQ-038 R11) with valid and invalid fixtures in
-    test/test_schemas.py. Idea 000677 (run-ledger cost fold) is the originating idea.
+    object of the canonical run schema (REQ-038 R11) with valid and invalid fixtures in
+    test/test_schemas.py.
   - Write tools/run_cost_report.py, a fold of the ledger into a markdown rollup of tokens by run,
     role, model and day, following autoclaude-api scout/report/aggregate.py and render.py at commit
     c7abe1389cd7593810dee345b5a3e2dd2b332540 in shape only, with the provenance header.
@@ -18687,6 +18725,5 @@ items:
   - test/test_run_cost_report.py
   - test/test_schemas.py
   - docs/08-governance/
-  - docs/03-sessions/
   next_action: Deferred. When resume_when holds, read the 000349 ruling, the canonical ledger's
-    writer and schemas/run.schema.json, then write the fixture ledger and the test first.
+    writer and its schema, then write the fixture ledger and the test first.
