@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-09-phase-arch-07-demo-adversary-2",
+  "date": "2026-10-09",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "0f0438540088ae116632052950b3136d03336fa3",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "A symlink inside the new dev-server fs.allow directories (_data/workbench/ or ts/) that points outside them is followed, so a path such as _private/ is served through /@fs/; the recorded claim that _private/ stays unreachable is not an invariant.",
+      "evidence": "ts/vite.config.ts fs.allow change and its comment. Reproduced: ln -sfn ../../outside-repo-sim _data/workbench/evil-symlink; GET /@fs/<repo>/_data/workbench/evil-symlink/secret.txt returned 200 with the outside file. Vite isFileLoadingAllowed compares path prefixes without realpath. No CI, schema or governance check refuses symlinks there.",
+      "consequence": "A committed symlink (a one-line mode 120000 add in a diff) would expose the developer's local _private/ portfolio through the dev server. Not a regression: before this phase the default allow-list was the whole repository root."
+    }
+  ],
+  "raw_reply_sha256": "d2669422f846dc3a8da0ff68e6474f75c068aeb593f058ece5416b12888e5d10",
+  "notes": "Security review standing in for the built-in /security-review (owner ruling, 2026-10-06; idea 000595), triggered by the ts/vite.config.ts dev-server file-access change. Dispatched by the Session Manager in its own scratch clone at 0f043854. The reviewer gave one major finding and no explicit verdict line; recorded as reject because the owner ruled on 2026-10-09 that it be fixed before merge (a check refusing tracked symlinks under _data/workbench/ and ts/, a dev-server guard rejecting /@fs/ paths whose real path leaves the allow-list, and an accurate comment). Raw reply kept at _working/session-manager/review-replies/phase-arch-07-0f043854-security-demo-adversary.md."
+}
