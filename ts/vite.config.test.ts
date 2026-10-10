@@ -8,7 +8,7 @@
 // config's own file-serving routes (`/workbench-layouts/`, `/generated-overview/`,
 // `/workbench-file/`) are run over the same kind of tree, since each serves files by its own route
 // rather than through Vite's.
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawn } from 'node:child_process'
 import {
   mkdirSync,
   mkdtempSync,
@@ -76,14 +76,17 @@ afterEach(async () => {
   rmSync(base, { recursive: true, force: true })
 })
 
-async function serve(plugins: Plugin[]): Promise<(path: string) => Promise<Response>> {
+async function serve(
+  plugins: Plugin[],
+  root: string = site,
+): Promise<(path: string) => Promise<Response>> {
   const server = await createServer({
     configFile: false,
-    root: site,
+    root,
     logLevel: 'silent',
     plugins,
     optimizeDeps: { noDiscovery: true },
-    server: { port: 0, hmr: false, fs: { allow: [site] } },
+    server: { port: 0, hmr: false, fs: { allow: [root] } },
   })
   servers.push(server)
   await server.listen()
@@ -181,4 +184,98 @@ describe("the config's own file routes check the real path", () => {
     expect((await get('/workbench-file/docs/to-git.txt')).status).toBe(403)
     expect(await (await get('/workbench-file/docs/ok.txt?raw=1')).text()).toBe('OK')
   })
+})
+
+// A child process that, until it is told to stop, renames a regular file and a symlink to an
+// outside file over one name, as fast as it can. It prints how many swaps it made.
+const TOGGLER = `
+const { renameSync, rmSync, symlinkSync, writeFileSync } = require('node:fs')
+const [target, secret, publicText] = process.argv.slice(1)
+let swaps = 0
+let stop = false
+process.stdin.on('data', () => { stop = true })
+const step = () => {
+  for (let i = 0; i < 200 && !stop; i += 1) {
+    const temporary = target + '.swap' + (swaps % 2)
+    rmSync(temporary, { force: true })
+    if (swaps % 2) symlinkSync(secret, temporary)
+    else writeFileSync(temporary, publicText)
+    renameSync(temporary, target)
+    swaps += 1
+  }
+  if (stop) {
+    writeFileSync(target, publicText)
+    process.stdout.write(String(swaps))
+    process.exit(0)
+  }
+  setImmediate(step)
+}
+step()
+`
+
+describe('serving under concurrent renames (check-then-serve race)', () => {
+  // Each case gets its own tree and server, with no other symlink in it, and runs a toggler for a
+  // bounded time with 16 requests in flight. Against the round-2 guard, which checked a name and
+  // then let Vite or the route open it again, the same harness got the outside file back.
+  it('serves no outside byte by any route while a name flips to a symlink and back', async () => {
+    const uncaught: unknown[] = []
+    const record = (error: unknown) => uncaught.push(error)
+    process.on('uncaughtException', record)
+    try {
+      const cases: [string, string, string][] = [
+        ['data/layouts/race.json', `${LAYOUTS}race.json`, '{}'],
+        ['pub/race.html', '/generated-overview/race.html', 'PUBLIC'],
+        ['repo/docs/race.txt', '/workbench-file/docs/race.txt', 'PUBLIC'],
+        ['site/public/race.txt', '/race.txt', 'PUBLIC'],
+        ['site/data/race.txt', '/@fs<site>/data/race.txt', 'PUBLIC'],
+        ['site/data/race.txt', '/data/race.txt?raw', 'PUBLIC'],
+        ['site/data/race.ts', '/data/race.ts', 'export {}'],
+        ['site/race.html', '/race.html', '<p>PUBLIC</p>'],
+      ]
+      for (const [relative, url, publicText] of cases) {
+        const tree = realpathSync(mkdtempSync(join(base, 'race-')))
+        const raceSite = join(tree, 'site')
+        const layouts = join(raceSite, 'data', 'layouts')
+        mkdirSync(layouts, { recursive: true })
+        mkdirSync(join(raceSite, 'public'))
+        mkdirSync(join(tree, 'pub'))
+        mkdirSync(join(tree, 'repo', 'docs'), { recursive: true })
+        mkdirSync(join(tree, 'outside'))
+        execFileSync('git', ['init', '--quiet'], { cwd: join(tree, 'repo') })
+        writeFileSync(join(raceSite, 'index.html'), '<!doctype html><title>t</title>')
+        const secret = join(tree, 'outside', relative.endsWith('.ts') ? 'secret.ts' : 'secret.txt')
+        writeFileSync(secret, relative.endsWith('.ts') ? 'export default "SECRET"' : 'SECRET')
+        const target = join(tree, relative.replace(/^data\//, 'site/data/'))
+        writeFileSync(target, publicText)
+        const get = await serve(
+          [
+            refuseSymlinkEscapes(raceSite, [raceSite], { [LAYOUTS]: layouts }),
+            serveWorkbenchLayouts(layouts),
+            serveGeneratedOverview(join(tree, 'pub')),
+            serveRepositoryFiles(join(tree, 'repo')),
+          ],
+          raceSite,
+        )
+        const toggler = spawn(process.execPath, ['-e', TOGGLER, target, secret, publicText])
+        let swaps = ''
+        toggler.stdout.on('data', (chunk: Buffer) => (swaps += chunk.toString()))
+        const exited = new Promise((resolve) => toggler.on('exit', resolve))
+        const path = url.replace('<site>', raceSite)
+        const until = Date.now() + 1200
+        while (Date.now() < until) {
+          const bodies = await Promise.all(
+            Array.from({ length: 16 }, () => get(path).then((response) => response.text())),
+          )
+          for (const body of bodies) expect(body, url).not.toContain('SECRET')
+        }
+        toggler.stdin.write('stop')
+        await exited
+        expect(Number(swaps), `${url}: the toggler ran`).toBeGreaterThan(50)
+        expect((await get('/')).status, `${url}: the server still answers`).toBe(200)
+      }
+      expect(uncaught).toEqual([])
+    } finally {
+      process.off('uncaughtException', record)
+    }
+  }, 90_000)
 })

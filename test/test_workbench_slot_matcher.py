@@ -39,7 +39,7 @@ PANEL_ELEMENTS_SCHEMA = ROOT / "schemas" / "workbench-panel-elements.schema.json
 CASES_PATH = DATA / "matcher-cases.json"
 REGISTRY_PATH = ROOT / "ts" / "src" / "workbench" / "panelRegistry.tsx"
 TS_SRC = ROOT / "ts" / "src"
-PY_SRC = ROOT / "src"
+PY_SOURCES = (ROOT / "src", ROOT / "tools")
 
 
 def _validator(path: Path) -> Draft7Validator:
@@ -239,7 +239,8 @@ def test_no_source_or_data_file_carries_a_per_panel_or_per_slot_allow_list() -> 
         text = path.read_text(encoding="utf-8")
         if re.search(r"eligible_slots|eligibleSlots|admits_panels|allowed_panels", text):
             offenders.append(path.relative_to(ROOT).as_posix())
-    for path in sorted(PY_SRC.rglob("*.py")):
+    # `test/` is not scanned: tests name these fields to assert they are gone.
+    for path in sorted(p for directory in PY_SOURCES for p in directory.rglob("*.py")):
         text = path.read_text(encoding="utf-8")
         if re.search(r"eligible_slots|admits_panels|allowed_panels", text):
             offenders.append(path.relative_to(ROOT).as_posix())
