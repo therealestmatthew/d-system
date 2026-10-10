@@ -11,7 +11,8 @@ requirements, so a template and its schema cannot drift apart unnoticed.
 A backlog phase is a YAML item in backlog.yaml, not a Markdown document, so it is checked
 separately (REQ-024 R03): the item named by REFERENCE_PHASE is cut out of backlog.yaml as text,
 unchanged, and parsed as its own YAML document; it must validate, and copies with a required
-field removed must not. Every phase in backlog.yaml must also validate, and the keys in
+field removed must not, while an active copy with no agent must (the host decides when an
+active phase needs one). Every phase in backlog.yaml must also validate, and the keys in
 phase.template.md's YAML block must match the schema. backlog.yaml is only read.
 
 Run from the repository root:
@@ -162,6 +163,15 @@ def check_phases() -> int:
         errors = describe_errors(schema, copy)
         report(bool(errors), f"{REFERENCE_PHASE} without {field} ({reason}) against "
                f"phase.schema.json: {'invalid' if errors else 'valid'} (expected invalid)", errors)
+
+    # The host's concurrency rule, not the schema, decides when an active phase needs an agent:
+    # d-system requires none while max_active is 1, so an unclaimed active phase must validate.
+    unclaimed = {k: v for k, v in extracted.items()
+                 if k not in {"agent", "session", "completion_evidence", "result"}}
+    unclaimed["status"] = "active"
+    errors = describe_errors(schema, unclaimed)
+    report(not errors, f"{REFERENCE_PHASE} as active with no agent against phase.schema.json: "
+           f"{'valid' if not errors else 'invalid'} (expected valid)", errors)
 
     invalid = [(item.get("id", "?"), describe_errors(schema, item)) for item in items]
     invalid = [(phase_id, errors) for phase_id, errors in invalid if errors]

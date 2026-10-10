@@ -74,20 +74,28 @@ The schema checks these when present. They are the fields d-system uses beyond t
 
 An adopting repository may add fields of its own; the schema allows them.
 
+The core is deliberately looser than d-system's own phase definition, the `items` entry in
+d-system's `schemas/backlog.schema.json`. That definition requires every field above, fixes the
+identifier patterns (`phase-xxx-NN`, `doc-...`, `sys-...`) and requires at least two acceptance
+conditions; this schema requires one. Every phase in d-system's backlog validates against this
+schema, and `check_schemas.py` checks that it still does.
+
 ## Fields that depend on status
 
 The schema enforces these:
 
 | Status | Must have | Must not have |
 |---|---|---|
-| `active` | `agent` | — |
+| `active` | — (see below) | — |
 | `blocked` | `blocked_reason`, `resume_when` | — |
 | `deferred` | `blocked_reason`, `resume_when` | `agent`, `completion_evidence`, `result` |
 | `cancelled` | `blocked_reason` | `agent`, `completion_evidence`, `result` |
 | `queued` | — | `agent`, `completion_evidence`, `result` |
 | `complete` | `session`, `completion_evidence`, `result` | — |
 
-- `agent` is the claim: set it with `status: active` in one commit on the integration branch.
+- `agent` is the claim. The schema does not decide when an active phase must name one: that is
+  the host repository's concurrency rule. d-system requires an agent on every active phase only when
+  more than one phase may be active at once (`max_active` above 1).
 - `session` names the session record that completed the phase.
 - `completion_evidence` lists paths that exist and prove completion. It is kept separate from
   `deliverables`, which are planned.
