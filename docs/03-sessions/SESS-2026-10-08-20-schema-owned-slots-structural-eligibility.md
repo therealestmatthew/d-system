@@ -230,8 +230,8 @@ Session Manager to Session 2 (Builder B), which finished the phase locally.
 - CMD, PowerShell and Windows checks are owner-machine, not run. The CMD and PowerShell panels'
   scrollback regions were not exercised here either (the shells are unavailable on Linux); `C10`.
 - `brain/concepts/terms-workbench-ui.md` and `docs/08-governance/GLOSSARY.md` still describe a
-  per-panel `eligible_slots`; they are outside this phase's deliverables. Sent to Ideation as an
-  idea on 2026-10-09; Ideation is holding it until the next free id.
+  per-panel `eligible_slots`; they are outside this phase's deliverables. Recorded as idea `000690`
+  on 2026-10-09.
 
 ## Gate checks
 
@@ -272,8 +272,7 @@ structural rule. The owner signed off on its removal on 2026-10-09, relayed by t
 probe was removed.
 
 **Minor F02** (stale `eligible_slots` prose in `brain/concepts/terms-workbench-ui.md` and
-`docs/08-governance/GLOSSARY.md`): outside the deliverables; sent to Ideation as an idea, which is
-holding it until the next free id.
+`docs/08-governance/GLOSSARY.md`): outside the deliverables; recorded as idea `000690`.
 
 **Major F01, security stand-in** (a symlink under the new `server.fs.allow` directories is
 followed). Vite checks `server.fs.allow` by path prefix and does not resolve symlinks. A prototype
