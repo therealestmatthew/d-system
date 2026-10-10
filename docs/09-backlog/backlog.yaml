@@ -8870,9 +8870,10 @@ items:
     server followed a symlink under the new server.fs.allow directories; a first-registered
     middleware now realpaths /@fs/ and root-relative requests and returns 403 outside the list
     (ts/vite.config.test.ts reproduces the 200 without it and asserts 403 with it), and a pytest
-    refuses tracked symlinks under ts/ and _data/workbench/. Round 2: the file routes in vite.config.ts
-    (/workbench-layouts/, /generated-overview/, /workbench-file/) now check the resolved path too,
-    and /workbench-file/ judges ignore rules on it; vite.config.test.ts covers each.'
+    refuses tracked symlinks under ts/ and _data/workbench/. Round 2: the file routes in
+    vite.config.ts (/workbench-layouts/, /generated-overview/, /workbench-file/) now check the
+    resolved path too, and /workbench-file/ judges ignore rules on it; vite.config.test.ts covers
+    each.'
 - id: phase-arch-08
   title: Multi-instance panel identity across layout, storage, registry and sessions
   plan: doc-workbench-architecture-quality
