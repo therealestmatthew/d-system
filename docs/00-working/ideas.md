@@ -28579,3 +28579,13 @@ Today the structuring step between a raw capture and a staged record exists only
 - **finding** by agent-renumber (2026-10-09T17:46:37-04:00): Recorded first as 000616 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T14:59:17+00:00; renumbered to 000689 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000616.
 
 </details>
+
+---
+
+## 000690 · Reword the per-panel eligible_slots descriptions in the workbench vocabulary note and GLOSSARY.md after phase-arch-07
+
+**Created 2026-10-09T21:13:17-04:00 · Status: `open`**
+
+After phase-arch-07, brain/concepts/terms-workbench-ui.md and docs/08-governance/GLOSSARY.md still describe a per-panel eligible_slots list, which arch-07 removes in favour of structural matching (REQ-011 R12); both need rewording.
+
+Raised by Session 2 - Builder B (phase-arch-07) during the 2026-10-09 workbench run (Session Manager relay).
