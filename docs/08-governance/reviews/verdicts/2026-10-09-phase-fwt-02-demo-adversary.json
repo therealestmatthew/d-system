@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-09-phase-fwt-02-demo-adversary",
+  "date": "2026-10-09",
+  "phase": "phase-fwt-02",
+  "reviewed_commit": "8d72ff2944189592717e4ae8bf6547b29e048291",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "phase.schema.json requires agent on every active phase, but d-system governance requires it only when max_active > 1; at max_active 1 the new whole-backlog check would fail a phase governance accepts.",
+      "evidence": "docs/00-working/framework/05-schemas/phase.schema.json:254-258 vs src/governance/backlog.py:136-139; max_active is 4 today and was 3 earlier; its schema minimum is 1.",
+      "consequence": "A false failure of the check this phase adds, the first time max_active is set to 1. Untested and undocumented."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "The portable schema allows one acceptance condition while schemas/backlog.schema.json requires two, and neither file cross-references the other.",
+      "evidence": "phase.schema.json:186-199 minItems 1; schemas/backlog.schema.json acceptance minItems 2.",
+      "consequence": "Drift risk between two overlapping schemas."
+    }
+  ],
+  "raw_reply_sha256": "ad39393eb5c0488d515ee814a77434636b1d451a01bf471ae4ba682ba40d2476",
+  "notes": "Round 1 gating review, dispatched and briefed by the Session Manager in its own scratch clone at 8d72ff29, in parallel with the runner. Brief: phase entry, diff 0143ce11..8d72ff29 (docs/03-sessions excluded), the owner rulings for the phase. The reviewer called it pass-with-findings; recorded as pass with its findings. Owner rulings 2026-10-09: F01 fix by dropping the rule from the portable schema (host concurrency rule decides; documented; max_active 1 test); F02 document the deliberate difference with cross-references. Raw reply at _working/session-manager/review-replies/phase-fwt-02-8d72ff29-demo-adversary.md."
+}
