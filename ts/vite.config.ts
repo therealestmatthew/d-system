@@ -70,6 +70,9 @@ function isWithin(path: string, directories: string[]): boolean {
   return directories.some((directory) => path === directory || path.startsWith(directory + sep))
 }
 
+// A path with a `node_modules` directory in it, on either separator.
+const NODE_MODULES_SEGMENT = /[\\/]node_modules[\\/]/
+
 const PROC_FD = '/proc/self/fd'
 const hasProcFd = existsSync(PROC_FD)
 
@@ -83,8 +86,11 @@ export type OpenResult = CheckedFile | 'absent' | 'changed' | 'forbidden'
 // path lies inside one of `directories` (already resolved by `realDirectories`). On Linux the
 // opened file's real path is read from `/proc/self/fd`, which names the file the descriptor holds,
 // however the name changes afterwards. Elsewhere (macOS, Windows) the name is resolved again and
-// the result must be a regular file, not a symlink, with the descriptor's device and inode. The
-// caller owns a returned descriptor and must close it.
+// the result must be a regular file, not a symlink, with the descriptor's device and inode. A file
+// with more than one hard link is refused too: a hard link is a second name for the same file, so
+// one placed inside the directories can name a file that lives outside them, and neither its path
+// nor its inode shows that. Files under a `node_modules` directory are exempt, because package
+// managers hard-link packages there. The caller owns a returned descriptor and must close it.
 function openOnce(path: string, directories: string[]): OpenResult {
   let fd: number
   try {
@@ -115,6 +121,7 @@ function openOnce(path: string, directories: string[]): OpenResult {
       }
     }
     if (!isWithin(realPath, directories)) return refuse('forbidden')
+    if (opened.nlink > 1n && !NODE_MODULES_SEGMENT.test(realPath)) return refuse('forbidden')
     return { fd, realPath }
   } catch {
     return refuse('changed')
@@ -196,7 +203,8 @@ const LOADED_EXTENSIONS = new Set([
 ])
 
 // Keeps the dev server from serving any file that, symlinks resolved, lies outside the directories
-// it may serve, by any route and under concurrent renames. Vite's own `server.fs.allow` check
+// it may serve, or that a hard link names from inside them (see `openOnce`), by any route and
+// under concurrent renames. Vite's own `server.fs.allow` check
 // compares path prefixes and resolves no symlink, so a symlink inside `ts/` or `_data/workbench/`
 // that points elsewhere (at `_private/`, say) was served through `/@fs/<absolute path>` and
 // through a root-relative URL (security review of `phase-arch-07`, 2026-10-09). Three parts:
@@ -216,9 +224,14 @@ const LOADED_EXTENSIONS = new Set([
 //   route also serves only from a checked descriptor itself, which covers `/generated-overview/`,
 //   whose `_public/` lies outside the list.
 //
-// What it does not cover: `node_modules`, which npm writes, and import queries other than `?raw`
-// (`?inline`, `?worker`, `?url` of a CSS file), which the plugins that own them read by name. A URL naming no existing file passes through untouched, for
-// Vite to answer as it would have. Exported for `vite.config.test.ts`.
+// Every request that names a file is checked by the first middleware, so a symlink or a hard link
+// leading outside is refused (403) on every route, `node_modules` and every import query
+// included. Two kinds of request are checked there but then read again by name by Vite or the
+// plugin that owns them, so they are not protected against a swap between the check and the read:
+// source modules under `node_modules` (`load` passes them through; npm writes that directory),
+// and import queries other than `?raw` (`?inline`, `?worker`, `?url`). A URL naming no existing
+// file passes through untouched, for Vite to answer as it would have. Exported for
+// `vite.config.test.ts`.
 // `test/test_workbench_slot_matcher.py` also refuses a tracked symlink under either directory, so
 // one cannot be merged in the first place.
 export function refuseSymlinkEscapes(
@@ -346,7 +359,7 @@ export function refuseSymlinkEscapes(
       const raw = id.endsWith('?raw')
       const path = raw ? id.slice(0, -'?raw'.length) : id
       if (path.includes('\0') || path.includes('?') || !isAbsolute(path)) return null
-      if (/[\\/]node_modules[\\/]/.test(path)) return null
+      if (NODE_MODULES_SEGMENT.test(path)) return null
       if (!raw && !LOADED_EXTENSIONS.has(extname(path).toLowerCase())) return null
       const file = openChecked(path, realDirectories(allow))
       if (file === 'absent') return null

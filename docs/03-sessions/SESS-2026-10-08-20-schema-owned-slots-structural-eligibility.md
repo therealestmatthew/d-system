@@ -389,14 +389,15 @@ JSON-valid secret, and `index.html`. Every one gave 0 responses with the outside
 uncaught exceptions, and a server still answering. `?inline` on an SVG also gave 0, but the guard
 does not cover it by design.
 
-**What remains uncovered:**
-- `node_modules`, which npm writes and the `load` hook skips.
-- Import queries other than `?raw` (`?inline`, `?worker`, `?url` of a CSS file), which the plugins
-  that own them read by name.
-- On macOS and Windows, a directory component of the real path swapped to a symlink between
-  `realpath` and `lstat`. Linux reads the descriptor's own path and has no such gap.
-- A hard link to an outside file placed inside a served directory. That is a regular file, not a
-  symlink, and is outside this check.
+**What remains uncovered** (corrected in round 4 below). Every request that names a file is
+checked, so a symlink or hard link leading outside is refused (403) on every route, including
+under `node_modules` and on every import query. Two kinds of request are checked and then read
+again by name, so they are not protected against a swap between the check and the read:
+- source modules under `node_modules`, which the `load` hook passes through;
+- import queries other than `?raw` (`?inline`, `?worker`, `?url`), which the plugins that own them
+  read.
+On macOS and Windows there is a further gap: a directory component of the real path swapped to a
+symlink between `realpath` and `lstat`. Linux reads the descriptor's own path and has no such gap.
 
 **The test.** `ts/vite.config.test.ts` gains a race case. For eight routes it builds a fresh tree
 and server, runs the toggler for 1.2 s with 16 requests in flight, and asserts that no response
@@ -415,3 +416,35 @@ correct guard.
 check `--quick` printed `52 panel cells ... rules pass=260 fail=0 ... 0 finding(s)` and exited 0.
 The same check with `--self-test` exited 0 and caught all nine injected violations. JSON imports,
 `?import`, modules and plain JSON gave the same responses with and without the guard.
+
+## Review round 4: hard links (2026-10-09)
+
+On `91580253` the security stand-in returned pass with findings. Its live attack confirmed the
+race fix: the race test fails against `ca00beda`, and a toggler with 400 requests got nothing out,
+with the server up and file descriptors flat. One major remained, by owner ruling of 2026-10-09: a
+hard link inside a served directory to an outside file was served on every route. The reviewer
+reproduced it through `ts/public/`, through `/@fs/` on `_data/workbench/` and through
+`/workbench-file/` on `docs/`. A hard link is a second name for the same file, so the opened file's
+`/proc/self/fd` path and its inode both look like an inside file.
+
+Fixed in `openOnce`: a regular file whose `fstat` link count is above 1 is refused with 403.
+Files whose real path has a `node_modules` directory component (`/[\\/]node_modules[\\/]/` on the
+real path) are exempt, because package managers hard-link packages there. A hard link placed under
+`node_modules` is therefore still served; npm writes that directory and nothing tracked lives
+there.
+
+No tracked file in this worktree or the primary checkout has a link count above 1, and no file of
+any kind under `ts/` (outside `node_modules`), `_data/workbench/` or `_public/` has one, so the
+rule refuses nothing the workbench serves today. On the worktree's dev server, `/`,
+`src/main.tsx`, a `.ts` module, `slot-schemas.json?import`, `layout-1.json`, `README.md` through
+`/workbench-file/`, the generated overview page and `/@vite/client` all returned 200.
+
+`ts/vite.config.test.ts` gains two cases, ten in all:
+- Seven URLs naming a hard link to an outside file, across Vite's public and `/@fs/` paths,
+  root-relative, `?raw` and the three config routes, all return 403 without the content. With the
+  link-count check removed, that test fails.
+- A hard-linked file under `node_modules` is still served.
+
+The minor finding, that the comment in `vite.config.ts` overclaimed what is not covered, is fixed:
+the comment now says that every file-naming request is checked, and names the two kinds of
+request that are read again by name after the check.
