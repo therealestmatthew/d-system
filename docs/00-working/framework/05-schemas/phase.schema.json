@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "phase.schema.json",
   "title": "Backlog phase",
-  "description": "Validates one backlog phase on its own, as a YAML mapping extracted from the backlog file (no front matter or section conversion applies). A phase is one session of work: what it changes (scope), how completion is observed (acceptance, verification), and what it locks while claimed (systems, deliverables, depends_on). The required fields are the portable core. The optional fields are the ones d-system uses, listed so their shape is checked when present. Other fields are allowed, so an adopting repository can add its own without editing this schema.",
+  "description": "Validates one backlog phase on its own, as a YAML mapping extracted from the backlog file (no front matter or section conversion applies). A phase is one session of work: what it changes (scope), how completion is observed (acceptance, verification), and what it locks while claimed (systems, deliverables, depends_on). The required fields are the portable core. The optional fields are the ones d-system uses, listed so their shape is checked when present. Other fields are allowed, so an adopting repository can add its own without editing this schema. The core is deliberately looser than d-system's own item definition (schemas/backlog.schema.json in d-system), which requires every field, fixes identifier patterns and requires at least two acceptance conditions. Every phase in d-system's backlog validates here; check_schemas.py checks that. Whether an active phase must name an agent is left to the host repository's concurrency rule (d-system requires one only when more than one phase may be active at once).",
   "type": "object",
   "required": [
     "id",
@@ -62,7 +62,7 @@
     },
     "acceptance": {
       "allOf": [{"$ref": "#/$defs/textList"}, {"minItems": 1}],
-      "description": "Observable conditions that must hold for the phase to be complete."
+      "description": "Observable conditions that must hold for the phase to be complete. At least one here; d-system's own backlog schema requires at least two."
     },
     "verification": {
       "allOf": [{"$ref": "#/$defs/textList"}, {"minItems": 1}],
@@ -96,7 +96,7 @@
     },
     "agent": {
       "$ref": "#/$defs/text",
-      "description": "Identity of the agent holding the claim. Present only while the phase is active or blocked, or as a record once complete."
+      "description": "Identity of the agent holding the claim. Not allowed on a queued, deferred or cancelled phase. Whether an active phase must carry one is the host repository's concurrency rule, not this schema's."
     },
     "blocked_reason": {
       "$ref": "#/$defs/text",
@@ -126,10 +126,6 @@
     }
   },
   "allOf": [
-    {
-      "if": {"properties": {"status": {"const": "active"}}, "required": ["status"]},
-      "then": {"required": ["agent"]}
-    },
     {
       "if": {"properties": {"status": {"enum": ["queued", "deferred", "cancelled"]}}, "required": ["status"]},
       "then": {
