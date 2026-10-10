@@ -176,6 +176,7 @@ CI regenerates it and fails on any difference.
 | PLAN-050.05 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.05-boundary-decision-report.md |
 | PLAN-051 | plan | draft | repository-owner | docs/01-plans/PLAN-051-session-autonomy-configuration.md |
 | PLAN-052 | plan | approved | repository-owner | docs/01-plans/PLAN-052-plugin-audit-remediation.md |
+| PLAN-053 | plan | draft | repository-owner | docs/01-plans/PLAN-053-sibling-repo-feature-migration.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -219,6 +220,7 @@ CI regenerates it and fails on any difference.
 | PROMPT-042 | prompt | active | repository-owner | docs/02-prompts/PROMPT-042-monitoring-artifact-investigation-pack.md |
 | PROMPT-043 | prompt | draft | repository-owner | docs/02-prompts/PROMPT-043-openai-agent-interoperability-preplan.md |
 | PROMPT-044 | prompt | active | repository-owner | docs/02-prompts/PROMPT-044-helpdesk-pre-plan-package.md |
+| PROMPT-045 | prompt | draft | repository-owner | docs/02-prompts/PROMPT-045-sibling-repo-migration-runner.md |
 | REQ-001 | requirement | active | repository-owner | docs/06-requirements/REQ-001-document-code-requirements.md |
 | REQ-002 | requirement | active | repository-owner | docs/06-requirements/REQ-002-capture-requirements.md |
 | REQ-003 | requirement | draft | repository-owner | docs/06-requirements/REQ-003-idea-plan-lifecycle.md |
@@ -255,6 +257,7 @@ CI regenerates it and fails on any difference.
 | REQ-035 | requirement | draft | repository-owner | docs/06-requirements/REQ-035-plugin-audit-remediation.md |
 | REQ-036 | requirement | draft | repository-owner | docs/06-requirements/REQ-036-engine-pages-house-style.md |
 | REQ-037 | requirement | draft | repository-owner | docs/06-requirements/REQ-037-workbench-content-fit-contracts.md |
+| REQ-038 | requirement | draft | repository-owner | docs/06-requirements/REQ-038-sibling-repo-feature-migration.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -484,6 +487,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-10-08-17 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-17-terminal-persistence-audit.md |
 | SESS-2026-10-08-18 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-18-tooltip-bottom-clip.md |
 | SESS-2026-10-08-19 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-19-viewer-last-modified-badge.md |
+| SESS-2026-10-10-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-10-01-sibling-repo-migration-planning.md |
 
 ## Plans and their phases
 
@@ -570,6 +574,7 @@ CI regenerates it and fails on any difference.
 | PLAN-050.05 | doc-system-boundary-study-decision-report | draft | 0 | 0 | 1 | agent-boundary-study |
 | PLAN-051 | doc-session-autonomy-configuration | draft | 3 | 0 | 0 | — |
 | PLAN-052 | doc-plugin-audit-remediation | approved | 4 | 0 | 2 | agent-builder-a, agent-standby-3 |
+| PLAN-053 | doc-sibling-repo-feature-migration | draft | 5 | 0 | 0 | — |
 
 ## Held codes
 
@@ -580,4 +585,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-477 documents — adr: 28, architecture: 12, governance: 19, operation: 29, plan: 81, prompt: 43, requirement: 36, session: 229.
+481 documents — adr: 28, architecture: 12, governance: 19, operation: 29, plan: 82, prompt: 44, requirement: 37, session: 230.

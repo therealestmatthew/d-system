@@ -1,0 +1,374 @@
+{
+  "review_id": "2026-10-10-plan-053",
+  "procedure": "GOV-018",
+  "date": "2026-10-10",
+  "target": {
+    "plan": "PLAN-053",
+    "requirement": "REQ-038",
+    "phases": [
+      "phase-mig-01",
+      "phase-mig-02",
+      "phase-mig-03",
+      "phase-mig-04",
+      "phase-mig-05",
+      "phase-mig-06"
+    ]
+  },
+  "entry_check": {
+    "result": "pass",
+    "standard": "GOV-010",
+    "detail": "GOV-018 step 1 script run on PLAN-053-sibling-repo-feature-migration.md at 666d162: exit 0. Re-run after the revision that applied the dispositions below: exit 0."
+  },
+  "altitudes_run": [
+    "plan",
+    "phase"
+  ],
+  "status": "dispositioned",
+  "notes": "Both altitudes ran in one dispatch each on the partition-adversary type with PROMPT-038, against the plan at 666d162 on branch ccr-1f7a3866-smac3h, with the two source repositories available read-only. Both dispatches reached the agent's 50-turn limit before reporting and were asked to deliver what they had verified; each stated what it had not checked. The plan altitude did not sweep every decision for a rejected alternative or every step for a failure path. The phase altitude did not run pytest, ruff or mypy, did not run --next-code, and read phase-mig-06 only lightly. The planner dispositioned every finding in the same session and revised REQ-038, PLAN-053 and the six phase entries; the revised entry check and the governance check both pass. No later-added phases: all six were registered with the plan.",
+  "findings": [
+    {
+      "id": "F01",
+      "altitude": "plan",
+      "subject": "phase-mig-02",
+      "severity": "blocker",
+      "title": "The sanitiser's placement is impossible as written, and a copy of the source function fails the plan's own R04 test.",
+      "evidence": "src/capture/structure.py docstring: 'This module does not read text for meaning... comes from whichever agent is structuring'. load_raw is called only inside stage_capture, after the agent has produced proposals, so nothing in structure.py hands text to an agent. structure() does start = content.find(quote) against raw['content'] and stores start/end in provenance. The source sanitize_text (/home/user/autoclaude-api/scout/_security.py) run on 'a\\u200bb\\u202ec\\ufeffd\\x00e\\x07f\\ng\\th' returned 'abcdef\\ng h', so the tab does not survive; it also collapses runs of spaces and tabs and 3+ newlines, keeps '\\r', removes ZWJ joiners and NFC-normalises. REQ-038 R04 said a tab survives and 'no NFC or NFKC'.",
+      "consequence": "The verbatim copy that R05, D8 and the phase scope required fails the R04 tab assertion. Sanitising content inside the structuring path shifts the quote offsets and makes content.find(quote) raise StructuringError for any quote spanning a removed character, so REQ-002 R6 provenance no longer indexes the raw record. The agent still reads the raw text through some other route, so the stated purpose is not served.",
+      "minimal_fix": "Decide where text actually reaches the agent. Then either state the sanitiser as a modified port with its own character policy, or apply it where the agent reads, leaving the offset basis stated.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "port-placed-where-no-reader-exists",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "Verified by reading structure.py lines 114, 160-180 and 257-272 and review.py line 79. PLAN-053 D3 now names the read surface the phase adds (tools/capture.py show), D3a records the sanitiser as adapted with the three dropped behaviours, REQ-038 R04 and R05 state the character policy (categories Cf and Cc except newline and tab, no normalisation, no collapsing) and the index map back to raw offsets, and phase-mig-02's scope, acceptance and deliverables carry the show subcommand, the OPS-008 rule and the offset-map case."
+        }
+      ]
+    },
+    {
+      "id": "F02",
+      "altitude": "plan",
+      "subject": "phase-mig-04",
+      "severity": "blocker",
+      "title": "The timeline routes are registered unconditionally with no recorded decision, against ADR-015's rejection of ungated read routes and its one-gate rule.",
+      "evidence": "ADR-015 Decision 1: 'Every workbench route mounts only when D_SYSTEM_DEMO_TERMINAL=1 is set and under the loopback-only binding'. ADR-015 rejected alternatives: 'Mounting the read routes ungated... keeping them behind the same flag preserves ADR-013's property that the system's default state exposes nothing'. src/api/__init__.py gates every other data route that way; only the demo stage routes, which serve public talking points, are unconditional. No decision entry in PLAN-053 stated the alternative or its cost. The threat-surface paragraph omitted that the DuckDB projection holds the private portfolio when D_SYSTEM_DATA_ROOT=_private/portfolio.",
+      "consequence": "A database-backed route over the owner's real milestones is served on the default binding without the loopback check. This reverses a recorded decision without naming it, and G3 cannot weigh it.",
+      "minimal_fix": "Add a decision entry naming the gated alternative and its cost, or mount under the existing flag.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "reverses-recorded-decision-unnamed",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "Verified against ADR-015 and src/api/__init__.py. PLAN-053 D10 mounts the routes under the same gate and loopback check as the workbench read routes and names the ungated alternative and its cost; REQ-038 R09 and its boundary line, the threat-surface paragraph and phase-mig-04's scope and acceptance now say so, with the gate-unset case as a test."
+        }
+      ]
+    },
+    {
+      "id": "F03",
+      "altitude": "plan",
+      "subject": "PLAN-053",
+      "severity": "major",
+      "title": "The concurrency section is wrong against the validator: the six phases collide with each other and with other queued phases.",
+      "evidence": "collisions() from src/governance/backlog.py run over the real backlog: phase-mig-01/phase-mig-02 ['share deliverable path docs/03-sessions/']; every mig pair shares docs/03-sessions/; phase-mig-03/phase-mig-06 also share docs/08-governance/systems.yaml and test/test_schemas.py; phase-mig-01/phase-mig-06 share docs/08-governance/. The plan said mig-01 and mig-02 were disjoint and mig-05 collided with nothing. It said phase-cap-08 declares sys-capture, but the backlog gives it sys-portfolio only. It said phase-idg-06 collides via the idea log, but idg-06 declares sys-governance and the actual collision is the shared deliverable .claude/agents/idea-triage.md.",
+      "consequence": "Two phases claimed together are refused by the validator, and PROMPT-045's empty-Conflicts test serialises them. The plan's execution order and its stated reasons were false.",
+      "minimal_fix": "Redo the section from collisions() output.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "false-concurrency-claim",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "docs/03-sessions/ removed from every phase's deliverables (PLAN-053 D11; the containment check exempts a phase's own session record), then collisions() re-run over the revised backlog and the section rewritten from its output, including the measured phase-cap-08 and phase-idg-06 collisions."
+        }
+      ]
+    },
+    {
+      "id": "F04",
+      "altitude": "plan",
+      "subject": "phase-mig-01",
+      "severity": "major",
+      "title": "The triage driver step that runs the tool has no failure path, and the role-contract change is not made in the binding document.",
+      "evidence": "agent-workflows/idea-triage.md step 2 is a sequence of dispatch, independent verification and triaged. The phase scope said 'runs the tool for the idea and pastes its output into the dispatch', and R03 gave no behaviour for a non-zero exit, a timeout, or an unknown id. GOV-014's Triage section lists inputs as only 'the idea's own id, title and body'. idea-triage-agent.md says 'Where this file and GOV-014 differ, GOV-014 governs'. mig-01's deliverables did not include GOV-014.",
+      "consequence": "A failed pre-pass either blocks the whole sweep or lets the role run on an empty input, which the plan did not say. The new role input contradicted GOV-014, which governs.",
+      "minimal_fix": "State what the driver does when the tool fails (stop, or dispatch without it and say so), and amend or cite GOV-014's Triage inputs.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "step-without-failure-path",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "REQ-038 R03 and phase-mig-01's scope now state the failure path (dispatch without the pre-pass, write 'overlap pre-pass unavailable' with the last stderr line into the dispatch, the finding repeats it) with a grep in verification, and the phase amends GOV-014's Triage inputs line to name the pre-pass output as advisory, with GOV-014 under its declared docs/08-governance/ deliverable."
+        }
+      ]
+    },
+    {
+      "id": "F05",
+      "altitude": "plan",
+      "subject": "phase-mig-01",
+      "severity": "minor",
+      "title": "The generated .codex/agents/idea-triage.toml target is missing from the deliverables.",
+      "evidence": "agent-workflows/workflows.yaml lists a codex target .codex/agents/idea-triage.toml for idea-triage-agent; test/test_agent_workflows.py lines 215 to 227 check it. The phase's deliverables listed .claude/agents/idea-triage.md, .claude/commands/idea-triage.md and .agents/, but not .codex/.",
+      "consequence": "Regeneration changes a file outside the declared deliverables, so the collision check and the diff review do not cover it.",
+      "minimal_fix": "Add .codex/agents/ to the deliverables.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": ".codex/agents/idea-triage.toml added to phase-mig-01's deliverables and named in its scope."
+        }
+      ]
+    },
+    {
+      "id": "F06",
+      "altitude": "plan",
+      "subject": "phase-mig-06",
+      "severity": "minor",
+      "title": "The deferred phase declares a system that does not own the file it edits, and its dependency is already satisfied.",
+      "evidence": "phase-mig-06 systems: [sys-auto-ledger], whose only path in docs/08-governance/systems.yaml is PLAN-032. schemas/run.schema.json was delivered by phase-irs-04 (status complete). depends_on: [phase-irs-04] is therefore already met, so the real gate, idea 000349, is only in resume_when.",
+      "consequence": "A concurrent phase editing run.schema.json is not flagged. If the 000349 ruling picks the phase-auto-04 ledger, the phase's schema work targets the wrong file.",
+      "minimal_fix": "Declare the system that owns run.schema.json, or record in scope that the 000349 ruling may change the target.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "No system lists run.schema.json; the phase now declares sys-realization (the system phase-irs-04 delivered it under) and sys-gov-docs, and its first scope line says the 000349 ruling may change the target file. depends_on keeps phase-irs-04 as the data dependency; the gate stays in resume_when."
+        }
+      ]
+    },
+    {
+      "id": "F07",
+      "altitude": "plan",
+      "subject": "PLAN-053",
+      "severity": "minor",
+      "title": "The plan and PROMPT-045 cite a review record and a session record that do not exist on the branch.",
+      "evidence": "ls docs/08-governance/reviews/2026-10-10-plan-053.json returned 'No such file or directory'. ls docs/03-sessions | grep 2026-10-10 printed nothing. REQ-038 R13 verification and the plan's 'R13 is already met' relied on 'the session record'.",
+      "consequence": "R13's stated verification could not be run as written and the plan's evidence for it was absent.",
+      "minimal_fix": "Land the records, or reword the claims as future.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "This record and the session record SESS-2026-10-10-01 land in the same pull request, and REQ-038 R13 and PLAN-053 now name the session record by code."
+        }
+      ]
+    },
+    {
+      "id": "F08",
+      "altitude": "phase",
+      "subject": "phase-mig-02",
+      "severity": "major",
+      "title": "The scope says to copy sanitize_text, but the source function contradicts the phase's own R04 test, so a copy cannot pass it.",
+      "evidence": "Ran the source function from /home/user/autoclaude-api/scout/_security.py (sanitize_text, lines 57-100) on a string containing U+200B, U+202E, U+FEFF, NUL, U+0007, a tab, a CR and a combining accent. Output: 'abcdef g\\nh\\ri é é'; tab kept: False; CR kept: True; NFC changed input: True. The source collapses [ \\t]+ to a space, NFC-normalises, keeps CR, and strips all category C, not only the listed code points.",
+      "consequence": "A verbatim copy fails the tab-survives assertion. Making it pass means rewriting the function. The R05 and R12 claim of 'copied from' with a provenance header is then misleading, and the 17 source tests no longer describe it.",
+      "minimal_fix": "Reword scope and R05 to say 'adapted from', and list the three behaviours dropped (NFC, space and tab collapse, CR retention) with the category-C rule kept or narrowed.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "verbatim-port-fails-own-test",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "Same defect as F01's second half. REQ-038 R05 and R12, PLAN-053 D3a and phase-mig-02's scope say adapted, name the three dropped behaviours, and keep the category rule as Cf and Cc except newline and tab."
+        }
+      ]
+    },
+    {
+      "id": "F09",
+      "altitude": "phase",
+      "subject": "phase-mig-02",
+      "severity": "major",
+      "title": "Sanitising after load_raw does not sit before any agent, and it shifts the provenance offsets recorded against the raw record.",
+      "evidence": "src/capture/structure.py:257-272: stage_capture(capture_id, proposals, ...) takes proposals already built by the agent, then calls load_raw at line 270. No code path from load_raw feeds an agent. Lines 170-175 compute provenance start/end with content.find(quote) on raw['content'], and REQ-002 R6 requires 'provenance locating the supporting text in the raw capture'. src/capture/review.py:79 reads the unsanitised raw content separately.",
+      "consequence": "The R04 test passes while the stated purpose, reducing what reaches an agent, is not met. If content is sanitised before the quote check, offsets index sanitised text rather than the stored raw record. A genuine quote that contains a stripped character raises 'quote does not occur'. Review shows owners unsanitised text.",
+      "minimal_fix": "Name the function that hands text to the structuring agent and apply the sanitiser there. Decide in the scope whether offsets and quote matching use raw or sanitised content, and add an acceptance line for that case.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "port-placed-where-no-reader-exists",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "Same defect as F01's first half. The phase adds the show subcommand as the agent's read surface, resolves quotes against the sanitised view with sanitize_with_map and stores raw offsets, and its acceptance carries the quote-spanning-a-removed-character case and the unchanged-offsets control. The review path is stated as out of scope in REQ-038's boundaries because the owner, not an agent, reads it."
+        }
+      ]
+    },
+    {
+      "id": "F10",
+      "altitude": "phase",
+      "subject": "phase-mig-01",
+      "severity": "major",
+      "title": "Every mig phase declares the deliverable docs/03-sessions/, so the validator treats any two of them as colliding, contradicting the plan's concurrency section.",
+      "evidence": "collisions() from src/governance/backlog.py run over the real backlog printed ['share deliverable path docs/03-sessions/'] for phase-mig-01/phase-mig-02, phase-mig-01/phase-mig-04, phase-mig-01/phase-mig-05, phase-mig-02/phase-mig-05, phase-mig-04/phase-mig-05 and every other pair.",
+      "consequence": "The claim-time check refuses every concurrent claim among these phases. The execution-order section was wrong as written, and the planned parallelism could not happen.",
+      "minimal_fix": "Drop docs/03-sessions/ from the deliverables (the containment check already exempts a phase's own session record) or correct the concurrency section to say the phases run serially.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "slug": "shared-session-dir-deliverable",
+      "aliases": ["false-concurrency-claim"],
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "Same defect as F03. docs/03-sessions/ dropped from all six phases (PLAN-053 D11) and the concurrency section rewritten from the re-run collisions() output."
+        }
+      ]
+    },
+    {
+      "id": "F11",
+      "altitude": "phase",
+      "subject": "phase-mig-02",
+      "severity": "minor",
+      "title": "The plan's cross-backlog collision claims name the wrong systems and the wrong phases.",
+      "evidence": "Plan text: 'phase-cap-08, first in next_up, declares sys-capture, so phase-mig-02 cannot be active at the same time'. The backlog shows phase-cap-08 systems ['sys-portfolio'] and deliverables ['docs/03-sessions/']. collisions(): phase-mig-01/phase-cap-08 shares sys-portfolio, phase-mig-03/phase-cap-08 shares sys-portfolio. phase-idg-06 declares sys-governance, and its collision with phase-mig-01 is the path .claude/agents/idea-triage.md.",
+      "consequence": "The owner would sequence on a false collision map: cap-08 actually blocks phase-mig-01 and phase-mig-03, and idg-06 collides through the generated agent file.",
+      "minimal_fix": "Replace the 'Against the rest of the backlog' bullet with the measured collisions.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "The 'Against the rest of the backlog' bullets now carry the measured collisions, including phase-cap-08 on sys-portfolio against phase-mig-01 and phase-mig-03."
+        }
+      ]
+    },
+    {
+      "id": "F12",
+      "altitude": "phase",
+      "subject": "phase-mig-01",
+      "severity": "minor",
+      "title": "Regenerating the workflow sources also rewrites .codex/agents/idea-triage.toml and requires a new OPS document under sys-gov-docs; neither is declared.",
+      "evidence": "agent-workflows/workflows.yaml lines 175-203: the idea-triage-agent source has a codex target at .codex/agents/idea-triage.toml, and test_agent_workflows.py:221-227 round-trips it. docs/08-governance/ is owned by sys-gov-docs, which phase-mig-01 did not declare (systems: [sys-portfolio]). systems.yaml has no entry covering agent-workflows/, and sys-portfolio lists named tools only, not tools/idea_overlap.py.",
+      "consequence": "The containment check reports .codex/agents/idea-triage.toml as an undeclared change. sys-gov-docs is not locked, so a concurrent writer of docs/08-governance/ is not detected.",
+      "minimal_fix": "Add .codex/agents/idea-triage.toml to deliverables and sys-gov-docs to systems.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "phase-mig-01 now declares sys-gov-docs beside sys-portfolio and lists .codex/agents/idea-triage.toml. The plan's concurrency section no longer claims sys-portfolio owns the tool; it records that the lock comes from the declared system and paths."
+        }
+      ]
+    },
+    {
+      "id": "F13",
+      "altitude": "phase",
+      "subject": "phase-mig-01",
+      "severity": "minor",
+      "title": "The role's inputs change but GOV-014, which governs where it differs from the role file, is not updated.",
+      "evidence": "docs/08-governance/GOV-014-realization-role-contracts.md lines 76-77 give the Triage inputs as the idea event and 'the idea's own id, title and body'. agent-workflows/idea-triage-agent.md says 'Where this file and GOV-014 differ, GOV-014 governs'.",
+      "consequence": "The role file and its binding contract diverge on inputs at the moment the phase lands.",
+      "minimal_fix": "Add GOV-014's Triage inputs line to the phase's edits, or state in scope that the overlap output is advisory and outside the contract's inputs.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "Same defect as F04's second half. The phase amends GOV-014's Triage inputs line to name the pre-pass output as an advisory third input, with an acceptance line and a grep in REQ-038 R03."
+        }
+      ]
+    },
+    {
+      "id": "F14",
+      "altitude": "phase",
+      "subject": "phase-mig-04",
+      "severity": "minor",
+      "title": "The first DB-backed route has no acceptance for a missing or unbuilt database, and 'no write, no subprocess, no env var' has no verification command.",
+      "evidence": "src/db/connection.py: get_db() runs DB_PATH.parent.mkdir(exist_ok=True) and duckdb.connect(...) read-write, with a relative path 'data/d_system.duckdb'. grep for get_db in src and test finds only its definition, so no route uses it yet. The acceptance line 'The route module contains no write, no subprocess and no new environment variable' had no matching entry in verification.",
+      "consequence": "On a fresh checkout the 'read-only' route creates data/ and an empty database, then fails with a missing-table error. The test must point DB_PATH elsewhere, which the scope did not mention. One acceptance line could not be observed.",
+      "minimal_fix": "Add an acceptance line for the unbuilt-database response, say how the test points DB_PATH at a built database, and add a grep to verification.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "phase-mig-04's scope now says the tests point src.db.connection.DB_PATH at a projection built in a temporary directory and never at data/, the route answers 503 naming tools/rebuild_db.py when the projection is missing or lacks the table and creates no file, and the grep for subprocess, os.environ and write statements is in acceptance and verification. REQ-038 R09 carries the same."
+        }
+      ]
+    },
+    {
+      "id": "F15",
+      "altitude": "phase",
+      "subject": "phase-mig-03",
+      "severity": "minor",
+      "title": "The scope registers only the schema path in systems.yaml, so the new data directory is unowned although sys-portfolio is declared for it.",
+      "evidence": "systems.yaml sys-portfolio paths list _data/projects, _data/tags.json, _data/people, _data/commitments, _data/tasks and _data/ideas.jsonl, with no _data/timelines. Scope: 'Register the new schema path on sys-contracts' only.",
+      "consequence": "The sys-portfolio lock the plan relies on rested on a path no system owns. A later phase touching timelines would lock nothing.",
+      "minimal_fix": "Add _data/timelines to sys-portfolio paths in the same systems.yaml edit.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "phase-mig-03's scope and acceptance now register _data/timelines on sys-portfolio and the schema on sys-contracts in the same systems.yaml edit."
+        }
+      ]
+    },
+    {
+      "id": "F16",
+      "altitude": "phase",
+      "subject": "phase-mig-05",
+      "severity": "minor",
+      "title": "next_action sends the author to 'the four autoclaude-api writes modules named in the scope', but the scope names none.",
+      "evidence": "backlog.yaml phase-mig-05 scope named only the directory web/apps/api/writes/ and the mechanisms. The directory holds fs.py, editor.py, audit.py, git.py, serialize.py and triage.py (ls). git.py, which contains the refuse-dirty and commit steps, was not among the named mechanisms.",
+      "consequence": "The session would have to guess which modules, and might leave out the git commit and dirty-tree handling that the worktree rules bear on most.",
+      "minimal_fix": "Name fs.py, editor.py, audit.py and git.py in scope.",
+      "engine": "single-adversary",
+      "author": "partition-adversary dispatched with PROMPT-038",
+      "dispositions": [
+        {
+          "value": "fixed",
+          "by": "planner",
+          "recorded_by": "Session Manager - migration planning (ccr-1f7a3866-smac3h)",
+          "date": "2026-10-10",
+          "reason": "phase-mig-05's scope and next_action now name fs.py, editor.py, audit.py and git.py with what each contributes, git.py included for the no-shell commit and dirty-tree handling."
+        }
+      ]
+    }
+  ]
+}
