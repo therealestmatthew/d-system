@@ -155,3 +155,16 @@ Round 1, at `8d72ff29`, run by the Session Manager. Verdict records, committed u
 While fixing F02, the first wording ("a phase valid there is valid here") claimed more than holds:
 d-system's JSON schema alone accepts a whitespace-only title, which this schema rejects. It was
 replaced with the statement the check tests: every phase in d-system's backlog validates.
+
+Round 2, at `fb779060` after rebasing onto dev `6d6d4165`: gating pass, shadow pass. Verdict records,
+committed unchanged in `8e08dbe7`:
+
+- `docs/08-governance/reviews/verdicts/2026-10-09-phase-fwt-02-demo-adversary-2.json`
+  (sha256 `881c296ef461a7e25f7592fb6fee8f54b921397d6e94f0cc77cc548b4f493f85`): one finding.
+  - **F01 minor — fixed.** `phase.schema.json` and `phase.template.md` said d-system's backlog
+    schema "requires every field", which is untrue for `ideas`. Both now name exactly what it
+    requires: the ten core fields plus `sources`, `owner`, `priority`, `session_budget` and
+    `next_action`, not `ideas` (checked against the `required` list in
+    `schemas/backlog.schema.json`).
+- `docs/08-governance/reviews/verdicts/2026-10-09-phase-fwt-02-review-judge-2.json`
+  (sha256 `5b3f4cce740f5bdc7b9160c369702be34d6175b268caf22fc5ba104a49b22a0f`): no findings.

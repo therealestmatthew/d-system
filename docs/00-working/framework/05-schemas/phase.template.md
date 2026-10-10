@@ -75,8 +75,9 @@ The schema checks these when present. They are the fields d-system uses beyond t
 An adopting repository may add fields of its own; the schema allows them.
 
 The core is deliberately looser than d-system's own phase definition, the `items` entry in
-d-system's `schemas/backlog.schema.json`. That definition requires every field above, fixes the
-identifier patterns (`phase-xxx-NN`, `doc-...`, `sys-...`) and requires at least two acceptance
+d-system's `schemas/backlog.schema.json`. That definition requires every field in the required-fields
+table plus `sources`, `owner`, `priority`, `session_budget` and `next_action` (not `ideas`), fixes
+the identifier patterns (`phase-xxx-NN`, `doc-...`, `sys-...`) and requires at least two acceptance
 conditions; this schema requires one. Every phase in d-system's backlog validates against this
 schema, and `check_schemas.py` checks that it still does.
 
