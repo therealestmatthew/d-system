@@ -1,0 +1,39 @@
+{
+  "verdict_id": "2026-10-09-phase-arch-07-review-judge-3",
+  "date": "2026-10-09",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "91580253d2e165920a2fa5b2b55445ed6f67464f",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "verdict": "reject",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "Claims ts/vite.config.test.ts is wired into no command the runner executes.",
+      "evidence": "Judge read ts/vitest.config.ts include as ['src/**/*.test.tsx'] and counted 19 test files as src tests only.",
+      "consequence": "If true, the round's race and route tests would never run."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "The non-Linux fallback in openOnce has a narrower check window than the /proc/self/fd path; it fails closed on a dev/inode mismatch.",
+      "evidence": "ts/vite.config.ts openOnce fallback (~419-428).",
+      "consequence": "Weaker on macOS/Windows; not exercised in this environment."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "node_modules and import queries other than ?raw are served by Vite re-reading the file by name, outside the checked-descriptor path (disclosed in the code).",
+      "evidence": "ts/vite.config.ts load hook and its comment.",
+      "consequence": "A residual race window for those request types."
+    }
+  ],
+  "raw_reply_sha256": "72181488dbb0d496be500b0767bd787d56af7d48c71970be22e2ceafaa31393a",
+  "notes": "Rounds 3+4 shadow review, dispatched by the Session Manager after the runner finished (manifest _working/review-checks/phase-arch-07/91580253d2e1/, passed), with no checkout. Coordinator check of F01: it is wrong. The branch's ts/vitest.config.ts at 91580253 includes 'vite.config.test.ts' (added in round 2); the judge read the dev copy. The branch has 18 ts/src test files plus vite.config.test.ts, matching the runner's 19 files. Recorded unchanged for the shadow comparison. F03 became the owner's import-query ruling of 2026-10-10. Raw reply at _working/session-manager/review-replies/phase-arch-07-91580253-review-judge.md."
+}
