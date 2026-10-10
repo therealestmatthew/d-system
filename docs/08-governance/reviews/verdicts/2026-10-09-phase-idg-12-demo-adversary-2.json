@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-09-phase-idg-12-demo-adversary-2",
+  "date": "2026-10-09",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "83b37d06b051c71027b409ab36652a2538aa0cb3",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "No size cap between a staged draft and the conformance check: the check command reads the whole draft and plan_quality scans it, so a very large draft stalls the check and uses several GB of memory.",
+      "evidence": ".claude/agents/idea-planner.md:209 and agent-workflows/idea-planner-agent.md:198 (f.read()); src/governance/plan_quality.py:103, :156, :168. A 2 GB file: 51.4 s and about 4.2 GB peak RSS; a 200 MB draft about 9 s.",
+      "consequence": "An accidental runaway draft can exceed a command timeout or exhaust memory. Predates cycle 10."
+    }
+  ],
+  "raw_reply_sha256": "74f926aa7319da4c7daf031dcca6628e481b665962180722b9b156bfa26ec362",
+  "notes": "Round 9, re-review of fix cycle 10 (owner ruling 2026-10-09: unreadable drafts reported, loop continues, exit nonzero). Dispatched and briefed by the Session Manager in its own scratch clone at 83b37d06, in parallel with the runner. Brief: phase entry, full branch diff vs c3b4d0a0, the round diff b8d2c6f3..83b37d06, the rulings. Runner manifest _working/review-checks/phase-idg-12/83b37d06b051/ (passed). The owner ruled on 2026-10-09 that F01 be fixed as cycle 11. Raw reply kept at _working/session-manager/review-replies/phase-idg-12-83b37d06-demo-adversary.md."
+}

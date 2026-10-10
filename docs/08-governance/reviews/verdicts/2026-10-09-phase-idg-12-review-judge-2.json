@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-09-phase-idg-12-review-judge-2",
+  "date": "2026-10-09",
+  "phase": "phase-idg-12",
+  "reviewed_commit": "83b37d06b051c71027b409ab36652a2538aa0cb3",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "verdict": "pass",
+  "gating": false,
+  "findings": [],
+  "raw_reply_sha256": "502760e836e03a596ff51fc4828e8154cd05a94278714129a23cc90f28cb5194",
+  "notes": "Round 9 shadow review, dispatched by the Session Manager after the runner finished, with the phase entry, the diffs, the rulings (including the owner's acceptance of R19 as checked in the session record) and the runner manifest. No checkout. Raw reply kept at _working/session-manager/review-replies/phase-idg-12-83b37d06-review-judge.md."
+}
