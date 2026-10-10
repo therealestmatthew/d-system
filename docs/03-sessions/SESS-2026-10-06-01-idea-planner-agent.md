@@ -7,7 +7,7 @@ kind: session
 status: active
 owner: repository-owner
 created: '2026-10-06'
-updated: '2026-10-06'
+updated: '2026-10-09'
 systems: [sys-governance]
 depends_on: [doc-idea-graph-lifecycle, doc-idea-graph-lifecycle-requirements]
 ---
@@ -41,7 +41,8 @@ commit, together with Standby's review fixes 1, 2, 6 and 7:
   outside the declared deliverables; the owner approved it for this phase.
 - **R19 evidence location (coordinator's assumption, reported to the owner).** The live run is
   quoted here rather than saved under `docs/00-working/promoted/`. ADR-019 staging needs a reserved
-  code, and this run reserves none.
+  code, and this run reserves none. On 2026-10-09 the owner accepted this as the R19 evidence
+  (round-8 shadow F01), and checks R19 in the "R19 live run" section below at the merge.
 
 ## What was built
 
@@ -88,14 +89,15 @@ what the draft cites.
 
 ## Verification
 
-Run in the phase worktree at `7eca001`:
+Run in the phase worktree at `04b465cc` (fix cycle 11), on dev `c3b4d0a0`:
 
 ```
-uv run python -m src.governance                      Governance OK: 45 systems, 454 documents, 37 memories, 347 backlog phases
+uv run python -m src.governance                      Governance OK: 45 systems, 478 documents, 37 memories, 357 backlog phases
 uv run python tools/generate_agent_workflows.py --check   17 workflow adapter(s) current
 uv run ruff check src/ test/ tools/                  All checks passed!
-uv run mypy src/                                     Success: no issues found in 51 source files
-uv run pytest -q                                     1673 passed, 1 warning
+uv run mypy src/                                     Success: no issues found in 53 source files
+uv run pytest -q                                     2147 passed, 1 warning
+cd ts && npm test                                    169 passed (13 files)
 ```
 
 ## Review
@@ -104,7 +106,7 @@ The validator (`demo-validator-code`) failed the first build. Its high-severity 
 filename omitted the reserved code that ADR-019 step 3 and GOV-011 require. The fix in `7028efd`
 passes the reserved code in as an input. The validator passed that fix and each fix after it.
 
-The Session Manager dispatched three rounds of build review:
+The Session Manager dispatched nine rounds of build review:
 
 - **Round 1, at `7028efd`.** Gating `demo-adversary` pass, shadow `review-judge` pass. Records:
   `docs/08-governance/reviews/verdicts/2026-10-05-phase-idg-12-demo-adversary.json` and
@@ -197,5 +199,42 @@ The Session Manager dispatched three rounds of build review:
   prints one result line per draft, and the planner reads only its own line. The run exits
   nonzero if any path file is refused.
 
-Fix cycles used: eight, all on the same safe-write command after cycle 1. Two is `PROMPT-036`'s
-cap; the owner granted cycles 3 to 8.
+- **Rebases and re-claim (2026-10-08/09).** The branch was rebased onto dev `6951bb62`, and then
+  onto `c3b4d0a0`. Both rebases conflicted only in `catalog.md`, which was regenerated with
+  `--catalog`. On 2026-10-08 the cloud workbench run (`fc7e42f7`) released this phase's claim to
+  queued, on the owner's instruction. On 2026-10-09 the owner ruled that it be re-claimed
+  (`c3b4d0a0`), with the declared deliverables narrowed to the files the branch touches:
+  `test/test_plan_quality.py` and `test/test_planner_safe_write.py` replace `test/`, and
+  `agent-workflows/idea-planner-agent.md` and `agent-workflows/workflows.yaml` were added.
+- **Fix cycle 9 (`b8d2c6f3`, owner ruling of 2026-10-08).** The validator had found that a `.path`
+  file whose draft had since moved still passed both checks, and then crashed `open()` before
+  later drafts' lines printed. The ruling: such a file is reported on its own line as stale, it
+  does not stop other lines, it does not by itself make the exit nonzero, and name and content
+  validation are unchanged. The draft open now catches `FileNotFoundError` and prints
+  `stale <path_file>: ...`.
+- **Round 8, at `b8d2c6f3`.** Gating **reject**, shadow pass. Records:
+  `docs/08-governance/reviews/verdicts/2026-10-09-phase-idg-12-demo-adversary.json` and
+  `docs/08-governance/reviews/verdicts/2026-10-09-phase-idg-12-review-judge.json`.
+  - Gating F01 (blocker): only `FileNotFoundError` was caught. A directory, a chmod 000 draft or
+    a symlink loop at the draft path still crashed the check and hid a valid draft's line.
+  - Shadow F01 (minor): R19's recorded run lives only in this session record, which a review
+    cannot read. **The owner accepted it on 2026-10-09**, relayed by the Session Manager. The
+    owner checks R19 in this record's "R19 live run" section at the merge.
+  - Fix cycle 10 was owner-granted on 2026-10-09:
+    - `b374e491`: any other `OSError`, or a `UnicodeDecodeError`, prints
+      `unreadable <path_file>: ... could not be read (<reason>)`, sets the error flag, and
+      continues, so it fails closed. A missing draft stays stale.
+    - `39737c43`: the validator then found that a FIFO at the draft path blocked forever. The
+      draft is now opened with `O_NONBLOCK`, checked with `fstat` `S_ISREG` on the same
+      descriptor, and read only after that.
+- **Round 9, at `83b37d06`.** Gating pass, shadow pass with no findings. Records:
+  `docs/08-governance/reviews/verdicts/2026-10-09-phase-idg-12-demo-adversary-2.json` and
+  `docs/08-governance/reviews/verdicts/2026-10-09-phase-idg-12-review-judge-2.json`.
+  - Gating F01 (minor): the draft read had no size cap. A 2 GB draft took 51 s and about
+    4.2 GB of memory.
+  - On 2026-10-09 the owner ruled it be fixed as cycle 11 (`04b465cc`): a draft larger than
+    `max_draft_bytes` (4 MiB) is refused as unreadable (too large) before it is read. The check
+    is `fstat` on the open descriptor, and the read is also bounded. The run exits nonzero.
+
+Fix cycles used: eleven, all on the same safe-write command after cycle 1. Two is `PROMPT-036`'s
+cap; the owner granted cycles 3 to 8, and then cycles 9, 10 and 11 one at a time.
