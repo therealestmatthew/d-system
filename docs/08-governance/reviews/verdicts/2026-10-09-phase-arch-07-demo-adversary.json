@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-09-phase-arch-07-demo-adversary",
+  "date": "2026-10-09",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "0f0438540088ae116632052950b3136d03336fa3",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "The R12 no-allow-list scan covers TypeScript and JSON but not Python sources under src/.",
+      "evidence": "test/test_workbench_slot_matcher.py test_no_source_or_data_file_carries_a_per_panel_or_per_slot_allow_list scans ts/src/**/*.ts* and _data/**/*.json only.",
+      "consequence": "A future Python-side allow-list would not be caught by this test."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "brain/concepts/terms-workbench-ui.md and docs/08-governance/GLOSSARY.md still describe the retired per-panel eligible_slots model.",
+      "evidence": "grep hits in both files; outside the phase deliverables.",
+      "consequence": "Stale prose; not an enforcement path. A follow-up idea is held for Ideation."
+    }
+  ],
+  "raw_reply_sha256": "820f6e8f7a3d876ee3bbc821be24588af0d32eac1621d0a7e758d466b0ab0441",
+  "notes": "Round 1 gating review, dispatched and briefed by the Session Manager in its own scratch clone at 0f043854, in parallel with the runner. Brief: the phase entry from dev, the diff 4cfb05e8..0f043854 (docs/03-sessions excluded), and the nine owner-ratified design choices. Raw reply kept at _working/session-manager/review-replies/phase-arch-07-0f043854-demo-adversary.md."
+}
