@@ -343,6 +343,75 @@ re-check on the worktree's dev server gave 404, 403 and 403 for the three symlin
 `layout-1.json`, `README.md`, the generated overview page and `/`. The temporary symlinks and the
 scratch file were removed.
 
-Not acted on, pending the owner: the reviewer's major finding that the check-then-serve sequence is
-not atomic. Toggling a file under `ts/public/` between a file and a symlink crashed the dev server
-with an unhandled `ReadStream` `ENOENT` in Vite's serving path; no leak was isolated.
+The reviewer's major finding, that the check-then-serve sequence is not atomic, went to the owner,
+who ruled on 2026-10-09 that it is fixed in this phase (round 3 below).
+
+## Review round 3: the check-then-serve race (2026-10-09)
+
+The round 2 verdict records are committed unchanged in `bb003e90`. They are the functional gating
+pass, the security reject (F01 the layouts route, F02 the race) and the shadow pass with one
+minor. That minor, the Python allow-list scan reading `src/` only, is fixed: the scan now reads
+`tools/` as well, and a probe file under `tools/` made it fail. `test/` stays out of the scan,
+because tests name the fields to assert they are gone.
+
+**The race leaked, not only crashed.** A probe ran a real Vite 6 dev server, plus a child process
+renaming a regular file and an outside-pointing symlink over one name (about 9,000 swaps a
+second), while 16 requests ran at a time for 2.8 s. Under the round 2 code, responses carrying the
+outside file numbered 312 on `/workbench-layouts/`, 682 on `/race.txt` (`ts/public/`) and 925 on
+`/@fs/`. Every run also logged two or three uncaught exceptions, which would have ended a real dev
+server.
+
+**The fix: one descriptor, opened then checked, is the only thing read.**
+- `openChecked` opens the name, then checks the open file. On Linux it reads the real path from
+  `/proc/self/fd/N`. Elsewhere it requires `lstat(realpath(name))` to be a regular file with the
+  descriptor's device and inode, compared as bigints. The real path must lie inside the allowed
+  directories.
+- The result is `'absent'`, `'changed'` (a rename replaced the opened file), `'forbidden'`, or the
+  descriptor. A changed name is retried up to five times and is never handed on to code that would
+  open the name again.
+- Bytes come only from that descriptor: `streamChecked`, which has an error handler and closes the
+  descriptor on end, failure or client abort, and `readChecked`.
+- The three config routes serve this way, and the `/workbench-file/` checks and Markdown render
+  use the descriptor and its real path.
+
+**Vite's own paths.** The guard now serves, from the checked descriptor, every GET or HEAD that
+Vite would send as the file stands: a non-module extension, any query but `?import`. A `load` hook
+(`enforce: 'pre'`) gives the transform pipeline source modules and `?raw` imports from a checked
+descriptor, outside `node_modules`. A second middleware, registered after Vite's single-page
+fallback, serves `.html` pages through `server.transformIndexHtml` from a checked descriptor. The
+uncaught exceptions came from Vite's file watcher (chokidar's `readlink` `EINVAL` on the flipping
+name), not from serving: with the watcher off there were none. The guard now listens for watcher
+`error` events and logs them.
+
+**Measured after the fix**, same probe, ten paths: `/workbench-layouts/`, `/generated-overview/`,
+`/workbench-file/`, `/race.txt`, `/@fs/`, a `.ts` module, `?raw`, `?t=`, `.json?import` with a
+JSON-valid secret, and `index.html`. Every one gave 0 responses with the outside content, 0
+uncaught exceptions, and a server still answering. `?inline` on an SVG also gave 0, but the guard
+does not cover it by design.
+
+**What remains uncovered:**
+- `node_modules`, which npm writes and the `load` hook skips.
+- Import queries other than `?raw` (`?inline`, `?worker`, `?url` of a CSS file), which the plugins
+  that own them read by name.
+- On macOS and Windows, a directory component of the real path swapped to a symlink between
+  `realpath` and `lstat`. Linux reads the descriptor's own path and has no such gap.
+- A hard link to an outside file placed inside a served directory. That is a regular file, not a
+  symlink, and is outside this check.
+
+**The test.** `ts/vite.config.test.ts` gains a race case. For eight routes it builds a fresh tree
+and server, runs the toggler for 1.2 s with 16 requests in flight, and asserts that no response
+contains the secret, that the toggler made more than 50 swaps, that the server still answers, and
+that no uncaught exception was recorded. It passed 5 runs out of 5, about 12 s for the whole file.
+Its sensitivity was measured by mutation:
+- Restoring the round 2 guard behaviour (check once, then hand every request on) failed 3 runs out
+  of 3, on `/race.txt`.
+- Making `/workbench-layouts/` reopen its name instead of streaming the checked descriptor failed 2
+  runs out of 3.
+
+The test is bounded and probabilistic: it can miss a regression, but it cannot fail against a
+correct guard.
+
+**Regression check on the real app**: with the worktree's backend and dev server, the live REQ-037
+check `--quick` printed `52 panel cells ... rules pass=260 fail=0 ... 0 finding(s)` and exited 0.
+The same check with `--self-test` exited 0 and caught all nine injected violations. JSON imports,
+`?import`, modules and plain JSON gave the same responses with and without the guard.

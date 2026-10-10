@@ -1,8 +1,20 @@
 import { spawnSync } from 'node:child_process'
-import { createReadStream, existsSync, readFileSync, realpathSync, statSync } from 'node:fs'
+import {
+  closeSync,
+  createReadStream,
+  existsSync,
+  fstatSync,
+  lstatSync,
+  openSync,
+  readFileSync,
+  readlinkSync,
+  realpathSync,
+} from 'node:fs'
+import type { ServerResponse } from 'node:http'
 import {
   basename,
   extname,
+  isAbsolute,
   join,
   normalize,
   relative as relativePath,
@@ -31,29 +43,191 @@ const GENERATED_OVERVIEW_PREFIX = '/generated-overview/'
 const WORKBENCH_LAYOUTS_PREFIX = '/workbench-layouts/'
 const WORKBENCH_FILE_PREFIX = '/workbench-file/'
 
-// Refuses any dev-server request whose file, once symlinks are resolved, lies outside the
-// directories the server may serve. Vite's own `server.fs.allow` check compares path prefixes and
-// does not resolve symlinks, so without this a symlink inside `ts/` or `_data/workbench/` that
-// points elsewhere (at `_private/`, say) is served, both through `/@fs/<absolute path>` and through
-// a root-relative URL (security review of `phase-arch-07`, 2026-10-09). The middleware is attached
-// directly in `configureServer`, so it runs before Vite's internal middlewares, and the plugin is
-// first in `plugins` below, so it runs before this file's other routes. `routes` maps this file's
-// own URL prefixes that serve a directory inside the allow-list (`/workbench-layouts/`) to that
-// directory, so those URLs are checked too; every file-serving route below also checks the real
-// path itself, which covers `/generated-overview/`, whose `_public/` lies outside the list. A URL
-// naming no existing file passes through untouched, for Vite to answer as it would have. Exported
-// for `vite.config.test.ts`. `test/test_workbench_slot_matcher.py` also refuses a tracked symlink
-// under either directory, so one cannot be merged in the first place.
+// --- Serving a file only from a descriptor that was checked ------------------------------------
+//
+// Every file this dev server serves from `ts/`, `_data/workbench/` or `_public/` is opened first
+// and checked second, and its bytes come from that same open descriptor. Checking a path and then
+// opening it again leaves a window in which the name can be swapped for a symlink that points
+// elsewhere: a probe that renamed a regular file and an outside-pointing symlink over one name
+// while requests ran got the outside file back from every route (security review of
+// `phase-arch-07`, 2026-10-09). An open descriptor cannot be swapped.
+
+// A file opened and checked: the descriptor to read from and the path it really has.
+export type CheckedFile = { fd: number; realPath: string }
+
+// The directories, symlinks resolved; one that does not exist is dropped.
+function realDirectories(directories: string[]): string[] {
+  return directories.flatMap((directory) => {
+    try {
+      return [realpathSync(directory)]
+    } catch {
+      return []
+    }
+  })
+}
+
+function isWithin(path: string, directories: string[]): boolean {
+  return directories.some((directory) => path === directory || path.startsWith(directory + sep))
+}
+
+const PROC_FD = '/proc/self/fd'
+const hasProcFd = existsSync(PROC_FD)
+
+// What opening a name found. `'absent'`: nothing could be opened there, or it is not a regular file
+// (a directory, say), so the request is someone else's to answer. `'changed'`: a file was opened
+// but the name no longer leads to it (a rename replaced it, or the name now differs from what the
+// descriptor holds). `'forbidden'`: the opened file lies outside the directories.
+export type OpenResult = CheckedFile | 'absent' | 'changed' | 'forbidden'
+
+// Opens `path` and returns the descriptor only if the file it opened is a regular file whose real
+// path lies inside one of `directories` (already resolved by `realDirectories`). On Linux the
+// opened file's real path is read from `/proc/self/fd`, which names the file the descriptor holds,
+// however the name changes afterwards. Elsewhere (macOS, Windows) the name is resolved again and
+// the result must be a regular file, not a symlink, with the descriptor's device and inode. The
+// caller owns a returned descriptor and must close it.
+function openOnce(path: string, directories: string[]): OpenResult {
+  let fd: number
+  try {
+    fd = openSync(path, 'r')
+  } catch {
+    return 'absent'
+  }
+  const refuse = (result: 'absent' | 'changed' | 'forbidden') => {
+    closeSync(fd)
+    return result
+  }
+  try {
+    const opened = fstatSync(fd, { bigint: true })
+    if (!opened.isFile()) return refuse('absent')
+    let realPath: string
+    if (hasProcFd) {
+      realPath = readlinkSync(`${PROC_FD}/${fd}`)
+      if (realPath.endsWith(' (deleted)')) return refuse('changed')
+    } else {
+      try {
+        realPath = realpathSync(path)
+      } catch {
+        return refuse('changed')
+      }
+      const named = lstatSync(realPath, { bigint: true, throwIfNoEntry: false })
+      if (!named?.isFile() || named.dev !== opened.dev || named.ino !== opened.ino) {
+        return refuse('changed')
+      }
+    }
+    if (!isWithin(realPath, directories)) return refuse('forbidden')
+    return { fd, realPath }
+  } catch {
+    return refuse('changed')
+  }
+}
+
+// `openOnce`, tried again while the name keeps changing under it (an editor's save-by-rename, or
+// a deliberate swap). A file still changing after the last try stays `'changed'`; callers answer
+// that themselves and never hand the request on to code that would open the name again.
+export function openChecked(path: string, directories: string[]): OpenResult {
+  let result = openOnce(path, directories)
+  for (let attempt = 1; result === 'changed' && attempt < 5; attempt += 1) {
+    result = openOnce(path, directories)
+  }
+  return result
+}
+
+// Reads a checked file whole and closes its descriptor.
+function readChecked(file: CheckedFile): Buffer {
+  try {
+    return readFileSync(file.fd)
+  } finally {
+    closeSync(file.fd)
+  }
+}
+
+// Streams a checked file into `res`; the caller has set the status and headers. A read error
+// before any byte is sent becomes a 404, one after is a dropped connection, and neither reaches
+// the process as an unhandled `error` event. The descriptor closes when the stream ends, fails or
+// the client goes away.
+function streamChecked(res: ServerResponse, file: CheckedFile): void {
+  const stream = createReadStream('', { fd: file.fd, autoClose: true })
+  stream.on('error', () => {
+    if (res.headersSent) {
+      res.destroy()
+    } else {
+      res.statusCode = 404
+      res.end()
+    }
+  })
+  res.on('close', () => stream.destroy())
+  stream.pipe(res)
+}
+
+// Request extensions Vite transforms rather than serves as they are; the guard leaves those to
+// Vite's pipeline, where `load` below supplies the checked bytes.
+const MODULE_EXTENSIONS = new Set([
+  '.js',
+  '.mjs',
+  '.cjs',
+  '.jsx',
+  '.ts',
+  '.tsx',
+  '.mts',
+  '.cts',
+  '.css',
+  '.scss',
+  '.sass',
+  '.less',
+  '.styl',
+  '.html',
+  '.htm',
+  '.vue',
+  '.svelte',
+  '.wasm',
+])
+// The module files `load` reads itself; anything else is left to Vite and its other plugins.
+const LOADED_EXTENSIONS = new Set([
+  '.js',
+  '.mjs',
+  '.cjs',
+  '.jsx',
+  '.ts',
+  '.tsx',
+  '.mts',
+  '.cts',
+  '.css',
+  '.json',
+])
+
+// Keeps the dev server from serving any file that, symlinks resolved, lies outside the directories
+// it may serve, by any route and under concurrent renames. Vite's own `server.fs.allow` check
+// compares path prefixes and resolves no symlink, so a symlink inside `ts/` or `_data/workbench/`
+// that points elsewhere (at `_private/`, say) was served through `/@fs/<absolute path>` and
+// through a root-relative URL (security review of `phase-arch-07`, 2026-10-09). Three parts:
+//
+// - A middleware, attached directly in `configureServer` and first in `plugins`, so it runs before
+//   Vite's internal middlewares and this file's other routes. For a GET or HEAD of a file Vite
+//   would send unchanged (an extension it does not transform, no `?import`) it serves the file
+//   itself from a checked descriptor, so Vite never reopens the name. For anything else it opens
+//   and checks the file, refusing it with 403 if it leads outside, and then hands the request on.
+// - A `load` hook (`enforce: 'pre'`) that gives Vite's transform pipeline the bytes of a source
+//   module (`LOADED_EXTENSIONS`, outside `node_modules`) or of a `?raw` import from a checked
+//   descriptor, so a module cannot be swapped between that check and Vite's read either.
+// - A second middleware, after Vite's single-page fallback, that serves `.html` pages from a
+//   checked descriptor through Vite's HTML transform.
+// - `routes` maps this file's own URL prefixes that serve a directory inside the allow-list
+//   (`/workbench-layouts/`) to that directory, so the middleware checks those URLs too; each such
+//   route also serves only from a checked descriptor itself, which covers `/generated-overview/`,
+//   whose `_public/` lies outside the list.
+//
+// What it does not cover: `node_modules`, which npm writes, and import queries other than `?raw`
+// (`?inline`, `?worker`, `?url` of a CSS file), which the plugins that own them read by name. A URL naming no existing file passes through untouched, for
+// Vite to answer as it would have. Exported for `vite.config.test.ts`.
+// `test/test_workbench_slot_matcher.py` also refuses a tracked symlink under either directory, so
+// one cannot be merged in the first place.
 export function refuseSymlinkEscapes(
   root: string,
   allow: string[],
   routes: Record<string, string> = {},
 ): Plugin {
-  const allowed = allow.map((directory) => realpathSync(directory))
-  const isAllowed = (path: string) =>
-    allowed.some((directory) => path === directory || path.startsWith(directory + sep))
-  // The files a request URL can name: an absolute path after `/@fs`, or a path under the root or
-  // under its `public/` directory, which Vite serves at the root as well.
+  // The files a request URL can name, in the order Vite looks: an absolute path after `/@fs`, a
+  // route's own directory, or a path under the root's `public/` directory and then the root.
   const candidates = (urlPath: string): string[] => {
     if (urlPath.startsWith('/@fs/')) {
       const absolute = urlPath.slice('/@fs'.length)
@@ -62,49 +236,127 @@ export function refuseSymlinkEscapes(
     for (const [prefix, directory] of Object.entries(routes)) {
       if (urlPath.startsWith(prefix)) return [join(directory, urlPath.slice(prefix.length))]
     }
-    return [join(root, urlPath), join(root, 'public', urlPath)]
+    return [join(root, 'public', urlPath), join(root, urlPath)]
   }
+  // A file Vite would send as it is: a GET or HEAD of a non-module extension. For those Vite
+  // transforms only an `?import` request (an asset imported from a module); any other query
+  // (`?raw` fetched directly, `?t=`) is served from the file unchanged.
+  const servesAsIs = (url: string, urlPath: string, method: string | undefined) =>
+    (method === 'GET' || method === 'HEAD') &&
+    !/[?&]import(?:[&=]|$)/.test(url) &&
+    extname(urlPath) !== '' &&
+    !MODULE_EXTENSIONS.has(extname(urlPath).toLowerCase()) &&
+    !Object.keys(routes).some((prefix) => urlPath.startsWith(prefix))
 
   return {
     name: 'refuse-symlink-escapes',
+    enforce: 'pre',
     configureServer(server) {
+      // The file watcher reports a name that changes between a file and a symlink faster than it
+      // can read it (`readlink` `EINVAL`) as an `error` event; with no listener that event is
+      // thrown and ends the dev server. A watch error is logged and the server keeps running.
+      server.watcher.on('error', (error) => {
+        server.config.logger.warn(`file watcher: ${String(error)}`)
+      })
       server.middlewares.use((req, res, next) => {
+        const url = req.url ?? ''
         let urlPath: string
         try {
-          urlPath = decodeURIComponent((req.url ?? '').split('?')[0] ?? '')
+          urlPath = decodeURIComponent(url.split('?')[0] ?? '')
         } catch {
           next()
           return
         }
+        const directories = realDirectories(allow)
         for (const candidate of candidates(urlPath)) {
-          let real: string
-          try {
-            real = realpathSync(candidate)
-          } catch {
-            continue
-          }
-          if (!isAllowed(real)) {
+          const file = openChecked(candidate, directories)
+          if (file === 'absent') continue
+          if (file === 'forbidden') {
             res.statusCode = 403
             res.end('Forbidden')
             return
           }
+          if (file === 'changed') {
+            res.statusCode = 404
+            res.end('Not found')
+            return
+          }
+          if (!servesAsIs(url, urlPath, req.method)) {
+            closeSync(file.fd)
+            next()
+            return
+          }
+          const contentType = CONTENT_TYPE_BY_EXTENSION[extname(urlPath).toLowerCase()]
+          res.statusCode = 200
+          res.setHeader('Content-Type', contentType ?? 'application/octet-stream')
+          res.setHeader('Cache-Control', 'no-cache')
+          if (req.method === 'HEAD') {
+            closeSync(file.fd)
+            res.end()
+            return
+          }
+          streamChecked(res, file)
+          return
         }
         next()
       })
+      // Registered after Vite's own middlewares (a returned function runs after them), which
+      // includes the single-page fallback that rewrites a route to `/index.html`, and before
+      // Vite's HTML middleware, which would read the page from its name again: an `.html` file
+      // is served here from a checked descriptor, through Vite's own HTML transform.
+      return () => {
+        server.middlewares.use((req, res, next) => {
+          let urlPath: string
+          try {
+            urlPath = decodeURIComponent((req.url ?? '').split('?')[0] ?? '')
+          } catch {
+            next()
+            return
+          }
+          if (req.method !== 'GET' || extname(urlPath).toLowerCase() !== '.html') {
+            next()
+            return
+          }
+          const file = openChecked(join(root, urlPath), realDirectories(allow))
+          if (file === 'absent') {
+            next()
+            return
+          }
+          if (file === 'forbidden' || file === 'changed') {
+            res.statusCode = file === 'forbidden' ? 403 : 404
+            res.end(file === 'forbidden' ? 'Forbidden' : 'Not found')
+            return
+          }
+          const html = readChecked(file).toString('utf-8')
+          server
+            .transformIndexHtml(req.url ?? urlPath, html, req.originalUrl)
+            .then((transformed) => {
+              res.statusCode = 200
+              res.setHeader('Content-Type', 'text/html; charset=utf-8')
+              res.setHeader('Cache-Control', 'no-cache')
+              res.end(transformed)
+            })
+            .catch(next)
+        })
+      }
     },
-  }
-}
-
-// Whether `path`, with every symlink resolved, lies inside `directory` (also resolved). The routes
-// below check this after the textual `../` check: a path can stay textually inside a directory
-// and still lead out of it through a symlink. False when either cannot be resolved.
-function realPathWithin(path: string, directory: string): boolean {
-  try {
-    const real = realpathSync(path)
-    const realDirectory = realpathSync(directory)
-    return real === realDirectory || real.startsWith(realDirectory + sep)
-  } catch {
-    return false
+    load(id) {
+      // `?raw` is answered here exactly as Vite's asset plugin answers it, so that plugin does not
+      // read the file by its name; any other query belongs to the plugin that owns it.
+      const raw = id.endsWith('?raw')
+      const path = raw ? id.slice(0, -'?raw'.length) : id
+      if (path.includes('\0') || path.includes('?') || !isAbsolute(path)) return null
+      if (/[\\/]node_modules[\\/]/.test(path)) return null
+      if (!raw && !LOADED_EXTENSIONS.has(extname(path).toLowerCase())) return null
+      const file = openChecked(path, realDirectories(allow))
+      if (file === 'absent') return null
+      if (file === 'forbidden') {
+        throw new Error(`Refused: ${id} leads outside the directories the dev server may serve.`)
+      }
+      if (file === 'changed') throw new Error(`${id} kept changing while it was read; try again.`)
+      const text = readChecked(file).toString('utf-8')
+      return raw ? `export default ${JSON.stringify(text)}` : text
+    },
   }
 }
 
@@ -132,20 +384,22 @@ export function serveGeneratedOverview(directory: string = publicDir): Plugin {
         res.end('Forbidden')
         return
       }
-      if (!existsSync(resolved) || !statSync(resolved).isFile()) {
+      // Opened once and checked; the bytes come from that descriptor (see `openChecked`).
+      const file = openChecked(resolved, realDirectories([directory]))
+      if (file === 'absent' || file === 'changed') {
         res.statusCode = 404
         res.setHeader('Content-Type', 'text/plain; charset=utf-8')
         res.end(`Generated overview page not found at ${resolved}.`)
         return
       }
-      if (!realPathWithin(resolved, directory)) {
+      if (file === 'forbidden') {
         res.statusCode = 403
         res.end('Forbidden')
         return
       }
       res.statusCode = 200
       res.setHeader('Content-Type', 'text/html; charset=utf-8')
-      createReadStream(resolved).pipe(res)
+      streamChecked(res, file)
     })
   }
 
@@ -176,20 +430,22 @@ export function serveWorkbenchLayouts(directory: string = workbenchLayoutsDir): 
         res.end('Forbidden')
         return
       }
-      if (!existsSync(resolved) || !statSync(resolved).isFile()) {
+      // Opened once and checked; the bytes come from that descriptor (see `openChecked`).
+      const file = openChecked(resolved, realDirectories([directory]))
+      if (file === 'absent' || file === 'changed') {
         res.statusCode = 404
         res.setHeader('Content-Type', 'text/plain; charset=utf-8')
         res.end(`Layout definition not found at ${resolved}.`)
         return
       }
-      if (!realPathWithin(resolved, directory)) {
+      if (file === 'forbidden') {
         res.statusCode = 403
         res.end('Forbidden')
         return
       }
       res.statusCode = 200
       res.setHeader('Content-Type', 'application/json; charset=utf-8')
-      createReadStream(resolved).pipe(res)
+      streamChecked(res, file)
     })
   }
 
@@ -314,32 +570,28 @@ export function serveRepositoryFiles(root: string = repoRoot): Plugin {
         res.end('Forbidden')
         return
       }
-      if (!existsSync(resolved) || !statSync(resolved).isFile()) {
+      // Resolve symlinks before trusting the boundary check above: `resolved` there is only
+      // textually normalized, so a symlink under the repository whose target lands outside it
+      // passes that check untouched. The backend's own boundary (`src/api/routes/workbench.py`'s
+      // `resolve_repo_relative_path`) follows symlinks for this reason (ADR-015 rule 2: "symlinks
+      // whose resolved target leaves the root"). The file is opened once and checked, and every
+      // check below and the bytes served use that descriptor and its real path, so the name
+      // cannot be swapped between the check and the read (see `openChecked`). The symlink-resolved
+      // root is the boundary, so a symlinked worktree checkout itself doesn't widen it.
+      const realRoot = realpathSync(root)
+      const file = openChecked(resolved, [realRoot])
+      if (file === 'absent' || file === 'changed') {
         res.statusCode = 404
         res.setHeader('Content-Type', 'text/plain; charset=utf-8')
         res.end(`Not found: ${relative}`)
         return
       }
-      // Resolve symlinks before trusting the boundary check above: `resolved` there is only
-      // textually normalized (`normalize`/`join`, matching `serveGeneratedOverview`'s and
-      // `serveWorkbenchLayouts`'s own string-containment checks), so a symlink under the
-      // repository whose target lands outside it — e.g. `_public/evil-link.txt` pointing outside
-      // the repo root — passes that check untouched and would still serve the outside file's
-      // bytes. The backend's own boundary (`src/api/routes/workbench.py`'s
-      // `resolve_repo_relative_path`) uses `Path.resolve()`, which follows symlinks, for exactly
-      // this reason (ADR-015 rule 2: "symlinks whose resolved target leaves the root");
-      // `realpathSync` is Node's equivalent, and by this point `existsSync` above has already
-      // confirmed the symlink chain resolves to a real file, so this cannot throw for the paths
-      // that reach it.
-      const realResolved = realpathSync(resolved)
-      // The symlink-resolved root: the boundary check compares against this, not the textual
-      // `root`, so a symlinked worktree checkout itself doesn't widen the boundary.
-      const realRoot = realpathSync(root)
-      if (realResolved !== realRoot && !realResolved.startsWith(realRoot + sep)) {
+      if (file === 'forbidden') {
         res.statusCode = 403
         res.end('Forbidden')
         return
       }
+      const realResolved = file.realPath
       // The ignore and `.git` checks run on the resolved path as well as the requested one: a
       // symlink in a tracked directory can lead to an ignored file (anything under `_private/`)
       // or into `.git/`, and `git check-ignore` judges only the path it is given (security review
@@ -350,11 +602,13 @@ export function serveRepositoryFiles(root: string = repoRoot): Plugin {
           .split('/')
           .some((segment) => segment.replace(/[. ]+$/, '').toLowerCase() === '.git')
       ) {
+        closeSync(file.fd)
         res.statusCode = 403
         res.end('Forbidden')
         return
       }
       if (isGitIgnored(relative, root) || isGitIgnored(realRelative, root)) {
+        closeSync(file.fd)
         res.statusCode = 404
         res.setHeader('Content-Type', 'text/plain; charset=utf-8')
         res.end(`Not found: ${relative}`)
@@ -452,6 +706,7 @@ export function serveRepositoryFiles(root: string = repoRoot): Plugin {
 </body>
 </html>
 `
+        closeSync(file.fd)
         res.setHeader('Content-Type', 'text/html; charset=utf-8')
         res.end(html)
         return
@@ -468,7 +723,7 @@ export function serveRepositoryFiles(root: string = repoRoot): Plugin {
       // is what a sanitizer would otherwise exist to backstop.
       if (extname(realResolved).toLowerCase() === '.md') {
         try {
-          const source = readFileSync(realResolved, 'utf-8')
+          const source = readChecked(file).toString('utf-8')
           // `{ async: false }` pins the synchronous overload — `marked.parse` is typed to return
           // `string | Promise<string>` because an async extension can make it asynchronous, but
           // none is registered here, so this is always the synchronous, string-returning path;
@@ -544,13 +799,8 @@ ${rendered}
         }
         return
       }
-      // Stream from the already-`realpathSync`-resolved path, not the textually-normalized
-      // `resolved` re-opened here: re-deriving bytes from `resolved` after the symlink-boundary
-      // check above passed would reopen the original (possibly symlinked) path, leaving a
-      // TOCTOU window between the check and the read where the symlink target could change: the
-      // check would have validated one file but the stream would read whatever `resolved` points
-      // to at read time. `realResolved` is the same file the check just validated.
-      createReadStream(realResolved).pipe(res)
+      // Streamed from the descriptor the checks above judged, never from a name reopened here.
+      streamChecked(res, file)
     })
   }
 
