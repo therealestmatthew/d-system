@@ -8818,6 +8818,8 @@ items:
   - ts/src/stage/*.test.tsx
   - ts/src/stage/explorer/*.test.tsx
   - ts/vite.config.ts
+  - ts/vite.config.test.ts
+  - ts/vitest.config.ts
   - _data/workbench/
   - schemas/workbench-layout.schema.json
   - schemas/workbench-slot-schemas.schema.json
@@ -8829,7 +8831,9 @@ items:
   - docs/06-requirements/
   next_action: Assert the one-header count as a test before changing the rendering, so idea
     000101's defect is reproduced by the check first. Deliverables widened at claim time per
-    ADR-031's "What each downstream phase builds" row (owner ruling 2026-10-08).
+    ADR-031's "What each downstream phase builds" row (owner ruling 2026-10-08). Widened again on
+    2026-10-09 by owner ruling to name ts/vite.config.test.ts and ts/vitest.config.ts for the dev
+    server's symlink guard (security review, round 1).
   session: doc-session-schema-owned-slots-structural-eligibility
   completion_evidence:
   - _data/workbench/slot-schemas.json
@@ -8846,7 +8850,12 @@ items:
   - test/test_workbench_slot_matcher.py
   - test/test_workbench_layout_schema.py
   - docs/06-requirements/REQ-007-workbench.md
+  - ts/vite.config.ts
+  - ts/vite.config.test.ts
   - docs/03-sessions/SESS-2026-10-08-20-schema-owned-slots-structural-eligibility.md
+  - docs/08-governance/reviews/verdicts/2026-10-09-phase-arch-07-demo-adversary.json
+  - docs/08-governance/reviews/verdicts/2026-10-09-phase-arch-07-demo-adversary-2.json
+  - docs/08-governance/reviews/verdicts/2026-10-09-phase-arch-07-review-judge.json
   result: 'Each slot role has a schema (_data/workbench/slot-schemas.json) whose frame declares the
     help and controls sub-slots and the element types each admits; panel types declare their body kind
     and bar elements (panel-elements.json). Eligibility is computed by one matcher written twice
@@ -8857,7 +8866,11 @@ items:
     cloud run, finished locally on 2026-10-09 after the rebase onto dev. uv run pytest: 2175 passed.
     cd ts && npm test: 277 passed; npm run build built. Live REQ-037 check with --self-test, all four
     sizes: 104 panel cells, rules pass=520 fail=0, nine of nine injected violations caught. The nine
-    ratification items were ratified by the owner on 2026-10-09.'
+    ratification items were ratified by the owner on 2026-10-09. Review round 1 (security): the dev
+    server followed a symlink under the new server.fs.allow directories; a first-registered
+    middleware now realpaths /@fs/ and root-relative requests and returns 403 outside the list
+    (ts/vite.config.test.ts reproduces the 200 without it and asserts 403 with it), and a pytest
+    refuses tracked symlinks under ts/ and _data/workbench/.'
 - id: phase-arch-08
   title: Multi-instance panel identity across layout, storage, registry and sessions
   plan: doc-workbench-architecture-quality

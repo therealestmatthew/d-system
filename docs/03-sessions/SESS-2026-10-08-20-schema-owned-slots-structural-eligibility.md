@@ -251,3 +251,55 @@ Run locally on 2026-10-09 in `../d-system-worktrees/phase-arch-07`, after the re
 
 The cloud checkpoint's last full run, before the final commit, was `2 failed, 2167 passed, 1 skipped
 in 374.98s`, with the two failures named above.
+
+## Review round 1 (2026-10-09)
+
+Verdicts on `0f043854`, committed unchanged in `b2682aef`: gating `demo-adversary` pass with two
+minors, the security stand-in (`demo-adversary-2`) reject with one major, `review-judge` (shadow)
+pass.
+
+**Test baseline sign-off.** `tools/check_test_baseline.py` against dev `4cfb05e8` reported one test
+that passed in the base and is missing in the branch:
+`test.test_workbench_layout_schema::test_panel_with_no_eligible_slot_fails_schema`. Commit
+`c487acdf` removed it with the `eligible_slots` field it exercised; it is superseded by
+`test_layout_carrying_an_eligibility_list_fails_the_schema` (any `eligible_slots` fails the schema,
+per shipped layout) and by `test_panel_with_no_eligible_slot_fails_invariant`, rewritten to the
+structural rule. The owner signed off on its removal on 2026-10-09, relayed by the Session Manager.
+
+**Minor F01** (the R12 scan did not cover Python sources): fixed. The scan in
+`test_no_source_or_data_file_carries_a_per_panel_or_per_slot_allow_list` now also reads
+`src/**/*.py`; a probe file holding `eligible_slots` under `src/workbench/` made it fail, and the
+probe was removed.
+
+**Minor F02** (stale `eligible_slots` prose in `brain/concepts/terms-workbench-ui.md` and
+`docs/08-governance/GLOSSARY.md`): outside the deliverables; sent to Ideation as an idea, which is
+holding it until the next free id.
+
+**Major F01, security stand-in** (a symlink under the new `server.fs.allow` directories is
+followed). Vite checks `server.fs.allow` by path prefix and does not resolve symlinks. A prototype
+on a throwaway root showed the same file served two ways: through `/@fs/<absolute path>`, the
+reviewer's case, and through a plain root-relative URL for a symlink under the Vite root. The second
+route existed before this phase, since `ts/` is always the root. Fixed in two parts, by owner
+ruling of 2026-10-09:
+
+- `refuseSymlinkEscapes` in `ts/vite.config.ts`, first in `plugins` and attached directly in
+  `configureServer`, so it runs before Vite's own middlewares. It realpaths the file a request names
+  (the `/@fs/` path, or the path under the root or its `public/` directory) and returns 403 when
+  the real path lies outside the allow-list. `server.fs.allow` and the guard take one shared list,
+  `devServerAllow`, and the config's comments now say the allow-list alone does not stop a symlink.
+  `ts/vite.config.test.ts` (a Vitest test in Node, added to `ts/vitest.config.ts`'s include list)
+  builds a tree with outside-pointing symlinks and runs a real Vite dev server over it. Without the
+  guard, both routes return 200 with the outside file, which reproduces the hole. With it, four
+  escape URLs (including a `%2E%2E` variant) return 403, and allowed files are still served. With
+  the guard's refusal disabled, the blocking test fails.
+- `test_no_tracked_symlink_under_the_dev_server_allow_list` in
+  `test/test_workbench_slot_matcher.py` fails on any `git ls-files` mode-120000 entry under `ts/`
+  or `_data/workbench/`; a symlink staged only in the index made it fail. Today there are none,
+  and all 23 symlinks under `ts/node_modules` point inside `ts/`.
+- Live check against this worktree's own dev server, with temporary untracked symlinks under
+  `_data/workbench/` and `ts/` pointing at a scratch file: both returned 403, and `/`,
+  `/src/main.tsx`, `slot-schemas.json` and `panel-elements.json` returned 200. The symlinks were
+  removed afterwards.
+
+The owner widened the deliverables to name `ts/vite.config.test.ts` and `ts/vitest.config.ts` and
+ruled that the guard covers root-relative URLs as well as `/@fs/`.
