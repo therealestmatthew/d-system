@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    include: ['src/**/*.test.tsx'],
+    // vite.config.test.ts runs a real dev server in Node (its own `@vitest-environment node`).
+    include: ['src/**/*.test.tsx', 'vite.config.test.ts'],
   },
 })

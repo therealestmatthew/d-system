@@ -15,6 +15,9 @@ const workbenchLayoutsDir = join(repoRoot, '_data', 'workbench', 'layouts')
 // `panel-elements.json`, ADR-031 decision 4): they sit one directory above the layouts, and the
 // dev server may serve this directory and nothing else outside `ts/` (see `server.fs.allow`).
 const workbenchDataDir = join(repoRoot, '_data', 'workbench')
+// The directories the dev server may serve files from: `server.fs.allow` and
+// `refuseSymlinkEscapes` both take this one list.
+const devServerAllow = [__dirname, workbenchDataDir]
 // The symlink-resolved repo root — `serveRepositoryFiles`'s boundary check below must compare
 // against this, not the textual `repoRoot`, so a symlinked worktree checkout itself doesn't
 // widen the boundary it is meant to enforce.
@@ -23,6 +26,60 @@ const realRepoRoot = realpathSync(repoRoot)
 const GENERATED_OVERVIEW_PREFIX = '/generated-overview/'
 const WORKBENCH_LAYOUTS_PREFIX = '/workbench-layouts/'
 const WORKBENCH_FILE_PREFIX = '/workbench-file/'
+
+// Refuses any dev-server request whose file, once symlinks are resolved, lies outside the
+// directories the server may serve. Vite's own `server.fs.allow` check compares path prefixes and
+// does not resolve symlinks, so without this a symlink inside `ts/` or `_data/workbench/` that
+// points elsewhere (at `_private/`, say) is served, both through `/@fs/<absolute path>` and through
+// a root-relative URL (security review of `phase-arch-07`, 2026-10-09). The middleware is attached
+// directly in `configureServer`, so it runs before Vite's internal middlewares, and the plugin is
+// first in `plugins` below, so it runs before this file's other routes. A URL naming no existing
+// file passes through untouched, for Vite to answer as it would have. Exported for
+// `vite.config.test.ts`. `test/test_workbench_slot_matcher.py` also refuses a tracked symlink under
+// either directory, so one cannot be merged in the first place.
+export function refuseSymlinkEscapes(root: string, allow: string[]): Plugin {
+  const allowed = allow.map((directory) => realpathSync(directory))
+  const isAllowed = (path: string) =>
+    allowed.some((directory) => path === directory || path.startsWith(directory + sep))
+  // The files a request URL can name: an absolute path after `/@fs`, or a path under the root or
+  // under its `public/` directory, which Vite serves at the root as well.
+  const candidates = (urlPath: string): string[] => {
+    if (urlPath.startsWith('/@fs/')) {
+      const absolute = urlPath.slice('/@fs'.length)
+      return [/^\/[A-Za-z]:/.test(absolute) ? absolute.slice(1) : absolute]
+    }
+    return [join(root, urlPath), join(root, 'public', urlPath)]
+  }
+
+  return {
+    name: 'refuse-symlink-escapes',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        let urlPath: string
+        try {
+          urlPath = decodeURIComponent((req.url ?? '').split('?')[0] ?? '')
+        } catch {
+          next()
+          return
+        }
+        for (const candidate of candidates(urlPath)) {
+          let real: string
+          try {
+            real = realpathSync(candidate)
+          } catch {
+            continue
+          }
+          if (!isAllowed(real)) {
+            res.statusCode = 403
+            res.end('Forbidden')
+            return
+          }
+        }
+        next()
+      })
+    },
+  }
+}
 
 // Serves files under `_public/` at `/generated-overview/<path>` so `OverviewRegion` can embed
 // the generated overview page (its actual location is reported at runtime by the backend's
@@ -463,6 +520,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
+      refuseSymlinkEscapes(__dirname, devServerAllow),
       react(),
       serveGeneratedOverview(),
       serveWorkbenchLayouts(),
@@ -477,9 +535,10 @@ export default defineConfig(({ mode }) => {
     ],
     server: {
       // `ts/` itself (the default) plus the workbench data directory: the page imports the slot
-      // schema and panel element files from `_data/workbench/`. Naming that one directory, not the
-      // repository root, keeps `_private/` and every other path unreachable through `/@fs/`.
-      fs: { allow: [__dirname, workbenchDataDir] },
+      // schema and panel element files from `_data/workbench/`. Vite checks this list by path
+      // prefix only, so on its own it does not stop a symlink under either directory from serving
+      // a file elsewhere; `refuseSymlinkEscapes` (first in `plugins`) refuses those requests.
+      fs: { allow: devServerAllow },
       proxy: {
         '/api': {
           target: apiTarget,

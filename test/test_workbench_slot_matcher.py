@@ -15,6 +15,7 @@ from __future__ import annotations
 import copy
 import json
 import re
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -38,6 +39,7 @@ PANEL_ELEMENTS_SCHEMA = ROOT / "schemas" / "workbench-panel-elements.schema.json
 CASES_PATH = DATA / "matcher-cases.json"
 REGISTRY_PATH = ROOT / "ts" / "src" / "workbench" / "panelRegistry.tsx"
 TS_SRC = ROOT / "ts" / "src"
+PY_SRC = ROOT / "src"
 
 
 def _validator(path: Path) -> Draft7Validator:
@@ -237,11 +239,37 @@ def test_no_source_or_data_file_carries_a_per_panel_or_per_slot_allow_list() -> 
         text = path.read_text(encoding="utf-8")
         if re.search(r"eligible_slots|eligibleSlots|admits_panels|allowed_panels", text):
             offenders.append(path.relative_to(ROOT).as_posix())
+    for path in sorted(PY_SRC.rglob("*.py")):
+        text = path.read_text(encoding="utf-8")
+        if re.search(r"eligible_slots|admits_panels|allowed_panels", text):
+            offenders.append(path.relative_to(ROOT).as_posix())
     for path in sorted(DATA.rglob("*.json")):
         text = path.read_text(encoding="utf-8")
         if re.search(r'"(eligible_slots|admits_panels|allowed_panels)"', text):
             offenders.append(path.relative_to(ROOT).as_posix())
     assert offenders == [], f"an eligibility list is back: {offenders}"
+
+
+# --- the dev server's allow-list holds no symlink (ts/vite.config.ts server.fs.allow) ----------
+
+
+def test_no_tracked_symlink_under_the_dev_server_allow_list() -> None:
+    """`ts/vite.config.ts` lets the dev server serve `ts/` and `_data/workbench/`. Vite checks that
+    list by path prefix without resolving symlinks, so a committed symlink under either directory
+    that points elsewhere (at `_private/`, say) would be served. The config's own guard refuses such
+    a request at run time; this check refuses the symlink before it is merged."""
+    listing = subprocess.run(
+        ["git", "ls-files", "-s", "-z", "--", "ts", "_data/workbench"],
+        cwd=ROOT,
+        capture_output=True,
+        check=True,
+    ).stdout
+    entries = [entry for entry in listing.split(b"\0") if entry]
+    assert entries, "git listed no files under ts/ or _data/workbench/"
+    symlinks = [
+        entry.split(b"\t", 1)[1].decode() for entry in entries if entry.startswith(b"120000 ")
+    ]
+    assert symlinks == [], f"tracked symlinks under the dev server's allow-list: {symlinks}"
 
 
 # --- a panel never draws a top bar (ADR-031 decision 1, REQ-011 R13) ----------------------------
