@@ -1,6 +1,14 @@
 import { spawnSync } from 'node:child_process'
 import { createReadStream, existsSync, readFileSync, realpathSync, statSync } from 'node:fs'
-import { basename, extname, join, normalize, resolve, sep } from 'node:path'
+import {
+  basename,
+  extname,
+  join,
+  normalize,
+  relative as relativePath,
+  resolve,
+  sep,
+} from 'node:path'
 import { defineConfig, loadEnv, type Connect, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { marked } from 'marked'
@@ -18,10 +26,6 @@ const workbenchDataDir = join(repoRoot, '_data', 'workbench')
 // The directories the dev server may serve files from: `server.fs.allow` and
 // `refuseSymlinkEscapes` both take this one list.
 const devServerAllow = [__dirname, workbenchDataDir]
-// The symlink-resolved repo root — `serveRepositoryFiles`'s boundary check below must compare
-// against this, not the textual `repoRoot`, so a symlinked worktree checkout itself doesn't
-// widen the boundary it is meant to enforce.
-const realRepoRoot = realpathSync(repoRoot)
 
 const GENERATED_OVERVIEW_PREFIX = '/generated-overview/'
 const WORKBENCH_LAYOUTS_PREFIX = '/workbench-layouts/'
@@ -33,11 +37,18 @@ const WORKBENCH_FILE_PREFIX = '/workbench-file/'
 // points elsewhere (at `_private/`, say) is served, both through `/@fs/<absolute path>` and through
 // a root-relative URL (security review of `phase-arch-07`, 2026-10-09). The middleware is attached
 // directly in `configureServer`, so it runs before Vite's internal middlewares, and the plugin is
-// first in `plugins` below, so it runs before this file's other routes. A URL naming no existing
-// file passes through untouched, for Vite to answer as it would have. Exported for
-// `vite.config.test.ts`. `test/test_workbench_slot_matcher.py` also refuses a tracked symlink under
-// either directory, so one cannot be merged in the first place.
-export function refuseSymlinkEscapes(root: string, allow: string[]): Plugin {
+// first in `plugins` below, so it runs before this file's other routes. `routes` maps this file's
+// own URL prefixes that serve a directory inside the allow-list (`/workbench-layouts/`) to that
+// directory, so those URLs are checked too; every file-serving route below also checks the real
+// path itself, which covers `/generated-overview/`, whose `_public/` lies outside the list. A URL
+// naming no existing file passes through untouched, for Vite to answer as it would have. Exported
+// for `vite.config.test.ts`. `test/test_workbench_slot_matcher.py` also refuses a tracked symlink
+// under either directory, so one cannot be merged in the first place.
+export function refuseSymlinkEscapes(
+  root: string,
+  allow: string[],
+  routes: Record<string, string> = {},
+): Plugin {
   const allowed = allow.map((directory) => realpathSync(directory))
   const isAllowed = (path: string) =>
     allowed.some((directory) => path === directory || path.startsWith(directory + sep))
@@ -47,6 +58,9 @@ export function refuseSymlinkEscapes(root: string, allow: string[]): Plugin {
     if (urlPath.startsWith('/@fs/')) {
       const absolute = urlPath.slice('/@fs'.length)
       return [/^\/[A-Za-z]:/.test(absolute) ? absolute.slice(1) : absolute]
+    }
+    for (const [prefix, directory] of Object.entries(routes)) {
+      if (urlPath.startsWith(prefix)) return [join(directory, urlPath.slice(prefix.length))]
     }
     return [join(root, urlPath), join(root, 'public', urlPath)]
   }
@@ -81,6 +95,19 @@ export function refuseSymlinkEscapes(root: string, allow: string[]): Plugin {
   }
 }
 
+// Whether `path`, with every symlink resolved, lies inside `directory` (also resolved). The routes
+// below check this after the textual `../` check: a path can stay textually inside a directory
+// and still lead out of it through a symlink. False when either cannot be resolved.
+function realPathWithin(path: string, directory: string): boolean {
+  try {
+    const real = realpathSync(path)
+    const realDirectory = realpathSync(directory)
+    return real === realDirectory || real.startsWith(realDirectory + sep)
+  } catch {
+    return false
+  }
+}
+
 // Serves files under `_public/` at `/generated-overview/<path>` so `OverviewRegion` can embed
 // the generated overview page (its actual location is reported at runtime by the backend's
 // `overview-location` route, `src/api/routes/demo_stage.py`, not hardcoded here).
@@ -93,13 +120,14 @@ export function refuseSymlinkEscapes(root: string, allow: string[]): Plugin {
 // absent-content message the requirement calls for. Registering this middleware directly inside
 // `configureServer`/`configurePreviewServer` (rather than returning it as a post-hook function)
 // runs it before Vite's internal middlewares, so a 404 here is a real 404, not a fallback.
-function serveGeneratedOverview(): Plugin {
+// `directory` is a parameter so `vite.config.test.ts` can point the route at a scratch tree.
+export function serveGeneratedOverview(directory: string = publicDir): Plugin {
   const attach = (middlewares: Connect.Server) => {
     middlewares.use(GENERATED_OVERVIEW_PREFIX, (req, res) => {
       const requestedPath = decodeURIComponent((req.url ?? '').split('?')[0] ?? '')
-      const resolved = normalize(join(publicDir, requestedPath))
+      const resolved = normalize(join(directory, requestedPath))
       // Refuse anything that escapes `_public/` (defends against `../` traversal).
-      if (resolved !== publicDir && !resolved.startsWith(publicDir + sep)) {
+      if (resolved !== directory && !resolved.startsWith(directory + sep)) {
         res.statusCode = 403
         res.end('Forbidden')
         return
@@ -108,6 +136,11 @@ function serveGeneratedOverview(): Plugin {
         res.statusCode = 404
         res.setHeader('Content-Type', 'text/plain; charset=utf-8')
         res.end(`Generated overview page not found at ${resolved}.`)
+        return
+      }
+      if (!realPathWithin(resolved, directory)) {
+        res.statusCode = 403
+        res.end('Forbidden')
         return
       }
       res.statusCode = 200
@@ -132,12 +165,13 @@ function serveGeneratedOverview(): Plugin {
 // runtime — never bundled — matching this file's own rule for the generated overview page and
 // the existing `talking-points.json`/`demo-commands.json` runtime-fetch convention: editing a
 // shipped layout file changes the page's geometry with no frontend rebuild.
-function serveWorkbenchLayouts(): Plugin {
+// `directory` is a parameter so `vite.config.test.ts` can point the route at a scratch tree.
+export function serveWorkbenchLayouts(directory: string = workbenchLayoutsDir): Plugin {
   const attach = (middlewares: Connect.Server) => {
     middlewares.use(WORKBENCH_LAYOUTS_PREFIX, (req, res) => {
       const requestedPath = decodeURIComponent((req.url ?? '').split('?')[0] ?? '')
-      const resolved = normalize(join(workbenchLayoutsDir, requestedPath))
-      if (resolved !== workbenchLayoutsDir && !resolved.startsWith(workbenchLayoutsDir + sep)) {
+      const resolved = normalize(join(directory, requestedPath))
+      if (resolved !== directory && !resolved.startsWith(directory + sep)) {
         res.statusCode = 403
         res.end('Forbidden')
         return
@@ -146,6 +180,11 @@ function serveWorkbenchLayouts(): Plugin {
         res.statusCode = 404
         res.setHeader('Content-Type', 'text/plain; charset=utf-8')
         res.end(`Layout definition not found at ${resolved}.`)
+        return
+      }
+      if (!realPathWithin(resolved, directory)) {
+        res.statusCode = 403
+        res.end('Forbidden')
         return
       }
       res.statusCode = 200
@@ -197,8 +236,8 @@ const CONTENT_TYPE_BY_EXTENSION: Record<string, string> = {
 // ignore rules rather than a hand-kept list") applied here as this dev-server route's own
 // security boundary, independent of whatever the HTML Viewer's dropdown happens to have listed
 // (ADR-015 rule 2: "the in-app pickers ... are convenience, not the security boundary").
-function isGitIgnored(repoRelativePath: string): boolean {
-  const result = spawnSync('git', ['check-ignore', '-q', repoRelativePath], { cwd: repoRoot })
+function isGitIgnored(repoRelativePath: string, root: string): boolean {
+  const result = spawnSync('git', ['check-ignore', '-q', repoRelativePath], { cwd: root })
   return result.status === 0
 }
 
@@ -233,7 +272,8 @@ const RAW_IMAGE_QUERY_PARAM = 'raw'
 // is browser-verified, so it is left untouched.
 const RASTER_IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico'])
 
-function serveRepositoryFiles(): Plugin {
+// `root` is a parameter so `vite.config.test.ts` can point the route at a scratch repository.
+export function serveRepositoryFiles(root: string = repoRoot): Plugin {
   const attach = (middlewares: Connect.Server) => {
     middlewares.use(WORKBENCH_FILE_PREFIX, (req, res) => {
       // Split the query string off before decoding the path — `decodeURIComponent` must never see
@@ -248,8 +288,8 @@ function serveRepositoryFiles(): Plugin {
         res.end('A repository-relative file path is required.')
         return
       }
-      const resolved = normalize(join(repoRoot, relative))
-      if (resolved !== repoRoot && !resolved.startsWith(repoRoot + sep)) {
+      const resolved = normalize(join(root, relative))
+      if (resolved !== root && !resolved.startsWith(root + sep)) {
         res.statusCode = 403
         res.end('Forbidden')
         return
@@ -292,12 +332,29 @@ function serveRepositoryFiles(): Plugin {
       // confirmed the symlink chain resolves to a real file, so this cannot throw for the paths
       // that reach it.
       const realResolved = realpathSync(resolved)
-      if (realResolved !== realRepoRoot && !realResolved.startsWith(realRepoRoot + sep)) {
+      // The symlink-resolved root: the boundary check compares against this, not the textual
+      // `root`, so a symlinked worktree checkout itself doesn't widen the boundary.
+      const realRoot = realpathSync(root)
+      if (realResolved !== realRoot && !realResolved.startsWith(realRoot + sep)) {
         res.statusCode = 403
         res.end('Forbidden')
         return
       }
-      if (isGitIgnored(relative)) {
+      // The ignore and `.git` checks run on the resolved path as well as the requested one: a
+      // symlink in a tracked directory can lead to an ignored file (anything under `_private/`)
+      // or into `.git/`, and `git check-ignore` judges only the path it is given (security review
+      // of `phase-arch-07`, 2026-10-09). ADR-015 rule 3 runs it on resolved paths for this reason.
+      const realRelative = relativePath(realRoot, realResolved).split(sep).join('/')
+      if (
+        realRelative
+          .split('/')
+          .some((segment) => segment.replace(/[. ]+$/, '').toLowerCase() === '.git')
+      ) {
+        res.statusCode = 403
+        res.end('Forbidden')
+        return
+      }
+      if (isGitIgnored(relative, root) || isGitIgnored(realRelative, root)) {
         res.statusCode = 404
         res.setHeader('Content-Type', 'text/plain; charset=utf-8')
         res.end(`Not found: ${relative}`)
@@ -520,7 +577,9 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
-      refuseSymlinkEscapes(__dirname, devServerAllow),
+      refuseSymlinkEscapes(__dirname, devServerAllow, {
+        [WORKBENCH_LAYOUTS_PREFIX]: workbenchLayoutsDir,
+      }),
       react(),
       serveGeneratedOverview(),
       serveWorkbenchLayouts(),

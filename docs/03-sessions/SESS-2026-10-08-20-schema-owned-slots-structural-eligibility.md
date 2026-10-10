@@ -302,3 +302,47 @@ ruling of 2026-10-09:
 
 The owner widened the deliverables to name `ts/vite.config.test.ts` and `ts/vitest.config.ts` and
 ruled that the guard covers root-relative URLs as well as `/@fs/`.
+
+## Review round 2 (2026-10-09)
+
+On `5fe933fa` the functional gating review passed with no findings. The security stand-in
+rejected with one blocker: `/workbench-layouts/<name>` served a symlink under
+`_data/workbench/layouts/` that pointed outside, because that route checked containment textually
+and the guard did not map its prefix. An audit of every file-serving route in `ts/vite.config.ts`
+found the same gap in all three; each was reproduced live against this worktree's dev server with
+`D_SYSTEM_DEMO_TERMINAL=1` and a temporary untracked symlink, and each returned 200 with the
+target's content:
+
+- `/workbench-layouts/` (the blocker): textual check only.
+- `/generated-overview/`, which serves `_public/`: textual check only. `_public/` is outside the
+  dev server's allow-list, so the guard cannot map it; the route must check itself.
+- `/workbench-file/`, which serves any non-ignored repository file: it resolved symlinks against
+  the repository root, but ran `git check-ignore` and the `.git` segment check on the requested
+  path only, so a symlink in a tracked directory to an ignored file (`_private/` or `_working/`)
+  was served.
+
+Fixed at both layers. The guard takes a map of this config's own route prefixes to their
+directories and checks `/workbench-layouts/` through it. `realPathWithin` is a new helper, and
+`/workbench-layouts/` and `/generated-overview/` now refuse with 403 a file whose real path leaves
+their directory. `/workbench-file/` runs the `.git` check and `git check-ignore` on the resolved
+repository-relative path as well as the requested one. A `.git` target gets 403; an ignored target
+gets 404, as an ignored file already did. The three route plugins take their directory or root as
+a parameter, defaulting to the old constants, so the test can point them at a scratch tree.
+`realRepoRoot` moved into the route.
+
+`ts/vite.config.test.ts` gains four cases, seven in all:
+- A route with only a textual check serves the symlinked layout (the reproduction), and the guard's
+  prefix mapping refuses it.
+- `/workbench-layouts/` refuses its symlink and serves a real layout.
+- `/generated-overview/` refuses its symlink and serves a real page.
+- `/workbench-file/` over a scratch git repository: 404 for a symlink to an ignored file, 403 for
+  one into `.git/`, and the real file served.
+
+With the three route checks disabled, those three tests fail; restored, 7 of 7 pass. The live
+re-check on the worktree's dev server gave 404, 403 and 403 for the three symlinks, and 200 for
+`layout-1.json`, `README.md`, the generated overview page and `/`. The temporary symlinks and the
+scratch file were removed.
+
+Not acted on, pending the owner: the reviewer's major finding that the check-then-serve sequence is
+not atomic. Toggling a file under `ts/public/` between a file and a symlink crashed the dev server
+with an unhandled `ReadStream` `ENOENT` in Vite's serving path; no leak was isolated.
