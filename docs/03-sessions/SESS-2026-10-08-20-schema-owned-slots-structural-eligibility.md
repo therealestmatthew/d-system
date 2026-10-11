@@ -581,3 +581,90 @@ reviewer's case (`/data/race.svg?import&url: expected '<svg>SECRET</svg>' not to
 **Regression check on the real app**, on the worktree's backend and dev server: the live REQ-037
 check `--quick` printed `52 panel cells ... rules pass=260 fail=0 ... 0 finding(s)` and exited 0.
 The dev server log had no errors.
+
+## Review round 8 (2026-10-10)
+
+On `59121c16` the security stand-in rejected with two blockers, both within the existing rulings.
+
+**Blocker 1: a symlinked `node_modules`.** The hard-link exemption was `realpath(<root>/node_modules)`,
+so if that name was a symlink to a directory inside the allow-list (a decoy in `ts/`), hard links
+there were served: `/node_modules/leak.txt` and `/decoy/leak.txt` both returned the secret.
+
+Fixed: the exemption applies only while `<root>/node_modules` is a real directory (`lstat`, not a
+symlink). It is then the resolved root joined with `node_modules`, so the last component is never
+resolved through. If the name is a symlink, nothing is exempt. The `load` hook's pass-through uses
+the same test.
+
+A new case makes `<root>/node_modules` a symlink to a decoy holding a hard link to the secret. It
+requests both names, root-relative and through `/@fs/`, and all four get 403. Against the
+`59121c16` config it fails.
+
+**Blocker 2: `load` protected an enumerated list.** Any other query fell through to Vite's
+fallback, which reads the file by name. Under a race, `GET /data/swap.ts?foo=bar` with
+`Sec-Fetch-Dest: script` served the swapped secret module, transformed.
+
+Fixed by design. For every file inside the allow-list and outside the root's own `node_modules`,
+`load` now answers from the checked descriptor whatever the query:
+- `?raw`, `?url` and `?inline` as before;
+- otherwise the file's text, which is what Vite's fallback would have read;
+- for an asset type, its URL.
+
+A file in scope that cannot be opened is refused with an error rather than handed back. Otherwise
+a dangling symlink could be retargeted between the check and Vite's read.
+
+The one exception is `?html-proxy`. Vite's HTML plugin supplies that content from its own
+in-memory copy of an inline `<script>`, not from the file; the app's `index.html` has none.
+`?worker` and `?sharedworker` now also get the file's text, which Vite's worker plugin discards in
+dev in favour of a wrapper that names the worker URL.
+
+Three race cases with a query no plugin claims were added: `race.ts?foo=bar` and
+`race.css?foo=bar` from a module, and `race.svg?import&foo=bar`. Against the `59121c16` config the
+test fails on the first: `/data/race.ts?foo=bar: expected 'export const x = "SECRET"; …' not to
+contain 'SECRET'`.
+
+**Major: the two worker-wrapper cases.** `?worker` and `?worker&inline` cannot fail in dev, because
+the wrapper never contains the file's bytes. They are now labelled in the test as not evidence of
+protection, kept only to show the wrapper is still served while the name flips. `?worker_file` is
+the case that reads a worker's source. So of the 23 race cases, 21 can detect a leak.
+
+**A regression caught by the live check before commit.** The first version of the default-protect
+`load` treated every absolute-looking id as a file. `@vitejs/plugin-react`'s virtual module
+`/@react-refresh` therefore failed with "could not be opened": the dev server logged 23 errors and
+the live REQ-037 check exited 1. The vitest suite did not catch it, because its servers run no
+plugin with such an id.
+
+Fixed by scoping the hook: a path is in scope only if it lies inside the allow-list, as named or
+resolved. Anything else is left to the plugin that owns it, or to Vite's own `server.fs.allow`. A
+new case, "leaves a virtual module with an absolute-looking id to the plugin that owns it", runs
+a stand-in plugin with a `/@virtual-thing` id; without the scope check that test fails. The
+vitest file now has 15 cases.
+
+**Functional review of `59121c16`: one blocker and one major.**
+
+*Blocker: the guard ran in `vite build`.* Its `load` answered an asset import with the dev-server
+URL, so a build compiled `import logo from './logo.svg'` to `"/src/logo.svg"` and emitted no asset.
+The app imports no assets today, so nothing shipped broken, but the defect was latent.
+
+Fixed: the plugin is `apply: 'serve'`. A new case runs a real `vite.build()` with the guard
+installed, on a fixture whose module imports an SVG both plainly and with `?url`, with
+`assetsInlineLimit: 0`. It asserts `dist/assets/logo-*.svg` exists and that the built JavaScript
+references `/assets/logo-…` and never `/src/logo.svg`. Without `apply: 'serve'` it fails ("assets:
+index-….js: expected undefined to be defined").
+
+*Major: killing the top-level test run left its pool worker racing.* The toggler watched only its
+direct parent, the Vitest worker. When the top-level `vitest` (or `npx`) was killed, the worker
+survived, orphaned, and went on starting new race cases.
+
+Fixed: the worker reads its ancestors from `/proc` on Linux: its parent, the top-level `vitest`,
+`npm exec`, and so on up to init. On other platforms only the direct parent is known. The worker
+passes that list to each toggler. Both the toggler and the race loop stop as soon as any ancestor
+is gone, counting a zombie as gone. The race loop then throws "the test run was killed", and its
+`finally` blocks kill the toggler and remove the tree.
+
+A new case kills a stand-in top-level process whose stand-in worker survives, and the toggler
+still ends within 5 s. By hand, `kill -9` of the real `npm exec vitest` about 6 s into the race
+test ended the toggler within 1 s. The orphaned worker failed the case with "Error: the test run
+was killed" and the run ended, leaving no Vitest or toggler process and no tree.
+
+The guarantee as built: on Linux, the race stops when any ancestor of the test worker ends;
+elsewhere, when the worker's direct parent does. The vitest file now has 17 cases.

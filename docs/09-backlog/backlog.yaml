@@ -8880,7 +8880,10 @@ items:
     with more than one hard link is refused (403), except under the root package directory
     (ts/node_modules, anchored in round 5), where package managers make them. Round 7 (owner
     ruling): asset and worker import queries (?raw, ?url, ?inline, ?worker_file, asset ?import) are
-    answered from the checked descriptor too; 20 race cases, 0 leaks where 11 had leaked.'
+    answered from the checked descriptor too; 20 race cases, 0 leaks where 11 had leaked. Round 8:
+    load answers every in-scope file from the checked descriptor whatever its query (default
+    protect, only ?html-proxy excepted), and the hard-link exemption needs a real, unsymlinked
+    root node_modules.'
 - id: phase-arch-08
   title: Multi-instance panel identity across layout, storage, registry and sessions
   plan: doc-workbench-architecture-quality

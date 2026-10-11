@@ -10,8 +10,10 @@
 // rather than through Vite's.
 import { execFileSync, spawn } from 'node:child_process'
 import {
+  existsSync,
   linkSync,
   mkdirSync,
+  readdirSync,
   mkdtempSync,
   readFileSync,
   realpathSync,
@@ -21,7 +23,7 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { extname, join } from 'node:path'
-import { createServer, type Connect, type Plugin, type ViteDevServer } from 'vite'
+import { build, createServer, type Connect, type Plugin, type ViteDevServer } from 'vite'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
   refuseSymlinkEscapes,
@@ -145,6 +147,58 @@ describe('refuseSymlinkEscapes', () => {
   })
 })
 
+describe('a production build', () => {
+  it('emits an imported asset and references it, with the guard installed', async () => {
+    // The guard is for the dev server (`apply: 'serve'`); a build must emit assets as it would
+    // without it.
+    const app = join(base, 'app')
+    const dist = join(base, 'dist')
+    mkdirSync(join(app, 'src'), { recursive: true })
+    writeFileSync(join(app, 'src', 'logo.svg'), '<svg xmlns="http://www.w3.org/2000/svg"></svg>')
+    writeFileSync(
+      join(app, 'src', 'main.ts'),
+      'import a from "./logo.svg"\nimport b from "./logo.svg?url"\n' +
+        'document.body.dataset.a = a\ndocument.body.dataset.b = b\n',
+    )
+    writeFileSync(
+      join(app, 'index.html'),
+      '<!doctype html><script type="module" src="/src/main.ts"></script>',
+    )
+    await build({
+      configFile: false,
+      root: app,
+      logLevel: 'silent',
+      plugins: [refuseSymlinkEscapes(app, [app])],
+      build: { outDir: dist, assetsInlineLimit: 0, emptyOutDir: true },
+    })
+    const assets = readdirSync(join(dist, 'assets'))
+    const logo = assets.find((name) => /^logo-.*\.svg$/.test(name))
+    expect(logo, `assets: ${assets.join(', ')}`).toBeDefined()
+    const scripts = assets.filter((name) => name.endsWith('.js'))
+    const code = scripts.map((name) => readFileSync(join(dist, 'assets', name), 'utf-8')).join('')
+    expect(code).toContain(`/assets/${logo}`)
+    expect(code).not.toContain('/src/logo.svg')
+  }, 60_000)
+})
+
+describe('modules that are not files', () => {
+  it('leaves a virtual module with an absolute-looking id to the plugin that owns it', async () => {
+    // As `@vitejs/plugin-react` does with `/@react-refresh`: an id that looks like an absolute
+    // path but names no file. The guard's `load` must not claim it.
+    const virtual: Plugin = {
+      name: 'virtual-module',
+      resolveId: (id) => (id === '/@virtual-thing' ? id : null),
+      load: (id) => (id === '/@virtual-thing' ? 'export default "VIRTUAL"' : null),
+    }
+    writeFileSync(join(data, 'uses.ts'), 'import v from "/@virtual-thing"\nexport default v')
+    const get = await serve([refuseSymlinkEscapes(site, [site]), virtual])
+    const module = await get('/@virtual-thing', { accept: '*/*', 'sec-fetch-dest': 'script' })
+    expect(module.status).toBe(200)
+    expect(await module.text()).toContain('VIRTUAL')
+    expect((await get('/data/uses.ts')).status).toBe(200)
+  })
+})
+
 describe("the config's own file routes check the real path", () => {
   it('/workbench-layouts/ refuses a symlink that leads out of its directory', async () => {
     const get = await serve([serveWorkbenchLayouts(join(data, 'layouts'))])
@@ -189,20 +243,33 @@ describe("the config's own file routes check the real path", () => {
 
 // A child process that renames a regular file and a symlink to an outside file over one name, as
 // fast as it can, until it is told to stop, then prints how many swaps it made. It also exits on
-// its own at its deadline, and as soon as its parent is gone (its stdin pipe ends, or its parent
-// process id changes), so a test run that is killed or crashes cannot leave it spinning.
+// its own at its deadline, as soon as its parent is gone (its stdin pipe ends, or its parent
+// process id changes), and as soon as any process in `watch` (the test worker's ancestors, see
+// `ancestors`) is gone, so a test run that is killed or crashes cannot leave it spinning.
 const TOGGLER = `
-const { renameSync, rmSync, symlinkSync, writeFileSync } = require('node:fs')
-const [target, secret, publicText, deadlineMs] = process.argv.slice(1)
+const { readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } = require('node:fs')
+const [target, secret, publicText, deadlineMs, watchList = ''] = process.argv.slice(1)
 const deadline = Date.now() + Number(deadlineMs)
 const parent = process.ppid
+const watch = watchList.split(',').filter(Boolean).map(Number)
+const { existsSync } = require('node:fs')
+const alive = (pid) => { try { process.kill(pid, 0); return true } catch { return false } }
+const gone = (pid) => {
+  if (!existsSync('/proc/self')) return !alive(pid)
+  try {
+    const stat = readFileSync('/proc/' + pid + '/stat', 'utf-8')
+    return stat.slice(stat.lastIndexOf(')') + 2, stat.lastIndexOf(')') + 3) === 'Z'
+  } catch {
+    return true
+  }
+}
 let swaps = 0
 let stop = false
 process.stdin.on('data', () => { stop = true })
 process.stdin.on('end', () => process.exit(0))
 process.stdin.on('error', () => process.exit(0))
 const step = () => {
-  if (process.ppid !== parent || Date.now() > deadline) process.exit(0)
+  if (process.ppid !== parent || Date.now() > deadline || watch.some(gone)) process.exit(0)
   for (let i = 0; i < 200 && !stop; i += 1) {
     const temporary = target + '.swap' + (swaps % 2)
     rmSync(temporary, { force: true })
@@ -223,11 +290,47 @@ step()
 
 const TOGGLER_DEADLINE_MS = 10_000
 
+// Whether `pid` has ended: absent, or (on Linux) a zombie waiting to be reaped, which
+// `process.kill(pid, 0)` alone would still report as alive.
+function isGone(pid: number): boolean {
+  if (!existsSync('/proc/self')) return !isAlive(pid)
+  try {
+    const stat = readFileSync(`/proc/${pid}/stat`, 'utf-8')
+    return stat.slice(stat.lastIndexOf(')') + 2, stat.lastIndexOf(')') + 3) === 'Z'
+  } catch {
+    return true
+  }
+}
+
+// The process ids above this one, nearest first, up to but not including init: the Vitest worker's
+// parent, the top-level `vitest` it was forked from, `npx`, and so on. Killing any of them must end
+// the race. Read from `/proc` on Linux; elsewhere only the direct parent is known.
+function ancestors(): number[] {
+  const found: number[] = []
+  let pid = process.ppid
+  while (pid > 1 && found.length < 32) {
+    found.push(pid)
+    try {
+      const stat = readFileSync(`/proc/${pid}/stat`, 'utf-8')
+      pid = Number(stat.slice(stat.lastIndexOf(')') + 2).split(' ')[1])
+    } catch {
+      break
+    }
+  }
+  return found
+}
+
 // Runs `body` while a toggler flips `target`; `stop` ends the toggler and returns its swap count.
 // Whatever `body` does, the toggler is killed and waited for before this returns or throws, and
 // `onSpawn` sees its process id, so a test can check that none survives.
 async function withToggler<T>(
-  args: { target: string; secret: string; publicText: string; deadlineMs?: number },
+  args: {
+    target: string
+    secret: string
+    publicText: string
+    deadlineMs?: number
+    watch?: number[]
+  },
   body: (stop: () => Promise<number>) => Promise<T>,
   onSpawn: (pid: number) => void = () => {},
 ): Promise<T> {
@@ -239,6 +342,7 @@ async function withToggler<T>(
     args.secret,
     args.publicText,
     deadline,
+    (args.watch ?? ancestors()).join(','),
   ])
   if (toggler.pid !== undefined) onSpawn(toggler.pid)
   let output = ''
@@ -312,6 +416,46 @@ describe('the race test cleans up after itself', () => {
       expect(Date.now() - started).toBeLessThan(5_000)
     } finally {
       toggler.kill('SIGKILL')
+    }
+  })
+
+  it('exits when the top-level test run is killed, though the worker survives it', async () => {
+    const target = join(data, 'flip.txt')
+    writeFileSync(target, 'PUBLIC')
+    // Stand-ins for the top-level `vitest` and its pool worker. Killing the top level leaves the
+    // worker running, orphaned, as Vitest's own worker is; the toggler, which watches the
+    // worker's ancestors, must end anyway.
+    const top = spawn(process.execPath, [
+      '-e',
+      `const { spawn } = require('node:child_process')
+       const worker = spawn(process.execPath, ['-e', process.argv[1], ...process.argv.slice(2)],
+         { stdio: ['ignore', 'pipe', 'ignore'] })
+       worker.stdout.pipe(process.stdout)
+       setInterval(() => {}, 1000)`,
+      `const { spawn } = require('node:child_process')
+       const t = spawn(process.execPath, ['-e', process.argv[1], ...process.argv.slice(2, 6),
+         String(process.ppid)], { stdio: ['pipe', 'ignore', 'ignore'] })
+       process.stdout.write(process.pid + ' ' + t.pid + '\\n')
+       setTimeout(() => process.exit(0), 20000)`,
+      TOGGLER,
+      target,
+      join(base, 'outside', 'secret.txt'),
+      'PUBLIC',
+      '60000',
+    ])
+    const [workerPid, togglerPid] = await new Promise<number[]>((resolve) =>
+      top.stdout.once('data', (chunk: Buffer) =>
+        resolve(chunk.toString().trim().split(' ').map(Number)),
+      ),
+    )
+    try {
+      expect(isAlive(togglerPid)).toBe(true)
+      top.kill('SIGKILL')
+      expect(await waitUntilDead(togglerPid, 5_000)).toBe(true)
+      expect(isAlive(workerPid), 'the stand-in worker outlives the top level').toBe(true)
+    } finally {
+      top.kill('SIGKILL')
+      for (const pid of [workerPid, togglerPid]) if (isAlive(pid)) process.kill(pid, 'SIGKILL')
     }
   })
 
@@ -399,6 +543,26 @@ describe('hard links (security review, 2026-10-09)', () => {
     }
   })
 
+  it('grants no exemption when the root node_modules is a symlink', async () => {
+    // `<root>/node_modules` pointing at a decoy inside the allow-list must not make the decoy's
+    // hard links servable, under either name.
+    const decoy = join(site, 'decoy')
+    mkdirSync(decoy)
+    linkSync(join(base, 'outside', 'secret.txt'), join(decoy, 'leak.txt'))
+    symlinkSync(decoy, join(site, 'node_modules'))
+    const get = await serve([refuseSymlinkEscapes(site, [site])])
+    for (const path of [
+      '/node_modules/leak.txt',
+      '/decoy/leak.txt',
+      `/@fs${site}/node_modules/leak.txt`,
+      `/@fs${decoy}/leak.txt`,
+    ]) {
+      const response = await get(path)
+      expect(response.status, path).toBe(403)
+      expect(await response.text(), path).not.toContain('SECRET')
+    }
+  })
+
   it("still serves a hard-linked file under the root's own node_modules", async () => {
     const pkg = join(site, 'node_modules', 'pkg')
     mkdirSync(pkg, { recursive: true })
@@ -428,6 +592,7 @@ describe('serving under concurrent renames (check-then-serve race)', () => {
       const svg = ['<svg>PUBLIC</svg>', '<svg>SECRET</svg>']
       const css = ['body{} /* PUBLIC */', 'body{} /* SECRET */']
       const js = ['self.onmessage = () => {} // PUBLIC', 'self.onmessage = () => {} // SECRET']
+      const ts = ['export const x: string = "PUBLIC"', 'export const x: string = "SECRET"']
       type RaceCase = [string, string, string[], Record<string, string>?]
       const cases: RaceCase[] = [
         ['data/layouts/race.json', `${LAYOUTS}race.json`, ['{}', 'SECRET']],
@@ -436,7 +601,7 @@ describe('serving under concurrent renames (check-then-serve race)', () => {
         ['site/public/race.txt', '/race.txt', ['PUBLIC', 'SECRET']],
         ['site/data/race.txt', '/@fs<site>/data/race.txt', ['PUBLIC', 'SECRET']],
         ['site/data/race.txt', '/data/race.txt?raw', ['PUBLIC', 'SECRET']],
-        ['site/data/race.ts', '/data/race.ts', ['export {}', 'export default "SECRET"']],
+        ['site/data/race.ts', '/data/race.ts', ts],
         ['site/race.html', '/race.html', ['<p>PUBLIC</p>', 'SECRET']],
         // Import queries Vite's asset and worker plugins would answer by reading the name: the
         // security review's case (`?import&url` fetched directly) first, then each from a module.
@@ -449,9 +614,18 @@ describe('serving under concurrent renames (check-then-serve race)', () => {
         ['site/data/race.css', '/data/race.css?inline', css],
         ['site/data/race.css', '/data/race.css?url', css, fromModule],
         ['site/data/race.css', '/data/race.css?raw', css],
+        ['site/data/race.js', '/data/race.js?worker_file&type=module', js, fromWorker],
+        // A query no plugin claims: `load` must still answer from the checked descriptor, for a
+        // module, a stylesheet and an asset alike.
+        ['site/data/race.ts', '/data/race.ts?foo=bar', ts, fromModule],
+        ['site/data/race.css', '/data/race.css?foo=bar', css, fromModule],
+        ['site/data/race.svg', '/data/race.svg?import&foo=bar', svg, fromModule],
+        // Not evidence of protection: in dev, Vite's worker wrapper only names the worker's URL
+        // and never contains the file's bytes, so these two cannot fail. They are kept to show
+        // the wrapper is still served while the name flips; `?worker_file` above is the case
+        // that reads the worker's source.
         ['site/data/race.js', '/data/race.js?worker', js, fromModule],
         ['site/data/race.js', '/data/race.js?worker&inline', js, fromModule],
-        ['site/data/race.js', '/data/race.js?worker_file&type=module', js, fromWorker],
       ]
       for (const [relative, url, [publicText, secretText], headers] of cases) {
         const tree = realpathSync(mkdtempSync(join(base, 'race-')))
@@ -483,7 +657,10 @@ describe('serving under concurrent renames (check-then-serve race)', () => {
         try {
           const swaps = await withToggler({ target, secret, publicText }, async (stop) => {
             const until = Date.now() + 1200
+            const watched = ancestors()
             while (Date.now() < until) {
+              // A killed test run leaves this worker behind; stop rather than start more races.
+              if (watched.some(isGone)) throw new Error('the test run was killed')
               const bodies = await Promise.all(
                 Array.from({ length: 16 }, () =>
                   get(path, headers).then((response) => response.text()),

@@ -309,10 +309,21 @@ export function refuseSymlinkEscapes(
   routes: Record<string, string> = {},
 ): Plugin {
   // The root's own package directory, the only place a hard-linked file is served from (see
-  // `openOnce`), and the only `node_modules` whose modules `load` leaves to Vite.
+  // `openOnce`), and the only `node_modules` whose modules `load` leaves to Vite. It counts only
+  // while `<root>/node_modules` is a real directory: if that name is a symlink, which could point
+  // at any directory inside the allow-list, nothing is exempt. The resolved root is joined with
+  // the name, so the last component is never resolved through.
   const packages = join(root, 'node_modules')
   let config: ResolvedConfig | undefined
-  const packageDirectories = () => realDirectories([packages])
+  const packageDirectories = (): string[] => {
+    const entry = lstatSync(packages, { throwIfNoEntry: false })
+    if (!entry?.isDirectory()) return []
+    try {
+      return [join(realpathSync(root), 'node_modules')]
+    } catch {
+      return []
+    }
+  }
   // The files a request URL can name, in the order Vite looks: an absolute path after `/@fs`, a
   // route's own directory, or a path under the root's `public/` directory and then the root.
   const candidates = (urlPath: string): string[] => {
@@ -337,6 +348,10 @@ export function refuseSymlinkEscapes(
 
   return {
     name: 'refuse-symlink-escapes',
+    // The dev server only. A build reads files itself and emits them, and this plugin's `load`
+    // answers an asset import with its dev-server URL, which in a build would leave the asset
+    // unemitted and the reference pointing at a path that does not exist in `dist/`.
+    apply: 'serve',
     enforce: 'pre',
     configureServer(server) {
       // The file watcher reports a name that changes between a file and a symlink faster than it
@@ -450,30 +465,39 @@ export function refuseSymlinkEscapes(
     configResolved(resolved) {
       config = resolved
     },
-    // Supplies the bytes of a source module, a worker's source, and the asset queries Vite's
-    // asset plugin would otherwise answer by reading the file by its name, all from a checked
-    // descriptor. `?worker` and `?sharedworker` are left to Vite's worker plugin: its module only
-    // names the worker's URL, whose own request (`?worker_file`) comes back here.
+    // Supplies the bytes of every file inside the allow-list, outside the root's own
+    // `node_modules`, that Vite's pipeline loads, whatever its query, from a checked descriptor:
+    // for such a file `load` never hands the read back to Vite. By default the file's text, which
+    // is what Vite's own fallback would read, or for an asset type its URL; `?raw`, `?url` and
+    // `?inline` as Vite's asset plugin answers them. `?worker` and `?sharedworker` get the text
+    // too; in dev Vite's worker plugin replaces it with a wrapper that only names the worker's URL.
+    // The one exception is `?html-proxy`, whose content Vite's HTML plugin takes from its own
+    // in-memory copy of an inline script, not from the file.
     load(id) {
       const questionMark = id.indexOf('?')
       const path = questionMark === -1 ? id : id.slice(0, questionMark)
       const params = new URLSearchParams(questionMark === -1 ? '' : id.slice(questionMark + 1))
       if (path.includes('\0') || !isAbsolute(path)) return null
-      if (isWithin(path, packageDirectories()) || isWithin(path, [packages])) return null
+      // In scope is a path inside the allow-list, as named or resolved. Anything else (a virtual
+      // module with an absolute-looking id such as `/@react-refresh`, or a file elsewhere, which
+      // Vite's own `server.fs.allow` governs) is not this hook's to answer.
+      const allowed = realDirectories(allow)
+      if (!isWithin(path, allow) && !isWithin(path, allowed)) return null
+      const packageDirs = packageDirectories()
+      if (isWithin(path, packageDirs) || (packageDirs.length > 0 && isWithin(path, [packages]))) {
+        return null
+      }
+      if (params.has('html-proxy')) return null
       const extension = extname(path).toLowerCase()
-      const keys = [...params.keys()]
-      let reads: AssetQuery | 'text' | null
-      if (params.has('worker') || params.has('sharedworker')) return null
-      else if (assetQueryOf(params) !== null) reads = assetQueryOf(params)
-      else if (params.has('worker_file')) reads = 'text'
-      else if (keys.length === 0 && LOADED_EXTENSIONS.has(extension)) reads = 'text'
-      else if (keys.length === 0 && config?.assetsInclude(path)) reads = 'url'
-      else if (keys.every((key) => key === 'direct' || key === 'used')) {
-        reads = LOADED_EXTENSIONS.has(extension) ? 'text' : null
-      } else reads = null
-      if (reads === null) return null
-      const file = openChecked(path, realDirectories(allow), packageDirectories())
-      if (file === 'absent') return null
+      const textual =
+        params.has('worker_file') ||
+        LOADED_EXTENSIONS.has(extension) ||
+        config?.assetsInclude(path) !== true
+      const reads: AssetQuery | 'text' = assetQueryOf(params) ?? (textual ? 'text' : 'url')
+      const file = openChecked(path, allowed, packageDirs)
+      // Nothing usable there now: refused rather than handed to Vite, which would open the name
+      // again and could find something else.
+      if (file === 'absent') throw new Error(`${id} could not be opened.`)
       if (file === 'forbidden') {
         throw new Error(`Refused: ${id} leads outside the directories the dev server may serve.`)
       }
