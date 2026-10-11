@@ -668,3 +668,14 @@ was killed" and the run ended, leaving no Vitest or toggler process and no tree.
 
 The guarantee as built: on Linux, the race stops when any ancestor of the test worker ends;
 elsewhere, when the worker's direct parent does. The vitest file now has 17 cases.
+
+**Records for `59121c16`**, committed unchanged in `e44c4797`:
+- functional reject, whose blocker and major are fixed above;
+- security reject, whose two blockers and major are fixed above;
+- review-judge shadow pass with one minor, which is accepted.
+
+The minor says a bare direct `?worker` fetch is untested. A direct `?worker` request is a
+JavaScript request, so Vite transforms it into the same wrapper as the module case, and in dev
+that wrapper only names the worker's URL. A race case for it could not fail, like the two
+`?worker` cases already labelled as non-evidence. The worker's own bytes are covered by the
+`?worker_file` case.
