@@ -1,0 +1,39 @@
+{
+  "verdict_id": "2026-10-10-phase-arch-07-demo-adversary-2",
+  "date": "2026-10-10",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "59121c16f5b3b7d3908742d375ba4630799095a5",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "The hard-link exemption anchor resolves through <root>/node_modules, so a node_modules symlinked to a decoy inside the allow-list exempts hard links there.",
+      "evidence": "ts/vite.config.ts:311-315 and :134. /node_modules/leak.txt and /decoy/leak.txt returned 200 with the outside file.",
+      "consequence": "Hard-link disclosure for anyone able to replace node_modules with a symlink."
+    },
+    {
+      "id": "F02",
+      "severity": "blocker",
+      "title": "load() protects an enumerated list of query shapes; any other query falls through to Vite reading the file by name, which leaks under a swap race.",
+      "evidence": "ts/vite.config.ts:457-474 reads = null fallback; Vite loadAndTransform readFile. GET /data/swap.ts?foo=bar under a toggler served the transformed secret module.",
+      "consequence": "The import-query race is not closed in general."
+    },
+    {
+      "id": "F03",
+      "severity": "major",
+      "title": "The ?worker and ?worker&inline race cases cannot fail in dev, because the worker wrapper never contains the loaded bytes.",
+      "evidence": "Vite worker plugin transform in serve mode returns a wrapper computed from the id.",
+      "consequence": "Two of twenty race cases are not evidence."
+    }
+  ],
+  "raw_reply_sha256": "e1d65342a7d0d038db6140cc4a7e49198bf3155eabf6f1d023256153951b90a5",
+  "notes": "Rounds 6+7 security review standing in for /security-review, dispatched by the Session Manager in its own scratch clone at 59121c16 with live probing. All three fixed in round 8 (2bb3f63d). Raw reply at _working/session-manager/review-replies/phase-arch-07-59121c16-security-demo-adversary.md."
+}
