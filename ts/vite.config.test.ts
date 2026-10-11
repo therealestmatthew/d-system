@@ -20,7 +20,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { extname, join } from 'node:path'
 import { createServer, type Connect, type Plugin, type ViteDevServer } from 'vite'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
@@ -80,7 +80,7 @@ afterEach(async () => {
 async function serve(
   plugins: Plugin[],
   root: string = site,
-): Promise<(path: string) => Promise<Response>> {
+): Promise<(path: string, headers?: Record<string, string>) => Promise<Response>> {
   const server = await createServer({
     configFile: false,
     root,
@@ -93,7 +93,7 @@ async function serve(
   await server.listen()
   const address = server.httpServer?.address()
   if (address === null || typeof address !== 'object') throw new Error('no listening address')
-  return (path) => fetch(`http://127.0.0.1:${address.port}${path}`)
+  return (path, headers) => fetch(`http://127.0.0.1:${address.port}${path}`, { headers })
 }
 
 describe('refuseSymlinkEscapes', () => {
@@ -422,17 +422,38 @@ describe('serving under concurrent renames (check-then-serve race)', () => {
     const record = (error: unknown) => uncaught.push(error)
     process.on('uncaughtException', record)
     try {
-      const cases: [string, string, string][] = [
-        ['data/layouts/race.json', `${LAYOUTS}race.json`, '{}'],
-        ['pub/race.html', '/generated-overview/race.html', 'PUBLIC'],
-        ['repo/docs/race.txt', '/workbench-file/docs/race.txt', 'PUBLIC'],
-        ['site/public/race.txt', '/race.txt', 'PUBLIC'],
-        ['site/data/race.txt', '/@fs<site>/data/race.txt', 'PUBLIC'],
-        ['site/data/race.txt', '/data/race.txt?raw', 'PUBLIC'],
-        ['site/data/race.ts', '/data/race.ts', 'export {}'],
-        ['site/race.html', '/race.html', '<p>PUBLIC</p>'],
+      // The browser's headers for a module import, and for a worker's own script.
+      const fromModule = { accept: '*/*', 'sec-fetch-dest': 'script' }
+      const fromWorker = { 'sec-fetch-dest': 'worker' }
+      const svg = ['<svg>PUBLIC</svg>', '<svg>SECRET</svg>']
+      const css = ['body{} /* PUBLIC */', 'body{} /* SECRET */']
+      const js = ['self.onmessage = () => {} // PUBLIC', 'self.onmessage = () => {} // SECRET']
+      type RaceCase = [string, string, string[], Record<string, string>?]
+      const cases: RaceCase[] = [
+        ['data/layouts/race.json', `${LAYOUTS}race.json`, ['{}', 'SECRET']],
+        ['pub/race.html', '/generated-overview/race.html', ['PUBLIC', 'SECRET']],
+        ['repo/docs/race.txt', '/workbench-file/docs/race.txt', ['PUBLIC', 'SECRET']],
+        ['site/public/race.txt', '/race.txt', ['PUBLIC', 'SECRET']],
+        ['site/data/race.txt', '/@fs<site>/data/race.txt', ['PUBLIC', 'SECRET']],
+        ['site/data/race.txt', '/data/race.txt?raw', ['PUBLIC', 'SECRET']],
+        ['site/data/race.ts', '/data/race.ts', ['export {}', 'export default "SECRET"']],
+        ['site/race.html', '/race.html', ['<p>PUBLIC</p>', 'SECRET']],
+        // Import queries Vite's asset and worker plugins would answer by reading the name: the
+        // security review's case (`?import&url` fetched directly) first, then each from a module.
+        ['site/data/race.svg', '/data/race.svg?import&url', svg],
+        ['site/data/race.svg', '/data/race.svg?import&url', svg, fromModule],
+        ['site/data/race.svg', '/data/race.svg?import&inline', svg, fromModule],
+        ['site/data/race.svg', '/data/race.svg?import&raw', svg, fromModule],
+        ['site/data/race.svg', '/data/race.svg?import', svg, fromModule],
+        ['site/data/race.css', '/data/race.css?inline', css, fromModule],
+        ['site/data/race.css', '/data/race.css?inline', css],
+        ['site/data/race.css', '/data/race.css?url', css, fromModule],
+        ['site/data/race.css', '/data/race.css?raw', css],
+        ['site/data/race.js', '/data/race.js?worker', js, fromModule],
+        ['site/data/race.js', '/data/race.js?worker&inline', js, fromModule],
+        ['site/data/race.js', '/data/race.js?worker_file&type=module', js, fromWorker],
       ]
-      for (const [relative, url, publicText] of cases) {
+      for (const [relative, url, [publicText, secretText], headers] of cases) {
         const tree = realpathSync(mkdtempSync(join(base, 'race-')))
         const raceSite = join(tree, 'site')
         const layouts = join(raceSite, 'data', 'layouts')
@@ -443,8 +464,10 @@ describe('serving under concurrent renames (check-then-serve race)', () => {
         mkdirSync(join(tree, 'outside'))
         execFileSync('git', ['init', '--quiet'], { cwd: join(tree, 'repo') })
         writeFileSync(join(raceSite, 'index.html'), '<!doctype html><title>t</title>')
-        const secret = join(tree, 'outside', relative.endsWith('.ts') ? 'secret.ts' : 'secret.txt')
-        writeFileSync(secret, relative.endsWith('.ts') ? 'export default "SECRET"' : 'SECRET')
+        const secret = join(tree, 'outside', `secret${extname(relative)}`)
+        writeFileSync(secret, secretText)
+        // The secret as served raw, or inside a data URL.
+        const encoded = Buffer.from(secretText).toString('base64')
         const target = join(tree, relative.replace(/^data\//, 'site/data/'))
         writeFileSync(target, publicText)
         const get = await serve(
@@ -462,9 +485,14 @@ describe('serving under concurrent renames (check-then-serve race)', () => {
             const until = Date.now() + 1200
             while (Date.now() < until) {
               const bodies = await Promise.all(
-                Array.from({ length: 16 }, () => get(path).then((response) => response.text())),
+                Array.from({ length: 16 }, () =>
+                  get(path, headers).then((response) => response.text()),
+                ),
               )
-              for (const body of bodies) expect(body, url).not.toContain('SECRET')
+              for (const body of bodies) {
+                expect(body, url).not.toContain('SECRET')
+                expect(body, url).not.toContain(encoded)
+              }
             }
             return stop()
           })

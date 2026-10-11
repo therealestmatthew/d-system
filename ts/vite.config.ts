@@ -21,7 +21,14 @@ import {
   resolve,
   sep,
 } from 'node:path'
-import { defineConfig, loadEnv, type Connect, type Plugin } from 'vite'
+import {
+  defineConfig,
+  loadEnv,
+  type Connect,
+  type Plugin,
+  type ResolvedConfig,
+  type ViteDevServer,
+} from 'vite'
 import react from '@vitejs/plugin-react'
 import { marked } from 'marked'
 
@@ -209,6 +216,57 @@ const LOADED_EXTENSIONS = new Set([
   '.json',
 ])
 
+// The import queries Vite's asset plugin answers by reading the file by its name: `?raw` (the
+// text), `?url` (where it is served) and `?inline` (its bytes as a data URL, or for CSS its text).
+type AssetQuery = 'raw' | 'url' | 'inline'
+
+function assetQueryOf(params: URLSearchParams): AssetQuery | null {
+  if (params.has('raw')) return 'raw'
+  if (params.has('url')) return 'url'
+  if (params.has('inline')) return 'inline'
+  return null
+}
+
+const CSS_EXTENSIONS = new Set(['.css', '.scss', '.sass', '.less', '.styl', '.pcss', '.postcss'])
+
+// The URL the dev server serves `path` at: root-relative inside the root, `/@fs/` elsewhere.
+function devUrl(path: string, root: string): string {
+  const forward = (value: string) => value.split(sep).join('/')
+  if (isWithin(path, [root])) return '/' + forward(relativePath(root, path))
+  const absolute = forward(path)
+  return '/@fs' + (absolute.startsWith('/') ? absolute : '/' + absolute)
+}
+
+// Hands an import request to Vite's transform pipeline directly and sends the module it builds.
+// Vite's own middleware first asks whether it may serve the URL and, for an asset URL no module has
+// imported yet, falls back to its static server, which reads the file by its name; going to the
+// pipeline directly skips that, and the pipeline reads the file only through `load` below.
+function sendTransformed(
+  server: ViteDevServer,
+  url: string,
+  res: ServerResponse,
+  next: (error?: unknown) => void,
+): void {
+  const [pathPart, query = ''] = url.split('?')
+  const params = new URLSearchParams(query)
+  params.delete('import')
+  const rest = params.toString().replace(/=(?=&|$)/g, '')
+  server
+    .transformRequest(decodeURI(pathPart ?? '') + (rest ? `?${rest}` : ''))
+    .then((result) => {
+      if (result === null) {
+        res.statusCode = 404
+        res.end('Not found')
+        return
+      }
+      res.statusCode = 200
+      res.setHeader('Content-Type', 'text/javascript')
+      res.setHeader('Cache-Control', 'no-cache')
+      res.end(result.code)
+    })
+    .catch(next)
+}
+
 // Keeps the dev server from serving any file that, symlinks resolved, lies outside the directories
 // it may serve, or that a hard link names from inside them (see `openOnce`), by any route and
 // under concurrent renames. Vite's own `server.fs.allow` check
@@ -222,8 +280,10 @@ const LOADED_EXTENSIONS = new Set([
 //   itself from a checked descriptor, so Vite never reopens the name. For anything else it opens
 //   and checks the file, refusing it with 403 if it leads outside, and then hands the request on.
 // - A `load` hook (`enforce: 'pre'`) that gives Vite's transform pipeline the bytes of a source
-//   module (`LOADED_EXTENSIONS`, outside the root's own `node_modules`) or of a `?raw` import from
-//   a checked descriptor, so a module cannot be swapped between that check and Vite's read either.
+//   module (`LOADED_EXTENSIONS`, outside the root's own `node_modules`), of a worker's source and
+//   of an asset query from a checked descriptor, so a module cannot be swapped between that check
+//   and Vite's read either. An asset query or asset `?import` request never reaches Vite's own
+//   serving-access check, which for an un-imported URL falls back to sending the file by name.
 // - A second middleware, after Vite's single-page fallback, that serves `.html` pages from a
 //   checked descriptor through Vite's HTML transform.
 // - `routes` maps this file's own URL prefixes that serve a directory inside the allow-list
@@ -234,11 +294,11 @@ const LOADED_EXTENSIONS = new Set([
 // Every request that names a file is checked by the first middleware, so a symlink leading
 // outside is refused (403) on every route, `node_modules` and every import query included, and so
 // is a hard link anywhere but the root's own `node_modules` (`<root>/node_modules`, resolved; a
-// directory elsewhere that is merely named `node_modules` gets no exemption). Two kinds of request
-// are checked there but then read again by name by Vite or the plugin that owns them, so they are
-// not protected against a swap between the check and the read: source modules under the root's
-// own `node_modules` (`load` passes them through; npm writes that directory), and import queries
-// other than `?raw` (`?inline`, `?worker`, `?url`). A URL naming no existing
+// directory elsewhere that is merely named `node_modules` gets no exemption). Asset and worker
+// import queries are answered from a checked descriptor too (the middleware and `load`). One kind
+// of request is checked there but then read again by name by Vite, so it is not protected against
+// a swap between the check and the read: files under the root's own `node_modules`, which npm
+// writes and whose handling is left as Vite's. A URL naming no existing
 // file passes through untouched, for Vite to answer as it would have. Exported for
 // `vite.config.test.ts`.
 // `test/test_workbench_slot_matcher.py` also refuses a tracked symlink under either directory, so
@@ -251,6 +311,7 @@ export function refuseSymlinkEscapes(
   // The root's own package directory, the only place a hard-linked file is served from (see
   // `openOnce`), and the only `node_modules` whose modules `load` leaves to Vite.
   const packages = join(root, 'node_modules')
+  let config: ResolvedConfig | undefined
   const packageDirectories = () => realDirectories([packages])
   // The files a request URL can name, in the order Vite looks: an absolute path after `/@fs`, a
   // route's own directory, or a path under the root's `public/` directory and then the root.
@@ -307,7 +368,23 @@ export function refuseSymlinkEscapes(
             res.end('Not found')
             return
           }
-          if (!servesAsIs(url, urlPath, req.method)) {
+          // An asset query (`?raw`, `?url`, `?inline`) or an asset `?import`, outside the root's
+          // own `node_modules`, is never left to Vite, which may answer it by reading the file by
+          // name. From a module (`?import`, or the browser's `Sec-Fetch-Dest: script`) it gets the
+          // module the pipeline builds; fetched directly it gets the file's bytes, as Vite would.
+          const params = new URLSearchParams(url.split('?')[1] ?? '')
+          const extension = extname(urlPath).toLowerCase()
+          const assetImport = params.has('import') && !MODULE_EXTENSIONS.has(extension)
+          const guarded =
+            !isWithin(file.realPath, packageDirectories()) &&
+            (assetQueryOf(params) !== null || assetImport)
+          const fromModule = params.has('import') || req.headers['sec-fetch-dest'] === 'script'
+          if (guarded && fromModule && req.method === 'GET') {
+            closeSync(file.fd)
+            sendTransformed(server, url, res, next)
+            return
+          }
+          if (!guarded && !servesAsIs(url, urlPath, req.method)) {
             closeSync(file.fd)
             next()
             return
@@ -370,22 +447,51 @@ export function refuseSymlinkEscapes(
         })
       }
     },
+    configResolved(resolved) {
+      config = resolved
+    },
+    // Supplies the bytes of a source module, a worker's source, and the asset queries Vite's
+    // asset plugin would otherwise answer by reading the file by its name, all from a checked
+    // descriptor. `?worker` and `?sharedworker` are left to Vite's worker plugin: its module only
+    // names the worker's URL, whose own request (`?worker_file`) comes back here.
     load(id) {
-      // `?raw` is answered here exactly as Vite's asset plugin answers it, so that plugin does not
-      // read the file by its name; any other query belongs to the plugin that owns it.
-      const raw = id.endsWith('?raw')
-      const path = raw ? id.slice(0, -'?raw'.length) : id
-      if (path.includes('\0') || path.includes('?') || !isAbsolute(path)) return null
+      const questionMark = id.indexOf('?')
+      const path = questionMark === -1 ? id : id.slice(0, questionMark)
+      const params = new URLSearchParams(questionMark === -1 ? '' : id.slice(questionMark + 1))
+      if (path.includes('\0') || !isAbsolute(path)) return null
       if (isWithin(path, packageDirectories()) || isWithin(path, [packages])) return null
-      if (!raw && !LOADED_EXTENSIONS.has(extname(path).toLowerCase())) return null
+      const extension = extname(path).toLowerCase()
+      const keys = [...params.keys()]
+      let reads: AssetQuery | 'text' | null
+      if (params.has('worker') || params.has('sharedworker')) return null
+      else if (assetQueryOf(params) !== null) reads = assetQueryOf(params)
+      else if (params.has('worker_file')) reads = 'text'
+      else if (keys.length === 0 && LOADED_EXTENSIONS.has(extension)) reads = 'text'
+      else if (keys.length === 0 && config?.assetsInclude(path)) reads = 'url'
+      else if (keys.every((key) => key === 'direct' || key === 'used')) {
+        reads = LOADED_EXTENSIONS.has(extension) ? 'text' : null
+      } else reads = null
+      if (reads === null) return null
       const file = openChecked(path, realDirectories(allow), packageDirectories())
       if (file === 'absent') return null
       if (file === 'forbidden') {
         throw new Error(`Refused: ${id} leads outside the directories the dev server may serve.`)
       }
       if (file === 'changed') throw new Error(`${id} kept changing while it was read; try again.`)
-      const text = readChecked(file).toString('utf-8')
-      return raw ? `export default ${JSON.stringify(text)}` : text
+      if (reads === 'url') {
+        closeSync(file.fd)
+        const served = devUrl(file.realPath, realDirectories([root])[0] ?? root)
+        return `export default ${JSON.stringify(served)}`
+      }
+      const bytes = readChecked(file)
+      if (reads === 'text') return bytes.toString('utf-8')
+      if (reads === 'raw') return `export default ${JSON.stringify(bytes.toString('utf-8'))}`
+      // `?inline`: CSS keeps its text for Vite's CSS plugin to compile; anything else becomes a
+      // data URL.
+      if (CSS_EXTENSIONS.has(extension)) return bytes.toString('utf-8')
+      const contentType = CONTENT_TYPE_BY_EXTENSION[extension] ?? 'application/octet-stream'
+      const type = contentType.split(';')[0]
+      return `export default ${JSON.stringify(`data:${type};base64,${bytes.toString('base64')}`)}`
     },
   }
 }
