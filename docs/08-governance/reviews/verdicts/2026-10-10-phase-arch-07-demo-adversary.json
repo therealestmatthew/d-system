@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-10-phase-arch-07-demo-adversary",
+  "date": "2026-10-10",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "59121c16f5b3b7d3908742d375ba4630799095a5",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "The guard plugin runs during vite build: its load hook answers asset imports with a dev URL, so a built bundle references /src/... and the asset is never emitted.",
+      "evidence": "ts/vite.config.ts:450-495 (reads === url at 481-485, reached via assetsInclude at 470 or ?url); no apply: serve or command check. Real vite.build() on a fixture: const c=\"/src/logo.svg\", no dist/assets/logo-*.svg.",
+      "consequence": "Any asset import would 404 in production. Latent today: the app imports no assets."
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "title": "Killing the top-level vitest run leaves the pool worker running race cases and togglers; the toggler watches only its direct parent.",
+      "evidence": "kill -9 of the backgrounded npx vitest: the forks.js worker kept spawning race cases for 30+ s. ts/vite.config.test.ts:63-71 ppid check.",
+      "consequence": "The stated no-orphan guarantee holds only one hop up."
+    }
+  ],
+  "raw_reply_sha256": "141c0c5d88f310c412a010c0d8701bcbd7fa1fd23c11603f171c9320c1fd9aa7",
+  "notes": "Rounds 6+7 functional gating review, dispatched by the Session Manager in its own scratch clone at 59121c16. The reviewer called it pass-with-findings with one blocker; recorded as reject because a blocker stands. Both fixed in round 8. Raw reply at _working/session-manager/review-replies/phase-arch-07-59121c16-demo-adversary.md."
+}
