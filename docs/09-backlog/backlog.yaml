@@ -8878,7 +8878,9 @@ items:
     that leaked the outside file hundreds of times under round 2 now gets it back zero times on ten
     paths, and a bounded race test in vite.config.test.ts asserts it. Round 4 (owner ruling): a file
     with more than one hard link is refused (403), except under the root package directory
-    (ts/node_modules, anchored in round 5), where package managers make them.'
+    (ts/node_modules, anchored in round 5), where package managers make them. Round 7 (owner
+    ruling): asset and worker import queries (?raw, ?url, ?inline, ?worker_file, asset ?import) are
+    answered from the checked descriptor too; 20 race cases, 0 leaks where 11 had leaked.'
 - id: phase-arch-08
   title: Multi-instance panel identity across layout, storage, registry and sessions
   plan: doc-workbench-architecture-quality

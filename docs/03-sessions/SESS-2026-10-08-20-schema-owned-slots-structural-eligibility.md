@@ -498,3 +498,86 @@ free-floating regex put back, the test fails on the reviewer's case
 Waiting on the owner, not acted on: the reviewer's major finding that import queries other than
 `?raw` still leak under a race. `/data/race.svg?import&url` leaked the secret in 122 of 544
 requests. This is the residual the comment and this record already name.
+
+## Review round 7: the import-query race (2026-10-10)
+
+Records committed unchanged in `0f4078bd`:
+- `demo-adversary-5`: functional pass. F01, the orphan toggler, was fixed in `3f8af063`.
+- `demo-adversary-6`: security pass. F01 (hard links) and F02 (the comment) are fixed.
+- `review-judge-3`: shadow reject, three findings.
+  - F01, that `vite.config.test.ts` never runs, is not applicable. The judge read dev's
+    `vitest.config.ts`; on this branch the include list names the file, and the runner's 19 test
+    files are the 18 under `src/` plus this one.
+  - F02, that the non-Linux fallback's check window is narrower than the `/proc/self/fd` path, is
+    accepted as it stands. It fails closed on a device or inode mismatch, and "What remains
+    uncovered" above names it.
+  - F03 is the import-query race fixed below.
+- `demo-adversary-7`: round 5 security reject. F01 (the free-floating `node_modules` regex) was
+  fixed in `d2a3e4be`. F02 is the import-query race.
+
+**The race.** Owner ruling of 2026-10-10: fix it in this phase. The reviewer's case,
+`/data/race.svg?import&url` raced against a toggler, leaked 122 of 544 requests at `6e29c8d0`.
+Vite's source (6.4) shows two paths that read an asset by its name:
+- A `?raw`, `?url` or `?inline` request, or an SVG one, first passes `checkServingAccess`. For a
+  URL that no module has imported yet, that check falls back to Vite's static server, which sends
+  the file raw. This is the reviewer's case.
+- From a module, the transform pipeline's asset plugin reads the file to build the module, for
+  example to inline a small SVG as a data URL.
+
+Worker sources (`?worker_file`) were read by name as well, because the `load` hook skipped every id
+with a query.
+
+**The fix.** The guard never leaves an asset query (`?raw`, `?url`, `?inline`) or an asset
+`?import` to Vite, except under the root's own `node_modules`, which is unchanged.
+- From a module (an `import` parameter, or `Sec-Fetch-Dest: script`), the request goes straight to
+  `server.transformRequest`, skipping the serving-access fallback.
+- Fetched directly, it gets the file's bytes from the checked descriptor, as Vite's static server
+  would send them.
+
+The `load` hook now answers, from the checked descriptor:
+- `?raw`: the text, as before.
+- `?url`, and a plain import of an asset type: the URL. The file is checked but not read, and
+  fetching the URL goes through the guard's static path.
+- `?inline`: CSS text, which Vite's CSS plugin compiles, or a base64 data URL for anything else.
+- `?worker_file`: the worker source.
+- `?direct` and `?used` CSS: the text.
+
+`?worker` and `?sharedworker`, including `?worker&inline` in dev, stay with Vite's worker plugin,
+whose module only names the worker URL. No query type had to be refused.
+
+**What changes for the app.** A module importing each query type was compared with and without
+the guard:
+- The worker wrappers, the worker source, CSS, CSS `?inline`, `?raw` and JSON are identical.
+- A small SVG imported plainly or with `?url` now exports its URL, where Vite inlined it as a
+  data URL.
+- An `?inline` SVG is base64 rather than percent-encoded.
+
+**Measured.** The race test now has 20 cases, using `withToggler`, 1.2 s each and 16 requests in
+flight. The new cases are the reviewer's direct `?import&url`, plus `?import&url`, `?import&inline`,
+`?import&raw` and a plain `?import` of an SVG from a module; CSS `?inline` from a module and
+directly, CSS `?url` and `?raw`; and `?worker`, `?worker&inline` and `?worker_file`.
+
+Against `vite.config.ts` as it stood at `d2a3e4be`, every asset and worker query case leaked:
+
+| Request | Leaked |
+|---|---|
+| `?import&url`, direct | 146 of 1,040 |
+| `?import&url`, from a module | 145 of 992 |
+| `?import&inline` | 208 of 1,088 |
+| `?import&raw` | 218 of 1,168 |
+| plain SVG `?import` | 217 of 1,072 |
+| CSS `?inline`, from a module | 182 of 1,040 |
+| CSS `?inline`, direct | 196 of 1,104 |
+| CSS `?url` | 187 of 1,088 |
+| CSS `?raw` | 214 of 1,200 |
+| `?worker&inline` | 232 of 1,200 |
+| `?worker_file` | 226 of 1,200 |
+
+The `?worker` wrapper leaked nothing, because it reads nothing. With the fix, all 20 cases had 0
+leaks, in about 22,000 requests. Run against the old file, the committed test fails on the
+reviewer's case (`/data/race.svg?import&url: expected '<svg>SECRET</svg>' not to contain
+'SECRET'`).
+
+**Regression check on the real app**, on the worktree's backend and dev server: the live REQ-037
+check `--quick` printed `52 panel cells ... rules pass=260 fail=0 ... 0 finding(s)` and exited 0.
+The dev server log had no errors.
