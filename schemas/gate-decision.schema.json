@@ -6,7 +6,34 @@
   "type": "object",
   "required": ["run_id", "gate", "decision", "decision_seq", "at", "decided_by"],
   "additionalProperties": false,
+  "$defs": {
+    "ordering": {
+      "type": "array",
+      "description": "A proposed next_up ordering (phase-irs-07's Mapper role, src/governance/mapping.py): one plan's phases, each pinned to a position with the reason it sits there. Decision-ready, not a diff -- the owner ratifies, amends or rejects this list at Gate 3 through phase-irs-04's `gate` verb (phase-irs-14); nothing in this schema or in mapping.py writes it into next_up itself.",
+      "items": {
+        "type": "object",
+        "required": ["phase", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "phase": {
+            "type": "string",
+            "minLength": 1,
+            "description": "A backlog phase id (docs/09-backlog/backlog.yaml)."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Non-empty prose saying why this phase sits at this position -- never left blank and never a restatement of the phase id alone."
+          }
+        }
+      }
+    }
+  },
   "properties": {
+    "ordering": {
+      "$ref": "#/$defs/ordering",
+      "description": "Optional. The proposed ordering G3 ratified, amended or rejected for this decision. Absent on a decision line that carries no ordering (every decision before phase-irs-14, and any gate this run reaches that is not G3). Writing this field onto a decision line is phase-irs-14's work, not tools/append_decision.py's current one."
+    },
     "run_id": {
       "type": "string",
       "minLength": 1,

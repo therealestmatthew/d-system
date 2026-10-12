@@ -242,6 +242,32 @@ workflows:
       model: haiku
       effort: medium
       max_turns: 30
+- id: mapper-agent
+  name: mapper
+  description: >-
+    Writes depends_on and systems locks for an approved plan's registered phases, validator-
+    checked through src/governance/mapping.py, and proposes a next_up ordering it never writes
+    itself. Invoked once per approved plan.
+  authority: agent-invocable
+  source: agent-workflows/mapper-agent.md
+  requires:
+  - read_files
+  - search_files
+  - run_commands
+  targets:
+  - host: claude
+    kind: agent
+    path: .claude/agents/mapper.md
+    capabilities:
+      read_files: Read
+      search_files: Grep
+      run_commands: Bash
+    unsupported: []
+    render:
+      tools: "Read, Grep, Bash"
+      model: haiku
+      effort: medium
+      max_turns: 30
 - id: partition-ideas
   name: partition-ideas
   description: >-

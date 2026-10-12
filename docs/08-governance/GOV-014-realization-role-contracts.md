@@ -166,7 +166,13 @@ this document, once real dispatch data from `phase-irs-11`'s baselines gives a r
   permanently, under both this contract's reserved list and `ARCH-006`'s; never register a phase
   the validator rejects without revising first; on a second rejection, never proceed without
   escalating to G3 with the validator output attached.
-- **Existing agent definition:** none; none created by this phase.
+- **Existing agent definition:** `agent-workflows/mapper-agent.md` (`.claude/agents/mapper.md`),
+  created by `phase-irs-07`. Its only write path to `backlog.yaml` is
+  `src/governance/mapping.py`, which writes `depends_on`/`systems` for the named phases,
+  validator-checks the result and rolls back any write the validator rejects. The proposed
+  ordering is data conforming to the `ordering` `$def` of `schemas/gate-decision.schema.json` —
+  an ordered list of `{phase, reason}` entries — emitted to stdout or a caller-named path, never
+  into `next_up`.
 - **Per-dispatch ceiling:** 300,000 tokens.
 
 ### Test Author
