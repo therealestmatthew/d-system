@@ -1,12 +1,11 @@
 schema_version: 1
-updated: '2026-10-09'
+updated: '2026-10-12'
 decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
 - phase-cap-08
 - phase-irs-11
 - phase-irs-14
-- phase-idg-12
 - phase-irs-05
 - phase-irs-07
 - phase-irs-13
@@ -11121,7 +11120,7 @@ items:
   - sys-governance
   owner: repository-owner
   agent: agent-batch-runner
-  status: active
+  status: complete
   priority: 3
   session_budget: 1
   depends_on:
@@ -11171,8 +11170,23 @@ items:
   - test/test_planner_safe_write.py
   - agent-workflows/idea-planner-agent.md
   - agent-workflows/workflows.yaml
-  next_action: Write the agent against the GOV-014/ARCH-006 shape - track in, one draft per accepted
-    track, amendment case honoured - then build the REQ-022 R20 section checker in src/governance/.
+  next_action: 'Complete. The idea planner agent drafts one plan per accepted track, honours the amendment
+    case, and writes only through the constant section-check command; the REQ-022 R20 checker is in
+    src/governance/plan_quality.py. The return-to-planner loop belongs to phase-irs-14.'
+  session: doc-session-idea-planner-agent
+  completion_evidence:
+  - agent-workflows/idea-planner-agent.md
+  - .claude/agents/idea-planner.md
+  - src/governance/plan_quality.py
+  - test/test_plan_quality.py
+  - test/test_planner_safe_write.py
+  - docs/03-sessions/SESS-2026-10-06-01-idea-planner-agent.md
+  - docs/08-governance/reviews/verdicts/2026-10-09-phase-idg-12-demo-adversary-3.json
+  - docs/08-governance/reviews/verdicts/2026-10-09-phase-idg-12-review-judge-3.json
+  result: 'Merged onto dev at 4875a4f8 with the owner''s approval on 2026-10-12, after ten build-review rounds
+    and eleven fix cycles (cycles 3 to 11 owner-granted). Round 10: gating and shadow pass, no findings.
+    R19 (recorded live run) accepted by the owner as evidenced in SESS-2026-10-06-01; the check_diff_patterns
+    type-ignore was rewritten out on the owner''s ruling.'
 - id: phase-dgov-01
   title: Rule when a requirement is mandatory, classify the corpus, enforce forward
   plan: doc-document-backlog-governance
