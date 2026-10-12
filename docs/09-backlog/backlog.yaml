@@ -14373,8 +14373,10 @@ items:
   systems:
   - sys-realization
   - sys-backlog
+  - sys-governance
   owner: repository-owner
-  status: queued
+  agent: agent-batch-runner
+  status: active
   priority: 2
   session_budget: 1
   depends_on:
@@ -14392,8 +14394,13 @@ items:
   - uv run python -m src.governance
   - uv run pytest
   deliverables:
-  - src/
-  - .claude/agents/
+  - agent-workflows/mapper-agent.md
+  - agent-workflows/workflows.yaml
+  - .claude/agents/mapper.md
+  - src/governance/mapping.py
+  - schemas/gate-decision.schema.json
+  - test/test_mapping.py
+  - docs/08-governance/GOV-014-realization-role-contracts.md
   next_action: Define the proposal artifact the owner ratifies - it must read as a decision-ready
     ordering with reasons, not a diff.
 - id: phase-irs-08
