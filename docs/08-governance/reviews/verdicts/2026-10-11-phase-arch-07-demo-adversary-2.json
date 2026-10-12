@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-11-phase-arch-07-demo-adversary-2",
+  "date": "2026-10-11",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "2bb3f63d1e2b77f7ca789bdd5df710bb381c9ada",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "The ?html-proxy exception is a bare query-key test, so any in-scope module id carrying html-proxy that does not match Vite's strict html-proxy shape falls to Vite reading the file by name, which leaks under a swap race.",
+      "evidence": "ts/vite.config.ts:490 params.has('html-proxy') return null; Vite vite:html-inline-proxy matches only its strict htmlProxyRE. GET /data/race.ts?html-proxy under the withToggler race served the secret module; its sourcemap sourcesContent carried the secret.",
+      "consequence": "Every module-extension file under the allow-list is exposed to the swap race by appending ?html-proxy."
+    }
+  ],
+  "raw_reply_sha256": "87e7a91e1699f003560a59ab20d05e8ef5f155d08854d8a46b646b8d30fa88dd",
+  "notes": "Round 8 security review standing in for /security-review, dispatched by the Session Manager in its own scratch clone at 2bb3f63d. Owner ruling 2026-10-11: one more round; any new finding after it splits the guard's remaining work into a follow-up phase. Raw reply at _working/session-manager/review-replies/phase-arch-07-2bb3f63d-security-demo-adversary.md."
+}

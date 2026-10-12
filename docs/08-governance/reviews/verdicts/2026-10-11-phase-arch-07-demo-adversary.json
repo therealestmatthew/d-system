@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-11-phase-arch-07-demo-adversary",
+  "date": "2026-10-11",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "2bb3f63d1e2b77f7ca789bdd5df710bb381c9ada",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "After a top-level kill of the test run, the in-flight race case can fail with \"the toggler ran: expected 0 to be greater than 50\" instead of the designed \"the test run was killed\" message.",
+      "evidence": "ts/vite.config.test.ts:674-676; the toggler exits on its own ancestor check while the loop waits in Promise.all. Reproduced by kill -9 of npm exec mid race. Cleanup itself held.",
+      "consequence": "A killed run reads like a security regression, misdirecting whoever debugs it."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "The ?html-proxy exception in load() is untested.",
+      "evidence": "ts/vite.config.ts:474-490; no html-proxy case in ts/vite.config.test.ts.",
+      "consequence": "A regression on that path would go unnoticed."
+    }
+  ],
+  "raw_reply_sha256": "7b42b759614deb69e03640d7159113262e3f65a2979c2892b30026df5bb156b5",
+  "notes": "Round 8 functional gating review, dispatched by the Session Manager in its own scratch clone at 2bb3f63d. The reviewer called it pass-with-findings; recorded as pass with its findings. A pre-existing dev-server SPA-fallback quirk it noted was sent to Ideation as an idea. Raw reply at _working/session-manager/review-replies/phase-arch-07-2bb3f63d-demo-adversary.md."
+}
