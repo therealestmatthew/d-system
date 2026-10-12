@@ -28248,7 +28248,7 @@ The document also references two related ungoverned documents for context: `demo
 
 ## 000673 · Template: simple timeline of a project's dated events
 
-**Created 2026-10-09T17:46:00-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:00-04:00 · Status: `triaged`**
 
 A per-project vertical timeline of dated events: started, last_reviewed, each commitment's created, due_date and completed, each task's, target_date, and later interactions, decisions and milestone development events. A portfolio-wide view is the same component with a project column. CSS-only chronological list with a left rule; one new component in house-components.css, tokens only. slot-fill. Effort M. Data is ready today. Owner decisions: per-project, portfolio or person first; chronological or proportional; whether created dates count as events; whether a milestone development event is the milestone source; shared component or page-local CSS; as-of date from a parameter or the commit date.
 
@@ -28258,9 +28258,47 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:00-04:00): Recorded first as 000600 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:06+00:00; renumbered to 000673 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000600.
+- **finding** by agent-idea-triage (2026-10-12T17:54:47-04:00): Idea 000673 is one of fourteen portfolio template proposals (000673–000686) generated during the 2026-10-08 template exploration session, documented in _public/portfolio-guide.html, section 8. All propose CSS-only, deterministic, data-driven page components built from existing portfolio data with the house-style design system.
+
+RELATED GOVERNANCE DOCUMENTS:
+
+PLAN-036 (HTML generation and design system) establishes the template and component infrastructure these proposals depend on. Specifically:
+- phase-des-03 (Make the template layer a growing library with declared population methods) — status complete — provides the framework for growing templates/html/ without generator-code changes and declaring machine-readable population methods (deterministic slot-fill vs. AI adaptation).
+- phase-des-04 (Build the HTML component library) — status queued — focuses on interactive components for the engine pages.
+
+The portfolio guide confirms that no queued phase currently builds portfolio pages or templates like timelines, Gantts, or kanban boards, so the timeline proposal does not duplicate existing work.
+
+REQ-036 (Engine pages and house-style tokens) and REQ-021 (HTML generation design system) establish the house-style design system and tokens (colours, fonts, spacing, rules, radius) that these templates will draw from. The guide confirms the house-style infrastructure is approved and ready.
+
+RELATED BACKLOG PHASES:
+
+- phase-des-03 (complete): Provides the template library infrastructure and population-method contracts these templates would register with
+- phase-des-04 (queued): Focuses on interactive components; the portfolio templates (CSS-only, slot-fill) would use existing house components
+
+RELATED IDEAS:
+
+Infrastructure ideas that this timeline would depend on:
+- 000083 (Template library with deterministic or AI population): The infrastructure framework
+- 000084 (HTML component library): Components the timeline would reference
+- 000085 (Color palette library): Design tokens; superseded by house-style in REQ-036
+- 000092 (HTML Designer agent): Would extract templates after portfolio pages ship
+- 000511 (Application design styles and principles): The house-style design system
+
+Coordinated batch from the same 2026-10-08 exploration:
+- 000674–000686: Fourteen other portfolio template proposals (Gantt chart, commitments ledger, dashboard, project brief, person profile, kanban, calendar, waiting-on board, stale radar, weekly review, decision register, velocity trend, RACI matrix)
+
+The portfolio guide also references:
+- 000687 (Shared portfolio data loader): The first template built pays for this shared loader over data_root()
+- 000688 (phase-syn-05 dependency chain issue): Related to retired pipeline dependencies
+
+FINDING:
+
+The timeline template overlaps with PLAN-036's template library infrastructure (phase-des-03, complete) in scope but not in work — the idea proposes a specific portfolio template instance; the plan proposes the library framework to accumulate such templates. The timeline's constraints (house-style family, CSS-only slot-fill, deterministic from tracked data) are established by REQ-036 and phase-des-03. Data and effort sizing are ready (effort M, data available today, per the portfolio guide). No scheduled backlog phase builds portfolio display templates, so no work duplication exists.
+
+The fourteen template proposals (000673–000686) form a coordinated set from one exploration session, listed in the portfolio guide without internal links. The guide recommends 000687 (shared data loader) as the first build, then 000675 (commitments ledger) as the cheapest first template, with timeline and Gantt following unless reprioritized.
 
 </details>
 
@@ -28268,7 +28306,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000674 · Template: Gantt chart, project level first
 
-**Created 2026-10-09T17:46:01-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:01-04:00 · Status: `triaged`**
 
 One row per project from started to target_date, grouped by category or status, drawn with CSS grid (one column per week or month, bars placed by inline grid-column). Three of the five example projects draw today; one is open-ended and one unscheduled. Task-level bars are not a real Gantt: commitments and tasks have no start date, duration or dependency field, and a bar from created to due_date shows lead time, not a schedule. Minimal schema change for tasks: a nullable start_date on task and commitment, with the DDL column and loader change; dependencies are planned as a separate work-dependency record (ARCH-007), so an interim field conflicts with that direction. No script means no drag or zoom: zoom becomes separate renders at week, month and quarter, and the today line is the as-of date. slot-fill. Effort M at project level, L with tasks and dependencies.
 
@@ -28278,9 +28316,20 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:02-04:00): Recorded first as 000601 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:07+00:00; renumbered to 000674 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000601.
+- **finding** by agent-idea-triage (2026-10-12T17:54:48-04:00): **Related plan:** phase-des-03 (Make the template layer a growing library with declared population methods, PLAN-036 G37) is complete and has delivered the template library mechanism in templates/html/library.yaml and tools/template_library.py. The library currently declares four families (overview, house, atlas, lit-report), but no portfolio-level templates yet. Idea 000674 asks for a Gantt chart template to be added to this library, with a minimal schema change (nullable start_date on task/commitment). The mechanism to add it without code changes is already in place.
+
+**Related backlog phase:** phase-des-04 (Build the HTML component library, queued under PLAN-036 G37) is the next scheduled infrastructure phase and lists next_action to "check what phase-wb-03 shipped before building a second one" — it is scoped but not yet claimed.
+
+**Template batch:** This idea is one of a set of portfolio template proposals (000673-000686) discovered in the 2026-10-08 cloud session, all marked open with no phase assigned. All share the constraints of PLAN-036 amendment: house family, no script, declared in templates/html/library.yaml, deterministic output with explicit as-of date. The batch includes: 000673 (simple timeline), 000675 (commitments ledger), 000676 (portfolio dashboard), 000677 (project brief), 000678 (person profile), 000679 (kanban board), 000680 (agenda/calendar), 000681 (waiting-on board), 000682 (stale radar), 000683 (weekly review), 000684 (decision register), 000685 (commitment velocity), 000686 (RACI matrix).
+
+**Related ideas in other domains:** 000033 (Temporal projection explorer for idea/plan/portfolio history) and 000034 (Portfolio scenario simulator for what-if planning) address portfolio analysis and visualization from a different angle (projection and scenario modeling rather than template rendering), but share the domain of portfolio-level insights.
+
+No Gantt chart template is currently in templates/html/library.yaml. The idea is not yet fully delivered, but the delivery mechanism is complete. No phase yet covers building this specific portfolio template batch.
+
+PROPOSED LINK: 000674 --relates_to--> 000673 (both project-level timeline visualizations)
 
 </details>
 
@@ -28288,7 +28337,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000675 · Template: commitments ledger
 
-**Created 2026-10-09T17:46:02-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:02-04:00 · Status: `triaged`**
 
 What do I owe, to whom, by when, and what is overdue. Reads commitments: due_date, status, priority, promised_to, completed, against an as-of date. Table, pills and stat row only, so no new CSS. slot-fill. Effort S. Recommended first build: it proves the shared loader and the as-of handling. It is the page for the planned Accountability Ledger view (phase-sig-03), which is SQL only, not a duplicate of it.
 
@@ -28298,9 +28347,21 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:03-04:00): Recorded first as 000602 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:07+00:00; renumbered to 000675 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000602.
+- **finding** by agent-idea-triage (2026-10-12T17:54:49-04:00): Idea 000675 proposes a template to display commitments with due dates, statuses and whether they are overdue. It is distinct from phase-sig-03 (Implement the Accountability Ledger), which builds the SQL view—this idea is the HTML presentation layer that will use that view.
+
+Found related governed documents and phases:
+- PLAN-036 (HTML generation and design system): covers the template library and its population methods, including slot-filling and the house-style family constraint that applies to this template
+- REQ-036 (Idea realization engine pages and house-style tokens): specifies the house family tokens and deterministic output requirements that constrain this work
+- phase-sig-03 (Implement the Accountability Ledger): the queued SQL phase that builds the view this template will display; the idea's body correctly identifies this as separate work
+- phase-sig-02 (Implement Stale Radar): builds another view this idea might later depend on
+- 000687 (Shared portfolio data loader and a richer fictional fixture set): the owner's ruling on build order (handoff document, section 9) directs building 000687 before 000675, as 000675 depends on the shared loader
+
+The idea is coherent with the HTML generation programme (PLAN-036, G37) and carries the expected constraints (house family REQ-036, no script, deterministic output). It was recorded as part of template exploration 2026-10-08 and already carries a renumbering finding from the original id 000602.
+
+PROPOSED LINK: 000675 --relates_to--> 000687 (Template depends on shared portfolio data loader; owner's build order places 000687 first)
 
 </details>
 
@@ -28308,7 +28369,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000676 · Template: portfolio dashboard
 
-**Created 2026-10-09T17:46:04-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:04-04:00 · Status: `triaged`**
 
 Is my portfolio healthy. Project status, category, target_date and last_reviewed against review_cadence; open and overdue commitment counts. slot-fill. Effort M. Nothing blocks it today; later it reads the Stale Radar and Health Signal views (phase-sig-02, phase-sig-04). Overlaps the digest HTML export (phase-syn-05), which is itself stale (see the separate idea).
 
@@ -28318,9 +28379,22 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:05-04:00): Recorded first as 000603 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:07+00:00; renumbered to 000676 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000603.
+- **finding** by agent-idea-triage (2026-10-12T17:54:51-04:00): Related plan and backlog phases:
+
+PLAN-002 (Mini Systems Proposal) Section 10 describes the Portfolio Digest, which is exactly what 000676 asks for — "Is my portfolio healthy?" with signals on health distribution, load concentration, velocity trend and portfolio-level synthesis. PLAN-002 routes portfolio health through Tier 2 signals (Health Signal, Stale Radar, Accountability Ledger) and Tier 3 synthesis (Portfolio Digest with AI-assisted narrative), with output as HTML export — matching 000676's specification that the dashboard reads Stale Radar and Health Signal views and outputs HTML.
+
+On the backlog, 000676's implementation dependencies form a chain: phase-sig-02 (Implement Stale Radar) and phase-sig-04 (Implement Project Health Signal) produce the data; phase-syn-04 synthesizes the digest; phase-syn-05 (Export the portfolio digest through generated HTML) handles the HTML export 000676 mentions as an overlap.
+
+Related requirement: REQ-036 (Idea realization engine pages and the house-style tokens) is the constraint 000676 names — all template entries share "house family (REQ-036)", meaning this template must conform to the house-style token system when rendered.
+
+Related template ideas from the same 2026-10-08 exploration session: 000673–000686 are all template proposals. 000682 (Template: stale radar and review queue page) covers the stale-radar side of portfolio health; 000676 covers the broader portfolio-health dashboard. They are peer templates answering related but distinct questions, not a hierarchy.
+
+Related infrastructure: 000083 (Template library with deterministic or AI population) is the larger framework these templates feed into; 000092 (HTML Designer agent) and 000420–000421 (HTML style extraction and generation agents) are the agents proposed to work with template infrastructure; 000511 (Application design styles and principles) is the design-system work that 000676's house-style constraint connects to.
+
+No existing idea fully overlaps this proposal, and the work it requests is not yet delivered — the template itself remains to be built once the underlying signal phases land.
 
 </details>
 
@@ -28328,7 +28402,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000677 · Template: one-page project brief
 
-**Created 2026-10-09T17:46:06-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:06-04:00 · Status: `triaged`**
 
 The state of one project on one page: project fields, stakeholders, tags, open commitments and tasks. Population both, with a summary slot for an agent. Effort M. Adds the first new component, a card. Share a data function with the planned project context pack (phase-syn-01), which is Markdown, not HTML.
 
@@ -28338,9 +28412,26 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:06-04:00): Recorded first as 000604 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:08+00:00; renumbered to 000677 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000604.
+- **finding** by agent-idea-triage (2026-10-12T17:54:52-04:00): Idea 000677 is one of 16 portfolio template ideas (000673–000688) captured during the 2026-10-08 productivity system templates exploration session. The idea proposes an HTML template that displays a project's state on one page: project fields, stakeholders, tags, open commitments and tasks, with a slot for an agent-generated summary.
+
+Related governance:
+
+- **REQ-036** (Idea realization engine pages and the house-style tokens): Sets the house-style design tokens and CSS that all these portfolio templates must use. The idea explicitly states it must be built in the house family, declared in `templates/html/library.yaml`, with deterministic output and an explicit as-of date.
+
+- **PLAN-036** (HTML generation and design system): The plan that specifies the house-style infrastructure, including component and template library requirements. Ideas 000083, 000084, and 000085 (template library, component library, and palette library) are the infrastructure that 000677 and its sibling portfolio templates will build against.
+
+- **phase-syn-01** (Generate deterministic project context packs, in PLAN-009): The idea explicitly notes it shares a data function with this phase, which generates portable Markdown containing project metadata. The portfolio template will consume or coordinate with this phase's output.
+
+Related ideas:
+
+Batch siblings 000673–000688 are all portfolio templates with shared constraints: house family (REQ-036), no script, declared in `templates/html/library.yaml`, deterministic output, built against the tracked example set. The batch includes timelines, Gantt charts, commitments ledger, portfolio dashboard, person profile card, kanban board, agenda, waiting-on board, stale radar, weekly review, decision register, velocity trend, and RACI matrix.
+
+The "card" component mentioned in the idea body suggests possible connection to 000084 (HTML component library), which will define reusable component patterns for generated pages. However, 000677 is a specific portfolio template (deliverable), while 000084 is infrastructure (the library itself), so they are distinct work items with complementary relationship.
+
+No related plan, requirement or decision document exists for these specific portfolio templates yet; triage and sequencing against the house-family and template-library phases (phase-des-03, phase-des-04) will determine prioritization.
 
 </details>
 
@@ -28348,7 +28439,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000678 · Template: person profile and stakeholder card
 
-**Created 2026-10-09T17:46:07-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:07-04:00 · Status: `triaged`**
 
 Who this person is and what is open with them: person fields, their projects, commitments promised_to them, waiting-on items owed_by them, later interactions. slot-fill. Effort S. Exclude email from shareable output by default. Build after phase-proj-01 answers whether people records exist in the real portfolio.
 
@@ -28358,9 +28449,38 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:08-04:00): Recorded first as 000605 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:08+00:00; renumbered to 000678 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000605.
+- **finding** by agent-idea-triage (2026-10-12T17:54:53-04:00): Idea 000678 is one of a batch of template ideas proposed in the 2026-10-08 cloud-session template exploration (branch claude/productivity-system-templates-ie1x8d). The idea asks for a person profile and stakeholder card template, showing person fields, their projects, commitments, waiting-on items owed by them, and interaction history. Effort marked S; excludes email from shareable output by default.
+
+Related governed documents:
+- REQ-036 (Idea realization engine pages and the house-style tokens): defines house-style tokens, template family declarations in templates/html/library.yaml, and deterministic output with explicit as-of dates (constraints this idea shares with all template ideas).
+- PLAN-036 (HTML generation and design system): covers the template library phase (phase-des-03), which is complete. phase-des-03 delivered templates/html/library.yaml and tools/template_library.py to support declaring population methods for new templates.
+- phase-des-03 (complete): built the template library infrastructure; new templates like this one can be added without code changes by declaring them in templates/html/library.yaml with a population method.
+
+Related ideas from the same batch (all templates from the 2026-10-08 exploration):
+- 000673 (Template: simple timeline of a project's dated events)
+- 000674 (Template: Gantt chart, project level first)
+- 000675 (Template: commitments ledger)
+- 000676 (Template: portfolio dashboard)
+- 000677 (Template: one-page project brief)
+- 000679 (Template: kanban status board)
+- 000680 (Template: agenda and calendar view)
+- 000681 (Template: waiting-on board)
+- 000682 (Template: stale radar and review queue page)
+- 000683 (Template: weekly review page)
+- 000684 (Template: decision register)
+- 000685 (Template: commitment velocity trend)
+- 000686 (Template: RACI and role matrix)
+- 000687 (Shared portfolio data loader and a richer fictional fixture set) — this is the shared prerequisite every template idea depends on, per the batch constraints.
+
+Governance gate: the idea is conditioned on phase-proj-01 (Answer the portfolio data question against the real root), which is queued and waiting for the owner to answer whether people and commitments hold records in the real portfolio (_private/portfolio/). Idea 000022 (People and commitments have zero real records) is closely related to this gate. Until phase-proj-01 answers whether records exist, the scope of what a person profile template displays from live data cannot be fully scoped.
+
+The template library infrastructure (phase-des-03) is complete. This idea is ready to be scoped and sized, but sequencing should consider 000687 as a first step (the shared loader) and the outcome of phase-proj-01 as a gating dependency.
+
+PROPOSED LINK: 000678 --relates_to--> 000687 (shared portfolio data loader that all template ideas depend on; the batch documentation names it as the first step of the template build order)
+PROPOSED LINK: 000678 --relates_to--> 000022 (idea 000022 flags that people/commitment records do not exist; phase-proj-01 will establish whether they do, which gates the scope of this profile template)
 
 </details>
 
@@ -28368,7 +28488,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000679 · Template: kanban status board
 
-**Created 2026-10-09T17:46:09-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:09-04:00 · Status: `triaged`**
 
 What is in each state: tasks and commitments by status (five columns), projects by status (six). A static snapshot, not drag-and-drop; the workbench is the live view. Needs the card component. slot-fill. Effort S.
 
@@ -28378,9 +28498,34 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:09-04:00): Recorded first as 000606 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:08+00:00; renumbered to 000679 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000606.
+- **finding** by agent-idea-triage (2026-10-12T17:54:54-04:00): Idea 000679 is one of fourteen template proposals generated during a template exploration session (2026-10-08). The idea requests a kanban-style status board template showing tasks and commitments by status in five columns, and projects by status in six columns, rendered as a static snapshot with card components and slot-filling.
+
+**Related infrastructure and governance:**
+
+The template sits within the HTML generation and design system programme (PLAN-036, group G37). Its implementation depends on:
+- 000083 (Template library with deterministic or AI population): the container framework that would house this and other domain-specific templates
+- 000084 (HTML component library): provides the card component the idea names as a requirement
+- 000085 (Color palette library): shared styling
+- REQ-036 (Engine pages and house-style tokens): defines constraints every template must meet — house family, no script, deterministic output, explicit as-of date, built against tracked example set
+- REQ-021 R05–R06: template requirements on growing without generator changes and declaring population method
+- phase-des-03: Template library phase in PLAN-036, which formalized the container and population methods (phase-des-03 is complete in backlog.yaml; corrected by the triage driver)
+
+**Relationship to other ideas in same exploration:**
+
+The idea is one of fourteen template proposals (000673–000686) recorded from the 2026-10-08 template exploration. The owner explicitly chose to record each proposal separately for independent tracking. No other relationship links are recorded for this cluster. The owner's post-session rulings named 000687 (shared portfolio data loader) and 000675 (commitments ledger) as the first two templates to build, but did not yet rule on 000679.
+
+**Related backlog phase:**
+
+phase-syn-05 (Export the portfolio digest through generated HTML) is the context for portfolio templates, though it is independent and has not yet scoped which specific templates it will render.
+
+**Status:**
+
+This is an open proposal. It is not yet promoted or reflected in any phase scope. The template library infrastructure (phase-des-03) is already in place (phase-des-03 is complete in backlog.yaml; corrected by the triage driver).
+
+No related plan, phase or document found that duplicates or supersedes this idea's scope.
 
 </details>
 
@@ -28388,7 +28533,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000680 · Template: agenda and calendar view
 
-**Created 2026-10-09T17:46:10-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:10-04:00 · Status: `triaged`**
 
 What is coming up: every due_date on commitments, tasks and waiting-on records, project target_date, interaction dates, and the next review derived from last_reviewed plus review_cadence. slot-fill. Effort S for an agenda list, M for a month grid.
 
@@ -28398,9 +28543,21 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:11-04:00): Recorded first as 000607 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:09+00:00; renumbered to 000680 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000607.
+- **finding** by agent-idea-triage (2026-10-12T17:54:55-04:00): 000680 is one of a 15-idea batch of portfolio template proposals from the owner's 2026-10-08 cloud session (branch claude/productivity-system-templates-ie1x8d). The batch (000673–000687) proposes templates for timeline, Gantt chart, commitments ledger, portfolio dashboard, project brief, person profile, kanban board, agenda and calendar view (this idea), waiting-on board, stale radar, weekly review, decision register, commitment velocity, RACI matrix, and a shared portfolio data loader. All 15 ideas share the same source and constraints: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with explicit as-of date, built against tracked example set.
+
+Related ideas with no existing links: idea 000687 (Shared portfolio data loader and a richer fictional fixture set) — which the batch explicitly marks as a prerequisite "one-time cost every portfolio template shares." Idea 000083 (Template library with deterministic or AI population) is a broader related idea (triaged, 2026-09-10) about the template infrastructure layer itself.
+
+Related plan: PLAN-036 (HTML generation and design system, active, P9) covers template infrastructure through phase-des-03 (template library — make templates a growing library with declared population methods) and phase-des-04 (component library). The plan's section "Amendment, 2026-09-30" moves it forward in priority and gates the phases on the four engine-pages priorities instead of the older PLAN-003 audit. Template infrastructure itself (000083, 000084, 000085 and phase-des-03/04) is constrained by REQ-021 and now REQ-036. Phase-des-06 builds the HTML Designer agent that scans existing pages to extract templates.
+
+Related requirement: REQ-036 (Idea realization engine pages and the house-style tokens, draft status) defines house-style tokens, determinism constraints, and the "no script" rule (R12) that all portfolio templates must follow. It also defines the fictional fixture-set constraints (R07, R08).
+
+Portfolio templates (000673–000687) are not yet in the backlog, suggesting no phase exists yet for portfolio-specific template work. Phase-des-03 already built the general template library infrastructure on which these would depend (phase-des-03 is complete in backlog.yaml; corrected by the triage driver). Idea 000687 (data loader) is likely the sequencing dependency all portfolio templates need.
+
+PROPOSED LINK: 000680 --relates_to--> 000687 (portfolio templates depend on shared portfolio data loader)
+PROPOSED LINK: 000680 --relates_to--> 000083 (portfolio templates are instances of the template library infrastructure)
 
 </details>
 
@@ -28408,7 +28565,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000681 · Template: waiting-on board
 
-**Created 2026-10-09T17:46:11-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:11-04:00 · Status: `triaged`**
 
 What others owe me and who has gone quiet: waiting-on requested, last_chased, due_date, status and owed_by. slot-fill. Effort S. The example set has no waiting-on records, so it needs fixtures first.
 
@@ -28418,9 +28575,24 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:12-04:00): Recorded first as 000608 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:09+00:00; renumbered to 000681 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000608.
+- **finding** by agent-idea-triage (2026-10-12T17:54:56-04:00): Idea 000681 proposes a template for displaying waiting-on records (what others owe the owner), with fields for requested date, last_chased, due_date, status, and owed_by. The idea correctly notes that the tracked example set currently has no waiting-on records and needs fixtures before the template can be built.
+
+## Findings
+
+The waiting-on data structure is already fully defined in `schemas/waiting-on.schema.json`, with the exact fields the idea names (requested, last_chased, due_date, status, owed_by) plus priority and capture metadata. The schema is integrated into the governed data pipeline: commitment.schema.json references it, and it appears in the staged-record schema.
+
+This idea is one of 14 portfolio template ideas (000673–000686) from a single exploration session (cloud session of 2026-10-08, branch claude/productivity-system-templates-ie1x8d). All 14 share identical constraints: built in the house family (REQ-036), no script, declared in `templates/html/library.yaml`, deterministic output with an explicit as-of date, and built against the tracked example set. The exploration is documented at `_public/portfolio-guide.html` section 8.
+
+There is no existing plan document covering portfolio template development. PLAN-036 (HTML generation and design system) covers template libraries for the idea realization engine's generated pages (ideas 000083, 000084, 000085, 000092) — a different domain from portfolio data visualization. The asset work there (phase-des-03 template library, phase-des-04 component library) targets engine pages, not portfolio templates.
+
+Idea 000687 (Shared portfolio data loader and a richer fictional fixture set) is a documented prerequisite for all portfolio templates. It identifies the one-time infrastructure cost: a loader that reads through `data_root()` or the DuckDB layer with an explicit as-of date to keep pages deterministic. The current tracked example set holds only 5 projects, 1 person, 1 commitment and 3 tasks — no waiting-on, stale, milestone, interaction or other complex records. Idea 000687 proposes enriching this to support all template patterns.
+
+No related plan, requirement or backlog phase found beyond PLAN-036's distinct (engine page) scope.
+
+PROPOSED LINK: 000681 --relates_to--> 000687 (prerequisite: shared data loader and enriched fixture set required before any portfolio template can be built)
 
 </details>
 
@@ -28428,7 +28600,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000682 · Template: stale radar and review queue page
 
-**Created 2026-10-09T17:46:13-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:13-04:00 · Status: `triaged`**
 
 Which projects am I neglecting: last_reviewed, or the derived last_touched, against review_cadence. slot-fill. Effort S. phase-sig-02 builds the view (no page is queued); the figure can be computed inline until the view lands.
 
@@ -28438,9 +28610,28 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:13-04:00): Recorded first as 000609 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:09+00:00; renumbered to 000682 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000609.
+- **finding** by agent-idea-triage (2026-10-12T17:54:57-04:00): Idea 000682 proposes a template for a "stale radar and review queue page" — a portfolio visualization showing which projects are neglecting review based on review_cadence, last_reviewed, and derived last_touched. It is one of seven portfolio template proposals (000680–000686) from the template exploration session of 2026-10-08, plus a shared data loader (000687).
+
+## Related plans and phases
+
+**PLAN-009 (Capture Build, doc-capture-build)** explicitly names the backend work that 000682 assumes exists: phase-sig-02 "Implement Stale Radar" (queued, priority 2, session budget 1 session). The phase builds `v_stale_projects` — a DuckDB view that computes staleness across all six cadence thresholds (daily, weekly, biweekly, monthly, ad-hoc, ongoing), with explicit handling for unknown-review cases. PLAN-009 table row 102 states phase-sig-02 needs "Derived `last_touched` and `review_cadence` (phase 7); real activity (phase 8)" — both deliverables of phase-cap-07 and phase-cap-08, which are in the capture pipeline. Idea 000682's own text notes this: "phase-sig-02 builds the view (no page is queued)".
+
+## Related infrastructure
+
+**REQ-036 (engine pages house style, doc-engine-pages-house-style-requirements)** defines the house-family constraints that 000682 inherits: deterministic output with an explicit as-of date, no script, built against the tracked example set, and declared in `templates/html/library.yaml`. R07 and R08 (byte-identical regeneration and committed snapshots) directly apply.
+
+**Idea 000687 (Shared portfolio data loader and a richer fictional fixture set)** is a dependency: the one-time cost that every portfolio template shares. 000687 provides a loader reading through `data_root()` or the DuckDB layer and taking an explicit as-of date. Both 000682 and 000687 acknowledge this relationship in their text, but it is not yet recorded as a typed link.
+
+**Idea 000083 (Template library with deterministic or AI population)** addresses the broader infrastructure these portfolio templates assume: a growing library in `templates/html/` where templates are discoverable, reusable assets. Ideas 000084 (HTML component library) and 000092 (HTML Designer agent) link to 000083; the portfolio template batch (000680–000686) does not yet, though they reference the same `templates/html/library.yaml` declaration point.
+
+## Summary
+
+The backend data view (phase-sig-02) is already queued and planned. The template 000682 proposes depends on that view existing and on the shared data loader (000687) being built first. No contradictions or re-discovered relationships found; the work is positioned correctly in the pipeline. Six sibling template ideas (000680, 000681, 000683–000686) share the same constraints, source session, and dependency on 000687; they are distinct proposals at the same level rather than overlapping.
+
+PROPOSED LINK: 000682 --relates_to--> 000687 (portfolio template depends on shared data loader from same exploration session)
 
 </details>
 
@@ -28448,7 +28639,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000683 · Template: weekly review page
 
-**Created 2026-10-09T17:46:14-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:14-04:00 · Status: `triaged`**
 
 What happened, what slipped, what is next: completed and created dates this week, due next week, the stale list. Population both, with a narrative slot. Effort M. Duplicates the planned weekly review workflow (phase-syn-03) in content; that phase writes Markdown to docs/03-sessions/ and depends on phase-syn-02 and phase-sig-08.
 
@@ -28458,9 +28649,22 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:15-04:00): Recorded first as 000610 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:09+00:00; renumbered to 000683 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000610.
+- **finding** by agent-idea-triage (2026-10-12T17:54:58-04:00): Idea 000683 proposes an HTML template to display weekly review data: accomplished work, slipped items, upcoming due dates, and stale items. Effort M.
+
+Related plan phase: phase-syn-03 "Create the weekly review workflow" (PLAN-002, mini-systems plan) is a complementary but distinct deliverable. phase-syn-03 creates the review logic, manual prompt, and governed session output (tools/weekly_review.py, docs/02-prompts/weekly-review.md). Idea 000683 requests an HTML template to *display* that review data, not to generate it. The two are mutually supportive rather than overlapping: the template would consume phase-syn-03's output.
+
+Template ideas batch: Ideas 000673-000687 were all captured 2026-10-08 during a template exploration session. The batch includes individual template proposals (simple timeline, Gantt chart, commitments ledger, portfolio dashboard, project brief, person profile, kanban board, agenda view, waiting-on board, stale radar, this weekly review, decision register, velocity trend, RACI matrix) plus a shared data loader (000687). None of these template ideas currently carry links to each other or to parent concepts, despite being captured together from one exploration.
+
+Template infrastructure: The broader template ecosystem includes 000083 (template library concept with deterministic or AI population, triaged), 000084 (HTML component library, relates_to 000083), 000085 (color palette, relates_to 000084), and 000092 (HTML designer agent to extract templates, relates_to 000083-085). These four are triaged; the specific template proposals (000673-000687) remain open. Constraints all template ideas share: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with explicit as-of date, built against the tracked example set (per idea 000683's body).
+
+No existing delivered template or dashboard matching this idea's description was found in templates/html/ or the backlog. The house-style tokens (REQ-036) are under development but engine pages differ from weekly review dashboards in scope.
+
+PROPOSED LINK: 000683 --relates_to--> 000083 (both part of template/HTML generation ecosystem; 000683 is a specific implementation of the library concept)
+PROPOSED LINK: 000683 --relates_to--> 000687 (shared portfolio data loader that the template depends on for population)
+PROPOSED LINK: 000683 --relates_to--> 000682 (similar dashboard/review page concept for stale item tracking and queue display)
 
 </details>
 
@@ -28468,7 +28672,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000684 · Template: decision register
 
-**Created 2026-10-09T17:46:16-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:16-04:00 · Status: `triaged`**
 
 What was decided and why: decision date, text, rationale, alternatives, status (active, superseded, reversed) and supersedes. slot-fill. Effort S. No example decisions exist, so it needs fixtures.
 
@@ -28478,9 +28682,59 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:16-04:00): Recorded first as 000611 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:10+00:00; renumbered to 000684 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000611.
+- **finding** by agent-idea-triage (2026-10-12T17:54:59-04:00): Idea 000684 (Template: decision register) is one of fifteen portfolio template ideas (000673–000687) from the template exploration of the cloud session 2026-10-08. It proposes a slot-fill template to record decisions with fields: decision date, text, rationale, alternatives, status (active, superseded, reversed) and supersedes. Effort S; no example decisions exist yet, so it needs fixtures.
+
+## Related ideas (same batch, no links yet)
+
+The other fourteen template ideas were recorded from the same session in the same order:
+- 000673–000676: timeline, Gantt chart, commitments ledger, portfolio dashboard
+- 000677–000681: project brief, stakeholder card, kanban board, agenda/calendar, waiting-on board
+- 000682–000683: stale radar, weekly review
+- 000685–000686: commitment velocity trend, RACI matrix
+- 000687: shared portfolio data loader and fixture infrastructure
+
+None of these ideas carry links to each other yet; the link stage for this batch has not run.
+
+## Related decision-capture work
+
+Four ideas address how decisions are captured and surfaced across sessions, distinct from this template's scope:
+- 000275: Sub-agent per session record to extract decisions and outstanding items
+- 000276: Analyze how decision records are written and propose session-protocol enhancements
+- 000435: Capture every decision required from the owner in a file: pending ones updated when resolved, immediate ones captured in full
+- 000557: Decisionator agent: captures decisions across all sessions
+
+These overlap on *content* (what a decision record holds, how it is written) but do not propose a reusable portfolio template.
+
+## No plan or backlog phase names any template idea (673–687) yet
+
+Searched docs/01-plans/ and docs/09-backlog/backlog.yaml. Zero backlog phases queue any of the 000673–000687 family. These ideas remain unplanned.
+
+Related phases that consume portfolio data and signals:
+- phase-syn-03 to -05 (PLAN-002): Generate session briefings, weekly reviews, and portfolio digest export to HTML. These would use the templates once 000684 and siblings are built.
+- phase-des-03, -04 (PLAN-036, amended 2026-09-30): Build template and component libraries for HTML generation. Focused on component markup templates and CSS, not portfolio data templates.
+
+## Constraints from idea body and PLAN-036
+
+Idea 000684 names REQ-036 as the "house family" constraint. That requirement (amended 2026-09-30) specifies the design system for the idea realization engine's generated HTML pages, not portfolio templates. However, the decision register template will inherit:
+- Declared in templates/html/library.yaml
+- No script; deterministic output with explicit as-of date
+- Built against the tracked example set
+- Shared loader over data_root() required before first portfolio template (000687 captures this as infrastructure cost)
+
+## No related ADR, governance document, or requirement found
+
+Searched docs/04-decisions/ and docs/06-requirements/. No decision record or portfolio template requirement exists. The framework templates (PLAN-040, REQ-024) are for governance documents (plans, requirements, protocols), not portfolio data templates.
+
+## Summary
+
+Idea 000684 is the sixth of fifteen portfolio template proposals from one batch (2026-10-08) and is the only one addressing decision recording at the portfolio level. The related decision-capture ideas (000275, 000276, 000435, 000557) tackle *how* decisions are extracted and surfaced, not how a portfolio template displays them. No backlog phase yet queues any of the template family. Building the first template will incur infrastructure cost for a shared data loader (000687).
+
+PROPOSED LINK: 000684 --relates_to--> 000673 (both are portfolio templates from the same exploration session, part of a 15-idea family)
+PROPOSED LINK: 000684 --relates_to--> 000687 (the shared portfolio data loader that every template in the family depends on)
+PROPOSED LINK: 000684 --relates_to--> 000275 (overlap on decision extraction and capture, 000275 is the source of content 000684 templates)
 
 </details>
 
@@ -28488,7 +28742,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000685 · Template: commitment velocity trend
 
-**Created 2026-10-09T17:46:18-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:18-04:00 · Status: `triaged`**
 
 Am I creating faster than completing: weekly created versus completed counts as CSS bars or inline SVG. slot-fill. Effort M. Depends on the velocity view and persisted snapshots (phase-sig-06 to phase-sig-08).
 
@@ -28498,9 +28752,22 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:19-04:00): Recorded first as 000612 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:10+00:00; renumbered to 000685 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000612.
+- **finding** by agent-idea-triage (2026-10-12T17:55:01-04:00): Idea 000685 ("Template: commitment velocity trend") is part of a template batch of fourteen ideas (000673–000686, plus 000687 for shared data loading) proposed in a single cloud session (2026-10-08, cloud session branch claude/productivity-system-templates-ie1x8d). All share the same constraints: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with explicit as-of date, built against the tracked example set.
+
+The idea depends on signal work that is currently queued: phase-sig-06 (Implement weekly Commitment Velocity) defines the rolling weekly creation/completion counts, and phases phase-sig-07 (Define durable velocity snapshot ownership) and phase-sig-08 (Persist weekly velocity observations) specify and implement the snapshot persistence layer. These three phases are queued under doc-mini-systems and have not yet been scheduled.
+
+Related governed documents:
+- PLAN-036 (HTML generation and design system) covers the template library infrastructure (phase-des-03 "Make the template layer a growing library with declared population methods") (phase-des-03 is complete in backlog.yaml; corrected by the triage driver). The house family (templates/html/house-page.html) is the target style per REQ-036 (engine pages house style), approved 2026-09-30.
+- templates/html/library.yaml declares the template families (overview, house, atlas, lit-report); no commitment velocity templates are yet declared or built.
+- REQ-036 (engine pages house style) governs the visual constraints for any new template using the house family.
+
+The idea is not yet in any backlog phase and has no existing linked ideas, despite being part of a coherent batch. All fourteen template ideas (000673–000686) were captured from the same exploration session, and 000687 names the shared data loader they depend on. None of these ideas have cross-links recorded.
+
+PROPOSED LINK: 000685 --relates_to--> 000687 (Both depend on shared portfolio data loading; 000687 names the data layer 000685 needs to render velocity trends)
+PROPOSED LINK: 000685 --relates_to--> 000673 (Part of the same template batch from 2026-10-08 cloud session; all share REQ-036 house family constraint)
 
 </details>
 
@@ -28508,7 +28775,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000686 · Template: RACI and role matrix
 
-**Created 2026-10-09T17:46:20-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:20-04:00 · Status: `triaged`**
 
 Who is responsible, accountable, consulted and informed on each project. Depends on the planned ProjectParty and role-definition records (ARCH-007), which have no schema and no queued phase, so it is blocked. Interim: a people-by-projects matrix from project.stakeholders and person.role, noting that role is a job title, not a project role. slot-fill. Effort M.
 
@@ -28518,9 +28785,35 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:23-04:00): Recorded first as 000613 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:10+00:00; renumbered to 000686 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000613.
+- **finding** by agent-idea-triage (2026-10-12T17:55:02-04:00): Idea 000686 (Template: RACI and role matrix) is part of a batch of related template proposals from the 2026-10-08 cloud session template exploration. Blocked by ARCH-007 (Organizational identity, project parties, engagements and WBS data model), which is draft status and defines ProjectParty and role-definition records required to populate the matrix; neither has a schema or backlog phase yet. The interim solution documented in the idea uses project.stakeholders and person.role instead.
+
+All template ideas from the batch share constraints: house family (REQ-036), no script, declared in templates/html/library.yaml, deterministic output with an explicit as-of date, and built against the tracked example set.
+
+Related documents and governance:
+- ARCH-007 (the blocking dependency, project roles section line 61-92): defines ProjectParty, ProjectRoleDefinition, and role catalog requirements
+- REQ-036 (house style and template constraints): determinism, commitment, colour and styling rules for all templates
+- phase-syn-05 (Export the portfolio digest through generated HTML): planned phase for similar portfolio visualization work, currently blocked by cancelled phase-html-10
+
+Related template ideas from the same 2026-10-08 exploration batch:
+- 000673 (Simple timeline of project dated events) — also blocked on ARCH-007
+- 000674 (Gantt chart, project level) — also blocked on ARCH-007
+- 000675 (Commitments ledger) — recommended by owner to build second (after 000687)
+- 000680 (Agenda and calendar view)
+- 000681 (Waiting-on board)
+- 000682 (Stale radar and review queue)
+- 000683 (Weekly review page)
+- 000684 (Decision register)
+- 000685 (Commitment velocity trend)
+- 000687 (Shared portfolio data loader and richer fixture set) — prerequisite for all templates; owner ruled to build first
+
+No existing plan covers building these templates; phase-proj-01 (Answer the portfolio data question) gates template work by determining whether real portfolio data exists.
+
+PROPOSED LINK: 000686 --relates_to--> 000687 (Shared portfolio data loader is a prerequisite for all template ideas including this RACI matrix)
+PROPOSED LINK: 000686 --relates_to--> 000675 (Commitments ledger is recommended to build second after the shared loader)
+PROPOSED LINK: 000686 --extends--> 000673 (Both are blocked on the same ARCH-007 dependency; RACI and role matrix builds on organizational model)
 
 </details>
 
@@ -28528,7 +28821,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000687 · Shared portfolio data loader and a richer fictional fixture set
 
-**Created 2026-10-09T17:46:26-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:26-04:00 · Status: `triaged`**
 
 Not a template: the one-time cost every portfolio template shares. A loader that reads the data root through data_root() or the DuckDB layer and takes an explicit as-of date, so pages stay deterministic (REQ-036 R07, R08). With it, a richer tracked example set covering an overdue item, a blocked item, a milestone, an interaction and a waiting-on record: today the set holds 5 projects, 1 person, 1 commitment and 3 tasks, with exactly one overdue task and no supporting records. Suggested first step of the template build order.
 
@@ -28538,9 +28831,33 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:28-04:00): Recorded first as 000614 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:11+00:00; renumbered to 000687 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000614.
+- **finding** by agent-idea-triage (2026-10-12T17:55:03-04:00): 000687 is a proposal for a shared portfolio data loader and richer fictional fixture set that supports the portfolio template family (000680–000686). The idea frames itself not as a template itself, but as the common infrastructure cost every template shares: a loader that reads portfolio data through `data_root()` or the DuckDB layer with an explicit as-of date for deterministic output.
+
+**Related ideas:**
+All seven portfolio template ideas (000680 agenda/calendar, 000681 waiting-on board, 000682 stale radar, 000683 weekly review, 000684 decision register, 000685 commitment velocity trend, 000686 RACI matrix) were captured 2026-10-08 and explicitly share the same constraints and source. Each template's description states: "No generator reads portfolio data today, so the first template built also pays for a shared loader over data_root()" and names 000687's own requirements (deterministic output with explicit as-of date) as a shared dependency. None of the template ideas carry links to each other or to 000687 yet, despite this explicit interdependence.
+
+**Related requirements and architecture decisions:**
+- REQ-036 (engine pages house-style requirement), R07–R08: specifies that pages must read state through `fold()`, regenerate deterministically, and stamp each output with its source commit and date — exactly the as-of determinism this loader implements.
+- ADR-009 (structure/content boundary): documents the data loading architecture where `D_SYSTEM_DATA_ROOT` environment variable points the loader and validator at the real portfolio on the owner's machine (gitignored `_private/portfolio/`) or the fictional set in tracked `_data/`.
+
+**Related plans and phases:**
+- PLAN-034 (blocked downstream projections) and phase-proj-02 title "Deterministic as-of snapshots and two-point diffs" represent related portfolio data work, though focused on projection/simulation rather than template rendering.
+
+**Governance status:**
+No phases in the backlog yet cover 000687 or any of the template ideas (000680–686). The template ideas are open and unlinked to their enabling infrastructure, and no plan document yet scopes the loader build.
+
+000687's own text recommends itself as "suggested first step of the template build order," which aligns with its role as prerequisite. The structured data requirements and as-of handling this loader must implement are well-specified in REQ-036 R07–R08, and the data architecture choice (ADR-009) is already settled.
+
+PROPOSED LINK: 000680 --relates_to--> 000687 (portfolio template shares loader and as-of handling cost)
+PROPOSED LINK: 000681 --relates_to--> 000687 (portfolio template shares loader and as-of handling cost)
+PROPOSED LINK: 000682 --relates_to--> 000687 (portfolio template shares loader and as-of handling cost)
+PROPOSED LINK: 000683 --relates_to--> 000687 (portfolio template shares loader and as-of handling cost)
+PROPOSED LINK: 000684 --relates_to--> 000687 (portfolio template shares loader and as-of handling cost)
+PROPOSED LINK: 000685 --relates_to--> 000687 (portfolio template shares loader and as-of handling cost)
+PROPOSED LINK: 000686 --relates_to--> 000687 (portfolio template shares loader and as-of handling cost)
 
 </details>
 
@@ -28548,7 +28865,7 @@ Source: the template exploration of the cloud session of 2026-10-08 (branch clau
 
 ## 000688 · phase-syn-05 depends on the cancelled phase-html-10 and a retired page pipeline
 
-**Created 2026-10-09T17:46:31-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:31-04:00 · Status: `triaged`**
 
 The digest HTML export phase (phase-syn-05) depends on phase-html-10 and its scope names the existing YAML-to-JSON page build pipeline. Both were cancelled when PLAN-003 was retired (ADR-027). The phase should be re-scoped to the house template family before anyone claims it. Found by the template exploration of the cloud session of 2026-10-08.
 
@@ -28556,9 +28873,18 @@ The digest HTML export phase (phase-syn-05) depends on phase-html-10 and its sco
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:33-04:00): Recorded first as 000615 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T10:04:11+00:00; renumbered to 000688 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000615.
+- **finding** by agent-idea-triage (2026-10-12T17:55:04-04:00): Idea 000688 describes a dependency problem with phase-syn-05 (Export the portfolio digest through generated HTML) that depends on two cancelled/retired items: phase-html-10 (itself cancelled per ADR-027) and the YAML-to-JSON page build pipeline from PLAN-003, which was retired when ADR-027 was accepted on 2026-10-04.
+
+The backlog confirms this state: phase-syn-05 is queued with depends_on [phase-syn-04, phase-html-10], and its scope names "the existing YAML-to-JSON page build pipeline." phase-html-10 is cancelled with blocked_reason "Retired with PLAN-003 by ADR-027. The owner ruled on 2026-10-04...that generated pages are built from repository data by the house family and the engine and overview generators instead."
+
+Idea 000567 (Re-point phase-syn-05 off the retired PLAN-003 page pipeline) is already triaged and addresses the exact same problem. Its finding (from the triage pass following ADR-027) names the retirement directly, confirms phase-syn-05's blocked state in the backlog, and notes the phase needs "a new dependency (for example the engine page generator built by phase-des-09), a re-scope, or retirement." That finding also names four sibling ideas from the same audit: 000568 (phase-sch-06 stranded), 000569 (React error boundary), 000570 (CI ruff on tools/), and 000571 (sys-html registry).
+
+Idea 000688 appears to rediscover the same problem, found during a cloud session template exploration on 2026-10-08, and adds a specific proposal: re-scope phase-syn-05 to the house template family (templates/html/house-*.html and templates/styles/house*.css, committed after phase-des-07). The house family exists and is in active use by tools/generate_engine_pages.py (phase-des-09, phase-des-10) and tools/generate_overview.py (phase-demo-04).
+
+PROPOSED LINK: 000688 --relates_to--> 000567 (both identify the same blocked phase-syn-05 dependency; 000688 appears to rediscover the same problem and propose re-scoping to the house template family)
 
 </details>
 
@@ -28566,7 +28892,7 @@ The digest HTML export phase (phase-syn-05) depends on phase-html-10 and its sco
 
 ## 000689 · A command-line entry point for the capture structuring step
 
-**Created 2026-10-09T17:46:35-04:00 · Status: `open`**
+**Created 2026-10-09T17:46:35-04:00 · Status: `triaged`**
 
 Today the structuring step between a raw capture and a staged record exists only as library functions: structure() and stage_capture() in src/capture/structure.py. tools/review.py imports only StructuringError, and no script under tools/ calls either function, so the owner cannot run structuring by hand; a session or an agent has to call it. Intake (tools/capture.py) and review and promotion (tools/review.py) both have commands. Owner ruling, 2026-10-08, in the cloud session on branch claude/productivity-system-templates-ie1x8d: there should be a command-line entry point for structuring. Found by the document digest for the portfolio guide (_public/portfolio-guide.html, section 4, "Review and promote staged records"). Related: 000361 (a quick-entry writer for people, commitments and tasks), which addresses the same friction from the other side.
 
@@ -28574,9 +28900,18 @@ Today the structuring step between a raw capture and a staged record exists only
 
 
 <details>
-<summary>1 finding(s)</summary>
+<summary>2 finding(s)</summary>
 
 - **finding** by agent-renumber (2026-10-09T17:46:37-04:00): Recorded first as 000616 on branch claude/productivity-system-templates-ie1x8d (commit c1b608db) at 2026-10-08T14:59:17+00:00; renumbered to 000689 under the owner's 2026-10-08 ruling, because the workbench run (branch ccr-b69b05b4-tdcrux) had already used 000616.
+- **finding** by agent-idea-triage (2026-10-12T17:55:05-04:00): The idea asks for a command-line entry point to run the structuring step manually — turning raw captures into staged records — which mirrors tools/capture.py (raw intake) and tools/review.py (review and promotion).
+
+**Infrastructure exists:** The structuring logic is implemented in src/capture/structure.py (completed by phase-cap-05, SESS-2026-09-22-10). Raw captures are written to `_capture/raw/` by tools/capture.py, and staged records need to reach `_capture/staging/` for tools/review.py to operate on them. The pipeline is documented in OPS-008 and OPS-024, but the middle step lacks a command-line entry point.
+
+**Need is documented:** The portfolio guide (_public/portfolio-guide.html, section 4, "Review and promote staged records") explicitly flags this gap: "the structuring step between a raw note and a staged record is a library function an agent calls. No command-line entry point exists for it, so today a session or an agent runs it, not the owner by hand." REQ-002 and PLAN-009 establish structuring as a required phase (phase-cap-05, now complete), but no operations document or CLI tool delivers it.
+
+**Related capture work:** 000361 (a quick-entry writer for people, commitments and tasks) addresses friction from the opposite end of the pipeline, but sits outside structuring's domain.
+
+**No existing overlap found** with other open ideas. The need is specific and currently unmet by any backlog phase.
 
 </details>
 
@@ -28584,28 +28919,97 @@ Today the structuring step between a raw capture and a staged record exists only
 
 ## 000690 · Reword the per-panel eligible_slots descriptions in the workbench vocabulary note and GLOSSARY.md after phase-arch-07
 
-**Created 2026-10-09T21:13:17-04:00 · Status: `open`**
+**Created 2026-10-09T21:13:17-04:00 · Status: `triaged`**
 
 After phase-arch-07, brain/concepts/terms-workbench-ui.md and docs/08-governance/GLOSSARY.md still describe a per-panel eligible_slots list, which arch-07 removes in favour of structural matching (REQ-011 R12); both need rewording.
 
 Raised by Session 2 - Builder B (phase-arch-07) during the 2026-10-09 workbench run (Session Manager relay).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-12T17:55:06-04:00): Related plans and documents: This idea proposes updating documentation after phase-arch-07 (status: active, "Implement schema-owned slots and sub-slots with structural eligibility") completes. The work touches `brain/concepts/terms-workbench-ui.md` and `docs/08-governance/GLOSSARY.md` (which is auto-generated from the concept memory). Both currently describe panel eligibility as per-panel `eligible_slots` lists - see lines 33, 41, and 71-73 in the vocabulary note.
+
+Phase-arch-07 implements REQ-011 R12, which replaces per-panel eligibility lists with structural matching: panels become eligible for slots when their element configuration matches the element types the slot's schema admits (documented in ADR-031 and SESS-2026-10-08-12). This is the conceptual model idea 000141 proposed ("Slots as configuration schemas with nested sub-slots; panel eligibility by element-configuration match"). After phase-arch-07 merges, lines 33 and 41 in the vocabulary note will be outdated - they describe `eligible_slots` as a per-panel list that no longer exists.
+
+The vocabulary note is not a deliverable of phase-arch-07 itself; the phase owns the code and schema. Idea 000690 is the follow-up documentation task, captured by the session running phase-arch-07 per GOV-006's capture protocol.
+
+Related ideas: 000141 (the structural-matching model this task documents), 000124 (broader vocabulary formalization that 000141 presupposes), 000135 (multi-instance modularity 000141 generalizes). No idea-to-idea overlap requiring a PROPOSED LINK - 000690 is a direct follow-up to what 000141 conceptualized and 000141 does not name 000690.
+
+No existing governed document fully delivers this yet. It is future work gated on phase-arch-07.
+
+</details>
+
 ---
 
 ## 000691 · Vite dev server returns index.html with 200 for a missing module path instead of a 404
 
-**Created 2026-10-12T17:47:56-04:00 · Status: `open`**
+**Created 2026-10-12T17:47:56-04:00 · Status: `triaged`**
 
 In the ts/ Vite dev server, a request for a module path that does not exist (e.g. /src/does-not-exist.ts) returns 200 with index.html, because the SPA fallback middleware ignores the extension and uses only the Accept header. A mistyped or deleted import gets the app shell instead of a clear 404. Pre-existing; found by the phase-arch-07 round-8 functional review.
 
 Raised by Session Manager during the workbench run (2026-10-11).
 
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-12T17:55:07-04:00): Idea 000691 describes the root cause of Vite's SPA fallback behavior: when requesting a module path that does not exist (e.g., `/src/does-not-exist.ts`), the dev server returns HTTP 200 with `index.html` because the fallback middleware ignores the file extension and uses only the `Accept` header. This root cause manifests in multiple places across the workbench.
+
+**Related idea overlap:**
+
+000691 relates directly to 000555 (HtmlViewerRegion's page-exists check is fooled by Vite's SPA fallback). Both describe the same Vite dev server behavior from different angles:
+- 000691 names the root cause at the dev server level
+- 000555 names the specific symptom in the viewer component (the HEAD request to `/workbench-file/<file>` gets 200 instead of 404)
+- 000645 (viewer's absent-page check prints the same message for a missing route and file) relates to 000555 and describes the UX consequence
+
+**Existing plan coverage:**
+
+PLAN-027 (Workbench features and defects) addresses the manifestation via phase-wbf-16 ("Report a missing HTML Viewer page when the file route is absent"), which is marked complete. That phase fixed the specific symptom in HtmlViewerRegion by enabling D_SYSTEM_DEMO_TERMINAL=1 to gate the `/workbench-file/*` route registration, so the route's absence with the flag unset causes a real 404 rather than falling through to the SPA fallback.
+
+However, phase-wbf-16 addresses only the HtmlViewerRegion user-visible symptom, not the underlying issue: the Vite dev server still returns 200 with index.html for any missing module path generally (e.g., mistyped imports in source code). vite.config.ts lines 26-34 document this: verified against Vite 6.4.3 that `/@fs/<missing-file>` falls through to the SPA history fallback and returns 200 with index.html instead of 404. The current code works around this per-route by registering custom middleware before Vite's internal middlewares.
+
+**Finding:**
+
+Idea 000691 documents a pre-existing dev server issue found during phase-arch-07's round-8 functional review. The issue is distinct from and broader than 000555's scoped defect: 000555 is now addressed by the completed phase-wbf-16, but 000691 identifies an unaddressed root cause in Vite's dev server configuration that affects any module import path. No phase currently plans to reconfigure Vite's SPA fallback behavior to address module paths specifically (as opposed to routing them away via custom middleware per-route, the current approach).
+
+PROPOSED LINK: 000691 --relates_to--> 000555 (Both describe Vite's SPA fallback returning 200 with index.html instead of 404; 000691 names the root cause, 000555 names a specific manifestation now addressed by phase-wbf-16)
+
+</details>
+
 ---
 
 ## 000692 · A kill -9 of the top-level vitest run in ts/vite.config.test.ts goes unnoticed outside a race-case watch
 
-**Created 2026-10-12T17:47:56-04:00 · Status: `open`**
+**Created 2026-10-12T17:47:56-04:00 · Status: `triaged`**
 
 In ts/vite.config.test.ts (phase-arch-07), a kill -9 of the top-level `npm exec vitest` run is noticed only while a race-case toggler is watching that process. A kill during file import, or between race cases, leaves the reparented vitest CLI and worker to finish the whole file (about 33 s), report green, and exit, with no "the test run was killed" message. The owner accepted it for arch-07 as ordinary test-runner behaviour; a later hardening could make any ancestor death stop the run.
 
 Raised by Session Manager during the workbench run (2026-10-12).
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-12T17:55:08-04:00): Idea 000692 describes a vitest process lifecycle issue discovered during phase-arch-07 (Implement schema-owned slots and sub-slots with structural eligibility): when the top-level vitest run is killed with SIGKILL during file import or between test cases, the reparented vitest CLI and worker process continue executing until completion (~33s), report success, and exit silently with no "killed" signal.
+
+**Related work already documented:**
+- 000605 and 000659 address similar process cleanup and signal-handling defects, but for PosixPtyAdapter and bash shell lifecycle in terminal regions. Those ideas focus on SIGTERM escalation and process reaping. The vitest issue is structurally different: it is about a test runner's response to ancestor process death, not about signal disposition in a PTY.
+- 000026 (CI only compiles frontend — no test runner exists for ts/) and 000057 (Testing strategy across the system) are broader testing infrastructure ideas; neither specifically addresses test-runner process management or ancestor-death handling.
+- 000099 and 000129 document three failing PTY-based terminal tests in the demo, unrelated to vitest.
+
+**Relevant governed documents:**
+- phase-arch-07 (active, in PLAN-028) lists ts/vite.config.ts as a deliverable and is where the issue was discovered. The owner accepted the behavior as-is during arch-07's work, not scheduled to address.
+- No plan, requirement, ADR or backlog phase owns the proposed "later hardening" to make ancestor death stop the run.
+
+**Finding:**
+The idea documents accepted-but-noted test-runner behavior during phase-arch-07. The issue is isolated to vitest's unnoticed continuation after ancestor termination, which the owner has approved as tolerable for now. No related idea proposes to close it; the owner's comment that "a later hardening could make any ancestor death stop the run" names the desired future direction but assigns no backlog phase to it. The idea stands alone as a record of known behavior awaiting a future decision.
+
+</details>
