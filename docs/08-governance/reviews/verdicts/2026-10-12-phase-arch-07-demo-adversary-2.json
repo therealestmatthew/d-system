@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-12-phase-arch-07-demo-adversary-2",
+  "date": "2026-10-12",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "1735e7b2fdf4d6be974886dde65643414fa33ef1",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "pass",
+  "gating": true,
+  "findings": [],
+  "raw_reply_sha256": "36886f0767137dcef65932429ec74661892c988a48b596aeda7949c1f65e35da",
+  "notes": "Round 9 (final round) security review standing in for /security-review, dispatched by the Session Manager in its own scratch clone at 1735e7b2 with live probing of every html-proxy variant, the populate-then-swap race, HEAD, and a regression sweep. No findings; informational: HEAD on .html is safe because the first middleware checks every method and Node strips HEAD bodies, worth a code comment. Raw reply at _working/session-manager/review-replies/phase-arch-07-1735e7b2-security-demo-adversary.md."
+}

@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-12-phase-arch-07-demo-adversary",
+  "date": "2026-10-12",
+  "phase": "phase-arch-07",
+  "reviewed_commit": "1735e7b2fdf4d6be974886dde65643414fa33ef1",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "A kill -9 of the top-level test run registers only if a toggler is already watching that process; a kill before or between race cases leaves the reparented vitest run to finish silently and report green.",
+      "evidence": "ts/vite.config.test.ts:340-366 and :397-403. Kills at +1.0 s and +1.5 s: the vitest CLI, esbuild and forks.js worker ran the full ~33.5 s and reported 20 passed with no message; a kill at +4.0 s reported \"the test run was killed\".",
+      "consequence": "The claim that a killed run always says so does not hold; an operator may believe a run stopped while it finishes. No toggler outlives its deadline and nothing leaks."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "HTML_PROXY_ID matches Vite's inline-script proxy ids but not the dev-mode <style> id form (?html-proxy&direct&index=N.css); the comment claims parity with Vite's matcher.",
+      "evidence": "ts/vite.config.ts:173; a direct fetch of that id returned the page's own bytes through the checked path. Not reachable in the normal browser flow, where dev inlines style content.",
+      "consequence": "An overclaiming comment and an untested id shape; no outside file exposed."
+    }
+  ],
+  "raw_reply_sha256": "84687598c2dd6a922d4d823096f6669530cf6877bf69f7ae1c62b20f5ab27fe8",
+  "notes": "Round 9 (final round) functional gating review, dispatched by the Session Manager in its own scratch clone at 1735e7b2. Owner ruling 2026-10-12: F01 accepted as ordinary test-runner behaviour under kill -9 (no leak, togglers bounded by their deadline), with the phase's claim corrected to what holds and the gap recorded as an idea; F02 fixed by correcting the comment. No further review round. Raw reply at _working/session-manager/review-replies/phase-arch-07-1735e7b2-demo-adversary.md."
+}
