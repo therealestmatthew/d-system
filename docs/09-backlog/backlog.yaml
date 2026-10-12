@@ -14294,9 +14294,9 @@ items:
     review procedure, and adds no depends_on edge onto it.
   acceptance:
   - 'REQ-022 R11 holds: a deliberately oversized phase is split and each part re-enters review.'
-  - The fit heuristic is derived from historical session-length data across completed phases, not
-    from an invented size standard. This is judged by the session-close independent review, not by a
-    mechanical command.
+  - Fit is judged from a phase's scope size against the one-session budget (session_budget = 1,
+    GOV-002), not from historical timing data, which the backlog does not record. This is judged by
+    the session-close independent review, not by a mechanical command.
   verification:
   - uv run python -m src.governance
   - uv run pytest
@@ -14304,8 +14304,8 @@ items:
   - docs/08-governance/
   - .claude/agents/
   - test/
-  next_action: Derive the fit test from the session_budget field's actual meaning in completed phases
-    rather than inventing a size heuristic.
+  next_action: Write the scope-size fit test against the one-session budget, with a deliberately
+    oversized phase as the worked example for R11.
 - id: phase-irs-06
   title: Three-altitude review procedure with the interim adversarial engine
   plan: doc-idea-realization-system-plan
