@@ -278,8 +278,9 @@ describe("the config's own file routes check the real path", () => {
 // fast as it can, until it is told to stop, then prints how many swaps it made. It also exits on
 // its own at its deadline, as soon as its parent is gone (its stdin pipe ends, or its parent
 // process id changes), and as soon as any process in `watch` (the test worker's ancestors, see
-// `ancestors`) is gone, so a test run that is killed or crashes cannot leave it spinning. Its exit
-// code says which: 0 told to stop, 3 an ancestor is gone, 4 its deadline, 5 its parent is gone.
+// `ancestors`) is gone. Whatever kills or crashes the test run, a toggler stops by its deadline at
+// the latest. Its exit code says which: 0 told to stop, 3 an ancestor is gone, 4 its deadline, 5
+// its parent is gone.
 const TOGGLER = `
 const { readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } = require('node:fs')
 const [target, secret, publicText, deadlineMs, watchList = ''] = process.argv.slice(1)
@@ -326,8 +327,9 @@ step()
 
 const TOGGLER_DEADLINE_MS = 10_000
 
-// What a race case reports when the run it belongs to was killed, so it cannot be read as a
-// failed protection assertion.
+// What a race case reports when the run it belongs to was killed while that case's toggler was
+// running, so it cannot be read as a failed protection assertion. A kill before the race starts,
+// or between its cases, is not noticed: Vitest's orphaned worker finishes the run on its own.
 const RUN_KILLED = 'the test run was killed'
 const TOGGLER_EXIT: Record<number, string> = {
   3: `${RUN_KILLED} (the toggler saw an ancestor end)`,
@@ -348,8 +350,9 @@ function isGone(pid: number): boolean {
 }
 
 // The process ids above this one, nearest first, up to but not including init: the Vitest worker's
-// parent, the top-level `vitest` it was forked from, `npx`, and so on. Killing any of them must end
-// the race. Read from `/proc` on Linux; elsewhere only the direct parent is known.
+// parent, the top-level `vitest` it was forked from, `npx`, and so on. A toggler and the race loop
+// watch them, so killing any of them while a race case runs ends that case. Read from `/proc` on
+// Linux; elsewhere only the direct parent is known.
 function ancestors(): number[] {
   const found: number[] = []
   let pid = process.ppid
@@ -733,7 +736,9 @@ describe('serving under concurrent renames (check-then-serve race)', () => {
             const until = Date.now() + 1200
             const watched = ancestors()
             while (Date.now() < until) {
-              // A killed test run leaves this worker behind; stop rather than start more races.
+              // A killed test run leaves this worker behind; stop this case rather than keep
+              // racing. Checked only while a case runs; a kill between cases goes unnoticed (see
+              // RUN_KILLED).
               if (watched.some(isGone)) throw new Error(RUN_KILLED)
               const bodies = await Promise.all(
                 Array.from({ length: 16 }, () =>

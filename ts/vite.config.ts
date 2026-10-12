@@ -227,9 +227,13 @@ function assetQueryOf(params: URLSearchParams): AssetQuery | null {
   return null
 }
 
-// An inline `<script>` or `<style>` of an HTML page, as Vite's `vite:html-inline-proxy` plugin
-// names it: the same expression that plugin's `load` matches (Vite 6.4), which answers from its
-// in-memory copy of the page's inline block, or throws, and never reads the file by name.
+// An inline block of an HTML page, as Vite's `vite:html-inline-proxy` plugin names it: the same
+// expression that plugin's `load` matches (Vite 6.4), which answers from its in-memory copy of the
+// page's inline block, or throws, and never reads the file by name. It matches that plugin's ids
+// only, not every id Vite builds for an inline block. The dev form of an inline `<style>`
+// (`?html-proxy&direct&index=N.css`) does not match, so `load` answers it like any other in-scope
+// id, from the checked descriptor with the page's own text. The normal dev flow does not request
+// that id (security review of `phase-arch-07`, 2026-10-12).
 const HTML_PROXY_ID = /[?&]html-proxy=?(?:&inline-css)?(?:&style-attr)?&index=(\d+)\.(?:js|css)$/
 
 const CSS_EXTENSIONS = new Set(['.css', '.scss', '.sass', '.less', '.styl', '.pcss', '.postcss'])
@@ -436,6 +440,9 @@ export function refuseSymlinkEscapes(
             next()
             return
           }
+          // GET only. A HEAD of an `.html` page goes on to Vite, which is safe: the first
+          // middleware above has already checked the file for every method, and Node sends no
+          // body for HEAD.
           if (req.method !== 'GET' || extname(urlPath).toLowerCase() !== '.html') {
             next()
             return

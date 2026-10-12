@@ -666,8 +666,11 @@ still ends within 5 s. By hand, `kill -9` of the real `npm exec vitest` about 6 
 test ended the toggler within 1 s. The orphaned worker failed the case with "Error: the test run
 was killed" and the run ended, leaving no Vitest or toggler process and no tree.
 
-The guarantee as built: on Linux, the race stops when any ancestor of the test worker ends;
-elsewhere, when the worker's direct parent does. The vitest file now has 17 cases.
+What this guarantees, corrected after the final functional review (below): a kill is noticed only
+while a race case's toggler is running. On Linux the case then ends when any ancestor of the test
+worker ends; elsewhere, when the worker's direct parent does. A kill before the race starts, or
+between its cases, is not noticed, and Vitest's orphaned worker finishes the run on its own. In
+every case a toggler stops by its deadline at the latest. The vitest file now has 17 cases.
 
 **Records for `59121c16`**, committed unchanged in `e44c4797`:
 - functional reject, whose blocker and major are fixed above;
@@ -728,3 +731,33 @@ That minor is fixed by narrowing. The two cases left the race loop, and a plain 
 serves the ?worker and ?worker&inline wrappers", asserts that the guard still answers both with
 200 and a wrapper naming `?worker_file`. The race test now has 24 cases, every one of which can
 detect a leak; the vitest file has 20 cases.
+
+## Final review (2026-10-12)
+
+On `1735e7b2` the final security check passed with no findings, and the shadow review passed. The
+functional review rejected with one finding and one minor. Records committed unchanged in
+`c94c018e`.
+
+**F01: a kill before or between race cases is not noticed.** A `kill -9` of the top-level run
+before or between race cases goes unreported: the reparented Vitest run finishes about 33 s later,
+green, with no message. A kill while a toggler is watching does report.
+
+Owner ruling of 2026-10-12: **accepted** as ordinary test-runner behaviour under `kill -9`. Nothing
+leaks, and the togglers are bounded by their deadline. The claims are corrected to what holds: in
+the test's comments (`TOGGLER`, `RUN_KILLED`, `ancestors` and the race loop), and in the round 8
+"what this guarantees" paragraph above, which used to say a kill ends the race. A kill is reported
+only while a toggler is watching; an earlier kill lets the run finish on its own. The Session
+Manager sent the gap to Ideation as an idea.
+
+**F02 minor: `HTML_PROXY_ID` overstated its parity with Vite.** It matches the ids of Vite's
+`vite:html-inline-proxy` `load` only. The dev form of an inline `<style>`
+(`?html-proxy&direct&index=N.css`) does not match, so `load` answers it like any other in-scope
+id, from the checked descriptor, with the page's own text. The normal dev flow does not request
+that id. The comment in `vite.config.ts` now says so.
+
+**Security informational.** The `.html` middleware now has a comment explaining why a HEAD of an
+`.html` page going on to Vite is safe: the first middleware has already checked the file for every
+method, and Node sends no body for HEAD.
+
+These are comment and documentation changes only, with no change in behaviour, so by the owner's
+ruling there is no further review round.
