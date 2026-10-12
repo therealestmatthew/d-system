@@ -14896,8 +14896,8 @@ items:
   systems:
   - sys-fw-templates
   owner: repository-owner
+  status: complete
   agent: agent-builder-a
-  status: active
   priority: 2
   session_budget: 1
   depends_on: []
@@ -14918,8 +14918,21 @@ items:
   - docs/00-working/framework/05-schemas/phase.template.md
   - docs/00-working/framework/05-schemas/phase.schema.json
   - docs/00-working/framework/05-schemas/check_schemas.py
-  next_action: Extract phase-conc-01 from backlog.yaml as the reference shape before drafting the
-    schema, so the schema is built to fit an item already in use rather than an invented one.
+  next_action: None - complete.
+  session: doc-session-phase-template-schema
+  completion_evidence:
+  - docs/00-working/framework/05-schemas/phase.template.md
+  - docs/00-working/framework/05-schemas/phase.schema.json
+  - docs/00-working/framework/05-schemas/check_schemas.py
+  - docs/03-sessions/SESS-2026-10-09-01-phase-template-schema.md
+  result: 'Standalone phase template and portable-core schema shipped. check_schemas.py "0
+    failure(s)": phase-conc-01 cut from backlog.yaml as text validates unchanged, copies without
+    acceptance or result fail, an active copy with no agent validates, and all 357 phases
+    validate - REQ-024 R03 holds with no edit to backlog.yaml. Post-rebase on dev 232b4276:
+    "Governance OK: 45 systems, 480 documents, 38 memories, 357 backlog phases" and "2153
+    passed"; test baseline OK against 2149 on dev. Review: two rounds; adversary findings fixed
+    per owner rulings, one judge finding accepted (records in docs/08-governance/reviews/verdicts/).
+    Merged onto dev at 37812ca6 with the owner''s approval.'
 
 - id: phase-fwt-03
   title: Requirement and plan document schemas
