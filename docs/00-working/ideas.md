@@ -28589,3 +28589,23 @@ Today the structuring step between a raw capture and a staged record exists only
 After phase-arch-07, brain/concepts/terms-workbench-ui.md and docs/08-governance/GLOSSARY.md still describe a per-panel eligible_slots list, which arch-07 removes in favour of structural matching (REQ-011 R12); both need rewording.
 
 Raised by Session 2 - Builder B (phase-arch-07) during the 2026-10-09 workbench run (Session Manager relay).
+
+---
+
+## 000691 · Vite dev server returns index.html with 200 for a missing module path instead of a 404
+
+**Created 2026-10-12T17:47:56-04:00 · Status: `open`**
+
+In the ts/ Vite dev server, a request for a module path that does not exist (e.g. /src/does-not-exist.ts) returns 200 with index.html, because the SPA fallback middleware ignores the extension and uses only the Accept header. A mistyped or deleted import gets the app shell instead of a clear 404. Pre-existing; found by the phase-arch-07 round-8 functional review.
+
+Raised by Session Manager during the workbench run (2026-10-11).
+
+---
+
+## 000692 · A kill -9 of the top-level vitest run in ts/vite.config.test.ts goes unnoticed outside a race-case watch
+
+**Created 2026-10-12T17:47:56-04:00 · Status: `open`**
+
+In ts/vite.config.test.ts (phase-arch-07), a kill -9 of the top-level `npm exec vitest` run is noticed only while a race-case toggler is watching that process. A kill during file import, or between race cases, leaves the reparented vitest CLI and worker to finish the whole file (about 33 s), report green, and exit, with no "the test run was killed" message. The owner accepted it for arch-07 as ordinary test-runner behaviour; a later hardening could make any ancestor death stop the run.
+
+Raised by Session Manager during the workbench run (2026-10-12).
