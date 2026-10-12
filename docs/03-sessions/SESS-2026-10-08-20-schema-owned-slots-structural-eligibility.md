@@ -679,3 +679,44 @@ JavaScript request, so Vite transforms it into the same wrapper as the module ca
 that wrapper only names the worker's URL. A race case for it could not fail, like the two
 `?worker` cases already labelled as non-evidence. The worker's own bytes are covered by the
 `?worker_file` case.
+
+## Review round 9 (2026-10-11)
+
+Owner ruling of 2026-10-11: one more round, then one final security check. If that check finds
+anything new, the guard's remaining work splits into a follow-up phase, and this phase merges with
+that stated.
+
+**Security blocker: the `?html-proxy` exception was a bare key test.** Vite's `vite:html-inline-proxy`
+answers only ids matching its exact pattern. So `/data/race.ts?html-proxy` fell through to Vite
+reading the file by name, and under the race a plain GET served the secret module; esbuild's
+source map carried it in `sourcesContent`.
+
+Fixed: the exception is now `HTML_PROXY_ID`, the expression that plugin's `load` uses (Vite 6.4,
+`/[?&]html-proxy=?(?:&inline-css)?(?:&style-attr)?&index=(\d+)\.(?:js|css)$/`), and only on an
+`.html` or `.htm` path. For a matching id the plugin answers from its in-memory copy of the inline
+block or throws; it never reads the file. Any other id carrying `html-proxy` is treated like the
+rest.
+
+Three race cases were added: `race.ts?html-proxy` direct and from a module, and
+`race.ts?html-proxy&index=0.js` from a module. Against the `2bb3f63d` config the test fails on the
+first: `/data/race.ts?html-proxy: expected 'export const x = "SECRET"; …' not to contain 'SECRET'`.
+
+A new case serves a page with an inline module script through the guard, then requests the
+`html-proxy` URL the page names, and gets 200 with the script. With the exception removed, it
+gets 500. That also covers the functional minor that `?html-proxy` was untested.
+
+**Functional major: an in-flight case killed by an ancestor's death misreported.** It sometimes
+failed with "the toggler ran: expected 0 to be greater than 50", which reads like a security
+regression.
+
+Fixed: the toggler's exit code says why it stopped: 0 told to stop, 3 an ancestor gone, 4 its
+deadline, 5 its parent gone. `withToggler`'s `stop` turns 3, 4 and 5 into errors. For 3 the
+message is "the test run was killed (the toggler saw an ancestor end)", the same prefix as the race
+loop's own abort.
+
+A new case watches a stand-in ancestor, kills it, and asserts that the case rejects with "the test
+run was killed". By hand, `kill -9` of the real `npm exec vitest` at 5, 7 and 9 s into the race
+test reported "Error: the test run was killed" each time. Each kill left no toggler, no tree and
+no Vitest process.
+
+The race test now has 26 cases, 24 of which can detect a leak, and the vitest file has 19 cases.

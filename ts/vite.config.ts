@@ -227,6 +227,11 @@ function assetQueryOf(params: URLSearchParams): AssetQuery | null {
   return null
 }
 
+// An inline `<script>` or `<style>` of an HTML page, as Vite's `vite:html-inline-proxy` plugin
+// names it: the same expression that plugin's `load` matches (Vite 6.4), which answers from its
+// in-memory copy of the page's inline block, or throws, and never reads the file by name.
+const HTML_PROXY_ID = /[?&]html-proxy=?(?:&inline-css)?(?:&style-attr)?&index=(\d+)\.(?:js|css)$/
+
 const CSS_EXTENSIONS = new Set(['.css', '.scss', '.sass', '.less', '.styl', '.pcss', '.postcss'])
 
 // The URL the dev server serves `path` at: root-relative inside the root, `/@fs/` elsewhere.
@@ -471,8 +476,9 @@ export function refuseSymlinkEscapes(
     // is what Vite's own fallback would read, or for an asset type its URL; `?raw`, `?url` and
     // `?inline` as Vite's asset plugin answers them. `?worker` and `?sharedworker` get the text
     // too; in dev Vite's worker plugin replaces it with a wrapper that only names the worker's URL.
-    // The one exception is `?html-proxy`, whose content Vite's HTML plugin takes from its own
-    // in-memory copy of an inline script, not from the file.
+    // The one exception is an inline-block proxy of an HTML page (`HTML_PROXY_ID` on an `.html` or
+    // `.htm` path), whose content Vite's HTML plugin takes from its own in-memory copy of the
+    // block, not from the file. Any other id carrying `html-proxy` is treated like the rest.
     load(id) {
       const questionMark = id.indexOf('?')
       const path = questionMark === -1 ? id : id.slice(0, questionMark)
@@ -487,8 +493,8 @@ export function refuseSymlinkEscapes(
       if (isWithin(path, packageDirs) || (packageDirs.length > 0 && isWithin(path, [packages]))) {
         return null
       }
-      if (params.has('html-proxy')) return null
       const extension = extname(path).toLowerCase()
+      if (HTML_PROXY_ID.test(id) && (extension === '.html' || extension === '.htm')) return null
       const textual =
         params.has('worker_file') ||
         LOADED_EXTENSIONS.has(extension) ||

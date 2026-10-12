@@ -199,6 +199,22 @@ describe('modules that are not files', () => {
   })
 })
 
+describe('inline blocks of an HTML page', () => {
+  it("still serves a page's inline module script through Vite's proxy", async () => {
+    writeFileSync(
+      join(site, 'inline.html'),
+      '<!doctype html><script type="module">document.title = "INLINE-SCRIPT"</script>',
+    )
+    const get = await serve([refuseSymlinkEscapes(site, [site])])
+    const page = await (await get('/inline.html')).text()
+    const proxied = /src="([^"]*html-proxy[^"]*)"/.exec(page)?.[1]
+    expect(proxied, page).toBeDefined()
+    const module = await get(proxied ?? '', { accept: '*/*', 'sec-fetch-dest': 'script' })
+    expect(module.status).toBe(200)
+    expect(await module.text()).toContain('INLINE-SCRIPT')
+  })
+})
+
 describe("the config's own file routes check the real path", () => {
   it('/workbench-layouts/ refuses a symlink that leads out of its directory', async () => {
     const get = await serve([serveWorkbenchLayouts(join(data, 'layouts'))])
@@ -245,7 +261,8 @@ describe("the config's own file routes check the real path", () => {
 // fast as it can, until it is told to stop, then prints how many swaps it made. It also exits on
 // its own at its deadline, as soon as its parent is gone (its stdin pipe ends, or its parent
 // process id changes), and as soon as any process in `watch` (the test worker's ancestors, see
-// `ancestors`) is gone, so a test run that is killed or crashes cannot leave it spinning.
+// `ancestors`) is gone, so a test run that is killed or crashes cannot leave it spinning. Its exit
+// code says which: 0 told to stop, 3 an ancestor is gone, 4 its deadline, 5 its parent is gone.
 const TOGGLER = `
 const { readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } = require('node:fs')
 const [target, secret, publicText, deadlineMs, watchList = ''] = process.argv.slice(1)
@@ -266,10 +283,12 @@ const gone = (pid) => {
 let swaps = 0
 let stop = false
 process.stdin.on('data', () => { stop = true })
-process.stdin.on('end', () => process.exit(0))
-process.stdin.on('error', () => process.exit(0))
+process.stdin.on('end', () => process.exit(5))
+process.stdin.on('error', () => process.exit(5))
 const step = () => {
-  if (process.ppid !== parent || Date.now() > deadline || watch.some(gone)) process.exit(0)
+  if (watch.some(gone)) process.exit(3)
+  if (Date.now() > deadline) process.exit(4)
+  if (process.ppid !== parent) process.exit(5)
   for (let i = 0; i < 200 && !stop; i += 1) {
     const temporary = target + '.swap' + (swaps % 2)
     rmSync(temporary, { force: true })
@@ -289,6 +308,15 @@ step()
 `
 
 const TOGGLER_DEADLINE_MS = 10_000
+
+// What a race case reports when the run it belongs to was killed, so it cannot be read as a
+// failed protection assertion.
+const RUN_KILLED = 'the test run was killed'
+const TOGGLER_EXIT: Record<number, string> = {
+  3: `${RUN_KILLED} (the toggler saw an ancestor end)`,
+  4: 'the toggler reached its deadline before the case finished',
+  5: "the toggler's parent ended",
+}
 
 // Whether `pid` has ended: absent, or (on Linux) a zombie waiting to be reaped, which
 // `process.kill(pid, 0)` alone would still report as alive.
@@ -348,9 +376,12 @@ async function withToggler<T>(
   let output = ''
   toggler.stdout.on('data', (chunk: Buffer) => (output += chunk.toString()))
   const exited = new Promise<void>((resolve) => toggler.on('exit', () => resolve()))
+  // Ends the toggler and returns its swap count, or throws why it had already ended on its own.
   const stop = async () => {
-    toggler.stdin.write('stop')
+    if (toggler.exitCode === null) toggler.stdin.write('stop')
     await exited
+    const reason = TOGGLER_EXIT[toggler.exitCode ?? 0]
+    if (reason !== undefined) throw new Error(reason)
     return Number(output)
   }
   try {
@@ -395,6 +426,33 @@ describe('the race test cleans up after itself', () => {
     ).rejects.toThrow('a failing case')
     expect(pid).toBeGreaterThan(0)
     expect(isAlive(pid)).toBe(false)
+  })
+
+  it('reports an ancestor ending as the run being killed, not as a failed case', async () => {
+    const target = join(data, 'flip.txt')
+    writeFileSync(target, 'PUBLIC')
+    const ancestor = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'])
+    try {
+      const watched = ancestor.pid ?? 0
+      await expect(
+        withToggler(
+          {
+            target,
+            secret: join(base, 'outside', 'secret.txt'),
+            publicText: 'PUBLIC',
+            watch: [watched],
+          },
+          async (stop) => {
+            ancestor.kill('SIGKILL')
+            await waitUntilDead(watched, 5_000)
+            await new Promise((resolve) => setTimeout(resolve, 300))
+            return stop()
+          },
+        ),
+      ).rejects.toThrow(RUN_KILLED)
+    } finally {
+      ancestor.kill('SIGKILL')
+    }
   })
 
   it('stops on its own at its deadline', async () => {
@@ -620,6 +678,11 @@ describe('serving under concurrent renames (check-then-serve race)', () => {
         ['site/data/race.ts', '/data/race.ts?foo=bar', ts, fromModule],
         ['site/data/race.css', '/data/race.css?foo=bar', css, fromModule],
         ['site/data/race.svg', '/data/race.svg?import&foo=bar', svg, fromModule],
+        // `html-proxy` on a file that is not an HTML page is not Vite's inline-block proxy, so it
+        // must get the checked bytes like any other query.
+        ['site/data/race.ts', '/data/race.ts?html-proxy', ts],
+        ['site/data/race.ts', '/data/race.ts?html-proxy', ts, fromModule],
+        ['site/data/race.ts', '/data/race.ts?html-proxy&index=0.js', ts, fromModule],
         // Not evidence of protection: in dev, Vite's worker wrapper only names the worker's URL
         // and never contains the file's bytes, so these two cannot fail. They are kept to show
         // the wrapper is still served while the name flips; `?worker_file` above is the case
@@ -660,7 +723,7 @@ describe('serving under concurrent renames (check-then-serve race)', () => {
             const watched = ancestors()
             while (Date.now() < until) {
               // A killed test run leaves this worker behind; stop rather than start more races.
-              if (watched.some(isGone)) throw new Error('the test run was killed')
+              if (watched.some(isGone)) throw new Error(RUN_KILLED)
               const bodies = await Promise.all(
                 Array.from({ length: 16 }, () =>
                   get(path, headers).then((response) => response.text()),
