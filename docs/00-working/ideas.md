@@ -1113,6 +1113,7 @@ No related idea found by title overlap.
 - relates_to ← `000365`
 - relates_to ← `000366`
 - relates_to ← `000367`
+- relates_to ← `000678`
 
 ---
 
@@ -4651,6 +4652,8 @@ The template library idea is not formally linked to PLAN-003 yet, though it clea
 - relates_to ← `000092`
 - relates_to ← `000367`
 - relates_to ← `000511`
+- relates_to ← `000680`
+- relates_to ← `000683`
 
 ---
 
@@ -13526,6 +13529,7 @@ PROPOSED PROMOTION: 000275 -> PLAN-041 (formalized as phase-fwa-02, queued in ba
 - relates_to → `000281`
 - relates_to → `000276`
 - relates_to → `000332`
+- relates_to ← `000684`
 
 ---
 
@@ -24481,6 +24485,7 @@ PROPOSED LINK: 000555 --relates_to--> 000100 (both are flag-off workbench probe 
 **Links**
 
 - relates_to ← `000645`
+- relates_to ← `000691`
 
 ---
 
@@ -24831,6 +24836,10 @@ The same audit produced four sibling ideas: 000568 (phase-sch-06 stranded by the
 PROPOSED LINK: 000567 --relates_to--> 000568 (both are phases stranded by PLAN-003's retirement under ADR-027; different phases, same cause)
 
 </details>
+
+**Links**
+
+- relates_to ← `000688`
 
 ---
 
@@ -28302,6 +28311,13 @@ The fourteen template proposals (000673–000686) form a coordinated set from on
 
 </details>
 
+**Links**
+
+- relates_to ← `000674`
+- relates_to ← `000684`
+- relates_to ← `000685`
+- relates_to ← `000686`
+
 ---
 
 ## 000674 · Template: Gantt chart, project level first
@@ -28332,6 +28348,10 @@ No Gantt chart template is currently in templates/html/library.yaml. The idea is
 PROPOSED LINK: 000674 --relates_to--> 000673 (both project-level timeline visualizations)
 
 </details>
+
+**Links**
+
+- relates_to → `000673`
 
 ---
 
@@ -28365,6 +28385,11 @@ PROPOSED LINK: 000675 --relates_to--> 000687 (Template depends on shared portfol
 
 </details>
 
+**Links**
+
+- relates_to → `000687`
+- relates_to ← `000686`
+
 ---
 
 ## 000676 · Template: portfolio dashboard
@@ -28397,6 +28422,10 @@ Related infrastructure: 000083 (Template library with deterministic or AI popula
 No existing idea fully overlaps this proposal, and the work it requests is not yet delivered — the template itself remains to be built once the underlying signal phases land.
 
 </details>
+
+**Links**
+
+- relates_to → `000687`
 
 ---
 
@@ -28434,6 +28463,10 @@ The "card" component mentioned in the idea body suggests possible connection to 
 No related plan, requirement or decision document exists for these specific portfolio templates yet; triage and sequencing against the house-family and template-library phases (phase-des-03, phase-des-04) will determine prioritization.
 
 </details>
+
+**Links**
+
+- relates_to → `000687`
 
 ---
 
@@ -28484,6 +28517,11 @@ PROPOSED LINK: 000678 --relates_to--> 000022 (idea 000022 flags that people/comm
 
 </details>
 
+**Links**
+
+- relates_to → `000687`
+- relates_to → `000022`
+
 ---
 
 ## 000679 · Template: kanban status board
@@ -28529,6 +28567,10 @@ No related plan, phase or document found that duplicates or supersedes this idea
 
 </details>
 
+**Links**
+
+- relates_to → `000687`
+
 ---
 
 ## 000680 · Template: agenda and calendar view
@@ -28560,6 +28602,11 @@ PROPOSED LINK: 000680 --relates_to--> 000687 (portfolio templates depend on shar
 PROPOSED LINK: 000680 --relates_to--> 000083 (portfolio templates are instances of the template library infrastructure)
 
 </details>
+
+**Links**
+
+- relates_to → `000687`
+- relates_to → `000083`
 
 ---
 
@@ -28595,6 +28642,10 @@ No related plan, requirement or backlog phase found beyond PLAN-036's distinct (
 PROPOSED LINK: 000681 --relates_to--> 000687 (prerequisite: shared data loader and enriched fixture set required before any portfolio template can be built)
 
 </details>
+
+**Links**
+
+- relates_to → `000687`
 
 ---
 
@@ -28635,6 +28686,11 @@ PROPOSED LINK: 000682 --relates_to--> 000687 (portfolio template depends on shar
 
 </details>
 
+**Links**
+
+- relates_to → `000687`
+- relates_to ← `000683`
+
 ---
 
 ## 000683 · Template: weekly review page
@@ -28667,6 +28723,12 @@ PROPOSED LINK: 000683 --relates_to--> 000687 (shared portfolio data loader that 
 PROPOSED LINK: 000683 --relates_to--> 000682 (similar dashboard/review page concept for stale item tracking and queue display)
 
 </details>
+
+**Links**
+
+- relates_to → `000083`
+- relates_to → `000687`
+- relates_to → `000682`
 
 ---
 
@@ -28738,6 +28800,12 @@ PROPOSED LINK: 000684 --relates_to--> 000275 (overlap on decision extraction and
 
 </details>
 
+**Links**
+
+- relates_to → `000673`
+- relates_to → `000687`
+- relates_to → `000275`
+
 ---
 
 ## 000685 · Template: commitment velocity trend
@@ -28770,6 +28838,11 @@ PROPOSED LINK: 000685 --relates_to--> 000687 (Both depend on shared portfolio da
 PROPOSED LINK: 000685 --relates_to--> 000673 (Part of the same template batch from 2026-10-08 cloud session; all share REQ-036 house family constraint)
 
 </details>
+
+**Links**
+
+- relates_to → `000687`
+- relates_to → `000673`
 
 ---
 
@@ -28817,6 +28890,12 @@ PROPOSED LINK: 000686 --extends--> 000673 (Both are blocked on the same ARCH-007
 
 </details>
 
+**Links**
+
+- relates_to → `000687`
+- relates_to → `000675`
+- relates_to → `000673`
+
 ---
 
 ## 000687 · Shared portfolio data loader and a richer fictional fixture set
@@ -28861,6 +28940,21 @@ PROPOSED LINK: 000686 --relates_to--> 000687 (portfolio template shares loader a
 
 </details>
 
+**Links**
+
+- relates_to ← `000675`
+- relates_to ← `000676`
+- relates_to ← `000677`
+- relates_to ← `000678`
+- relates_to ← `000679`
+- relates_to ← `000680`
+- relates_to ← `000681`
+- relates_to ← `000682`
+- relates_to ← `000683`
+- relates_to ← `000684`
+- relates_to ← `000685`
+- relates_to ← `000686`
+
 ---
 
 ## 000688 · phase-syn-05 depends on the cancelled phase-html-10 and a retired page pipeline
@@ -28887,6 +28981,10 @@ Idea 000688 appears to rediscover the same problem, found during a cloud session
 PROPOSED LINK: 000688 --relates_to--> 000567 (both identify the same blocked phase-syn-05 dependency; 000688 appears to rediscover the same problem and propose re-scoping to the house template family)
 
 </details>
+
+**Links**
+
+- relates_to → `000567`
 
 ---
 
@@ -28981,6 +29079,10 @@ Idea 000691 documents a pre-existing dev server issue found during phase-arch-07
 PROPOSED LINK: 000691 --relates_to--> 000555 (Both describe Vite's SPA fallback returning 200 with index.html instead of 404; 000691 names the root cause, 000555 names a specific manifestation now addressed by phase-wbf-16)
 
 </details>
+
+**Links**
+
+- relates_to → `000555`
 
 ---
 
