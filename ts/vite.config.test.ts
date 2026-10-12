@@ -199,6 +199,23 @@ describe('modules that are not files', () => {
   })
 })
 
+describe('worker imports', () => {
+  // Not a race case: in dev, Vite's worker wrapper only names the worker's URL and never contains
+  // the file's bytes, so a race could not show a leak there. The worker's own source is the
+  // `?worker_file` race case; this only checks the guard still lets the wrappers through.
+  it('still serves the ?worker and ?worker&inline wrappers', async () => {
+    writeFileSync(join(data, 'w.js'), 'self.onmessage = () => {}')
+    const get = await serve([refuseSymlinkEscapes(site, [site])])
+    for (const path of ['/data/w.js?worker', '/data/w.js?worker&inline']) {
+      const response = await get(path, { accept: '*/*', 'sec-fetch-dest': 'script' })
+      expect(response.status, path).toBe(200)
+      const body = await response.text()
+      expect(body, path).toContain('WorkerWrapper')
+      expect(body, path).toContain('/data/w.js?worker_file')
+    }
+  })
+})
+
 describe('inline blocks of an HTML page', () => {
   it("still serves a page's inline module script through Vite's proxy", async () => {
     writeFileSync(
@@ -683,12 +700,6 @@ describe('serving under concurrent renames (check-then-serve race)', () => {
         ['site/data/race.ts', '/data/race.ts?html-proxy', ts],
         ['site/data/race.ts', '/data/race.ts?html-proxy', ts, fromModule],
         ['site/data/race.ts', '/data/race.ts?html-proxy&index=0.js', ts, fromModule],
-        // Not evidence of protection: in dev, Vite's worker wrapper only names the worker's URL
-        // and never contains the file's bytes, so these two cannot fail. They are kept to show
-        // the wrapper is still served while the name flips; `?worker_file` above is the case
-        // that reads the worker's source.
-        ['site/data/race.js', '/data/race.js?worker', js, fromModule],
-        ['site/data/race.js', '/data/race.js?worker&inline', js, fromModule],
       ]
       for (const [relative, url, [publicText, secretText], headers] of cases) {
         const tree = realpathSync(mkdtempSync(join(base, 'race-')))

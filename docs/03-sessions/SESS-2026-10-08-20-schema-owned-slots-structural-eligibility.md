@@ -719,4 +719,12 @@ run was killed". By hand, `kill -9` of the real `npm exec vitest` at 5, 7 and 9 
 test reported "Error: the test run was killed" each time. Each kill left no toggler, no tree and
 no Vitest process.
 
-The race test now has 26 cases, 24 of which can detect a leak, and the vitest file has 19 cases.
+Records for `2bb3f63d`, committed unchanged in `8d16d1e8`:
+- functional pass, whose major and minor are fixed above;
+- security reject, whose blocker is fixed above;
+- review-judge shadow pass, with one minor: the two `?worker` race cases cannot fail.
+
+That minor is fixed by narrowing. The two cases left the race loop, and a plain case, "still
+serves the ?worker and ?worker&inline wrappers", asserts that the guard still answers both with
+200 and a wrapper naming `?worker_file`. The race test now has 24 cases, every one of which can
+detect a leak; the vitest file has 20 cases.
