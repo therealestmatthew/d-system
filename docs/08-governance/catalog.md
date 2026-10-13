@@ -177,6 +177,7 @@ CI regenerates it and fails on any difference.
 | PLAN-050.05 | plan | draft | repository-owner | docs/01-plans/PLAN-050-system-boundary-study/PLAN-050.05-boundary-decision-report.md |
 | PLAN-051 | plan | draft | repository-owner | docs/01-plans/PLAN-051-session-autonomy-configuration.md |
 | PLAN-052 | plan | approved | repository-owner | docs/01-plans/PLAN-052-plugin-audit-remediation.md |
+| PLAN-054 | plan | draft | repository-owner | docs/01-plans/PLAN-054-agent-replicator.md |
 | PROMPT-001 | prompt | active | repository-owner | docs/02-prompts/PROMPT-001-artifact-code-generation-system.md |
 | PROMPT-002 | prompt | active | repository-owner | docs/02-prompts/PROMPT-002-capture-and-structuring-system.md |
 | PROMPT-003 | prompt | active | repository-owner | docs/02-prompts/PROMPT-003-systems-review.md |
@@ -256,6 +257,7 @@ CI regenerates it and fails on any difference.
 | REQ-035 | requirement | draft | repository-owner | docs/06-requirements/REQ-035-plugin-audit-remediation.md |
 | REQ-036 | requirement | draft | repository-owner | docs/06-requirements/REQ-036-engine-pages-house-style.md |
 | REQ-037 | requirement | draft | repository-owner | docs/06-requirements/REQ-037-workbench-content-fit-contracts.md |
+| REQ-039 | requirement | draft | repository-owner | docs/06-requirements/REQ-039-agent-replicator.md |
 | SESS-2026-09-05-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-01-document-code-system.md |
 | SESS-2026-09-05-02 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-05-02-baseline-lint-gate.md |
 | SESS-2026-09-06-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-09-06-01-capture-definition.md |
@@ -524,7 +526,7 @@ CI regenerates it and fails on any difference.
 | PLAN-018 | doc-plans-directory-consolidation | approved | 0 | 0 | 1 | agent-claude |
 | PLAN-019 | doc-idea-priority-queue | draft | 0 | 0 | 1 | agent-claude |
 | PLAN-020 | doc-portable-agent-workflows | draft | 1 | 0 | 2 | agent-build, agent-codex-port |
-| PLAN-021 | doc-live-demo | draft | 0 | 0 | 7 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
+| PLAN-021 | doc-live-demo | draft | 1 | 0 | 7 | agent-demo-content, agent-demo-data, agent-demo-glossary, agent-demo-stage |
 | PLAN-022 | doc-workbench | active | 0 | 0 | 10 | agent-demo-data, agent-demo-stage, agent-fable |
 | PLAN-023 | doc-lit-campaign | draft | 0 | 0 | 9 | agent-lit, agent-lit-3c |
 | PLAN-023.01 | doc-lit-campaign-scope | draft | 0 | 0 | 8 | agent-lit |
@@ -574,6 +576,7 @@ CI regenerates it and fails on any difference.
 | PLAN-050.05 | doc-system-boundary-study-decision-report | draft | 0 | 0 | 1 | agent-boundary-study |
 | PLAN-051 | doc-session-autonomy-configuration | draft | 3 | 0 | 0 | — |
 | PLAN-052 | doc-plugin-audit-remediation | approved | 4 | 0 | 2 | agent-builder-a, agent-standby-3 |
+| PLAN-054 | doc-agent-replicator | draft | 6 | 0 | 0 | — |
 
 ## Held codes
 
@@ -584,4 +587,4 @@ CI regenerates it and fails on any difference.
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-481 documents — adr: 28, architecture: 12, governance: 20, operation: 29, plan: 81, prompt: 43, requirement: 36, session: 232.
+483 documents — adr: 28, architecture: 12, governance: 20, operation: 29, plan: 82, prompt: 43, requirement: 37, session: 232.

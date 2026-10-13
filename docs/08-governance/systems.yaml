@@ -614,6 +614,20 @@ systems:
     triggering payload hash, model and tool versions, context-pack hash, budget, checkpoints and
     disposition, and resumes an interrupted run without repeating completed side effects. Planned
     only; no code exists yet. Registered separately from sys-auto-gateway for the same reason.
+- id: sys-fleet
+  name: Agent fleet and Replicator
+  domain: governance
+  status: planned
+  owner: repository-owner
+  paths:
+  - docs/01-plans/PLAN-054-agent-replicator.md
+  depends_on:
+  - sys-governance
+  description: The fleet tracker files (agent definitions, orchestration systems, typed role
+    relationships), the append-only fleet event log, the tools/fleet.py core with its bash and
+    PowerShell shells, and the double-click restart of every agent session (PLAN-054). Planned
+    only; no code exists yet. Registered at planning time, as sys-auto-gateway was, so phase-rep-*
+    phases lock this system rather than all of sys-governance; phase-rep-01 adds the real paths.
 - id: sys-realization
   name: Idea realization pipeline
   domain: governance

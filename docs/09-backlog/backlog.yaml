@@ -18177,8 +18177,8 @@ items:
   - doc-workbench-features-defects-requirements
   - doc-adr-terminal-interaction-api
   ideas:
-  - '000669'
   - '000614'
+  - '000669'
   systems:
   - sys-api
   - sys-wb-terminal
@@ -18389,11 +18389,11 @@ items:
   - doc-adr-slot-configuration-schema-model
   - doc-workbench-architecture-quality-requirements
   ideas:
-  - '000671'
+  - '000087'
+  - '000107'
   - '000651'
   - '000652'
-  - '000107'
-  - '000087'
+  - '000671'
   systems:
   - sys-wb-terminal
   - sys-api
@@ -18469,3 +18469,280 @@ items:
   next_action: Run uv run python -m src.governance --next-code adr for the code (ADR-032 was next
     on 2026-10-08), then read section 10 of docs/00-working/terminal-persistence-audit.md, ADR-014
     decision 4 and ADR-030 section 6 before writing. Do not build; do not choose warn-and-confirm.
+- id: phase-rep-01
+  title: Fleet model governance document, three fleet schemas, the tracked fleet files for three orchestration systems,
+    and the integrity tests
+  plan: doc-agent-replicator
+  sources:
+  - doc-agent-replicator-requirements
+  - doc-agent-replicator
+  - doc-multi-session-coordination-protocol
+  - doc-realization-role-contracts
+  - doc-live-demo
+  ideas:
+  - '000693'
+  systems:
+  - sys-fleet
+  - sys-gov-docs
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Governance document for the fleet model (idea 000693) - agent definitions, roles, orchestration systems, instances,
+    the edge types and lifecycle events of PLAN-054 D2, the authority rule (D6), the predicate vocabulary (D7), the
+    owner-only roles, and the overlay limits (D11). Allocate its code with --next-code governance (REQ-039 R01).
+  - schemas/fleet.schema.json, schemas/fleet-definition.schema.json, schemas/fleet-system.schema.json; the
+    permission-mode enum has no bypass value (R02, R05).
+  - docs/08-governance/fleet/fleet.yaml (host facts, enabled systems, defaults, the owner-only Replicator and Owner
+    Terminal), definitions.yaml (every session definition including the Replicator in manual mode and the Advisor as
+    open-advisor.sh launches it; subagent definitions point at their .claude/agents files), and systems/
+    gov017-multi-session.yaml, demo-build.yaml, idea-realization.yaml (R02, R03, R13).
+  - Tests - every fleet file passes its schema; one invalid fixture per schema; every reference resolves; the schema
+    enums agree with the document; a system file that names a roster table matches it row for row, which for the
+    GOV-017 system is The sessions table (R01, R04).
+  - systems.yaml - give sys-fleet its real paths.
+  acceptance:
+  - The governance document exists and the enum-agreement test fails on a fixture schema with an extra edge type.
+  - The three system files and fleet.yaml, definitions.yaml pass their schemas; a bypass-mode fixture fails.
+  - The integrity test fails on one fixture per broken reference kind and passes on the tracked files.
+  - The GOV-017 roster test passes. GOV-017's table does not list the Replicator or the Advisor until phase-rep-05, so
+    those two roles are marked in the system file as not yet in the governing table, and the test fails if such a
+    mark remains on a role the table lists.
+  - The test code names no session, role, system or document; each system file supplies its own roster reference.
+  verification:
+  - uv run pytest test/test_fleet_files.py
+  - grep -n "Session Manager\|GOV-017" test/test_fleet_files.py
+  - uv run ruff check src/ test/ tools/
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/fleet/
+  - schemas/fleet.schema.json
+  - schemas/fleet-definition.schema.json
+  - schemas/fleet-system.schema.json
+  - test/test_fleet_files.py
+  - test/fixtures/fleet/
+  - docs/08-governance/systems.yaml
+  next_action: Waits for the owner's G3 on PLAN-054. Read REQ-039, PLAN-054 D1-D4, D10, D11 and D15, GOV-017 The
+    sessions, GOV-014 Roles, PLAN-021 and the demo-* agent files, and _working/session-manager/open-advisor.sh and
+    sessions.json for the current launch settings. phase-mode-01 and phase-mode-02 also add schemas and governance
+    files; rebase onto whichever merged first.
+- id: phase-rep-02
+  title: The tools/fleet.py core - fold, authority, launch-command derivation, dry run, status, fleet map and overlay
+    checks - with its OPS document
+  plan: doc-agent-replicator
+  sources:
+  - doc-agent-replicator-requirements
+  - doc-agent-replicator
+  systems:
+  - sys-fleet
+  - sys-gov-docs
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-rep-01
+  scope:
+  - tools/fleet.py - fold _working/agents/events.jsonl into current state; decide a FLEET request by PLAN-054 D6;
+    implement the four predicates of D7; derive each launch command from the fleet files with a fresh --session-id
+    and log the launched event first (D8); dry run; status; write the fleet map under _working/agents/map/ (REQ-039
+    R06-R09, R11-R13).
+  - Overlay - load _working/agents/overlay/, refuse a definition that widens its tracked parent's permission mode or
+    tools (R05, R18).
+  - The OPS document, named for tools/fleet.py, with the generated reference block filled by tools/generate_tool_docs.py;
+    it covers the promotion of an overlay definition (R18).
+  - Fixtures - one per edge type that grants, no edge, each predicate true and false, an unknown requester, an
+    owner-only target, an unknown predicate, a fourth system, a widening and a narrowing overlay.
+  acceptance:
+  - Each fixture gives the decision PLAN-054 D6 and D7 state; the fourth-system fixture resolves with no code change.
+  - grep -n "Session Manager\|GOV-017" tools/fleet.py returns nothing.
+  - A fold test builds state from a fixture log that includes a kill and a respawn.
+  - git check-ignore _working/agents/events.jsonl reports it ignored.
+  - The dry run prints each command with its uuid and the matching launched event.
+  verification:
+  - uv run pytest test/test_fleet_core.py
+  - grep -n "Session Manager\|GOV-017" tools/fleet.py
+  - git check-ignore _working/agents/events.jsonl
+  - uv run python tools/fleet.py restart --all --dry-run --log test/fixtures/fleet/events-sample.jsonl
+  - uv run ruff check src/ test/ tools/
+  - uv run python tools/generate_tool_docs.py --check
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  deliverables:
+  - tools/fleet.py
+  - test/test_fleet_core.py
+  - test/fixtures/fleet/
+  - docs/08-governance/
+  next_action: Waits for phase-rep-01. Allocate the OPS code with --next-code operation and name the file after the
+    tool stem, as AGENTS.md requires.
+- id: phase-rep-03
+  title: Linux fleet shell, uuid-checked kill, the double-click restart launcher, and a live self-test that settles the
+    three launch unknowns
+  plan: doc-agent-replicator
+  sources:
+  - doc-agent-replicator-requirements
+  - doc-agent-replicator
+  systems:
+  - sys-fleet
+  - sys-gov-docs
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-rep-02
+  scope:
+  - tools/fleet/fleet.sh - open a terminal tab per session, start it under setsid, write the pidfile, kill by process
+    group only after /proc/<pid>/cmdline shows the instance's uuid; SIGKILL only on a second owner approval; refuse a
+    duplicate name the folded state shows running (REQ-039 R10, R14; PLAN-054 D8).
+  - tools/fleet/restart-agents.sh, its .desktop file, and fleet.py install-launcher, following PLAN-054 D12 (R17).
+  - The fleet-selftest system with one throwaway session - launch, check ListAgents, kill, relaunch; record whether
+    --name sets the ListAgents name, whether --session-id takes a fresh uuid interactively, and whether a claude
+    launch and a kill from Bash are classifier-blocked (R19; D13).
+  - The OPS document gains the shell's usage. A proposal to the owner to retire
+    _working/session-manager/relaunch-sessions.sh and open-advisor.sh, made in the session record; nothing under
+    _working/ is deleted.
+  acceptance:
+  - A dummy-process test kills a process whose command line has the uuid and refuses one whose command line lacks it.
+  - grep -n "pkill\|killall" tools/fleet/ returns nothing.
+  - restart-agents.sh --dry-run lists every agent session in the enabled systems, omits the Owner Terminal, and states
+    each system's restart-ready status.
+  - The session record quotes the self-test's output for each step and answers the three questions.
+  verification:
+  - uv run pytest test/test_fleet_shell.py
+  - grep -rn "pkill\|killall" tools/fleet/
+  - bash tools/fleet/restart-agents.sh --dry-run
+  - bash -n tools/fleet/fleet.sh tools/fleet/restart-agents.sh
+  - uv run ruff check src/ test/ tools/
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  deliverables:
+  - tools/fleet/
+  - tools/fleet.py
+  - test/test_fleet_shell.py
+  - test/fixtures/fleet/
+  - docs/08-governance/
+  next_action: Waits for phase-rep-02. The live self-test needs the owner at the desktop, since tab launching needs a
+    display; schedule it with the Session Manager.
+- id: phase-rep-04
+  title: PowerShell fleet shell and restart launcher, .gitattributes line endings, and a windows-latest dry-run CI job
+  plan: doc-agent-replicator
+  sources:
+  - doc-agent-replicator-requirements
+  - doc-agent-replicator
+  systems:
+  - sys-fleet
+  - sys-gov-docs
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-rep-02
+  - phase-rep-03
+  scope:
+  - tools/fleet/fleet.ps1 - Windows Terminal tabs, process lookup by uuid in the command line through
+    Get-CimInstance, tree kill with Stop-Process or taskkill /T; every decision from tools/fleet.py (REQ-039 R15;
+    PLAN-054 D8, D14).
+  - tools/fleet/restart-agents.ps1 and restart-agents.cmd; install-launcher writes the Windows shortcut (R17).
+  - .gitattributes - LF for .sh and .ps1, CRLF for .cmd (R16).
+  - A windows-latest job in .github/workflows/ci.yaml that installs uv, syncs, and runs the restart dry run through
+    fleet.ps1 against a fixture log. The workflow edit goes through a security review.
+  - The OPS document's list of behaviours unverified without a Windows host (D14).
+  acceptance:
+  - pwsh parses every .ps1 file on Linux.
+  - The windows-latest job passes on the pushed branch.
+  - git check-attr eol reports lf for a .sh and a .ps1 file and crlf for the .cmd file.
+  - The OPS document lists every unverified behaviour PLAN-054 D14 names.
+  verification:
+  - pwsh -NoProfile -Command "Get-ChildItem tools/fleet/*.ps1 | ForEach-Object { [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$null) | Out-Null }"
+  - git check-attr eol tools/fleet/fleet.sh tools/fleet/fleet.ps1 tools/fleet/restart-agents.cmd
+  - gh run list --branch agent/phase-rep-04 --workflow CI --limit 1
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  deliverables:
+  - tools/fleet/
+  - .gitattributes
+  - .github/workflows/ci.yaml
+  - docs/08-governance/
+  next_action: Waits for phase-rep-03, so the PowerShell shell follows a Linux shell that has run live. pwsh is not
+    installed on this machine as of 2026-10-12; ask the owner to install it before the parse check, or record that
+    only the CI job checked the .ps1 files.
+- id: phase-rep-05
+  title: Wire the Replicator into GOV-017 and PROMPT-037, record the owner's rulings in GOV-003, and run one live
+    restart of every agent session
+  plan: doc-agent-replicator
+  sources:
+  - doc-agent-replicator-requirements
+  - doc-agent-replicator
+  - doc-multi-session-coordination-protocol
+  - doc-prompt-session-manager-starter-messages
+  - doc-backlog-decisions
+  systems:
+  - sys-fleet
+  - sys-gov-docs
+  - sys-backlog
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-rep-03
+  scope:
+  - GOV-017 - a Replicator row in The sessions (meta, owner-only lifecycle) and an Advisor row; the FLEET,
+    FLEET-DONE, FLEET-REFUSED, restart-ready and ROSTER messages in the message table; the restart procedure, citing
+    the fleet governance document and the GOV-017 system file rather than restating them (REQ-039 R20).
+  - The GOV-017 system file drops its not-yet-in-table marks for the Replicator and the Advisor, so the roster test
+    compares the full table.
+  - PROMPT-037 - the Replicator's starter.
+  - GOV-003 - one entry quoting the owner's 2026-10-12 rulings on A1 and A2 with their date.
+  - One live restart of every agent session through the Replicator at a wind-down the owner schedules; the session
+    record quotes the restart-ready message, each kill and launch event, one approval prompt showing requester and
+    edge, and the roster afterwards (R20, R21).
+  acceptance:
+  - GOV-017's session table lists the Replicator and the Advisor, and its message table has the FLEET rows.
+  - The roster test passes with no not-yet-in-table marks left.
+  - The GOV-003 entry quotes the rulings with their date.
+  - The session record shows the live restart as the scope item states, with every session back in ListAgents.
+  verification:
+  - grep -n "Replicator\|FLEET" docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - grep -n "Replicator" docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  - uv run pytest test/test_fleet_files.py
+  - uv run python -m src.governance --catalog
+  - uv run python -m src.governance
+  deliverables:
+  - docs/08-governance/GOV-017-multi-session-coordination-protocol.md
+  - docs/08-governance/GOV-003-backlog-decisions.md
+  - docs/02-prompts/PROMPT-037-session-manager-starter-messages.md
+  - docs/08-governance/fleet/
+  next_action: Waits for phase-rep-03. Collides with phase-mode-03, which edits the same GOV-017 and PROMPT-037 passages;
+    the two are never active together, and whichever runs second rebases onto the other and re-reads those passages
+    (phase-grd-03 and phase-asr-04 also edit them). The live restart needs a wind-down the owner schedules.
+- id: phase-rep-06
+  title: Optional spike - claude --bg with Remote Control as a session primitive for the fleet shells
+  plan: doc-agent-replicator
+  sources:
+  - doc-agent-replicator
+  systems:
+  - sys-fleet
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-rep-03
+  scope:
+  - Launch one fleet-selftest session with claude --bg and Remote Control; record whether it appears in ListAgents,
+    accepts --session-id and --name, can be stopped by uuid, and survives the terminal closing (PLAN-054, A1 ruling 2).
+  - Write the result as a recommendation in docs/00-working/ for the owner; change no shell.
+  acceptance:
+  - The recommendation records each check with its real output and states keep tabs or move to --bg.
+  - Nothing under tools/fleet/ changes; git diff --stat dev shows only the docs/00-working/ file.
+  verification:
+  - uv run python -m src.governance
+  deliverables:
+  - docs/00-working/
+  next_action: Optional; runs only if the owner asks for it after phase-rep-03.
