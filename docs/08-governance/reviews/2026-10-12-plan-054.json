@@ -1,0 +1,172 @@
+{
+ "review_id": "2026-10-12-plan-054",
+ "procedure": "GOV-018",
+ "date": "2026-10-12",
+ "target": {
+  "plan": "PLAN-054",
+  "requirement": "REQ-039",
+  "phases": [
+   "phase-rep-01",
+   "phase-rep-02",
+   "phase-rep-03",
+   "phase-rep-04",
+   "phase-rep-05",
+   "phase-rep-06"
+  ],
+  "later_added_phases": []
+ },
+ "entry_check": {
+  "result": "pass",
+  "standard": "GOV-010",
+  "detail": "GOV-018 step 1 script run on docs/01-plans/PLAN-054-agent-replicator.md at fa4537d0: exit 0, no missing sections."
+ },
+ "altitudes_run": [
+  "plan",
+  "phase"
+ ],
+ "status": "open",
+ "notes": "Run by the Session Manager on 2026-10-12 on agent/plan-agent-replicator at fa4537d0 (drafts by Session 3 - Standby Builder), in a scratch clone, one dispatch per altitude. All six phases were registered in the plan's original commit, so no later-added altitude. Findings numbered in the order the replies were read: phase altitude first (F01-F06), then plan (F07-F10). The plan-altitude adversary reached its turn limit and was asked to report from what it had verified. F07 describes the state at fa4537d0's base (e6382ca8); 000693 was triaged afterwards at 11fb44e7. No finding was changed or dropped; the dispatcher added only id, engine and author. One schema-forced change: F01's adversary subject was \"phase-rep-04 / phase-rep-05 / phase-rep-06\"; the schema requires one phase id at the phase altitude, so the dispatcher recorded the first-named phase. The title and evidence, unchanged, name all three.",
+ "findings": [
+  {
+   "id": "F01",
+   "altitude": "phase",
+   "subject": "phase-rep-04",
+   "severity": "blocker",
+   "title": "The plan's claim that rep-04, rep-05 and rep-06 \"can run in parallel once rep-03 is complete\" is false under the repository's own collision check, because all three declare the shared system sys-fleet.",
+   "evidence": "PLAN-054 'Execution order and real concurrency': \"rep-04, rep-05 and rep-06 can run in parallel once rep-03 is complete, subject to the collisions below\" — and the only collisions it then names are with phase-mode-03, phase-grd-03 and phase-asr-04 (other plans), not among rep-04/05/06 themselves. Running the actual collisions() function from src/governance/backlog.py against the backlog.yaml entries: `phase-rep-04 phase-rep-05 -> ['share system sys-fleet', 'share system sys-gov-docs', 'share deliverable path docs/08-governance/GOV-003-backlog-decisions.md', 'share deliverable path docs/08-governance/GOV-017-multi-session-coordination-protocol.md', 'share deliverable path docs/08-governance/fleet/']`; `phase-rep-05 phase-rep-06 -> ['share system sys-fleet']`; `phase-rep-04 phase-rep-06 -> ['share system sys-fleet']`. `claim_conflicts()` in the same module uses `collisions()` to refuse claiming a phase while a colliding one is active, so no two of rep-04/05/06 can ever be active together — each declares systems: [sys-fleet, ...] by design (D15: sys-fleet exists precisely so rep-* phases lock it rather than all of sys-governance).",
+   "consequence": "An owner or Session Manager scheduling off this plan's 'Execution order' section will try to run two of rep-04/05/06 concurrently and have the claim refused, discovering the contradiction only at claim time rather than at G3 review. The parallelism the plan advertises as a scheduling fact does not exist.",
+   "minimal_fix": "Either drop sys-fleet from two of the three phases' systems lists (if their work genuinely doesn't need the lock) or correct the Execution order section to state that rep-04, rep-05 and rep-06 are mutually exclusive via sys-fleet and must run sequentially, same as any other rep-* pair.",
+   "slug": "asserted-concurrency-not-enforced",
+   "aliases": [
+    "claimed-parallelism-contradicts-shared-system"
+   ],
+   "engine": "single-adversary",
+   "author": "partition-adversary dispatched with PROMPT-038"
+  },
+  {
+   "id": "F02",
+   "altitude": "phase",
+   "subject": "phase-rep-01",
+   "severity": "major",
+   "title": "phase-rep-01's deliverables omit the path of the new governance document its own first scope line creates, so the real containment check will flag it as an undeclared file.",
+   "evidence": "Scope line 1: \"Governance document for the fleet model (idea 000693) ... Allocate its code with --next-code governance (REQ-039 R01).\" This document is distinct from the tracked data files PLAN-054 D3 places under docs/08-governance/fleet/ (fleet.yaml, definitions.yaml, systems/*.yaml) — it is a sibling GOV-0NN-*.md file at the top level of docs/08-governance/, the same place GOV-017 and GOV-014 live. phase-rep-01's deliverables are: `docs/08-governance/fleet/`, three schemas, `test/test_fleet_files.py`, `test/fixtures/fleet/`, `docs/08-governance/systems.yaml` — no bare `docs/08-governance/`. `covers()` in src/governance/containment.py (lines 183-188) matches a deliverable only as an exact path or a directory prefix of the changed file's path; `PurePosixPath('docs/08-governance/GOV-0NN-fleet-model.md').parts[:3]` cannot equal either `docs/08-governance/fleet` (3 parts, different last segment) or `docs/08-governance/systems.yaml` (different file), so the new document is covered by nothing declared. Contrast with the directly comparable precedent phase-mode-01 (new governance document + schema + registry, same shape of work), whose deliverables list the bare `docs/08-governance/` directory, which does cover wherever its new GOV-0NN document lands.",
+   "consequence": "`uv run python -m src.governance --containment phase-rep-01` (the merge-gate check GOV-017 names at line 282) will report the new governance document as an undeclared change, forcing a deliverables-only redo of the phase after the document is already written.",
+   "minimal_fix": "Add `docs/08-governance/` (or at minimum the specific GOV-0NN path once allocated) to phase-rep-01's deliverables, matching phase-mode-01's declaration for the same kind of work.",
+   "slug": "deliverable-omits-new-document-path",
+   "aliases": [
+    "narrower-deliverable-than-sibling-precedent"
+   ],
+   "engine": "single-adversary",
+   "author": "partition-adversary dispatched with PROMPT-038"
+  },
+  {
+   "id": "F03",
+   "altitude": "phase",
+   "subject": "phase-rep-01",
+   "severity": "major",
+   "title": "phase-rep-01's scope is sized well beyond the other rep-* phases and its own stated 1-session budget: it authors a brand-new governance model (5 kinds of thing, 10 edge types, 14 lifecycle events, 4 predicates, overlay limits) and faithfully encodes three real, non-trivial orchestration arrangements in the same session.",
+   "evidence": "Scope requires systems/gov017-multi-session.yaml to model GOV-017's full roster — `grep -n \"| Session Manager|...\" docs/08-governance/GOV-017-multi-session-coordination-protocol.md` shows 9 rows in 'The sessions' table (Session Manager, Ideation, Prompt Planner, Session 5, Sessions 1-4, Owner Terminal), each needing a role, cardinality, edges and lifecycle hooks encoded, and acceptance requires the roster test to match 'that table row for row'; systems/idea-realization.yaml must encode GOV-014's 10 roles (`grep -n \"^### \" docs/08-governance/GOV-014-realization-role-contracts.md` lists Triage, Partition, Planner, Adversary, Phase-fit, Mapper, Test Author, Developer, Validator, Realization) with their hands-off-to chain and the owner's approves edges at every gate; systems/demo-build.yaml must encode PLAN-021's coordinator-plus-three-orchestrators-plus-creators-and-validators structure. All of this sits alongside writing the founding governance document itself (on the order of GOV-017's ~5,300 words) plus 3 JSON schemas plus an integrity-test suite with one fixture per broken-reference kind, an enum-agreement test, a bypass-mode fixture, and the GOV-017 roster test.",
+   "consequence": "A single-session phase that in practice requires authoring an entire new governance subsystem plus faithfully modelling three independently complex real systems will run out of session budget partway through, most likely after the document and schemas land but before all three system files and their fixtures are complete and passing — leaving the phase half-done and needing a split that the plan never names.",
+   "minimal_fix": "Split phase-rep-01 so the governance document, schemas and integrity-test scaffolding form one phase, and the three system files (especially gov017-multi-session.yaml and idea-realization.yaml, the two with the largest real rosters) form one or two follow-on phases that depend on it.",
+   "slug": "phase-scope-exceeds-session-budget",
+   "aliases": [
+    "oversized-first-phase"
+   ],
+   "engine": "single-adversary",
+   "author": "partition-adversary dispatched with PROMPT-038"
+  },
+  {
+   "id": "F04",
+   "altitude": "phase",
+   "subject": "phase-rep-04",
+   "severity": "major",
+   "title": "phase-rep-04's acceptance has no line naming a case that must fail or be rejected (GOV-010 P6).",
+   "evidence": "phase-rep-04 acceptance: \"pwsh parses every .ps1 file on Linux.\" / \"The windows-latest job passes on the pushed branch.\" / \"git check-attr eol reports lf for a .sh and a .ps1 file and crlf for the .cmd file.\" / \"The OPS document lists every unverified behaviour PLAN-054 D14 names.\" All four are pass-only observations; none asserts an input, fixture or behaviour that must be refused or fail.",
+   "consequence": "A reviewer checking this phase off has no negative case to run, so a .ps1 file that happens to parse but silently derives the wrong command (e.g. mis-deriving a kill target) would pass acceptance undetected; GOV-010 P6 exists precisely to force a case that catches that.",
+   "minimal_fix": "Add a failing case, e.g. a malformed .ps1 fixture that pwsh's parser must reject, or a fixture restart dry run on fleet.ps1 that must be refused (mirroring R10's dummy-process refusal, ported to the Windows shell).",
+   "slug": "acceptance-missing-reject-case",
+   "aliases": [
+    "gov010-p6-gap"
+   ],
+   "engine": "single-adversary",
+   "author": "partition-adversary dispatched with PROMPT-038"
+  },
+  {
+   "id": "F05",
+   "altitude": "phase",
+   "subject": "phase-rep-05",
+   "severity": "minor",
+   "title": "phase-rep-05's acceptance has no line naming a case that must fail or be rejected (GOV-010 P6).",
+   "evidence": "phase-rep-05 acceptance: \"GOV-017's session table lists the Replicator and the Advisor...\" / \"The roster test passes with no not-yet-in-table marks left.\" / \"The GOV-003 entry quotes the rulings with their date.\" / \"The session record shows the live restart ... with every session back in ListAgents.\" All four are pass-only.",
+   "consequence": "Weaker than a blocker because rep-05 is pure wiring over already-tested rep-01/02/03 logic rather than new decision logic, but the gap is the same kind as rep-04's and the live restart in particular (a kill-and-relaunch of every real session) is exactly the kind of operation where a 'what must be refused' case (e.g. the launcher refusing when lock_free fails, per D12 step 2) would be cheap to require and valuable to check live.",
+   "minimal_fix": "Add a line requiring the live session record to also show one refusal — e.g. the launcher's lock_free refusal path, or a FLEET-REFUSED reply logged during the restart — not just the successful roster.",
+   "slug": "acceptance-missing-reject-case",
+   "aliases": [
+    "gov010-p6-gap"
+   ],
+   "engine": "single-adversary",
+   "author": "partition-adversary dispatched with PROMPT-038"
+  },
+  {
+   "id": "F06",
+   "altitude": "phase",
+   "subject": "phase-rep-04",
+   "severity": "minor",
+   "title": "phase-rep-04's deliverable `docs/08-governance/` is far broader than what its scope actually touches (only the OPS document's unverified-behaviours list), and that breadth is what drives the blocker-level false-parallelism finding above.",
+   "evidence": "Scope's only docs/08-governance/ touch: \"The OPS document's list of behaviours unverified without a Windows host (D14).\" That is a single file, OPS-*-fleet.md. The declared deliverable is the bare `docs/08-governance/` directory, confirmed via `covers()`/`path_conflict` to overlap with every other rep-* phase and with phase-mode-01.",
+   "consequence": "Beyond feeding the blocker above, the overbroad declaration also means the containment check would silently permit phase-rep-04 to touch any file under docs/08-governance/ without being flagged as out-of-scope, weakening the check for this phase specifically.",
+   "minimal_fix": "Narrow the deliverable to the specific OPS document path (same file rep-02 creates and rep-03 edits), e.g. `docs/08-governance/OPS-*-fleet.md`.",
+   "slug": "overbroad-deliverable-declaration",
+   "engine": "single-adversary",
+   "author": "partition-adversary dispatched with PROMPT-038"
+  },
+  {
+   "id": "F07",
+   "altitude": "plan",
+   "subject": "PLAN-054",
+   "severity": "major",
+   "title": "The source idea 000693 was never triaged or promoted before REQ-039 and PLAN-054 (plus six backlog phases) were drafted from it, unlike every precedent plan in the corpus.",
+   "evidence": "git show fa4537d0 --stat (the commit that adds PLAN-054, REQ-039 and phase-rep-01..06) touches no file under _data/; `_data/ideas.jsonl` shows 000693 with only a `created` event and two `annotated` notes, no `status` event, so fold() reports it `open`. Compare precedent: 000028 (behind PLAN-032/sys-auto-gateway, the exact precedent PLAN-054 D15 cites) has a `status` event open->triaged dated 2026-09-09 before its plan existed; 000466 (behind the draft PLAN-051) is `triaged`. idea.schema.json's own status enum states 'promoted=became a plan, requirement or phase', and GOV-003 states 'promoted requires a governed document in promoted_to'.",
+   "consequence": "The idea graph — the authoritative state CLAUDE.md names for this pipeline — now disagrees with the repository: a full plan, requirement and six queued phases exist for an idea the log still shows as an unlooked-at, uncoordinated capture. Any tool or reviewer trusting idea status (idea-priority queue, triage dashboards) will misclassify 000693 as needing scouting, and the gap has to be reconciled by hand before or at G3.",
+   "minimal_fix": "Append a status event (and, once G3 rules, a promoted event with promoted_to pointing at REQ-039/PLAN-054) for 000693 before the plan proceeds past review. Not performed here, per this role's standing prohibition on writing _data/ideas.jsonl.",
+   "engine": "single-adversary",
+   "author": "partition-adversary dispatched with PROMPT-038"
+  },
+  {
+   "id": "F08",
+   "altitude": "plan",
+   "subject": "PLAN-054 Decisions (D1, D2, D8, D9, D10, D11, D13, D14, D15)",
+   "severity": "major",
+   "title": "Nine of the plan's fifteen decisions name no rejected alternative and no cost, contrary to the plan's own standard (GOV-010 P2).",
+   "evidence": "GOV-010 P2: \"Each decision names the alternative it rejected and what that alternative would have cost... 'Chosen because it is good' is not a reason.\" D1 (five kinds of thing), D2 (edge types/lifecycle events), D8 (session-id pre-assignment), D9 (restart hooks), D10 (Replicator manual mode), D11 (overlay), D13 (self-test), D14 (PowerShell now) and D15 (sys-fleet registered now) each state only what was chosen and, at most, who ruled it — none states a rejected alternative's cost. Contrast D3, D4, D5, D6, D7 and D12, which each name a specific alternative and its cost (e.g. D6: \"refusing agent-requested kills until a uuid can be verified, would block the restart hand-off this plan exists for\").",
+   "consequence": "A reviewer at G3 cannot tell whether these nine decisions were weighed against a real alternative or simply asserted; per the standard's own worked example (PLAN-003, PLAN-002), this is the exact pattern that fails P2 and invites rework if the owner later asks why, say, the model was not built with fewer than five kinds of thing, or why PowerShell is written now rather than at rep-06's spike stage.",
+   "minimal_fix": "For each of the nine decisions, add one sentence naming the alternative considered and its cost, following the pattern already used in D3–D7 and D12.",
+   "engine": "single-adversary",
+   "author": "partition-adversary dispatched with PROMPT-038"
+  },
+  {
+   "id": "F09",
+   "altitude": "plan",
+   "subject": "PLAN-054 D8",
+   "severity": "minor",
+   "title": "D8's kill procedure does not state what happens when the uuid check fails, even though REQ-039 R10 requires a refusal in that case.",
+   "evidence": "PLAN-054 D8: \"A kill reads the pid from the folded state, checks that /proc/<pid>/cmdline contains the uuid, and sends SIGTERM to the process group.\" No sentence covers the case where the cmdline does not contain the uuid (e.g. the pid was reused). REQ-039 R10 states the required behaviour (\"a pid whose command line lacks the uuid is refused\") and phase-rep-03's acceptance row tests it, so the behaviour exists elsewhere in the plan's own paper trail, but D8 itself — the decision a reader would check first — is silent on it.",
+   "consequence": "A reader of the Decisions section alone would not know the kill is a safety-checked refusal rather than an unconditional signal; this is cosmetic only because R10 and phase-rep-03 already pin the real behaviour down.",
+   "minimal_fix": "Add one clause to D8: \"...sends SIGTERM to the process group; a mismatch refuses the kill and logs the reason.\"",
+   "engine": "single-adversary",
+   "author": "partition-adversary dispatched with PROMPT-038"
+  },
+  {
+   "id": "F10",
+   "altitude": "plan",
+   "subject": "PLAN-054 Execution order and real concurrency",
+   "severity": "minor",
+   "title": "The stated GOV-017/PROMPT-037 collision list names two already-complete phases as if they are live collision risks.",
+   "evidence": "PLAN-054: \"phase-grd-03 and phase-asr-04 also edit those files.\" Checked docs/09-backlog/backlog.yaml: phase-grd-03 and phase-asr-04 both carry `status: complete`. A full scan of every backlog item's `deliverables` against the two file paths (GOV-017-multi-session-coordination-protocol.md, PROMPT-037-session-manager-starter-messages.md) shows the only two phases still `queued` against them are phase-mode-03 and phase-rep-05 itself; phase-sch-03, phase-grd-01, phase-grd-02, phase-grd-03, phase-asr-04 and phase-asr-05 are all complete.",
+   "consequence": "None on what gets built — the real collision (phase-mode-03) is correctly identified — but a future reader checking \"who else touches these files\" is pointed at two phases that already merged and present no actual scheduling conflict, which wastes a lookup.",
+   "minimal_fix": "Drop the completed phases from that sentence, or mark them as historical (already landed) rather than listing them beside the live phase-mode-03 collision.",
+   "engine": "single-adversary",
+   "author": "partition-adversary dispatched with PROMPT-038"
+  }
+ ]
+}
