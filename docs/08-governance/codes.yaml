@@ -65,6 +65,11 @@ reserved:
   reason: Projection publication decision; deliverable of phase-rel-05.
 - code: GOV-012
   reason: Idea metrics command and generated-page rule; deliverable of phase-idg-08.
+- code: GOV-023
+  reason: Fleet model governance document (PLAN-054); deliverable of phase-rep-01.
+- code: OPS-034
+  reason: Operations document for tools/fleet.py (PLAN-054); deliverable of phase-rep-02, phase-rep-03 and
+    phase-rep-04.
 # Codes withdrawn from use. Never reissued, so a deletion cannot recycle a number.
 retired:
 - code: PLAN-011
