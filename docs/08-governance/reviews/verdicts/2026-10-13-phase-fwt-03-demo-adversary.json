@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-13-phase-fwt-03-demo-adversary",
+  "date": "2026-10-13",
+  "phase": "phase-fwt-03",
+  "reviewed_commit": "547b3154fd10fd8597d52240501edefae692a0aa",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "pass",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "The placeholder check runs only on the two shipped valid examples, so a real document that is still template boilerplate validates against the schema.",
+      "evidence": "docs/00-working/framework/05-schemas/check_schemas.py:61-69 (PLACEHOLDER_FREE lists only requirement.valid.md and plan.valid.md). requirement.template.md with only code, created and the H1 title filled in: schema errors [], while PLACEHOLDER.findall finds 9 markers.",
+      "consequence": "A reused template can pass the family's check while still carrying placeholder text; only the raw template is rejected, through its front-matter patterns. REQ-024 R04 as written still holds."
+    }
+  ],
+  "raw_reply_sha256": "521a85ee2d5d6688f899ad0d08d6ef241e28673286a28906193faa3cd09a7d95",
+  "notes": "Gating functional review, dispatched by the Session Manager in its own scratch clone at 547b3154. It also judged the unruled status enum (draft, approved, active, complete, deprecated, superseded) consistent with real plan usage. Owner ruling 2026-10-13 (SM session): fix F01 in this phase. Raw reply at _working/session-manager/review-replies/phase-fwt-03-547b3154-demo-adversary.md."
+}

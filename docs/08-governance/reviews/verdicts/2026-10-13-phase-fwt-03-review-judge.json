@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-13-phase-fwt-03-review-judge",
+  "date": "2026-10-13",
+  "phase": "phase-fwt-03",
+  "reviewed_commit": "547b3154fd10fd8597d52240501edefae692a0aa",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "The phase's second verification entry is prose, so the review runner never executes check_schemas.py.",
+      "evidence": "docs/09-backlog/backlog.yaml phase-fwt-03 verification entry 2; manifest _working/review-checks/phase-fwt-03/547b3154fd10/ entry 4: not run: not a command.",
+      "consequence": "The manifest carries no execution evidence for check_schemas.py; the judge traced it by hand. The wording predates this diff."
+    }
+  ],
+  "raw_reply_sha256": "71e74a044b1d61580be1e43301f12d4656049d8be1ec879bc4f9191b8199c721",
+  "notes": "Shadow review, dispatched by the Session Manager after the runner finished (manifest _working/review-checks/phase-fwt-03/547b3154fd10/, passed). It did not find the gating major (placeholder check scope). The gating reviewer did execute check_schemas.py (exit 0). Raw reply at _working/session-manager/review-replies/phase-fwt-03-547b3154-review-judge.md."
+}
