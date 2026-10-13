@@ -6,7 +6,9 @@ texts in document order, ignoring headings inside fenced code blocks and HTML co
 
 Each case in CASES names an example, a schema and whether the example must validate.
 The script also checks that each template's headings satisfy its schema's section
-requirements, so a template and its schema cannot drift apart unnoticed.
+requirements, so a template and its schema cannot drift apart unnoticed, and that each example
+listed in PLACEHOLDER_FREE carries none of the templates' placeholders (REQ-024 R04: a filled,
+placeholder-free instance).
 
 A backlog phase is a YAML item in backlog.yaml, not a Markdown document, so it is checked
 separately (REQ-024 R03): the item named by REFERENCE_PHASE is cut out of backlog.yaml as text,
@@ -51,12 +53,29 @@ CASES: list[tuple[str, str, bool]] = [
     ("protocol.valid.md", "governance.schema.json", False),
     ("governance-shape-labelled-protocol.md", "protocol.schema.json", False),
     ("protocol-shape-labelled-governance.md", "governance.schema.json", False),
+    # REQ-024 R04: a filled requirement passes; without acceptance criteria it fails.
+    ("requirement.valid.md", "requirement.schema.json", True),
+    ("requirement.no-acceptance.md", "requirement.schema.json", False),
+    # REQ-024 R04: a filled plan passes; without scope, or without phases, it fails.
+    ("plan.valid.md", "plan.schema.json", True),
+    ("plan.no-scope.md", "plan.schema.json", False),
+    ("plan.no-phases.md", "plan.schema.json", False),
 ]
+
+# Examples that must be filled instances of their template, with no placeholder left in them.
+PLACEHOLDER_FREE: list[str] = ["requirement.valid.md", "plan.valid.md"]
+
+# The placeholder forms the templates use: a NNN code, a YYYY-MM-DD date, a [Bracketed Name]
+# in the title line, an <angle-bracket> slot, an HTML comment, and an "Example:" lead-in.
+PLACEHOLDER = re.compile(r"[A-Z]+-NNN|YYYY-MM-DD|^# .*\[[^\]]+\]|<[a-z][^>]*>|<!--|^Example:",
+                         re.MULTILINE)
 
 # (template file, schema file): the template's headings must satisfy the schema's `sections`.
 TEMPLATES: list[tuple[str, str]] = [
     ("governance.template.md", "governance.schema.json"),
     ("protocol.template.md", "protocol.schema.json"),
+    ("requirement.template.md", "requirement.schema.json"),
+    ("plan.template.md", "plan.schema.json"),
 ]
 
 # (field removed from the reference phase, reason the copy must fail)
@@ -213,6 +232,14 @@ def main() -> int:
         print(f"{'PASS' if ok else 'FAIL'}  {template} headings against {schema_name} sections")
         for message in errors:
             print(f"        {message}")
+
+    for example in PLACEHOLDER_FREE:
+        found = PLACEHOLDER.findall((EXAMPLES / example).read_text(encoding="utf-8"))
+        ok = not found
+        failures += not ok
+        print(f"{'PASS' if ok else 'FAIL'}  {example} has no template placeholders")
+        for placeholder in found:
+            print(f"        placeholder: {placeholder!r}")
 
     failures += check_phases()
 

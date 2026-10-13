@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "requirement.schema.json",
+  "title": "Requirement document",
+  "description": "Validates a requirement document after check_schemas.py has converted it to {front_matter, sections}: front_matter is the parsed YAML front matter, sections is the list of level-2 heading texts in document order. A requirement document states what is needed and why, each numbered requirement with how it will be verified, what is in and out of scope, and the conditions that must hold for the work to count as done. The schema checks that each section exists, not what it says; other level-2 sections are allowed.",
+  "type": "object",
+  "required": ["front_matter", "sections"],
+  "additionalProperties": false,
+  "properties": {
+    "front_matter": {
+      "type": "object",
+      "required": ["code", "title", "kind", "status", "created"],
+      "properties": {
+        "code": {"type": "string", "pattern": "^[A-Z]+-[0-9]{3}$"},
+        "title": {"type": "string", "minLength": 1},
+        "kind": {"const": "requirement"},
+        "status": {"enum": ["draft", "approved", "active", "complete", "deprecated", "superseded"]},
+        "created": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true,
+      "allOf": [
+        {"contains": {"const": "Overview"}},
+        {"contains": {"const": "Requirements"}},
+        {"contains": {"const": "Scope"}},
+        {"contains": {"const": "Acceptance criteria"}}
+      ]
+    }
+  }
+}
