@@ -29115,3 +29115,36 @@ Raised by Session Manager during the workbench run (2026-10-12).
 The idea documents accepted-but-noted test-runner behavior during phase-arch-07. The issue is isolated to vitest's unnoticed continuation after ancestor termination, which the owner has approved as tolerable for now. No related idea proposes to close it; the owner's comment that "a later hardening could make any ancestor death stop the run" names the desired future direction but assigns no backlog phase to it. The idea stands alone as a record of known behavior awaiting a future decision.
 
 </details>
+
+---
+
+## 000693 · Agent Replicator: an agent that creates and tracks new agents and builds the infrastructure for managing them
+
+**Created 2026-10-12T22:04:20-04:00 · Status: `open`**
+
+create the 'Agent Replicator' agent. This agent's job is to create and track new agents and build the infrastructure for managing those agents. It should write the bash or Powershell (Linux or windows depending on owner system) scripts for launching and killing agent sessions. It creates a log of agents and their configurations and can create new agents on the fly that can be launched from Claude session to open them when needed. Utilize advisor for this.
+
+The agent replicator should also manage creation and removal of all agent sessions so coordinator sessions are not trying to restart themselves.
+
+don't design it specific to this SM format. It should be generalizable to understanding orchestration systems in general so as the system evolves, it dynamically adapts based on its generalized understanding - not linked to one specific agent orchestration system design.
+
+Be sure we design the system of tracker files needed for managing the growing agent fleets, including how we map relationships between individual agents to form orchestration systems.
+
+We should draft windows Powershell now
+
+I also will need a simple script I can double click to run and reboot the system.
+
+**Annotations**
+
+- **note** by repository-owner (2026-10-12T22:33:28-04:00): PRIORITY (2026-10-12, relayed by Session Manager).
+- **note** by repository-owner (2026-10-12T22:33:28-04:00): Clarification (2026-10-12, relayed by Session Manager): 'reboot the system' means restart all agent sessions, not the computer.
+
+---
+
+## 000694 · pytest runs in worktrees are killed by a signal (exit 144) partway through; find what sends the kill
+
+**Created 2026-10-12T22:04:21-04:00 · Status: `open`**
+
+pytest runs in worktrees get killed by a signal (exit 144) at random points, 9% to 64%. Runs detached with setsid/nohup complete. Find what sends the kill (possibly another session's tests killing by pattern or process group).
+
+Reported by Session 2 - Builder B, 2026-10-12.
