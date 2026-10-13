@@ -547,7 +547,7 @@ CI regenerates it and fails on any difference.
 | PLAN-038 | doc-backlog-status-regression-guard-plan | draft | 0 | 0 | 1 | agent-coord |
 | PLAN-039 | doc-idea-realization-system-plan | draft | 9 | 1 | 5 | agent-batch-runner, agent-build, agent-builder-a, agent-codex-boundary-study, agent-coord |
 | PLAN-039.01 | doc-irs-orchestrator-design | draft | 5 | 1 | 4 | agent-batch-runner, agent-build, agent-coord |
-| PLAN-040 | doc-portable-framework-document-templates | draft | 3 | 0 | 2 | agent-builder-a, agent-builder-b |
+| PLAN-040 | doc-portable-framework-document-templates | draft | 2 | 1 | 2 | agent-builder-a, agent-builder-b |
 | PLAN-041 | doc-portable-framework-content-extraction | draft | 3 | 0 | 0 | — |
 | PLAN-042 | doc-session-taxonomy-investigation | draft | 0 | 0 | 2 | agent-tax |
 | PLAN-043 | doc-literature-review-report-page | approved | 1 | 0 | 3 | agent-batch-runner, agent-lrr |

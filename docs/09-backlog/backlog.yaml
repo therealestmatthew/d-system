@@ -15003,7 +15003,8 @@ items:
   systems:
   - sys-fw-templates
   owner: repository-owner
-  status: queued
+  agent: agent-builder-a
+  status: active
   priority: 2
   session_budget: 1
   depends_on: []
@@ -15025,6 +15026,8 @@ items:
   - docs/00-working/framework/05-schemas/plan.schema.json
   - docs/00-working/framework/05-schemas/requirement.template.md
   - docs/00-working/framework/05-schemas/plan.template.md
+  - docs/00-working/framework/05-schemas/examples
+  - docs/00-working/framework/05-schemas/check_schemas.py
   next_action: Read the existing requirement.template.md and plan.template.md drafts against
     REQ-024 R04 before writing either schema, and note in the phase's session record anywhere the
     draft's shape had to change.
