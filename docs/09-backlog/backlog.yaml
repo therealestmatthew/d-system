@@ -15010,8 +15010,8 @@ items:
   systems:
   - sys-fw-templates
   owner: repository-owner
+  status: complete
   agent: agent-builder-a
-  status: active
   priority: 2
   session_budget: 1
   depends_on: []
@@ -15035,9 +15035,25 @@ items:
   - docs/00-working/framework/05-schemas/plan.template.md
   - docs/00-working/framework/05-schemas/examples
   - docs/00-working/framework/05-schemas/check_schemas.py
-  next_action: Read the existing requirement.template.md and plan.template.md drafts against
-    REQ-024 R04 before writing either schema, and note in the phase's session record anywhere the
-    draft's shape had to change.
+  next_action: None - complete.
+  session: doc-session-requirement-plan-schemas
+  completion_evidence:
+  - docs/00-working/framework/05-schemas/requirement.schema.json
+  - docs/00-working/framework/05-schemas/plan.schema.json
+  - docs/00-working/framework/05-schemas/requirement.template.md
+  - docs/00-working/framework/05-schemas/plan.template.md
+  - docs/00-working/framework/05-schemas/check_schemas.py
+  - docs/03-sessions/SESS-2026-10-12-01-requirement-plan-schemas.md
+  result: 'Requirement and plan schemas shipped, both drafts rewritten in the family style.
+    check_schemas.py "0 failure(s)": requirement.valid.md and plan.valid.md validate and are
+    placeholder-free; copies without Acceptance criteria, Scope or Phases fail - REQ-024 R04
+    holds. A --document mode also fails retained template markers and sample text, ignoring case
+    and punctuation; reworded sample text is a stated known limit (idea 000695). Post-rebase on
+    dev b941407d: "Governance OK: 46 systems, 484 documents, 38 memories, 364 backlog phases" and
+    "2268 passed"; test baseline OK against 2263 on dev. Review: three rounds; adversary findings
+    fixed per owner rulings, the round-3 rewording finding accepted as a known limit, judge
+    findings accepted (records in docs/08-governance/reviews/verdicts/). Merged onto dev at
+    f3481aac with the owner''s approval.'
 
 - id: phase-fwt-04
   title: Session-record document schema
