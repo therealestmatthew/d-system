@@ -18537,6 +18537,9 @@ items:
   - doc-multi-session-coordination-protocol
   - doc-realization-role-contracts
   - doc-live-demo
+  - doc-prompt-demo-agent-roster-spec
+  - doc-prompt-demo-build-orchestration
+  - doc-prompt-demo-build-delegation-pack
   systems:
   - sys-fleet
   - sys-gov-docs
@@ -18551,15 +18554,19 @@ items:
     Terminal as an owner-only role referencing the fleet-level role, the Advisor (lifecycle replicator) and the
     Replicator marked as not yet in the governing table; edges, the primary-checkout lock and claim slots as declared
     resources, lifecycle hooks and kill preconditions (REQ-039 R03, R04; PLAN-054 D1, D3, D9).
-  - docs/08-governance/fleet/systems/demo-build.yaml - the PLAN-021 orchestrators and the creators and validators they
-    dispatch, all lifecycle parent (R03).
+  - docs/08-governance/fleet/systems/demo-build.yaml - the coordinator, a top-level session running PROMPT-014, and the
+    ten agents of PROMPT-012's roster, lifecycle parent. Edges follow PROMPT-018 - the coordinator delegates to the
+    three orchestrators and itself dispatches demo-adversary and demo-validator-web (the completion gate), and the
+    orchestrators delegate to the creators, demo-validator-code and demo-validator-check (R03).
   - docs/08-governance/fleet/systems/idea-realization.yaml - the GOV-014 roles with the hands-off-to chain and the
     owner's approves edges at each gate (R03).
   - fleet.yaml enables the three systems.
   - test/test_fleet_systems.py - each system file passes its schema and resolves; a system file that names a roster
     table in its governing document matches it row for row; a not-yet-in-table mark on a role the table lists fails.
   acceptance:
-  - The three system files pass the schema and the integrity test from phase-rep-01.
+  - The integrity test from phase-rep-01 runs on the three tracked system files, not only on fixtures, and passes.
+  - demo-build.yaml's roles equal PROMPT-012's ten agents plus the PROMPT-014 coordinator, and its delegates-to edges
+    from the coordinator name demo-adversary and demo-validator-web, as PROMPT-018 states.
   - The roster test passes for the GOV-017 system, with the Owner Terminal row matched by its owner-only role.
   - A fixture system file missing one row of its governing table fails the roster test, and a fixture that keeps a
     not-yet-in-table mark on a listed role fails.
@@ -18575,8 +18582,9 @@ items:
   - docs/08-governance/fleet/fleet.yaml
   - test/test_fleet_systems.py
   - test/fixtures/fleet/
-  next_action: Waits for phase-rep-01. Read GOV-017 The sessions, GOV-014 Roles, PLAN-021 and the demo-* files in
-    .claude/agents/ before writing each system file. Split out of phase-rep-01 by the planner's disposition of F03 in
+  next_action: Waits for phase-rep-01. Read GOV-017 The sessions, GOV-014 Roles, PLAN-021, PROMPT-012's roster,
+    PROMPT-014 and PROMPT-018 (the completion gate) and the demo-* files in .claude/agents/ before writing each system
+    file. The later-added review 2026-10-13-plan-054-later-added F01 set the demo-build roster. Split out of phase-rep-01 by the planner's disposition of F03 in
     review 2026-10-12-plan-054.
 - id: phase-rep-02
   title: The tools/fleet.py core - fold, authority, launch-command derivation, dry run, status, fleet map and overlay
@@ -18596,15 +18604,16 @@ items:
   - phase-rep-07
   scope:
   - tools/fleet.py - fold _working/agents/events.jsonl into current state; decide a FLEET request by PLAN-054 D6;
-    implement the five predicates of D7, reading holds edges for resource_free; derive each launch command from the fleet files with a fresh --session-id
+    implement the five predicates of D7, reading holds edges for resource_free; record hold and release from a
+    resource's granting role only (D6); derive each launch command from the fleet files with a fresh --session-id
     and log the launched event first (D8); dry run; status; write the fleet map under _working/agents/map/ (REQ-039
     R06-R09, R11-R13).
   - Overlay - load _working/agents/overlay/, refuse a definition that widens its tracked parent's permission mode or
     tools (R05, R18).
   - docs/08-governance/OPS-034-fleet.md (code allocated at planning time), with the generated reference block filled by
     tools/generate_tool_docs.py; it covers the promotion of an overlay definition (R18).
-  - Fixtures - one per edge type that grants, no edge, each predicate true and false, an unknown requester, an
-    owner-only target, an unknown predicate, a fourth system, a widening and a narrowing overlay.
+  - Fixtures - one per edge type that grants, no edge, each predicate true and false, an unknown requester, a hold from
+    a role that does not grant the resource, an owner-only target, an unknown predicate, a fourth system, a widening and a narrowing overlay.
   acceptance:
   - Each fixture gives the decision PLAN-054 D6 and D7 state; the fourth-system fixture resolves with no code change.
   - grep -n "Session Manager\|GOV-017" tools/fleet.py finds no line (the verification step asserts no match).
@@ -18751,7 +18760,9 @@ items:
     FLEET-DONE, FLEET-REFUSED, restart-ready and ROSTER messages in the message table; the restart procedure, citing
     the fleet governance document and the GOV-017 system file rather than restating them (REQ-039 R20).
   - The GOV-017 system file drops its not-yet-in-table marks for the Replicator and the Advisor, so the roster test
-    compares the full table.
+    compares the full table, and declares the primary-checkout lock with the Session Manager as its granting role.
+  - GOV-017 - the Session Manager sends FLEET hold with each GRANTED and FLEET release on each TURN DONE (PLAN-054 D6,
+    D7).
   - PROMPT-037 - the Replicator's starter.
   - GOV-003 - one entry quoting the owner's 2026-10-12 rulings on A1 and A2 with their date.
   - One live restart of every agent session through the Replicator at a wind-down the owner schedules; the session
@@ -18762,6 +18773,8 @@ items:
   - The roster test passes with no not-yet-in-table marks left.
   - The GOV-003 entry quotes the rulings with their date.
   - The session record shows the live restart as the scope item states, with every session back in ListAgents.
+  - During the wind-down, one lock grant is recorded as a hold edge and resource_free reports false until the matching
+    release, then true; the session record quotes both status outputs.
   - Before the restart, a FLEET kill of the Owner Terminal requested from a non-owner session is refused; the session
     record quotes the FLEET-REFUSED reply and the logged refusal.
   verification:
@@ -18777,8 +18790,7 @@ items:
   - docs/08-governance/fleet/systems/gov017-multi-session.yaml
   next_action: Waits for phase-rep-03. Collides with phase-mode-03, the only other queued phase that edits these
     GOV-017 and PROMPT-037 passages; the two are never active together, and whichever runs second rebases onto the
-    other and re-reads those passages. Decide who records holds edges for the primary-checkout lock (PLAN-054 D7). The
-    live restart needs a wind-down the owner schedules.
+    other and re-reads those passages. The live restart needs a wind-down the owner schedules.
 - id: phase-rep-06
   title: Optional spike - claude --bg with Remote Control as a session primitive for the fleet shells
   plan: doc-agent-replicator

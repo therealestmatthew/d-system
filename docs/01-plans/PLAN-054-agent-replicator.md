@@ -110,7 +110,7 @@ authority rule to differ.
 
 **D6. Every lifecycle request goes through one authority rule.** A request is
 `FLEET <verb> <system> <target> [args]`, with verbs `launch`, `kill`, `restart`, `status`,
-`register`. The core:
+`register`, `hold` and `release`. The core:
 
 1. identifies the requester from the sender's registered name, through the folded instances, to
    a role; an unknown sender is refused and logged;
@@ -120,6 +120,12 @@ authority rule to differ.
 3. checks every kill precondition the system file lists;
 4. executes, which in the Replicator means a tool call the owner approves (D10);
 5. logs the outcome and replies `FLEET-DONE` or `FLEET-REFUSED` with the reason.
+
+`hold` and `release` start and stop no process. `FLEET hold <system> <resource> <holder>` opens a
+`holds` edge from the holder's instance to a resource the system file declares, and `release`
+closes it. Each declared resource names the role that grants it; only that role or the owner may
+send `hold` or `release` for it, and steps 3 and 4 do not apply. The `resource_free` predicate
+(D7) reads these edges.
 
 Nothing in the code names a role, system or document; the system files supply all of it (R06). A
 fourth system, such as an `ADR-023` orchestrator, is a fourth file.
@@ -146,8 +152,10 @@ state a condition no code checks.
 `resource_free` departs from the Advisor's A2 list, which had four predicates. `lock_free` sees
 only git's own state, so it cannot tell that a session has been granted the primary-checkout
 lock and has not yet started a git command. A system that declares a lock records each grant and
-release as a `holds` edge, and `resource_free` reads them. Its result is only as current as those
-events; for `GOV-017`, `phase-rep-05` decides who records them.
+release as a `holds` edge through `FLEET hold` and `FLEET release` (D6), and `resource_free` reads
+them. Its result is only as current as those messages. For `GOV-017` the granting role is the
+Session Manager, which grants the primary-checkout lock: it sends `hold` with each `GRANTED` and
+`release` when it receives each `TURN DONE`. `phase-rep-05` writes that into `GOV-017` and the system file.
 
 **D8. Launch pre-assigns the session id; kill checks it.** Each launch writes a `launched` event
 with a fresh uuid, then starts `claude --session-id <uuid> --name <name> ...`. On Linux the shell
@@ -246,11 +254,11 @@ of them changes `src/governance`.
 | Phase | What | Requirements | Depends on |
 |---|---|---|---|
 | `phase-rep-01` | `GOV-023` (model, edge types, lifecycle events, authority rule, predicates, owner-only kinds, overlay limits); three schemas; `fleet.yaml` and `definitions.yaml` (including the Replicator and the Advisor); the schema, integrity and enum-agreement tests; `sys-fleet` paths | R01, R02, R04 (references), R05 (schema), R13 (data) | none |
-| `phase-rep-07` | The three system files (`gov017-multi-session`, `demo-build`, `idea-realization`) and the roster test that compares a system file with its governing table | R03, R04 (roster) | `phase-rep-01` |
+| `phase-rep-07` | The three system files (`gov017-multi-session`, `demo-build`, `idea-realization`) and the roster test that compares a system file with its governing table. The demo build's roster is `PROMPT-012`'s ten agents plus the coordinator session of `PROMPT-014`, which itself dispatches `demo-adversary` and `demo-validator-web` (`PROMPT-018`) | R03, R04 (roster) | `phase-rep-01` |
 | `phase-rep-02` | `tools/fleet.py`: fold, authority, command derivation, dry run, status, fleet map, overlay checks; `OPS-034`; fixtures for each edge type, each predicate, each refusal, a fourth system and an overlay | R05 (overlay), R06–R09, R11–R13, R18 | `phase-rep-07` |
 | `phase-rep-03` | `tools/fleet/fleet.sh`: tabs, `setsid`, pidfiles, uuid-checked kill; `restart-agents.sh`, its `.desktop` file and `install-launcher`; the `fleet-selftest` system and its live run; the proposal to the owner to retire the two interim scripts | R10, R14, R17 (Linux), R19 | `phase-rep-02` |
 | `phase-rep-04` | `tools/fleet/fleet.ps1`, `restart-agents.ps1` and its `.cmd` wrapper; `.gitattributes`; the `windows-latest` dry-run job; the unverified list in the `OPS` document | R15, R16, R17 (Windows) | `phase-rep-02`, `phase-rep-03` |
-| `phase-rep-05` | The wiring: `GOV-017` (Replicator row, `FLEET` and restart messages, restart procedure), `PROMPT-037` (Replicator starter), the `GOV-003` entry recording the owner's rulings; one live restart of every agent session through the Replicator at an owner-scheduled wind-down | R20, R21 | `phase-rep-03` |
+| `phase-rep-05` | The wiring: `GOV-017` (Replicator row, `FLEET` and restart messages, restart procedure, `hold` and `release` on each lock grant and release), `PROMPT-037` (Replicator starter), the `GOV-003` entry recording the owner's rulings; one live restart of every agent session through the Replicator at an owner-scheduled wind-down | R20, R21 | `phase-rep-03` |
 | `phase-rep-06` | Optional spike: `claude --bg` with Remote Control, written up as a recommendation | none (spike) | `phase-rep-03` |
 
 ## Requirement coverage
