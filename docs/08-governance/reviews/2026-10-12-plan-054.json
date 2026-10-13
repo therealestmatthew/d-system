@@ -24,7 +24,7 @@
   "plan",
   "phase"
  ],
- "status": "open",
+ "status": "dispositioned",
  "notes": "Run by the Session Manager on 2026-10-12 on agent/plan-agent-replicator at fa4537d0 (drafts by Session 3 - Standby Builder), in a scratch clone, one dispatch per altitude. All six phases were registered in the plan's original commit, so no later-added altitude. Findings numbered in the order the replies were read: phase altitude first (F01-F06), then plan (F07-F10). The plan-altitude adversary reached its turn limit and was asked to report from what it had verified. F07 describes the state at fa4537d0's base (e6382ca8); 000693 was triaged afterwards at 11fb44e7. No finding was changed or dropped; the dispatcher added only id, engine and author. One schema-forced change: F01's adversary subject was \"phase-rep-04 / phase-rep-05 / phase-rep-06\"; the schema requires one phase id at the phase altitude, so the dispatcher recorded the first-named phase. The title and evidence, unchanged, name all three.",
  "findings": [
   {
@@ -41,7 +41,16 @@
     "claimed-parallelism-contradicts-shared-system"
    ],
    "engine": "single-adversary",
-   "author": "partition-adversary dispatched with PROMPT-038"
+   "author": "partition-adversary dispatched with PROMPT-038",
+   "dispositions": [
+    {
+     "value": "fixed",
+     "by": "planner",
+     "recorded_by": "Session 3 - Standby Builder (planner stand-in, unclaimed plan-agent-replicator)",
+     "date": "2026-10-13",
+     "reason": "Verified: collisions() returns 'share system sys-fleet' for every rep-* pair, so no two can be active together. The Execution order section of PLAN-054 now says every rep-* phase declares sys-fleet and the phases run one at a time (rep-01, rep-07, rep-02, rep-03, then rep-04, rep-05 and rep-06 in the owner's order). The parallel claim is gone. sys-fleet stays on every phase, because each one writes fleet code or fleet data, or launches fleet sessions."
+    }
+   ]
   },
   {
    "id": "F02",
@@ -57,7 +66,16 @@
     "narrower-deliverable-than-sibling-precedent"
    ],
    "engine": "single-adversary",
-   "author": "partition-adversary dispatched with PROMPT-038"
+   "author": "partition-adversary dispatched with PROMPT-038",
+   "dispositions": [
+    {
+     "value": "fixed",
+     "by": "planner",
+     "recorded_by": "Session 3 - Standby Builder (planner stand-in, unclaimed plan-agent-replicator)",
+     "date": "2026-10-13",
+     "reason": "phase-rep-01's deliverables now name docs/08-governance/GOV-023-fleet-model.md. GOV-023 was allocated with --next-code governance and reserved in codes.yaml for phase-rep-01, and no local or origin branch holds it. The fleet data files are also declared by exact path."
+    }
+   ]
   },
   {
    "id": "F03",
@@ -73,7 +91,16 @@
     "oversized-first-phase"
    ],
    "engine": "single-adversary",
-   "author": "partition-adversary dispatched with PROMPT-038"
+   "author": "partition-adversary dispatched with PROMPT-038",
+   "dispositions": [
+    {
+     "value": "fixed",
+     "by": "planner",
+     "recorded_by": "Session 3 - Standby Builder (planner stand-in, unclaimed plan-agent-replicator)",
+     "date": "2026-10-13",
+     "reason": "Planner's sizing call: split. GOV-023, three schemas and an integrity suite with one fixture per broken-reference kind fill one session. Modelling GOV-017's 9 rows, GOV-014's 10 roles and the PLAN-021 build, with a roster test, is a second session that needs the first one's schemas. phase-rep-01 now holds GOV-023, the schemas, fleet.yaml, definitions.yaml and the integrity and enum tests. The new phase-rep-07 holds the three system files and test/test_fleet_systems.py, and phase-rep-02 now depends on phase-rep-07. It is numbered rep-07 rather than renumbered, so this record's phase references stay correct. PLAN-054's phase table and coverage table are updated, and the reason is under Requirement coverage."
+    }
+   ]
   },
   {
    "id": "F04",
@@ -89,7 +116,16 @@
     "gov010-p6-gap"
    ],
    "engine": "single-adversary",
-   "author": "partition-adversary dispatched with PROMPT-038"
+   "author": "partition-adversary dispatched with PROMPT-038",
+   "dispositions": [
+    {
+     "value": "fixed",
+     "by": "planner",
+     "recorded_by": "Session 3 - Standby Builder (planner stand-in, unclaimed plan-agent-replicator)",
+     "date": "2026-10-13",
+     "reason": "phase-rep-04 now has two reject cases. In the windows-latest job, a fleet.ps1 kill of a dummy process whose command line lacks the uuid must exit non-zero, log a failed event and leave the process running. A fixture .ps1 file with a syntax error must be rejected by the same parse check that passes the real files. Both are in scope and acceptance, and test/fixtures/fleet/ is added to its deliverables."
+    }
+   ]
   },
   {
    "id": "F05",
@@ -105,7 +141,16 @@
     "gov010-p6-gap"
    ],
    "engine": "single-adversary",
-   "author": "partition-adversary dispatched with PROMPT-038"
+   "author": "partition-adversary dispatched with PROMPT-038",
+   "dispositions": [
+    {
+     "value": "fixed",
+     "by": "planner",
+     "recorded_by": "Session 3 - Standby Builder (planner stand-in, unclaimed plan-agent-replicator)",
+     "date": "2026-10-13",
+     "reason": "phase-rep-05 acceptance now requires a refusal before the live restart: a FLEET kill of the Owner Terminal requested from a non-owner session is refused, and the session record quotes the FLEET-REFUSED reply and the logged refusal. The live lock_free path was not chosen, because it would need a git operation under way during a full restart."
+    }
+   ]
   },
   {
    "id": "F06",
@@ -118,7 +163,16 @@
    "minimal_fix": "Narrow the deliverable to the specific OPS document path (same file rep-02 creates and rep-03 edits), e.g. `docs/08-governance/OPS-*-fleet.md`.",
    "slug": "overbroad-deliverable-declaration",
    "engine": "single-adversary",
-   "author": "partition-adversary dispatched with PROMPT-038"
+   "author": "partition-adversary dispatched with PROMPT-038",
+   "dispositions": [
+    {
+     "value": "fixed",
+     "by": "planner",
+     "recorded_by": "Session 3 - Standby Builder (planner stand-in, unclaimed plan-agent-replicator)",
+     "date": "2026-10-13",
+     "reason": "The deliverables of phase-rep-02, phase-rep-03 and phase-rep-04 now name docs/08-governance/OPS-034-fleet.md instead of docs/08-governance/. OPS-034 was allocated and reserved in codes.yaml for those three phases. phase-rep-05's docs/08-governance/fleet/ is narrowed to the one system file it edits."
+    }
+   ]
   },
   {
    "id": "F07",
@@ -130,7 +184,16 @@
    "consequence": "The idea graph — the authoritative state CLAUDE.md names for this pipeline — now disagrees with the repository: a full plan, requirement and six queued phases exist for an idea the log still shows as an unlooked-at, uncoordinated capture. Any tool or reviewer trusting idea status (idea-priority queue, triage dashboards) will misclassify 000693 as needing scouting, and the gap has to be reconciled by hand before or at G3.",
    "minimal_fix": "Append a status event (and, once G3 rules, a promoted event with promoted_to pointing at REQ-039/PLAN-054) for 000693 before the plan proceeds past review. Not performed here, per this role's standing prohibition on writing _data/ideas.jsonl.",
    "engine": "single-adversary",
-   "author": "partition-adversary dispatched with PROMPT-038"
+   "author": "partition-adversary dispatched with PROMPT-038",
+   "dispositions": [
+    {
+     "value": "fixed",
+     "by": "planner",
+     "recorded_by": "Session 3 - Standby Builder (planner stand-in, unclaimed plan-agent-replicator)",
+     "date": "2026-10-13",
+     "reason": "Correct at fa4537d0's base (e6382ca8), where 000693 was open. Ideation triaged it at 11fb44e7, 000693-000694: triage findings, open -> triaged. The branch is now rebased onto 11fb44e7, and fold() reports 000693 as triaged. Promotion to REQ-039 and PLAN-054 belongs at or after G3 through the sanctioned writer. This session does not write _data/ideas.jsonl."
+    }
+   ]
   },
   {
    "id": "F08",
@@ -142,7 +205,16 @@
    "consequence": "A reviewer at G3 cannot tell whether these nine decisions were weighed against a real alternative or simply asserted; per the standard's own worked example (PLAN-003, PLAN-002), this is the exact pattern that fails P2 and invites rework if the owner later asks why, say, the model was not built with fewer than five kinds of thing, or why PowerShell is written now rather than at rep-06's spike stage.",
    "minimal_fix": "For each of the nine decisions, add one sentence naming the alternative considered and its cost, following the pattern already used in D3–D7 and D12.",
    "engine": "single-adversary",
-   "author": "partition-adversary dispatched with PROMPT-038"
+   "author": "partition-adversary dispatched with PROMPT-038",
+   "dispositions": [
+    {
+     "value": "fixed",
+     "by": "planner",
+     "recorded_by": "Session 3 - Standby Builder (planner stand-in, unclaimed plan-agent-replicator)",
+     "date": "2026-10-13",
+     "reason": "Each of D1, D2, D8, D9, D10, D11, D13, D14 and D15 in PLAN-054 now names its rejected alternative and that alternative's cost. D1: a flat roster cannot express authority. D2: free-text edge types cannot be matched to verbs. D8: transcript search and kill by name stop the wrong session. D9: a restart sequence written into the code is the Session Manager-specific design the owner ruled out. D10: in auto mode the classifier is the only check on a kill. D11: committing first puts a turn and a merge before every one-off agent. D13: testing unknowns in the first live restart risks every session at once. D14: deferring leaves the Windows path unknown and the core's interface unfit for it. D15: tagging the phases sys-governance collides with every engine phase."
+    }
+   ]
   },
   {
    "id": "F09",
@@ -154,7 +226,16 @@
    "consequence": "A reader of the Decisions section alone would not know the kill is a safety-checked refusal rather than an unconditional signal; this is cosmetic only because R10 and phase-rep-03 already pin the real behaviour down.",
    "minimal_fix": "Add one clause to D8: \"...sends SIGTERM to the process group; a mismatch refuses the kill and logs the reason.\"",
    "engine": "single-adversary",
-   "author": "partition-adversary dispatched with PROMPT-038"
+   "author": "partition-adversary dispatched with PROMPT-038",
+   "dispositions": [
+    {
+     "value": "fixed",
+     "by": "planner",
+     "recorded_by": "Session 3 - Standby Builder (planner stand-in, unclaimed plan-agent-replicator)",
+     "date": "2026-10-13",
+     "reason": "D8 now states the mismatch case. When the command line lacks the uuid (a reused pid or a stale pidfile), the kill is refused, a failed event records the reason, and the instance is reported as orphan-detected. The Windows paragraph applies the same refusal. REQ-039 R10 now says so too, and phase-rep-03 and phase-rep-04 carry it in scope."
+    }
+   ]
   },
   {
    "id": "F10",
@@ -166,7 +247,16 @@
    "consequence": "None on what gets built — the real collision (phase-mode-03) is correctly identified — but a future reader checking \"who else touches these files\" is pointed at two phases that already merged and present no actual scheduling conflict, which wastes a lookup.",
    "minimal_fix": "Drop the completed phases from that sentence, or mark them as historical (already landed) rather than listing them beside the live phase-mode-03 collision.",
    "engine": "single-adversary",
-   "author": "partition-adversary dispatched with PROMPT-038"
+   "author": "partition-adversary dispatched with PROMPT-038",
+   "dispositions": [
+    {
+     "value": "fixed",
+     "by": "planner",
+     "recorded_by": "Session 3 - Standby Builder (planner stand-in, unclaimed plan-agent-replicator)",
+     "date": "2026-10-13",
+     "reason": "Verified: phase-grd-03 and phase-asr-04 are complete. They are removed from PLAN-054's Execution order section and from phase-rep-05's next_action, which now names phase-mode-03 as the only other queued phase that edits those GOV-017 and PROMPT-037 passages."
+    }
+   ]
   }
  ]
 }
