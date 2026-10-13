@@ -344,8 +344,27 @@ not dispatched; it runs on the next tip. Verdict record, committed unchanged in 
     form; corrected under Decisions.
 
 Round 3, at `70646557`, run by the Session Manager: gating reject, which the owner ruled **accept
-after a small fix** (2026-10-13). Round-2 F02 to F04 were found resolved. The round-3 verdict record
-follows once the round-3 shadow review returns.
+after a small fix** (2026-10-13). Round-2 F02 to F04 were found resolved. Verdict records, committed
+unchanged in `3c67125c`:
+
+- `docs/08-governance/reviews/verdicts/2026-10-13-phase-fwt-03-demo-adversary-3.json`
+  (sha256 `d9244ca59d78f98f7e7d9d3b1d42d0a8df31f94a43b261f540d5b275c8e6edc6`): the two gating
+  findings below.
+- `docs/08-governance/reviews/verdicts/2026-10-13-phase-fwt-03-review-judge-2.json`
+  (sha256 `96fc4684621893f09480157751af144283df5b8f859ef5c976aef20713c467be`): shadow, three minor
+  findings.
+  - **F01 — accepted**, for the same reason as round 1's judge F01: the phase's verification entry
+    is prose, so the manifest has no execution evidence for `check_schemas.py`; the command and its
+    output are in this record's Verification section.
+  - **F02 — no action.** The BOM fixture's first bytes are `EF BB BF`; the Session Manager checked.
+  - **F03 — accepted.** `check_schemas.py` is outside the repository's ruff and mypy paths. Run once
+    on the file: `uv run ruff check` reports "All checks passed!"; `uv run mypy` reports only
+    `Library stubs not installed for "yaml"` and `... for "jsonschema"`, the same two errors dev's
+    copy of the file reports, and the same two `phase-fwt-02` recorded. With
+    `--ignore-missing-imports` mypy reports "Success: no issues found in 1 source file". Adding stub
+    packages is a dependency change outside this phase.
+
+Gating findings:
 
 - **Blocker — accepted as a known limit, per the owner's ruling.** Light rewording of every sample
   sentence passed `--document`, because the comparison is an exact substring match. Both sides are
