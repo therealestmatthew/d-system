@@ -8784,7 +8784,7 @@ items:
   - sys-ui
   owner: repository-owner
   agent: agent-builder-b
-  status: active
+  status: complete
   priority: 2
   session_budget: 1
   depends_on:
@@ -8828,11 +8828,8 @@ items:
   - test/test_workbench_slot_matcher.py
   - src/workbench/
   - docs/06-requirements/
-  next_action: Assert the one-header count as a test before changing the rendering, so idea
-    000101's defect is reproduced by the check first. Deliverables widened at claim time per
-    ADR-031's "What each downstream phase builds" row (owner ruling 2026-10-08). Widened again on
-    2026-10-09 by owner ruling to name ts/vite.config.test.ts and ts/vitest.config.ts for the dev
-    server's symlink guard (security review, round 1).
+  next_action: None - complete. Idea 000101's defect, reproduced first by the one-header test, is
+    fixed.
   session: doc-session-schema-owned-slots-structural-eligibility
   completion_evidence:
   - _data/workbench/slot-schemas.json
@@ -8882,7 +8879,10 @@ items:
     answered from the checked descriptor too; 20 race cases, 0 leaks where 11 had leaked. Round 8:
     load answers every in-scope file from the checked descriptor whatever its query (default
     protect, only the ids of the Vite inline-block proxy excepted), and the hard-link exemption
-    needs a real, unsymlinked root node_modules.'
+    needs a real, unsymlinked root node_modules. Merged onto dev 3bb650d4 at 64777e20 with owner
+    approval on 2026-10-12 after review round 9 and the final review: post-rebase uv run pytest 2253
+    passed, npm test 297 passed, ruff 0, mypy 0; the one baseline-missing test (removed with
+    eligible_slots) was signed off by the owner.'
 - id: phase-arch-08
   title: Multi-instance panel identity across layout, storage, registry and sessions
   plan: doc-workbench-architecture-quality
