@@ -87,17 +87,17 @@ PASS  requirement.boilerplate.md as a requirement document (--document): fails (
         placeholder: 'Example:'
         placeholder: '<!--'
         placeholder: 'Example:'
-        front-matter title is the template's sample: 'Short name of the feature or subsystem'
-        section 'Overview' keeps the template's sample text: 'Route planners need a multi-stop route ordered to minimise d'
-        section 'Overview' keeps the template's sample text: 'Today they order stops by hand, which takes several minutes '
-        section 'Requirements' keeps the template's sample text: '**R01 — An optimised route visits every stop.** Given a star'
-        section 'Requirements' keeps the template's sample text: '*Verification:* `uv run pytest test/test_route_optimizer.py '
-        section 'Requirements' keeps the template's sample text: '**R02 — The response arrives within two seconds.**'
-        section 'Requirements' keeps the template's sample text: '*Verification:* a load test of ten concurrent requests repor'
-        section 'Scope' keeps the template's sample text: 'the ordering algorithm and the HTTP endpoint that returns th'
-        section 'Scope' keeps the template's sample text: 'a user interface for viewing routes, and storing routes betw'
-        section 'Acceptance criteria' keeps the template's sample text: 'R01 and R02 each pass their stated verification.'
-        section 'Acceptance criteria' keeps the template's sample text: 'An invalid coordinate returns an error that names the offend'
+        front-matter title is the template's sample: 'short name of the feature or subsystem'
+        section 'Overview' keeps the template's sample text: 'route planners need a multi stop route ordered to minimise d'
+        section 'Overview' keeps the template's sample text: 'today they order stops by hand which takes several minutes p'
+        section 'Requirements' keeps the template's sample text: 'r01 an optimised route visits every stop given a start an en'
+        section 'Requirements' keeps the template's sample text: 'verification uv run pytest test test route optimizer py k vi'
+        section 'Requirements' keeps the template's sample text: 'r02 the response arrives within two seconds'
+        section 'Requirements' keeps the template's sample text: 'verification a load test of ten concurrent requests reports '
+        section 'Scope' keeps the template's sample text: 'the ordering algorithm and the http endpoint that returns th'
+        section 'Scope' keeps the template's sample text: 'a user interface for viewing routes and storing routes betwe'
+        section 'Acceptance criteria' keeps the template's sample text: 'r01 and r02 each pass their stated verification'
+        section 'Acceptance criteria' keeps the template's sample text: 'an invalid coordinate returns an error that names the offend'
 PASS  plan.boilerplate.md as a plan document (--document): fails (expected fail)
         placeholder: '<!--'
         placeholder: '<!--'
@@ -106,41 +106,53 @@ PASS  plan.boilerplate.md as a plan document (--document): fails (expected fail)
         placeholder: 'Example:'
         placeholder: '<!--'
         placeholder: 'Example:'
-        front-matter title is the template's sample: 'Short name of what will be built'
-        section 'Overview' keeps the template's sample text: 'Build the route optimiser as a nearest-neighbour ordering be'
-        section 'Overview' keeps the template's sample text: 'Nearest-neighbour is fast enough for ten stops and simple en'
+        front-matter title is the template's sample: 'short name of what will be built'
+        section 'Overview' keeps the template's sample text: 'build the route optimiser as a nearest neighbour ordering be'
+        section 'Overview' keeps the template's sample text: 'nearest neighbour is fast enough for ten stops and simple en'
         section 'Overview' keeps the template's sample text: 'an exact solver is deferred unless the latency target is mis'
-        section 'Scope' keeps the template's sample text: 'the ordering module, the endpoint, and their tests.'
-        section 'Scope' keeps the template's sample text: 'caching distances between requests, and any user interface.'
-        section 'Phases' keeps the template's sample text: '`phase-route-01` — Ordering module.'
-        section 'Phases' keeps the template's sample text: 'Orders stops by nearest neighbour and returns the total dist'
-        section 'Phases' keeps the template's sample text: '`src/route/order.py`, `test/test_route_optimizer.py`.'
-        section 'Phases' keeps the template's sample text: 'Exposes the ordering over HTTP and returns an error that nam'
-        section 'Phases' keeps the template's sample text: '`src/api/routes/route.py`, `test/test_route_api.py`.'
+        section 'Scope' keeps the template's sample text: 'the ordering module the endpoint and their tests'
+        section 'Scope' keeps the template's sample text: 'caching distances between requests and any user interface'
+        section 'Phases' keeps the template's sample text: 'phase route 01 ordering module'
+        section 'Phases' keeps the template's sample text: 'orders stops by nearest neighbour and returns the total dist'
+        section 'Phases' keeps the template's sample text: 'src route order py test test route optimizer py'
+        section 'Phases' keeps the template's sample text: 'exposes the ordering over http and returns an error that nam'
+        section 'Phases' keeps the template's sample text: 'src api routes route py test test route api py'
 PASS  requirement.stripped-sample.md as a requirement document (--document): fails (expected fail)
-        front-matter title is the template's sample: 'Short name of the feature or subsystem'
-        section 'Overview' keeps the template's sample text: 'Route planners need a multi-stop route ordered to minimise d'
-        section 'Overview' keeps the template's sample text: 'Today they order stops by hand, which takes several minutes '
-        section 'Requirements' keeps the template's sample text: '**R01 — An optimised route visits every stop.** Given a star'
-        section 'Requirements' keeps the template's sample text: '*Verification:* `uv run pytest test/test_route_optimizer.py '
-        section 'Requirements' keeps the template's sample text: '**R02 — The response arrives within two seconds.**'
-        section 'Requirements' keeps the template's sample text: '*Verification:* a load test of ten concurrent requests repor'
-        section 'Scope' keeps the template's sample text: 'the ordering algorithm and the HTTP endpoint that returns th'
-        section 'Scope' keeps the template's sample text: 'a user interface for viewing routes, and storing routes betw'
-        section 'Acceptance criteria' keeps the template's sample text: 'R01 and R02 each pass their stated verification.'
-        section 'Acceptance criteria' keeps the template's sample text: 'An invalid coordinate returns an error that names the offend'
+        front-matter title is the template's sample: 'short name of the feature or subsystem'
+        section 'Overview' keeps the template's sample text: 'route planners need a multi stop route ordered to minimise d'
+        section 'Overview' keeps the template's sample text: 'today they order stops by hand which takes several minutes p'
+        section 'Requirements' keeps the template's sample text: 'r01 an optimised route visits every stop given a start an en'
+        section 'Requirements' keeps the template's sample text: 'verification uv run pytest test test route optimizer py k vi'
+        section 'Requirements' keeps the template's sample text: 'r02 the response arrives within two seconds'
+        section 'Requirements' keeps the template's sample text: 'verification a load test of ten concurrent requests reports '
+        section 'Scope' keeps the template's sample text: 'the ordering algorithm and the http endpoint that returns th'
+        section 'Scope' keeps the template's sample text: 'a user interface for viewing routes and storing routes betwe'
+        section 'Acceptance criteria' keeps the template's sample text: 'r01 and r02 each pass their stated verification'
+        section 'Acceptance criteria' keeps the template's sample text: 'an invalid coordinate returns an error that names the offend'
 PASS  plan.stripped-sample.md as a plan document (--document): fails (expected fail)
-        front-matter title is the template's sample: 'Short name of what will be built'
-        section 'Overview' keeps the template's sample text: 'Build the route optimiser as a nearest-neighbour ordering be'
-        section 'Overview' keeps the template's sample text: 'Nearest-neighbour is fast enough for ten stops and simple en'
+        front-matter title is the template's sample: 'short name of what will be built'
+        section 'Overview' keeps the template's sample text: 'build the route optimiser as a nearest neighbour ordering be'
+        section 'Overview' keeps the template's sample text: 'nearest neighbour is fast enough for ten stops and simple en'
         section 'Overview' keeps the template's sample text: 'an exact solver is deferred unless the latency target is mis'
-        section 'Scope' keeps the template's sample text: 'the ordering module, the endpoint, and their tests.'
-        section 'Scope' keeps the template's sample text: 'caching distances between requests, and any user interface.'
-        section 'Phases' keeps the template's sample text: '`phase-route-01` — Ordering module.'
-        section 'Phases' keeps the template's sample text: 'Orders stops by nearest neighbour and returns the total dist'
-        section 'Phases' keeps the template's sample text: '`src/route/order.py`, `test/test_route_optimizer.py`.'
-        section 'Phases' keeps the template's sample text: 'Exposes the ordering over HTTP and returns an error that nam'
-        section 'Phases' keeps the template's sample text: '`src/api/routes/route.py`, `test/test_route_api.py`.'
+        section 'Scope' keeps the template's sample text: 'the ordering module the endpoint and their tests'
+        section 'Scope' keeps the template's sample text: 'caching distances between requests and any user interface'
+        section 'Phases' keeps the template's sample text: 'phase route 01 ordering module'
+        section 'Phases' keeps the template's sample text: 'orders stops by nearest neighbour and returns the total dist'
+        section 'Phases' keeps the template's sample text: 'src route order py test test route optimizer py'
+        section 'Phases' keeps the template's sample text: 'exposes the ordering over http and returns an error that nam'
+        section 'Phases' keeps the template's sample text: 'src api routes route py test test route api py'
+PASS  req-case-only.md as a requirement document (--document): fails (expected fail)
+        front-matter title is the template's sample: 'short name of the feature or subsystem'
+        section 'Overview' keeps the template's sample text: 'route planners need a multi stop route ordered to minimise d'
+        section 'Overview' keeps the template's sample text: 'today they order stops by hand which takes several minutes p'
+        section 'Requirements' keeps the template's sample text: 'r01 an optimised route visits every stop given a start an en'
+        section 'Requirements' keeps the template's sample text: 'verification uv run pytest test test route optimizer py k vi'
+        section 'Requirements' keeps the template's sample text: 'r02 the response arrives within two seconds'
+        section 'Requirements' keeps the template's sample text: 'verification a load test of ten concurrent requests reports '
+        section 'Scope' keeps the template's sample text: 'the ordering algorithm and the http endpoint that returns th'
+        section 'Scope' keeps the template's sample text: 'a user interface for viewing routes and storing routes betwe'
+        section 'Acceptance criteria' keeps the template's sample text: 'r01 and r02 each pass their stated verification'
+        section 'Acceptance criteria' keeps the template's sample text: 'an invalid coordinate returns an error that names the offend'
 PASS  requirement.bom.md as a requirement document (--document): passes (expected pass)
 PASS  phase-conc-01 cut from backlog.yaml as text equals the parsed backlog item
 PASS  phase-conc-01 against phase.schema.json: valid (expected valid)
@@ -164,7 +176,7 @@ pattern finds every one of those forms, so the check is not passing by matching 
 
 `--document <path> --kind <kind>` (added for review finding F01, extended in round 2) runs the
 schema check, the placeholder check and the retained-sample check on any one document and exits 1
-if any fails, or if the path does not exist. The suite runs it on nine examples, under
+if any fails, or if the path does not exist. The suite runs it on ten examples, under
 DOCUMENT_CASES above. Run directly:
 
 ```text
@@ -190,8 +202,18 @@ them.
 The retained-sample check compares the front-matter `title` with the template's sample title, and
 each section body with the sentences of the template's sample text. The sample is read from the
 kind's own template, with comments and `Example:` lead-ins removed, split into paragraphs, list
-items and bold-led lines, then into sentences. Sentences shorter than 30 characters are not compared,
-so a short generic phrase cannot fail a real document. The two stripped-sample fixtures are the
+items and bold-led lines, then into sentences. Both sides are normalized before comparing: case
+folded, punctuation removed, whitespace collapsed (round 3). Sentences shorter than 30 characters
+after normalizing are not compared, so a short generic phrase cannot fail a real document.
+`req-case-only.md`, the reviewer's round-3 probe copied unchanged, lowercases the title and the
+first Overview sentence and must fail.
+
+**Known limit (owner ruling, round 3): reworded sample text passes.** The comparison is exact after
+normalizing, so a sample sentence with a word or two changed is not caught. The check is a lint aid
+for an author who forgot to replace the sample, not a guarantee that none remains; fuzzy matching
+was ruled out. The reviewer's two full-rewording probes now exit 1, but only because normalizing
+made a few sentences they left untouched match (the R02 heading, the verification command, the
+first phase line). Their reworded sentences still pass. The two stripped-sample fixtures are the
 reviewer's round-2 probes, copied unchanged: the boilerplate copies with every comment and
 `Example:` lead-in removed. `requirement.bom.md` is `requirement.valid.md` with a UTF-8 byte-order
 mark, also the reviewer's probe. A missing path:
@@ -255,7 +277,8 @@ one section rewritten and the rest of the sample kept, and one with comments rem
   passing `--document` cases so a false positive of this kind fails the suite.
 - **Retained template sample text fails `--document`** (owner ruling, 2026-10-13, review round 2).
   A document fails if its front-matter title is its template's sample title, or if any section
-  keeps a sentence of the template's sample text.
+  keeps a sentence of the template's sample text. Round 3 (owner ruling): both comparisons ignore
+  case and punctuation; reworded text is a stated known limit, with no fuzzy matching.
 - **`governance.valid.md` and `protocol.valid.md` were rewritten** (owner, this session, chosen over
   replacing the two templates' sample text, which are `phase-fwt-01` files outside this phase's
   deliverables, and over limiting the sample check to requirement and plan). Both restated the
@@ -319,3 +342,14 @@ not dispatched; it runs on the next tip. Verdict record, committed unchanged in 
     leading mark first; `requirement.bom.md` is a passing case.
   - The reviewer also flagged the round-1 claim that no Markdown template uses the angle-bracket
     form; corrected under Decisions.
+
+Round 3, at `70646557`, run by the Session Manager: gating reject, which the owner ruled **accept
+after a small fix** (2026-10-13). Round-2 F02 to F04 were found resolved. The round-3 verdict record
+follows once the round-3 shadow review returns.
+
+- **Blocker — accepted as a known limit, per the owner's ruling.** Light rewording of every sample
+  sentence passed `--document`, because the comparison is an exact substring match. Both sides are
+  now normalized, and the limit is stated in `retained_sample`'s docstring and above. No fuzzy
+  matching. The Session Manager is sending the rewording gap to Ideation as an idea.
+- **Minor — fixed.** The title comparison was case-sensitive. It now uses the same normalization,
+  and `req-case-only.md` is a failing fixture.

@@ -97,6 +97,8 @@ DOCUMENT_CASES: list[tuple[str, str, bool]] = [
     # The same copies with every comment and "Example:" lead-in removed, sample text kept.
     ("requirement.stripped-sample.md", "requirement", False),
     ("plan.stripped-sample.md", "plan", False),
+    # requirement.stripped-sample.md with its title and first Overview sentence lowercased.
+    ("req-case-only.md", "requirement", False),
     # requirement.valid.md saved with a UTF-8 byte-order mark.
     ("requirement.bom.md", "requirement", True),
 ]
@@ -172,10 +174,16 @@ def _collapse(text: str) -> str:
     return " ".join(text.split())
 
 
+def _normalize(text: str) -> str:
+    """Case-folded, punctuation removed and whitespace collapsed, so a change of case or
+    punctuation alone does not hide retained sample text."""
+    return _collapse(re.sub(r"[^\w\s]|_", " ", text.casefold()))
+
+
 def template_sample(kind: str) -> tuple[str, list[str]]:
     """A template's sample front-matter title and the sentences of its sample section text,
-    with "Example:" lead-ins removed, whitespace collapsed, and sentences shorter than
-    MIN_SAMPLE dropped."""
+    with "Example:" lead-ins removed, each normalized (_normalize), and sentences shorter than
+    MIN_SAMPLE after normalizing dropped."""
     front_matter, sections = split_document(
         (HERE / f"{kind}.template.md").read_text(encoding="utf-8"))
     sentences: list[str] = []
@@ -185,21 +193,27 @@ def template_sample(kind: str) -> tuple[str, list[str]]:
         blocks = re.split(r"\n\s*\n|\n(?=\s*(?:[-*] |\d+\. |\*\*|\*[A-Z]))", body)
         for block in blocks:
             block = _collapse(re.sub(r"^\s*(?:[-*]|\d+\.)\s+", "", block))
-            sentences += [s.strip() for s in re.split(r"(?<=[.:;])\s+", block)]
-    return str(front_matter.get("title", "")), [s for s in sentences if len(s) >= MIN_SAMPLE]
+            sentences += [_normalize(s) for s in re.split(r"(?<=[.:;])\s+", block)]
+    title = _normalize(str(front_matter.get("title", "")))
+    return title, [s for s in sentences if len(s) >= MIN_SAMPLE]
 
 
 def retained_sample(text: str, kind: str) -> list[str]:
-    """Where a document still carries its template's sample title or sample sentences."""
+    """Where a document still carries its template's sample title or sample sentences.
+
+    Both sides are normalized (_normalize) and compared exactly, so a change of case or
+    punctuation is still caught. Reworded sample text is a known limit: a sentence with even a
+    word or two changed passes. The check is a lint aid for an author who forgot to replace the
+    sample, not a guarantee that none of it remains; fuzzy matching is deliberately not used."""
     title, sentences = template_sample(kind)
     front_matter, sections = split_document(text)
     found: list[str] = []
-    if title and _collapse(str(front_matter.get("title", ""))) == _collapse(title):
+    if title and _normalize(str(front_matter.get("title", ""))) == title:
         found.append(f"front-matter title is the template's sample: {title!r}")
     for heading, body in sections:
-        collapsed = _collapse(body)
+        padded = f" {_normalize(body)} "
         found += [f"section {heading!r} keeps the template's sample text: {s[:60]!r}"
-                  for s in sentences if s in collapsed]
+                  for s in sentences if f" {s} " in padded]
     return found
 
 
