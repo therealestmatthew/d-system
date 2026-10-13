@@ -4,7 +4,7 @@ id: doc-agent-replicator
 code: PLAN-054
 title: Agent Replicator — fleet tracker files and a generalized orchestration model, one Python core with bash and PowerShell shells, a double-click restart of every agent session, and the GOV-017 wiring
 kind: plan
-status: draft
+status: approved
 owner: repository-owner
 created: '2026-10-12'
 updated: '2026-10-13'
@@ -20,14 +20,17 @@ restart), `000514` (a catalog of repeatable automation commands), `000389` (sess
 resumability) and `000540` (the multi-session orchestration ships with the engine). This plan
 covers the launcher `000515` asks for, but promotes none of the four.
 
-**Status: draft.** Written 2026-10-12 by Session 3 - Standby Builder on an owner-approved
+**Status: approved at G3 on 2026-10-13.** Written 2026-10-12 by Session 3 - Standby Builder on an owner-approved
 assignment relayed by the Session Manager, running unclaimed (no backlog phase). The inputs were
 the Advisor's answers A1 (the Replicator) and A2 (the fleet model) and the owner's rulings on each,
 under `_working/session-manager/advisor/` (gitignored). `REQ-039`, *Accepted decisions*, quotes
 the rulings. It was reviewed under `GOV-018` at the plan and phase altitudes. The review record is
 `2026-10-12-plan-054`, with ten findings, dispositioned on 2026-10-13 by the same session as planner
-stand-in. The same revision applied the Advisor's check of the drafts against the rulings. It
-awaits G3.
+stand-in. The same revision applied the Advisor's check of the drafts against the rulings. A
+later-added review of `phase-rep-07`, `2026-10-13-plan-054-later-added`, had one finding, also
+fixed. The owner approved the plan and `REQ-039` at G3 on 2026-10-13, relayed by the Session
+Manager, including the departure that moves the system files from the first phase to
+`phase-rep-07`.
 
 ## Context and scope
 
@@ -310,7 +313,7 @@ them. The phase id is `rep-07` rather than a renumbering, so the review record's
   `sys-gov-docs` with every `rep-*` phase, so the validator keeps any `rep-*` phase and either of
   them from being active together; whichever merges second rebases.
 - `rep-04` edits `.github/workflows/ci.yaml`, which any CI phase also edits.
-- No phase goes into `next_up` without the owner's word (OQ5).
+- The owner placed the chain at the front of `next_up` at G3 (OQ5).
 
 ## Out of scope
 
@@ -326,18 +329,16 @@ them. The phase id is `rep-07` rather than a renumbering, so the review record's
 
 ## Open questions
 
-- **OQ1. Does the double-click launcher restart the Replicator?** The owner said "all agent
-  sessions". Proposed: yes, last, because the owner is the requester; the Owner Terminal is never
-  restarted.
-- **OQ2. What the launcher does when no coordinator has reported ready to restart.** D12 now
-  states it: warn, ask again, then resume each session by its recorded uuid and log each kill as
-  `owner-forced-no-restart-ready`; refuse only while `lock_free` fails. The owner confirms or
-  changes this at G3. The alternative, refusing until a restart-ready event exists, would make the
-  launcher useless when the coordinator itself has hung.
-- **OQ3. Where the launcher's desktop file is installed.** Proposed: `~/.local/share/applications`
-  and `~/Desktop` on Linux, the Windows desktop on Windows, written only by `install-launcher` when
-  the owner runs it. How it shows output is settled in D12 (`Terminal=true`; the `.cmd` pauses on
-  failure).
-- **OQ4. Registering `sys-fleet` in this planning change** (D15). Proposed: yes, as planned, with
-  `PLAN-054` as its only path until `rep-01`.
-- **OQ5. Queue position.** The seven phases stay out of `next_up` until the owner places them.
+All five were ruled by the owner at G3 on 2026-10-13, relayed by the Session Manager.
+
+- **OQ1. Does the double-click launcher restart the Replicator?** Yes, last. It never restarts
+  the Owner Terminal (D12, step 5).
+- **OQ2. What the launcher does when no coordinator has reported ready to restart.** As D12
+  states: warn, ask again, then resume each session by its recorded uuid and log each kill as
+  `owner-forced-no-restart-ready`; refuse only while `lock_free` fails.
+- **OQ3. Where the launcher's desktop file is installed.** Only by `install-launcher`, when the
+  owner runs it: `~/.local/share/applications` and `~/Desktop` on Linux, the desktop on Windows.
+- **OQ4. Registering `sys-fleet` in this planning change** (D15). Yes.
+- **OQ5. Queue position.** The whole chain goes to the front of `next_up`, ahead of
+  `phase-cap-08`, in dependency order: `phase-rep-01`, `phase-rep-07`, `phase-rep-02`,
+  `phase-rep-03`, `phase-rep-04`, `phase-rep-05`, `phase-rep-06`.

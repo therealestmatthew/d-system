@@ -16,7 +16,9 @@ depends_on: [doc-multi-session-coordination-protocol, doc-prompt-session-manager
 
 Observable statements for idea `000693` (the Agent Replicator: a session that launches, kills
 and restarts the other agent sessions, driven by tracked fleet files). The plan that delivers them
-is [PLAN-054](../01-plans/PLAN-054-agent-replicator.md). Related ideas, read for context and not
+is [PLAN-054](../01-plans/PLAN-054-agent-replicator.md). The owner approved both at G3 on 2026-10-13. The status stays
+`draft` because a requirement takes only `draft` or `active`, and requirements paired with
+approved plans (`REQ-028`, `REQ-030`, `REQ-035`) stay `draft`. Related ideas, read for context and not
 promoted by this work: `000515` (a bash script that reopens every planning session after a
 restart), `000514` (a catalog of repeatable automation commands), `000389` (session state and
 resumability) and `000540` (the multi-session orchestration ships with the engine).
