@@ -1,0 +1,46 @@
+{
+  "verdict_id": "2026-10-13-phase-fwt-03-demo-adversary-2",
+  "date": "2026-10-13",
+  "phase": "phase-fwt-03",
+  "reviewed_commit": "9c3d3c61eed00c60aa0824df07c1231e9e687f84",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "title": "Round-1 F01 is not resolved: the placeholder check matches only literal lead-in markers, so a document with the template's comments and Example: prefixes removed but its sample text kept passes --document.",
+      "evidence": "docs/00-working/framework/05-schemas/check_schemas.py:100. examples/plan.boilerplate.md with every <!-- --> block and leading Example: removed, body and front-matter title still the template's sample text: check_schemas.py --document <probe> --kind plan -> PASS, exit 0. Same for the requirement kind.",
+      "consequence": "A copied template whose author tidied away the guidance but kept the sample content still passes the family's check."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "The front-matter title is never checked for placeholder text.",
+      "evidence": "requirement.schema.json title has minLength 1 only; the H1 regex in check_schemas.py:100 does not read front matter. The boilerplate fixtures keep the template's title string.",
+      "consequence": "A document can keep the template's title indefinitely."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "--document with a nonexistent path ends in an unhandled FileNotFoundError traceback.",
+      "evidence": "check_schemas.py:162 and 295-301; --document /no/such/file.md --kind requirement -> traceback, exit 1.",
+      "consequence": "No FAIL line for a caller to match; the exit code is Python's default, not a designed result."
+    },
+    {
+      "id": "F04",
+      "severity": "minor",
+      "title": "A UTF-8 byte-order mark defeats front-matter detection.",
+      "evidence": "FRONT_MATTER anchors on \\A---; a BOM copy of requirement.valid.md reports the required front-matter properties missing, exit 1. CRLF passes.",
+      "consequence": "A valid document saved with a BOM fails for a misreported reason (fails closed)."
+    }
+  ],
+  "raw_reply_sha256": "f422d91b6a69c0e091c2dca13a4eed70205999367b25413e7bca6fc56bdbea6d",
+  "notes": "Round 2 gating functional review, dispatched by the Session Manager in its own scratch clone at 9c3d3c61. Owner ruling 2026-10-13 (SM session): detect retained sample text in section bodies and the front-matter title, and fix F02-F04. Round 2 shadow review not dispatched: the round is superseded by the round 3 fix, and the shadow runs on the next tip. Raw reply at _working/session-manager/review-replies/phase-fwt-03-9c3d3c61-demo-adversary.md."
+}
