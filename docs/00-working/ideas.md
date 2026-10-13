@@ -29120,7 +29120,7 @@ The idea documents accepted-but-noted test-runner behavior during phase-arch-07.
 
 ## 000693 · Agent Replicator: an agent that creates and tracks new agents and builds the infrastructure for managing them
 
-**Created 2026-10-12T22:04:20-04:00 · Status: `open`**
+**Created 2026-10-12T22:04:20-04:00 · Status: `triaged`**
 
 create the 'Agent Replicator' agent. This agent's job is to create and track new agents and build the infrastructure for managing those agents. It should write the bash or Powershell (Linux or windows depending on owner system) scripts for launching and killing agent sessions. It creates a log of agents and their configurations and can create new agents on the fly that can be launched from Claude session to open them when needed. Utilize advisor for this.
 
@@ -29139,12 +29139,115 @@ I also will need a simple script I can double click to run and reboot the system
 - **note** by repository-owner (2026-10-12T22:33:28-04:00): PRIORITY (2026-10-12, relayed by Session Manager).
 - **note** by repository-owner (2026-10-12T22:33:28-04:00): Clarification (2026-10-12, relayed by Session Manager): 'reboot the system' means restart all agent sessions, not the computer.
 
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-12T22:37:40-04:00): # Triage Finding: 000693 (Agent Replicator)
+
+## Summary
+
+000693 proposes building an Agent Replicator system to create, track, and manage new agents, with infrastructure for launching/killing sessions, agent configuration logging, dynamic agent creation, and generalized orchestration. The idea seeks to replace manual coordination and enable the Session Manager and other coordinators to stop managing their own restarts.
+
+## Related Plans and Documents Found
+
+**PLAN-039.01 (Orchestrator design)** — A detailed orchestration system for the idea-realization pipeline that covers daemon-based lifecycle management (start, stop, status, halt, resume-dispatch), a tracked run ledger (`_data/runs.jsonl`), agent dispatch with budgets, and kill-switch semantics. However, PLAN-039.01 is **specific to orchestrating idea-realization runs**, not general agent creation or fleet management. It manages when phases run and when agents dispatch, but does not create or replicate new agent types.
+
+**PLAN-031 (Agent engineering and delegation)** — Covers agent construction, coordination, lifecycle roster management, and dispatch methodology. Relevant to orchestration and agent lifecycle but focused on how agents are engineered and reviewed, not on the infrastructure for creating and managing agent fleets.
+
+**PLAN-020 (Portable agent workflows)** — Addresses generating and managing agent workflows from a canonical source, with adapters for Claude Code, Codex, and other hosts. Relevant to agent infrastructure but focuses on portability and workflow generation, not agent replication or session management.
+
+**PLAN-008 (Session lifecycle protocols)** — Documents session opening and closing by session type. Relevant to how sessions are managed but does not address agent creation, replication, or fleet orchestration.
+
+## Interim Tools and Existing Infrastructure
+
+- `_working/session-manager/relaunch-sessions.sh` — Bash script for relaunching planning sessions after a restart
+- `_working/session-manager/sessions.json` — Registry of session configurations, currently interim/untracked
+- `_working/session-manager/open-advisor.sh` — Script for opening the advisor
+- `tools/generate_agent_workflows.py` — Tooling for generating portable agent workflows
+
+These interim tools provide partial implementations of restart/relaunch capability, but lack the generalized agent creation, replication, tracking, and orchestration infrastructure 000693 requests.
+
+## Related Ideas
+
+**000515 (bash relaunch script)** — Proposes a script to reopen planning sessions after restart. Already triaged, relates to 000389, 000340, 000514. This is a partial implementation of the restart capability 000693 asks for.
+
+**000389 (resume briefs/restart file)** — Proposes session state capture and resumability with a SAFE message contract and restart file. Already triaged, relates to 000385, 000319. Provides the state-management foundation 000693 would need for session restart.
+
+**000385 (lifecycle integrity and multi-coordinator orchestration)** — An anchor idea covering lifecycle and orchestration for multi-coordinator systems. Already triaged, touches exactly the coordination/orchestration problem 000693 addresses.
+
+**000514 (automation commands catalog)** — Proposes a catalog of repeatable automation commands and scripts. Already triaged, relates to 000515. Complements the infrastructure 000693 requests.
+
+## Key Distinction
+
+000693 asks for a generalized system to create, track, and manage **any agent**, with dynamic agent creation and fleet orchestration. PLAN-039.01 orchestrates **idea-realization pipeline runs** with a daemon and run ledger. They address different scopes: 000693 is about agent replication and fleet management; PLAN-039.01 is about orchestrating work phases. Both deal with lifecycle and coordination, but 000693's ask is broader and not specific to the pipeline.
+
+The interim Session Manager infrastructure (sessions.json, relaunch-sessions.sh) hints at what 000693 is asking for, but these are partial and gitignored — not a full governed system.
+
+## No Promotion Found
+
+000693 is not already fully delivered by an existing governed document. PLAN-039.01 overlaps in orchestration concerns but is specific to the idea-realization pipeline, not general agent management.
+
+PROPOSED LINK: 000693 --relates_to--> 000515 (Both address session/agent restart and relaunch infrastructure)
+PROPOSED LINK: 000693 --relates_to--> 000389 (000693 needs session state capture for agent restart and resumability)
+PROPOSED LINK: 000693 --relates_to--> 000385 (Both address multi-agent lifecycle and orchestration)
+
+</details>
+
 ---
 
 ## 000694 · pytest runs in worktrees are killed by a signal (exit 144) partway through; find what sends the kill
 
-**Created 2026-10-12T22:04:21-04:00 · Status: `open`**
+**Created 2026-10-12T22:04:21-04:00 · Status: `triaged`**
 
 pytest runs in worktrees get killed by a signal (exit 144) at random points, 9% to 64%. Runs detached with setsid/nohup complete. Find what sends the kill (possibly another session's tests killing by pattern or process group).
 
 Reported by Session 2 - Builder B, 2026-10-12.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-12T22:37:41-04:00): ## Scouting for related ideas, code, and documentation
+
+**Related ideas:** 000692 is closely related — it documents a kill -9 of a vitest run that goes unnoticed in certain conditions. Both 000692 and 000694 concern process termination during test runs.
+
+**Process-killing code in codebase:**
+
+Two tools create worktrees and run tests with explicit process group termination:
+
+1. `tools/run_review_checks.py` (lines 165-182): Runs verification commands in a detached worktree with `start_new_session=True`, killing the entire process group with `os.killpg(process.pid, signal.SIGKILL)` on timeout (30 minutes). The bash subprocess becomes the process group leader, and killpg kills all members.
+
+2. `test/test_planner_safe_write.py` (lines 84-97): Extracts and runs a check command in a temporary directory with `start_new_session=True`, similarly using `os.killpg(proc.pid, signal.SIGKILL)` on timeout. Comments state "Own process group, so a timeout kills `uv` and the Python child too".
+
+**Signal 16 investigation:**
+
+- Exit 144 = 128 + 16 (standard shell convention for process killed by signal N)
+- Signal 16 on Linux: SIGSTKFLT (Stack fault)
+- Confirmed via Python signal module
+- Neither run_review_checks.py nor test_planner_safe_write.py explicitly sends SIGSTKFLT; both send SIGKILL (signal 9) on timeout
+
+**The core puzzle:**
+
+The idea reports signal 16 kills at random points (9–64% through), but the observed code sends signal 9 (SIGKILL). Either:
+- Signal 16 is generated by the kernel (stack fault), not sent by code — unlikely as a random condition
+- The killer is not in the examined code paths
+- The exit code 144 interpretation differs from signal 16 convention (unlikely, but worth confirming how bash actually reports 128+16)
+
+**Key observation from idea:**
+
+Runs detached with setsid/nohup complete; normal worktree runs are killed. Both `start_new_session=True` and setsid create a new session, but there may be a subtle difference in signal delivery or process group isolation that matters here. Hypothesis: another concurrent worktree's timeout in run_review_checks.py or test_planner_safe_write.py is calling os.killpg with a pid that matches or collides with a pytest process group in a sibling worktree, or a shared resource (daemon, cleanup hook) is scanning and killing by pattern.
+
+**Documentation:**
+- No OPS docs on test execution or process management in worktrees found
+- `docs/04-decisions/ADR-003-multi-agent-concurrency.md` governs concurrent agents but does not address test-process isolation
+- Backlog phases related to review checks (phase-asr-02 in PLAN-047) run tests but do not name the kill issue
+
+**Next investigation steps (for owner decision):**
+- Strace or process accounting on a hanging worktree to see which process/signal kills the pytest
+- Check if exit 144 is truly 128+16 or if bash/pytest reports it differently
+- Review whether os.killpg calls in timeouts can target unintended processes due to pid reuse
+- Confirm whether a daemon or shared cleanup hook runs and affects worktrees
+
+</details>
