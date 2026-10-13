@@ -29123,7 +29123,7 @@ The idea documents accepted-but-noted test-runner behavior during phase-arch-07.
 
 ## 000693 · Agent Replicator: an agent that creates and tracks new agents and builds the infrastructure for managing them
 
-**Created 2026-10-12T22:04:20-04:00 · Status: `triaged`**
+**Created 2026-10-12T22:04:20-04:00 · Status: `promoted` · became REQ-039, PLAN-054**
 
 create the 'Agent Replicator' agent. This agent's job is to create and track new agents and build the infrastructure for managing those agents. It should write the bash or Powershell (Linux or windows depending on owner system) scripts for launching and killing agent sessions. It creates a log of agents and their configurations and can create new agents on the fly that can be launched from Claude session to open them when needed. Utilize advisor for this.
 
@@ -29260,3 +29260,13 @@ Runs detached with setsid/nohup complete; normal worktree runs are killed. Both 
 - Confirm whether a daemon or shared cleanup hook runs and affects worktrees
 
 </details>
+
+---
+
+## 000695 · check_schemas.py --document misses reworded template sample text; consider a fuzzy or structural check
+
+**Created 2026-10-13T19:06:59-04:00 · Status: `open`**
+
+fwt-03's check_schemas.py --document detects retained template sample text only by normalized exact sentence match; an author who rewords each sample sentence by a few words passes. Owner accepted this as a known limit of a lint aid; record the gap for a possible later fuzzy or structural check (e.g. token-overlap ratio against the template's sample sentences).
+
+From Session Manager, owner ruling 2026-10-13.
