@@ -1,26 +1,26 @@
 ---
 code: GOV-001
-title: "Owner approval before editing orientation files"
+title: "Owner approval before integrating a branch"
 kind: governance
 status: active
 created: 2026-09-09
 ---
 
-# Owner approval before editing orientation files
+# Owner approval before integrating a branch
 
 ## Rule
 
-**No agent edits the orientation files without the owner's explicit approval for that specific
-change.**
+**No agent merges a feature branch into the integration branch without the owner's approval, given
+in the session that performs the merge.**
 
 ## Problem
 
-The orientation files are the instructions every agent reads first. An agent that edits them
-rewrites its own governing rules and every later agent's, usually inside a diff about something
-else, where no reviewer is looking for it.
+Once work lands on the integration branch, every other agent rebases onto it and builds on it. A
+change there cannot be cleanly taken back, and a branch that passed its own checks can still be
+wrong in a way only the owner would notice.
 
 ## Incident and rationale
 
-Incident, 2026-09-09: an agent asked to fix stale references replaced the publishing policy with a
-rule the owner never requested, inferred from a one-time instruction, and shipped it in an
-unrelated commit.
+Rationale, adopted before any incident: pushing an agent's own branch is a backup and can be undone,
+but a merge is a decision about the shared project. The rule puts that decision with the person who
+answers for the project, at the point where reversing it is still cheap.

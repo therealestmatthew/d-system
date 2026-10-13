@@ -87,6 +87,17 @@ PASS  requirement.boilerplate.md as a requirement document (--document): fails (
         placeholder: 'Example:'
         placeholder: '<!--'
         placeholder: 'Example:'
+        front-matter title is the template's sample: 'Short name of the feature or subsystem'
+        section 'Overview' keeps the template's sample text: 'Route planners need a multi-stop route ordered to minimise d'
+        section 'Overview' keeps the template's sample text: 'Today they order stops by hand, which takes several minutes '
+        section 'Requirements' keeps the template's sample text: '**R01 — An optimised route visits every stop.** Given a star'
+        section 'Requirements' keeps the template's sample text: '*Verification:* `uv run pytest test/test_route_optimizer.py '
+        section 'Requirements' keeps the template's sample text: '**R02 — The response arrives within two seconds.**'
+        section 'Requirements' keeps the template's sample text: '*Verification:* a load test of ten concurrent requests repor'
+        section 'Scope' keeps the template's sample text: 'the ordering algorithm and the HTTP endpoint that returns th'
+        section 'Scope' keeps the template's sample text: 'a user interface for viewing routes, and storing routes betw'
+        section 'Acceptance criteria' keeps the template's sample text: 'R01 and R02 each pass their stated verification.'
+        section 'Acceptance criteria' keeps the template's sample text: 'An invalid coordinate returns an error that names the offend'
 PASS  plan.boilerplate.md as a plan document (--document): fails (expected fail)
         placeholder: '<!--'
         placeholder: '<!--'
@@ -95,6 +106,42 @@ PASS  plan.boilerplate.md as a plan document (--document): fails (expected fail)
         placeholder: 'Example:'
         placeholder: '<!--'
         placeholder: 'Example:'
+        front-matter title is the template's sample: 'Short name of what will be built'
+        section 'Overview' keeps the template's sample text: 'Build the route optimiser as a nearest-neighbour ordering be'
+        section 'Overview' keeps the template's sample text: 'Nearest-neighbour is fast enough for ten stops and simple en'
+        section 'Overview' keeps the template's sample text: 'an exact solver is deferred unless the latency target is mis'
+        section 'Scope' keeps the template's sample text: 'the ordering module, the endpoint, and their tests.'
+        section 'Scope' keeps the template's sample text: 'caching distances between requests, and any user interface.'
+        section 'Phases' keeps the template's sample text: '`phase-route-01` — Ordering module.'
+        section 'Phases' keeps the template's sample text: 'Orders stops by nearest neighbour and returns the total dist'
+        section 'Phases' keeps the template's sample text: '`src/route/order.py`, `test/test_route_optimizer.py`.'
+        section 'Phases' keeps the template's sample text: 'Exposes the ordering over HTTP and returns an error that nam'
+        section 'Phases' keeps the template's sample text: '`src/api/routes/route.py`, `test/test_route_api.py`.'
+PASS  requirement.stripped-sample.md as a requirement document (--document): fails (expected fail)
+        front-matter title is the template's sample: 'Short name of the feature or subsystem'
+        section 'Overview' keeps the template's sample text: 'Route planners need a multi-stop route ordered to minimise d'
+        section 'Overview' keeps the template's sample text: 'Today they order stops by hand, which takes several minutes '
+        section 'Requirements' keeps the template's sample text: '**R01 — An optimised route visits every stop.** Given a star'
+        section 'Requirements' keeps the template's sample text: '*Verification:* `uv run pytest test/test_route_optimizer.py '
+        section 'Requirements' keeps the template's sample text: '**R02 — The response arrives within two seconds.**'
+        section 'Requirements' keeps the template's sample text: '*Verification:* a load test of ten concurrent requests repor'
+        section 'Scope' keeps the template's sample text: 'the ordering algorithm and the HTTP endpoint that returns th'
+        section 'Scope' keeps the template's sample text: 'a user interface for viewing routes, and storing routes betw'
+        section 'Acceptance criteria' keeps the template's sample text: 'R01 and R02 each pass their stated verification.'
+        section 'Acceptance criteria' keeps the template's sample text: 'An invalid coordinate returns an error that names the offend'
+PASS  plan.stripped-sample.md as a plan document (--document): fails (expected fail)
+        front-matter title is the template's sample: 'Short name of what will be built'
+        section 'Overview' keeps the template's sample text: 'Build the route optimiser as a nearest-neighbour ordering be'
+        section 'Overview' keeps the template's sample text: 'Nearest-neighbour is fast enough for ten stops and simple en'
+        section 'Overview' keeps the template's sample text: 'an exact solver is deferred unless the latency target is mis'
+        section 'Scope' keeps the template's sample text: 'the ordering module, the endpoint, and their tests.'
+        section 'Scope' keeps the template's sample text: 'caching distances between requests, and any user interface.'
+        section 'Phases' keeps the template's sample text: '`phase-route-01` — Ordering module.'
+        section 'Phases' keeps the template's sample text: 'Orders stops by nearest neighbour and returns the total dist'
+        section 'Phases' keeps the template's sample text: '`src/route/order.py`, `test/test_route_optimizer.py`.'
+        section 'Phases' keeps the template's sample text: 'Exposes the ordering over HTTP and returns an error that nam'
+        section 'Phases' keeps the template's sample text: '`src/api/routes/route.py`, `test/test_route_api.py`.'
+PASS  requirement.bom.md as a requirement document (--document): passes (expected pass)
 PASS  phase-conc-01 cut from backlog.yaml as text equals the parsed backlog item
 PASS  phase-conc-01 against phase.schema.json: valid (expected valid)
 PASS  phase-conc-01 without acceptance (a required field) against phase.schema.json: invalid (expected invalid)
@@ -111,28 +158,52 @@ PASS  phase.template.md YAML keys against phase.schema.json properties
 The two filled examples are `examples/requirement.valid.md` and `examples/plan.valid.md`. The
 incomplete ones are the same files with one section cut: `requirement.no-acceptance.md`,
 `plan.no-scope.md` and `plan.no-phases.md`. The placeholder check confirms the filled examples
-carry none of the forms the four Markdown templates use (`REQ-NNN`, `YYYY-MM-DD`, a bracketed name
+carry none of the forms the four `--document` templates use (`REQ-NNN`, `YYYY-MM-DD`, a bracketed name
 in the title, an HTML comment, an `Example:` lead-in). Run against the templates instead, the same
 pattern finds every one of those forms, so the check is not passing by matching nothing.
 
-`--document <path> --kind <kind>` (added for review finding F01) runs the schema and the
-placeholder check on any one document and exits 1 if either fails. The suite runs it on six
-examples, under DOCUMENT_CASES above. Run directly:
+`--document <path> --kind <kind>` (added for review finding F01, extended in round 2) runs the
+schema check, the placeholder check and the retained-sample check on any one document and exits 1
+if any fails, or if the path does not exist. The suite runs it on nine examples, under
+DOCUMENT_CASES above. Run directly:
 
 ```text
 requirement.boilerplate.md --kind requirement: exit=1
 plan.boilerplate.md --kind plan: exit=1
+requirement.stripped-sample.md --kind requirement: exit=1
+plan.stripped-sample.md --kind plan: exit=1
+requirement.bom.md --kind requirement: exit=0
 requirement.valid.md --kind requirement: exit=0
 plan.valid.md --kind plan: exit=0
 plan.valid.md --kind requirement: exit=1
+governance.valid.md --kind governance: exit=0
 protocol.valid.md --kind protocol: exit=0
-document without kind: exit=2
+file.md --kind requirement: exit=1
+--document without --kind: exit=2
 ```
 
 The two boilerplate fixtures are the templates with only `code`, `created` and the title line
 filled in (and the plan's `depends_on`, so the plan fixture is not failed by its schema instead).
 Validated against the schema alone, both return no errors, so the placeholder check is what fails
 them.
+
+The retained-sample check compares the front-matter `title` with the template's sample title, and
+each section body with the sentences of the template's sample text. The sample is read from the
+kind's own template, with comments and `Example:` lead-ins removed, split into paragraphs, list
+items and bold-led lines, then into sentences. Sentences shorter than 30 characters are not compared,
+so a short generic phrase cannot fail a real document. The two stripped-sample fixtures are the
+reviewer's round-2 probes, copied unchanged: the boilerplate copies with every comment and
+`Example:` lead-in removed. `requirement.bom.md` is `requirement.valid.md` with a UTF-8 byte-order
+mark, also the reviewer's probe. A missing path:
+
+```text
+FAIL  /no/such/file.md as a requirement document
+        no such file: /no/such/file.md
+```
+
+Two further reviewer probes were run directly and fail as they should (exit 1): a requirement with
+one section rewritten and the rest of the sample kept, and one with comments removed but the
+`Example:` lead-ins kept.
 
 ## Acceptance
 
@@ -176,16 +247,31 @@ them.
 
 - **The angle-bracket form was removed from the placeholder pattern** (review round 1, while fixing
   F01). The first `--document` run failed `protocol.valid.md`, a filled document, on
-  `` `agent/<phase-id>` `` in a code span. None of the four Markdown templates uses an
-  angle-bracket slot (only `phase.template.md` does, and a phase is not a `--document` kind), so the
-  form was dropped rather than special-cased. The governance and protocol examples were added as
+  `` `agent/<phase-id>` `` in a code span. Of the Markdown templates only `phase.template.md` uses
+  an angle-bracket slot, and phase is not a `--document` kind, so the form was dropped rather than
+  special-cased. **Correction:** the round-1 fix commit's message says no Markdown template uses the
+  form. That is wrong: `phase.template.md` does. The commit message is left as pushed; this record
+  and the code comment carry the correct statement. The governance and protocol examples were added as
   passing `--document` cases so a false positive of this kind fails the suite.
+- **Retained template sample text fails `--document`** (owner ruling, 2026-10-13, review round 2).
+  A document fails if its front-matter title is its template's sample title, or if any section
+  keeps a sentence of the template's sample text.
+- **`governance.valid.md` and `protocol.valid.md` were rewritten** (owner, this session, chosen over
+  replacing the two templates' sample text, which are `phase-fwt-01` files outside this phase's
+  deliverables, and over limiting the sample check to requirement and plan). Both restated the
+  same rules their templates use as samples, so the new check failed them. They now restate
+  different rules: owner approval before integrating a branch (in the "rationale adopted before
+  any incident" form the template allows) and removing a finished worktree. The three fixtures
+  derived from them (`governance.no-incident.md`, `governance-shape-labelled-protocol.md`,
+  `protocol-shape-labelled-governance.md`) were regenerated from the new text by the same edits
+  as before. The round-1 cross-validation cases still pass. The example codes, GOV-001 and GOV-002,
+  are the adopting repository's own numbering, not d-system's documents of those codes.
 
 ## Unresolved
 
 - `tools/check_no_private_content.py` checked 0 identifiers in the worktree, because
   `_private/portfolio/` exists only in the primary checkout. Its `check_content` function, run on every
-  file the branch changes against dev (18, after the round-1 fix) with the 31 identifiers loaded
+  file the branch changes against dev (25, after the round-2 fixes) with the 31 identifiers loaded
   from the primary checkout, reported no violations.
 - The framework `INDEX.md` still lists `requirement.schema.json` and `plan.schema.json` as "to
   create". It is not a deliverable of this phase.
@@ -214,3 +300,22 @@ Round 1, at `547b3154`, run by the Session Manager. Verdict records, committed u
 
 The reviewers found the status values (`draft`, `approved`, `active`, `complete`, `deprecated`,
 `superseded`) consistent with d-system's real plans; no change.
+
+Round 2, at `9c3d3c61`, run by the Session Manager: gating **reject**. The round-2 shadow review was
+not dispatched; it runs on the next tip. Verdict record, committed unchanged in `828ebd48`:
+
+- `docs/08-governance/reviews/verdicts/2026-10-13-phase-fwt-03-demo-adversary-2.json`
+  (sha256 `6127a77de1082b0bb193d6d1ad9a4a051cfb53a73a4729443a4a1a7b4cc1eba1`): four findings.
+  - **F01 major — fixed** (owner ruling, 2026-10-13: detect retained sample text). Round 1's fix
+    matched only literal markers, so a copied template with its comments and `Example:` lead-ins
+    removed but its sample text kept passed `--document`. `--document` now also compares the
+    front-matter title and each section body with the template's own sample text. The reviewer's
+    two stripped probes are failing fixtures.
+  - **F02 minor — fixed** by the same check: a front-matter title equal to the template's sample
+    title fails.
+  - **F03 minor — fixed.** `--document` on a missing path printed a `FileNotFoundError` traceback. It
+    now prints a FAIL line naming the path and exits 1.
+  - **F04 minor — fixed.** A UTF-8 byte-order mark hid the front matter. `split_document` drops a
+    leading mark first; `requirement.bom.md` is a passing case.
+  - The reviewer also flagged the round-1 claim that no Markdown template uses the angle-bracket
+    form; corrected under Decisions.

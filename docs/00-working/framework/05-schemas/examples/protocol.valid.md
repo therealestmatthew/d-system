@@ -1,34 +1,34 @@
 ---
 code: GOV-002
-title: "Claiming a backlog phase"
+title: "Removing a finished worktree"
 kind: protocol
 status: active
 created: 2026-09-12
 ---
 
-# Claiming a backlog phase
+# Removing a finished worktree
 
 ## Trigger
 
-An agent has been assigned a backlog phase and has not yet written any file for it.
+A phase's branch has been merged into the integration branch, and the owner has approved removing
+its worktree.
 
 ## Steps
 
-1. On an up-to-date integration branch, run the governance check and the test suite. Stop if
-   either fails.
-2. Ask the owner to approve the claim.
-3. Set the phase's status to active and record your agent id, regenerate the catalog, and run the
-   governance check again.
-4. Commit those changes alone on the integration branch and push.
-5. Create `agent/<phase-id>` and its worktree, and do all further work there.
+1. Copy any untracked or ignored files the work produced out of the worktree; a merge never
+   carries them.
+2. From the primary checkout, confirm the merge: `git branch --merged dev` lists the branch.
+3. Run `git worktree remove <path>` from the primary checkout with the worktree's absolute path,
+   never from inside the worktree.
+4. Delete the branch with `git branch -d agent/<phase-id>`.
 
 ## Exit criteria
 
-The phase shows `status: active` with your agent id on the integration branch, the governance
-check exits 0, and `git worktree list` shows the new worktree on `agent/<phase-id>`.
+`git worktree list` no longer shows the path, and `git branch --list agent/<phase-id>` prints
+nothing.
 
 ## Failure handling
 
-If the governance check rejects the claim for overlapping a peer's systems or paths, do not retry;
-choose a different phase. If the push is rejected as non-fast-forward, pull with rebase, re-run the
-check, and confirm the claim is still safe before pushing again.
+If `git worktree remove` refuses because the worktree has uncommitted changes, stop and report them
+to the owner; do not pass `--force`. If `git branch -d` refuses because the branch is not merged,
+the merge did not happen: leave the branch in place and report it.

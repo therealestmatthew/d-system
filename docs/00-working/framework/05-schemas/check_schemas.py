@@ -22,9 +22,11 @@ To check one real document instead of the examples, name it and its kind:
     uv run python docs/00-working/framework/05-schemas/check_schemas.py \
         --document path/to/REQ-031-example.md --kind requirement
 
-That validates the document against the kind's schema and runs the placeholder check on it, so
-a copied template with only its code, date and title filled in fails. It exits 0 when both
-pass, 1 otherwise. DOCUMENT_CASES runs the same check on examples, including such a copy.
+That validates the document against the kind's schema, runs the placeholder check on it, and
+compares its front-matter title and each section body against the kind's template's own sample
+text, so a copied template fails whether or not its comments and "Example:" lead-ins were
+removed. It exits 0 when every check passes, 1 otherwise (including when the path does not
+exist). DOCUMENT_CASES runs the same check on examples, including such copies.
 
 Run from the repository root:
 
@@ -92,11 +94,17 @@ DOCUMENT_CASES: list[tuple[str, str, bool]] = [
     # A copied template with only code, created and the title line filled in.
     ("requirement.boilerplate.md", "requirement", False),
     ("plan.boilerplate.md", "plan", False),
+    # The same copies with every comment and "Example:" lead-in removed, sample text kept.
+    ("requirement.stripped-sample.md", "requirement", False),
+    ("plan.stripped-sample.md", "plan", False),
+    # requirement.valid.md saved with a UTF-8 byte-order mark.
+    ("requirement.bom.md", "requirement", True),
 ]
 
-# The placeholder forms the four Markdown templates use: a NNN code, a YYYY-MM-DD date, a
+# The placeholder forms the four --document templates use: a NNN code, a YYYY-MM-DD date, a
 # [Bracketed Name] in the title line, an HTML comment, and an "Example:" lead-in. Angle-bracket
-# slots are phase.template.md's form only, and a filled document may contain one in a code span.
+# slots are not included: of the Markdown templates only phase.template.md uses them, phase is
+# not a --document kind, and a filled document may contain one in a code span.
 PLACEHOLDER = re.compile(r"[A-Z]+-NNN|YYYY-MM-DD|^# .*\[[^\]]+\]|<!--|^Example:", re.MULTILINE)
 
 # (template file, schema file): the template's headings must satisfy the schema's `sections`.
@@ -113,6 +121,10 @@ PHASE_OMISSIONS: list[tuple[str, str]] = [
     ("result", "required once status is complete"),
 ]
 
+# A sentence of a template's sample text shorter than this is not compared, so a short generic
+# phrase cannot fail a real document.
+MIN_SAMPLE = 30
+
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
 
@@ -128,21 +140,67 @@ def _stringify_dates(value: Any) -> Any:
     return value
 
 
-def to_instance(text: str) -> dict[str, Any]:
-    """Convert a Markdown document to the {front_matter, sections} shape the schemas validate."""
+def split_document(text: str) -> tuple[dict[str, Any], list[tuple[str, str]]]:
+    """The parsed front matter and each level-2 section as (heading, body), with HTML comments
+    removed and headings inside fenced code blocks ignored. A leading byte-order mark is
+    dropped first, so it cannot hide the front matter."""
+    text = text.removeprefix("\ufeff")
     match = FRONT_MATTER.match(text)
     front_matter = _stringify_dates(yaml.safe_load(match.group(1))) if match else {}
     body = COMMENT.sub("", text[match.end():] if match else text)
 
-    sections: list[str] = []
+    sections: list[tuple[str, list[str]]] = []
     in_fence = False
     for line in body.splitlines():
         if line.lstrip().startswith("```"):
             in_fence = not in_fence
+        elif not in_fence and line.startswith("## "):
+            sections.append((line[3:].strip(), []))
             continue
-        if not in_fence and line.startswith("## "):
-            sections.append(line[3:].strip())
-    return {"front_matter": front_matter or {}, "sections": sections}
+        if sections:
+            sections[-1][1].append(line)
+    return front_matter or {}, [(heading, "\n".join(lines)) for heading, lines in sections]
+
+
+def to_instance(text: str) -> dict[str, Any]:
+    """Convert a Markdown document to the {front_matter, sections} shape the schemas validate."""
+    front_matter, sections = split_document(text)
+    return {"front_matter": front_matter, "sections": [heading for heading, _ in sections]}
+
+
+def _collapse(text: str) -> str:
+    return " ".join(text.split())
+
+
+def template_sample(kind: str) -> tuple[str, list[str]]:
+    """A template's sample front-matter title and the sentences of its sample section text,
+    with "Example:" lead-ins removed, whitespace collapsed, and sentences shorter than
+    MIN_SAMPLE dropped."""
+    front_matter, sections = split_document(
+        (HERE / f"{kind}.template.md").read_text(encoding="utf-8"))
+    sentences: list[str] = []
+    for _, body in sections:
+        body = re.sub(r"^Example:", "", body, flags=re.MULTILINE)
+        # A block is a paragraph, list item or bold-led line, so one kept item still matches.
+        blocks = re.split(r"\n\s*\n|\n(?=\s*(?:[-*] |\d+\. |\*\*|\*[A-Z]))", body)
+        for block in blocks:
+            block = _collapse(re.sub(r"^\s*(?:[-*]|\d+\.)\s+", "", block))
+            sentences += [s.strip() for s in re.split(r"(?<=[.:;])\s+", block)]
+    return str(front_matter.get("title", "")), [s for s in sentences if len(s) >= MIN_SAMPLE]
+
+
+def retained_sample(text: str, kind: str) -> list[str]:
+    """Where a document still carries its template's sample title or sample sentences."""
+    title, sentences = template_sample(kind)
+    front_matter, sections = split_document(text)
+    found: list[str] = []
+    if title and _collapse(str(front_matter.get("title", ""))) == _collapse(title):
+        found.append(f"front-matter title is the template's sample: {title!r}")
+    for heading, body in sections:
+        collapsed = _collapse(body)
+        found += [f"section {heading!r} keeps the template's sample text: {s[:60]!r}"
+                  for s in sentences if s in collapsed]
+    return found
 
 
 def describe_errors(schema: dict[str, Any], instance: Any) -> list[str]:
@@ -158,10 +216,13 @@ def describe_errors(schema: dict[str, Any], instance: Any) -> list[str]:
 
 
 def check_document(path: Path, kind: str) -> list[str]:
-    """Schema errors and placeholders left in one document of the given kind."""
+    """Schema errors, placeholders and retained template sample text in one document."""
+    if not path.is_file():
+        return [f"no such file: {path}"]
     text = path.read_text(encoding="utf-8")
     errors = describe_errors(load_schema(KINDS[kind]), to_instance(text))
-    return errors + [f"placeholder: {found!r}" for found in PLACEHOLDER.findall(text)]
+    errors += [f"placeholder: {found!r}" for found in PLACEHOLDER.findall(text)]
+    return errors + retained_sample(text, kind)
 
 
 def load_schema(name: str) -> dict[str, Any]:
@@ -296,6 +357,7 @@ def check_one(path: Path, kind: str) -> int:
     """The --document mode: 0 when the document passes its schema and has no placeholders."""
     errors = check_document(path, kind)
     print(f"{'PASS' if not errors else 'FAIL'}  {path} as a {kind} document")
+    # A missing path comes back as one "no such file" error, so it prints a FAIL line too.
     for message in errors:
         print(f"        {message}")
     return 1 if errors else 0
