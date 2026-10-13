@@ -761,3 +761,9 @@ method, and Node sends no body for HEAD.
 
 These are comment and documentation changes only, with no change in behaviour, so by the owner's
 ruling there is no further review round.
+
+**Test baseline sign-off at the merge.** After rebasing onto dev `3bb650d4`,
+`tools/check_test_baseline.py` (base 2153 passed, branch 2253 passed) again reported the one test
+removed with `eligible_slots`: `test.test_workbench_layout_schema::test_panel_with_no_eligible_slot_fails_schema`
+(removed in `f1ce38eb`, superseded as recorded in review round 1). The owner signed off on it on
+2026-10-12, in this session.
