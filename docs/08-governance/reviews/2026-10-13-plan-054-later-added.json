@@ -17,7 +17,7 @@
  "altitudes_run": [
   "later-added-phase"
  ],
- "status": "open",
+ "status": "dispositioned",
  "notes": "Reviewed by the Session Manager at 6444ef35 on agent/plan-agent-replicator, one dispatch on partition-adversary with PROMPT-038, in a scratch clone. phase-rep-07 was first registered in 5725667f, after the plan's original set (91494ea3), when the planner split it out of phase-rep-01 for review 2026-10-12-plan-054 finding F03. Findings recorded as reported; the dispatcher added only id, engine and author.",
  "findings": [
   {
@@ -31,7 +31,16 @@
    "minimal_fix": "Add doc-prompt-demo-build-orchestration (PROMPT-014) and doc-prompt-demo-build-delegation-pack (PROMPT-018) to phase-rep-07's sources, and reword the scope line to name the coordinator as a role and state that demo-adversary and demo-validator-web are dispatched by the coordinator, not the orchestrators.",
    "slug": "source-lacks-the-roster-it-is-cited-for",
    "engine": "single-adversary",
-   "author": "partition-adversary dispatched with PROMPT-038"
+   "author": "partition-adversary dispatched with PROMPT-038",
+   "dispositions": [
+    {
+     "value": "fixed",
+     "by": "planner",
+     "recorded_by": "Session 3 - Standby Builder (planner stand-in, unclaimed plan-agent-replicator)",
+     "date": "2026-10-13",
+     "reason": "phase-rep-07's sources now include PROMPT-012 (doc-prompt-demo-agent-roster-spec), PROMPT-014 (doc-prompt-demo-build-orchestration) and PROMPT-018 (doc-prompt-demo-build-delegation-pack). Its scope names the coordinator, a top-level session running PROMPT-014, and PROMPT-012's ten agents. It also states that the coordinator itself dispatches demo-adversary and demo-validator-web (PROMPT-018, the completion gate) while the orchestrators dispatch the creators and the other two validators. A new acceptance line requires demo-build.yaml's roles to equal that roster and its coordinator edges to name the two gate agents. PLAN-054's phase table carries the same roster sentence."
+    }
+   ]
   }
  ]
 }
