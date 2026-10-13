@@ -193,7 +193,7 @@ them.
 ## Review
 
 Round 1, at `547b3154`, run by the Session Manager. Verdict records, committed unchanged in
-`7e3d4a1b`:
+`31fbfd17` (`7e3d4a1b` before the rebase onto dev `9df2ae34`):
 
 - `docs/08-governance/reviews/verdicts/2026-10-13-phase-fwt-03-demo-adversary.json`
   (sha256 `f197a5872c1436d9de5c1139c74cf92dc528967471dffa25b3c0bdda2193eb22`): gating pass with one
