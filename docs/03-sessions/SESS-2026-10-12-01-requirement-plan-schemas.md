@@ -302,10 +302,10 @@ one section rewritten and the rest of the sample kept, and one with comments rem
 ## Review
 
 The commit hashes of verdict-record commits below are as of the branch's rebase onto dev
-`4c9225a8`; the round tips (`547b3154`, `9c3d3c61`, `70646557`) are the commits as reviewed.
+`b941407d`, the base it merges onto; the round tips (`547b3154`, `9c3d3c61`, `70646557`) are the commits as reviewed.
 
 Round 1, at `547b3154`, run by the Session Manager. Verdict records, committed unchanged in
-`685f49d5`:
+`743abb4c`:
 
 - `docs/08-governance/reviews/verdicts/2026-10-13-phase-fwt-03-demo-adversary.json`
   (sha256 `f197a5872c1436d9de5c1139c74cf92dc528967471dffa25b3c0bdda2193eb22`): gating pass with one
@@ -328,7 +328,7 @@ The reviewers found the status values (`draft`, `approved`, `active`, `complete`
 `superseded`) consistent with d-system's real plans; no change.
 
 Round 2, at `9c3d3c61`, run by the Session Manager: gating **reject**. The round-2 shadow review was
-not dispatched; it runs on the next tip. Verdict record, committed unchanged in `b88eb761`:
+not dispatched; it runs on the next tip. Verdict record, committed unchanged in `ff2e883b`:
 
 - `docs/08-governance/reviews/verdicts/2026-10-13-phase-fwt-03-demo-adversary-2.json`
   (sha256 `6127a77de1082b0bb193d6d1ad9a4a051cfb53a73a4729443a4a1a7b4cc1eba1`): four findings.
@@ -348,7 +348,7 @@ not dispatched; it runs on the next tip. Verdict record, committed unchanged in 
 
 Round 3, at `70646557`, run by the Session Manager: gating reject, which the owner ruled **accept
 after a small fix** (2026-10-13). Round-2 F02 to F04 were found resolved. Verdict records, committed
-unchanged in `fb444d60`:
+unchanged in `97edba4c`:
 
 - `docs/08-governance/reviews/verdicts/2026-10-13-phase-fwt-03-demo-adversary-3.json`
   (sha256 `d9244ca59d78f98f7e7d9d3b1d42d0a8df31f94a43b261f540d5b275c8e6edc6`): the two gating
