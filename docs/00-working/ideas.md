@@ -19182,6 +19182,7 @@ The two owner questions, 000387 and 000388, need answers before the proposals th
 - relates_to ← `000409`
 - relates_to ← `000410`
 - relates_to ← `000411`
+- relates_to ← `000693`
 
 ---
 
@@ -19331,6 +19332,7 @@ PROPOSED LINK: 000389 --relates_to--> 000319 (the same resumability ask, now wit
 - relates_to → `000385`
 - relates_to → `000319`
 - relates_to ← `000515`
+- relates_to ← `000693`
 
 ---
 
@@ -23241,6 +23243,7 @@ Neighbours: 000389 (session state and resumability: a resume brief per session r
 - relates_to → `000340`
 - relates_to → `None`
 - relates_to ← `000540`
+- relates_to ← `000693`
 
 ---
 
@@ -29192,6 +29195,12 @@ PROPOSED LINK: 000693 --relates_to--> 000389 (000693 needs session state capture
 PROPOSED LINK: 000693 --relates_to--> 000385 (Both address multi-agent lifecycle and orchestration)
 
 </details>
+
+**Links**
+
+- relates_to → `000515`
+- relates_to → `000389`
+- relates_to → `000385`
 
 ---
 
