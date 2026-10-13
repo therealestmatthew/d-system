@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-13-phase-fwt-03-demo-adversary-3",
+  "date": "2026-10-13",
+  "phase": "phase-fwt-03",
+  "reviewed_commit": "70646557583396e9886aa2401bee30417f9b74e1",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "Retained-sample detection matches only exact sentences after whitespace collapse, so changing one to three words in each sample sentence passes --document.",
+      "evidence": "docs/00-working/framework/05-schemas/check_schemas.py:192-203 (exact substring at 202). Probes keeping the template's scenario, numbers and structure with light rewording: --document req-evasion-full.md --kind requirement -> PASS exit 0; --document plan-evasion-full2.md --kind plan -> PASS exit 0.",
+      "consequence": "A template edited in place by light rewording passes as a filled document."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "The front-matter title comparison is case-sensitive.",
+      "evidence": "check_schemas.py:197 exact collapsed equality; req-case-only.md with only the title's case changed reports no title finding.",
+      "consequence": "The title half of the check is evaded by a case change."
+    }
+  ],
+  "raw_reply_sha256": "287f73552cd65acd167dde1cbfd47e262f240594ce01b372837e196ce2f1338b",
+  "notes": "Round 3 gating functional review, dispatched by the Session Manager in its own scratch clone at 70646557. Round-2 F02-F04 resolved; F01 resolved for unedited copies only. Owner ruling 2026-10-13 (SM session): make sentence and title comparison case- and punctuation-insensitive, add the case probe as a failing fixture, record reworded sample text as a known limit of a lint aid (idea via Ideation), no fuzzy matching, no further review round. Raw reply at _working/session-manager/review-replies/phase-fwt-03-70646557-demo-adversary.md."
+}

@@ -1,0 +1,39 @@
+{
+  "verdict_id": "2026-10-13-phase-fwt-03-review-judge-2",
+  "date": "2026-10-13",
+  "phase": "phase-fwt-03",
+  "reviewed_commit": "70646557583396e9886aa2401bee30417f9b74e1",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "check_schemas.py has no execution evidence in the review manifest.",
+      "evidence": "phase-fwt-03 verification entry 2 is prose; manifest _working/review-checks/phase-fwt-03/706465575833/ entry 4 not run; no test imports check_schemas.py.",
+      "consequence": "Repeats the round-1 judge finding; the script is executed only by reviewers by hand."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "The judge could not confirm examples/requirement.bom.md contains a byte-order mark.",
+      "evidence": "ripgrep strips a leading BOM; no byte-level read tool.",
+      "consequence": "If absent, the BOM case would be vacuous."
+    },
+    {
+      "id": "F03",
+      "severity": "minor",
+      "title": "check_schemas.py is outside the ruff and mypy gate paths.",
+      "evidence": "Gates run ruff on src/ test/ tools/ and mypy on src/; the script is under docs/00-working/framework/05-schemas/.",
+      "consequence": "Style or type regressions in the script are not gated."
+    }
+  ],
+  "raw_reply_sha256": "79ecb1811beafa29dd63cb93b1f7b3ade8315c149b8530d95966d09698b6678d",
+  "notes": "Round 3 shadow review, dispatched by the Session Manager after the runner finished (manifest _working/review-checks/phase-fwt-03/706465575833/, passed). It missed the gating blocker (light rewording evades the match). Its F02 is settled: the gating reviewer and the Session Manager read the first three bytes of requirement.bom.md as EF BB BF. Raw reply at _working/session-manager/review-replies/phase-fwt-03-70646557-review-judge.md."
+}
