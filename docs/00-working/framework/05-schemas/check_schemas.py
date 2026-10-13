@@ -17,6 +17,15 @@ field removed must not, while an active copy with no agent must (the host decide
 active phase needs one). Every phase in backlog.yaml must also validate, and the keys in
 phase.template.md's YAML block must match the schema. backlog.yaml is only read.
 
+To check one real document instead of the examples, name it and its kind:
+
+    uv run python docs/00-working/framework/05-schemas/check_schemas.py \
+        --document path/to/REQ-031-example.md --kind requirement
+
+That validates the document against the kind's schema and runs the placeholder check on it, so
+a copied template with only its code, date and title filled in fails. It exits 0 when both
+pass, 1 otherwise. DOCUMENT_CASES runs the same check on examples, including such a copy.
+
 Run from the repository root:
 
     uv run python docs/00-working/framework/05-schemas/check_schemas.py
@@ -26,6 +35,7 @@ Exits 0 when every case matches its expectation, 1 otherwise.
 
 from __future__ import annotations
 
+import argparse
 import datetime as dt
 import json
 import re
@@ -65,10 +75,29 @@ CASES: list[tuple[str, str, bool]] = [
 # Examples that must be filled instances of their template, with no placeholder left in them.
 PLACEHOLDER_FREE: list[str] = ["requirement.valid.md", "plan.valid.md"]
 
-# The placeholder forms the templates use: a NNN code, a YYYY-MM-DD date, a [Bracketed Name]
-# in the title line, an <angle-bracket> slot, an HTML comment, and an "Example:" lead-in.
-PLACEHOLDER = re.compile(r"[A-Z]+-NNN|YYYY-MM-DD|^# .*\[[^\]]+\]|<[a-z][^>]*>|<!--|^Example:",
-                         re.MULTILINE)
+# The schema for each document kind the --document mode accepts.
+KINDS: dict[str, str] = {
+    "governance": "governance.schema.json",
+    "protocol": "protocol.schema.json",
+    "requirement": "requirement.schema.json",
+    "plan": "plan.schema.json",
+}
+
+# (example file, kind, must pass): the --document check, schema and placeholders together.
+DOCUMENT_CASES: list[tuple[str, str, bool]] = [
+    ("governance.valid.md", "governance", True),
+    ("protocol.valid.md", "protocol", True),
+    ("requirement.valid.md", "requirement", True),
+    ("plan.valid.md", "plan", True),
+    # A copied template with only code, created and the title line filled in.
+    ("requirement.boilerplate.md", "requirement", False),
+    ("plan.boilerplate.md", "plan", False),
+]
+
+# The placeholder forms the four Markdown templates use: a NNN code, a YYYY-MM-DD date, a
+# [Bracketed Name] in the title line, an HTML comment, and an "Example:" lead-in. Angle-bracket
+# slots are phase.template.md's form only, and a filled document may contain one in a code span.
+PLACEHOLDER = re.compile(r"[A-Z]+-NNN|YYYY-MM-DD|^# .*\[[^\]]+\]|<!--|^Example:", re.MULTILINE)
 
 # (template file, schema file): the template's headings must satisfy the schema's `sections`.
 TEMPLATES: list[tuple[str, str]] = [
@@ -126,6 +155,13 @@ def describe_errors(schema: dict[str, Any], instance: Any) -> list[str]:
         else:
             messages.append(error.message)
     return messages
+
+
+def check_document(path: Path, kind: str) -> list[str]:
+    """Schema errors and placeholders left in one document of the given kind."""
+    text = path.read_text(encoding="utf-8")
+    errors = describe_errors(load_schema(KINDS[kind]), to_instance(text))
+    return errors + [f"placeholder: {found!r}" for found in PLACEHOLDER.findall(text)]
 
 
 def load_schema(name: str) -> dict[str, Any]:
@@ -241,11 +277,37 @@ def main() -> int:
         for placeholder in found:
             print(f"        placeholder: {placeholder!r}")
 
+    for example, kind, expected in DOCUMENT_CASES:
+        errors = check_document(EXAMPLES / example, kind)
+        ok = (not errors) == expected
+        failures += not ok
+        print(f"{'PASS' if ok else 'FAIL'}  {example} as a {kind} document (--document): "
+              f"{'passes' if not errors else 'fails'} (expected {'pass' if expected else 'fail'})")
+        for message in errors:
+            print(f"        {message}")
+
     failures += check_phases()
 
     print(f"\n{failures} failure(s)")
     return 1 if failures else 0
 
 
+def check_one(path: Path, kind: str) -> int:
+    """The --document mode: 0 when the document passes its schema and has no placeholders."""
+    errors = check_document(path, kind)
+    print(f"{'PASS' if not errors else 'FAIL'}  {path} as a {kind} document")
+    for message in errors:
+        print(f"        {message}")
+    return 1 if errors else 0
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--document", type=Path,
+                        help="check this document instead of the examples")
+    parser.add_argument("--kind", choices=sorted(KINDS),
+                        help="the document's kind (with --document)")
+    args = parser.parse_args()
+    if (args.document is None) != (args.kind is None):
+        parser.error("--document and --kind are used together")
+    sys.exit(check_one(args.document, args.kind) if args.document else main())

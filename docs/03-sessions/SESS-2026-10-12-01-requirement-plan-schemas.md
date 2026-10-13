@@ -7,7 +7,7 @@ kind: session
 status: active
 owner: repository-owner
 created: '2026-10-12'
-updated: '2026-10-12'
+updated: '2026-10-13'
 systems: [sys-fw-templates]
 depends_on: [doc-portable-framework-document-templates]
 ---
@@ -73,6 +73,28 @@ PASS  requirement.template.md headings against requirement.schema.json sections
 PASS  plan.template.md headings against plan.schema.json sections
 PASS  requirement.valid.md has no template placeholders
 PASS  plan.valid.md has no template placeholders
+PASS  governance.valid.md as a governance document (--document): passes (expected pass)
+PASS  protocol.valid.md as a protocol document (--document): passes (expected pass)
+PASS  requirement.valid.md as a requirement document (--document): passes (expected pass)
+PASS  plan.valid.md as a plan document (--document): passes (expected pass)
+PASS  requirement.boilerplate.md as a requirement document (--document): fails (expected fail)
+        placeholder: '<!--'
+        placeholder: '<!--'
+        placeholder: 'Example:'
+        placeholder: '<!--'
+        placeholder: 'Example:'
+        placeholder: '<!--'
+        placeholder: 'Example:'
+        placeholder: '<!--'
+        placeholder: 'Example:'
+PASS  plan.boilerplate.md as a plan document (--document): fails (expected fail)
+        placeholder: '<!--'
+        placeholder: '<!--'
+        placeholder: 'Example:'
+        placeholder: '<!--'
+        placeholder: 'Example:'
+        placeholder: '<!--'
+        placeholder: 'Example:'
 PASS  phase-conc-01 cut from backlog.yaml as text equals the parsed backlog item
 PASS  phase-conc-01 against phase.schema.json: valid (expected valid)
 PASS  phase-conc-01 without acceptance (a required field) against phase.schema.json: invalid (expected invalid)
@@ -89,10 +111,28 @@ PASS  phase.template.md YAML keys against phase.schema.json properties
 The two filled examples are `examples/requirement.valid.md` and `examples/plan.valid.md`. The
 incomplete ones are the same files with one section cut: `requirement.no-acceptance.md`,
 `plan.no-scope.md` and `plan.no-phases.md`. The placeholder check confirms the filled examples
-carry none of the forms the templates use (`REQ-NNN`, `YYYY-MM-DD`, a bracketed name in the title,
-an angle-bracket slot, an HTML comment, an `Example:` lead-in). Run against the two templates
-instead, the same pattern finds every one of those forms, so the check is not passing by matching
-nothing.
+carry none of the forms the four Markdown templates use (`REQ-NNN`, `YYYY-MM-DD`, a bracketed name
+in the title, an HTML comment, an `Example:` lead-in). Run against the templates instead, the same
+pattern finds every one of those forms, so the check is not passing by matching nothing.
+
+`--document <path> --kind <kind>` (added for review finding F01) runs the schema and the
+placeholder check on any one document and exits 1 if either fails. The suite runs it on six
+examples, under DOCUMENT_CASES above. Run directly:
+
+```text
+requirement.boilerplate.md --kind requirement: exit=1
+plan.boilerplate.md --kind plan: exit=1
+requirement.valid.md --kind requirement: exit=0
+plan.valid.md --kind plan: exit=0
+plan.valid.md --kind requirement: exit=1
+protocol.valid.md --kind protocol: exit=0
+document without kind: exit=2
+```
+
+The two boilerplate fixtures are the templates with only `code`, `created` and the title line
+filled in (and the plan's `depends_on`, so the plan fixture is not failed by its schema instead).
+Validated against the schema alone, both return no errors, so the placeholder check is what fails
+them.
 
 ## Acceptance
 
@@ -134,11 +174,43 @@ nothing.
 - **The filled examples restate REQ-024 and PLAN-040 in short form**, as the governance example
   restates GOV-001, so the examples describe real documents rather than invented ones.
 
+- **The angle-bracket form was removed from the placeholder pattern** (review round 1, while fixing
+  F01). The first `--document` run failed `protocol.valid.md`, a filled document, on
+  `` `agent/<phase-id>` `` in a code span. None of the four Markdown templates uses an
+  angle-bracket slot (only `phase.template.md` does, and a phase is not a `--document` kind), so the
+  form was dropped rather than special-cased. The governance and protocol examples were added as
+  passing `--document` cases so a false positive of this kind fails the suite.
+
 ## Unresolved
 
 - `tools/check_no_private_content.py` checked 0 identifiers in the worktree, because
-  `_private/portfolio/` exists only in the primary checkout. Its `check_content` function, run on the
-  ten changed files with the 31 identifiers loaded from the primary checkout, reported no
-  violations.
+  `_private/portfolio/` exists only in the primary checkout. Its `check_content` function, run on every
+  file the branch changes against dev (18, after the round-1 fix) with the 31 identifiers loaded
+  from the primary checkout, reported no violations.
 - The framework `INDEX.md` still lists `requirement.schema.json` and `plan.schema.json` as "to
   create". It is not a deliverable of this phase.
+
+## Review
+
+Round 1, at `547b3154`, run by the Session Manager. Verdict records, committed unchanged in
+`7e3d4a1b`:
+
+- `docs/08-governance/reviews/verdicts/2026-10-13-phase-fwt-03-demo-adversary.json`
+  (sha256 `f197a5872c1436d9de5c1139c74cf92dc528967471dffa25b3c0bdda2193eb22`): gating pass with one
+  finding.
+  - **F01 major — fixed** (owner ruling, 2026-10-13: fix in this phase). The placeholder check ran
+    only on the two shipped examples, so a real document that was still template boilerplate
+    validated. `check_schemas.py` now has a `--document <path> --kind <kind>` mode that runs the
+    schema and the placeholder check on any document and exits 1 if either fails. Two boilerplate
+    fixtures, `examples/requirement.boilerplate.md` and `examples/plan.boilerplate.md`, must fail it.
+    The existing cases are kept.
+- `docs/08-governance/reviews/verdicts/2026-10-13-phase-fwt-03-review-judge.json`
+  (sha256 `594d4f42a1c51a19621887c9dfdb3c25c83ca845b4f9bf9225f038c4c0c275b8`): shadow pass with one
+  finding.
+  - **F01 minor — accepted.** The phase's second verification entry is prose, so the review runner
+    does not execute `check_schemas.py`. Changing it is a `backlog.yaml` edit outside this phase's
+    deliverables, mid-review; `phase-fwt-02` accepted the same finding for the same reason. The
+    literal command and its output are in this record's Verification section.
+
+The reviewers found the status values (`draft`, `approved`, `active`, `complete`, `deprecated`,
+`superseded`) consistent with d-system's real plans; no change.
