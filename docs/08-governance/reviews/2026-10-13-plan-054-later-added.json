@@ -1,0 +1,37 @@
+{
+ "review_id": "2026-10-13-plan-054-later-added",
+ "procedure": "GOV-018",
+ "date": "2026-10-13",
+ "target": {
+  "plan": "PLAN-054",
+  "requirement": "REQ-039",
+  "later_added_phases": [
+   "phase-rep-07"
+  ]
+ },
+ "entry_check": {
+  "result": "pass",
+  "standard": "GOV-010",
+  "detail": "GOV-018 step 1 script run on docs/01-plans/PLAN-054-agent-replicator.md at 6444ef35: exit 0."
+ },
+ "altitudes_run": [
+  "later-added-phase"
+ ],
+ "status": "open",
+ "notes": "Reviewed by the Session Manager at 6444ef35 on agent/plan-agent-replicator, one dispatch on partition-adversary with PROMPT-038, in a scratch clone. phase-rep-07 was first registered in 5725667f, after the plan's original set (91494ea3), when the planner split it out of phase-rep-01 for review 2026-10-12-plan-054 finding F03. Findings recorded as reported; the dispatcher added only id, engine and author.",
+ "findings": [
+  {
+   "id": "F01",
+   "altitude": "later-added-phase",
+   "subject": "phase-rep-07",
+   "severity": "major",
+   "title": "The declared source for demo-build.yaml (PLAN-021, doc-live-demo) does not name the roster or dispatch structure the scope line claims it does, and nothing in acceptance would catch the resulting inaccuracy.",
+   "evidence": "phase-rep-07 scope: \"docs/08-governance/fleet/systems/demo-build.yaml - the PLAN-021 orchestrators and the creators and validators they dispatch, all lifecycle parent (R03).\" PLAN-054 D3 repeats the same framing. The phase's only source for this file is doc-live-demo (PLAN-021). Reading PLAN-021 in full: it names three orchestrator agents generically (never by name) and says the build session (the coordinator, PROMPT-014) \"dispatches the three orchestrator agents\" -- it never enumerates which agents are creators/validators, and says 'eight demo agents' total. The real roster, in PROMPT-012 (`doc-prompt-demo-agent-roster-spec`, not a declared source), is ten: demo-orch-stage, demo-orch-data, demo-orch-content, demo-creator-py, demo-creator-web, demo-creator-docs, demo-validator-code, demo-validator-check, demo-adversary, demo-validator-web (`ls .claude/agents/ | grep demo-` confirms these ten files exist, plus two unrelated demo-agent-* files used elsewhere). Critically, PROMPT-018 (`doc-prompt-demo-build-delegation-pack`, also not sourced), line 34-37: \"each phase's D0N-A (adversarial review, demo-adversary) and ... D02-W/D04-W/D05-W (Playwright browser checks, demo-validator-web) are dispatched by the coordinator ... not by the orchestrators.\" So two of the ten roles are dispatched by the coordinator directly, not by the orchestrators the scope line names as the dispatcher, and the coordinator itself -- the role PLAN-021 explicitly calls out as the one that \"claims the phases ... dispatches the three orchestrator agents\" -- is never named as a role anywhere in D3's table or phase-rep-07's scope.",
+   "consequence": "A developer building demo-build.yaml from the declared source alone will either omit the coordinator role (so no delegates-to/coordinates edge from coordinator to the three orchestrators can be modelled) or mis-attribute demo-adversary and demo-validator-web as dispatched by an orchestrator rather than the coordinator. Unlike the GOV-017 system, acceptance has no roster-fidelity test for demo-build.yaml (only \"the three system files pass the schema and the integrity test\", which checks internal reference resolution, not fidelity to PLAN-021/PROMPT-018), so an inaccurate model of this system would pass the phase's own acceptance undetected.",
+   "minimal_fix": "Add doc-prompt-demo-build-orchestration (PROMPT-014) and doc-prompt-demo-build-delegation-pack (PROMPT-018) to phase-rep-07's sources, and reword the scope line to name the coordinator as a role and state that demo-adversary and demo-validator-web are dispatched by the coordinator, not the orchestrators.",
+   "slug": "source-lacks-the-roster-it-is-cited-for",
+   "engine": "single-adversary",
+   "author": "partition-adversary dispatched with PROMPT-038"
+  }
+ ]
+}
