@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-12-phase-irs-07-demo-adversary",
+  "date": "2026-10-12",
+  "phase": "phase-irs-07",
+  "reviewed_commit": "ab5a7e8dabc6f774ac9a0986e802dc8350b7091e",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "reject",
+  "gating": true,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "blocker",
+      "title": "_block_lines writes an empty depends_on or systems list as a bare header line, which YAML reads as null, so the governance check rolls back the whole write.",
+      "evidence": "src/governance/mapping.py:37-39. apply_phase_locks with {\"phase-irs-08\": {\"depends_on\": [], \"systems\": [\"sys-realization\"]}} returned 1: 'backlog:items.285.depends_on: None is not of type array' then 'backlog.yaml rolled back'. 122 of 357 phases carry depends_on: [].",
+      "consequence": "Any plan whose locks include a root phase cannot be written; the mainstream case of the phase's scope fails. test/test_mapping.py has no empty-list case, so the suite passes."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "$defs.ordering.items.properties.phase in schemas/gate-decision.schema.json has no phase-id pattern.",
+      "evidence": "type string, minLength 1; backlog.schema.json uses ^phase-[a-z]+-[0-9]{2}$ for phase ids.",
+      "consequence": "A mistyped phase id in a proposed ordering validates; the owner ratifying at Gate 3 is the only check."
+    }
+  ],
+  "raw_reply_sha256": "a4dd1a33ab8ab4809f9c43e010e8aee558e58322278bc26e32f172a9119cc0a7",
+  "notes": "Gating functional review, dispatched by the Session Manager in its own scratch clone at ab5a7e8d after REVIEW-REQUEST. Raw reply at _working/session-manager/review-replies/phase-irs-07-ab5a7e8d-demo-adversary.md."
+}

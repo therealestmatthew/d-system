@@ -1,0 +1,25 @@
+{
+  "verdict_id": "2026-10-12-phase-irs-07-review-judge",
+  "date": "2026-10-12",
+  "phase": "phase-irs-07",
+  "reviewed_commit": "ab5a7e8dabc6f774ac9a0986e802dc8350b7091e",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "GOV-014 front matter updated: '2026-10-05' predates this commit, whose Mapper section it changes.",
+      "evidence": "docs/08-governance/GOV-014-realization-role-contracts.md front matter; Mapper section names phase-irs-07.",
+      "consequence": "The document's updated date understates its last change; not enforced by governance."
+    }
+  ],
+  "raw_reply_sha256": "8561d013b2f60285ae64f3437c5bafdb2ffd18f9c78b69587e4a0e160f6460b5",
+  "notes": "Shadow review, dispatched by the Session Manager after the runner finished (manifest _working/review-checks/phase-irs-07/ab5a7e8dabc6/, passed). It attacked write_locks_text and missed the gating blocker (empty-list serialization). Raw reply at _working/session-manager/review-replies/phase-irs-07-ab5a7e8d-review-judge.md."
+}
