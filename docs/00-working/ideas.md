@@ -29372,3 +29372,27 @@ From Session Manager, 2026-10-14; found by the review-judge on phase-rep-01.
 Our next steps are to reprioritize to support my AWS+Anthropic Innovation Alliance Hackathon. We need to scaffold the new d-system/idea realization system that we originally proposed that exists as a blank slate repository for me to send to my work repository for us to start collaborating on design and requirements and build of the hackathon.
 
 Owner, 2026-10-14, PRIORITY; relayed by Session Manager.
+
+---
+
+## 000699 · Hackathon repo: extract GOV-003's standing rules in a dedicated owner sign-off session, one ruling at a time
+
+**Created 2026-10-14T18:29:22-04:00 · Status: `open`**
+
+"Extract as a dedicated session where I review and sign off all of the rulings before they get converted."
+
+Context relayed by Session Manager: GOV-003's standing rules are to be extracted into the new hackathon control repository's (000698) standing-rules document only after the owner signs off each ruling.
+
+Owner, 2026-10-14; relayed by Session Manager.
+
+---
+
+## 000700 · Hackathon repo: review the brain/procedures anti-pattern rules in a dedicated owner session, approving each before it enters the repo
+
+**Created 2026-10-14T18:29:23-04:00 · Status: `open`**
+
+"we should go through this in a dedicated session where I review and approve each one before it makes its way into the repo."
+
+Context relayed by Session Manager: this concerns the 23 brain/procedures anti-pattern rules, for the new hackathon control repository (000698), treated the same way as GOV-003's rulings.
+
+Owner, 2026-10-14; relayed by Session Manager.
