@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "plugin": "idea-realization",
+  "plugin_version": "0.1.0",
+  "installed_at": "2026-10-14T23:06:45Z",
+  "updated_at": "2026-10-14T23:06:45Z",
+  "features": [
+    "backlog",
+    "documents",
+    "ideas",
+    "partition",
+    "product",
+    "reviews",
+    "workstreams"
+  ],
+  "files": [
+    {
+      "path": "ideas/ideas.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "feature": "ideas"
+    },
+    {
+      "path": "ideas/ideas.md",
+      "sha256": "a9a9c5b972021a28b0744b332c834ce672e2ced4a1a15ce09c9f5c5df40a1921",
+      "feature": "ideas"
+    },
+    {
+      "path": "ideas/priority.yaml",
+      "sha256": "474bec3ab3cb7637342d2ee0bfc97795b29afd01aa89f2d589c795eec6cbd1f3",
+      "feature": "ideas"
+    },
+    {
+      "path": ".idea-realization/schemas/idea.schema.json",
+      "sha256": "3ab558892c4acb274fa7f909bcf18560be5239704a5b241e6031b233cf0e2174",
+      "feature": "ideas"
+    },
+    {
+      "path": ".idea-realization/schemas/idea-priority.schema.json",
+      "sha256": "665146ee75edd2bb7912700b6b3f81fbc20508c734f4ea119105711740310ded",
+      "feature": "ideas"
+    },
+    {
+      "path": ".idea-realization/schemas/idea-partition-record.schema.json",
+      "sha256": "2cf7ee7062b5d632ad5add19ab6800f474aa9f3ab8a8cd298fe54a580455cc01",
+      "feature": "partition"
+    },
+    {
+      "path": "backlog/backlog.yaml",
+      "sha256": "75f397e89bd1bd15e2821c1acc6a6008439fa9b9a9a8a41f6faf408d2b0e8bb5",
+      "feature": "backlog"
+    },
+    {
+      "path": ".idea-realization/schemas/backlog.schema.json",
+      "sha256": "34b317723a7df339422e68d22318825db51b51b66a7402d187efacf221042a52",
+      "feature": "backlog"
+    },
+    {
+      "path": "docs/codes.yaml",
+      "sha256": "28b73c75a09813e1cebbd413a810454c2626975503d393954a3e0e09b7d06c59",
+      "feature": "documents"
+    },
+    {
+      "path": "docs/systems.yaml",
+      "sha256": "05d614491b0d027afd10ae937d96dd8e0b05cf26cc23cb3ba8eb126c0017336a",
+      "feature": "documents"
+    },
+    {
+      "path": ".idea-realization/schemas/document.schema.json",
+      "sha256": "7feebf7815a18f4d565c597e26b482c565a9868342af47d292f35294b0a04d69",
+      "feature": "documents"
+    },
+    {
+      "path": ".idea-realization/schemas/codes.schema.json",
+      "sha256": "565d9592e20d4b71884f0ab6e3a2704189503d1dc59decebfb1002b469f7cd52",
+      "feature": "documents"
+    },
+    {
+      "path": ".idea-realization/schemas/systems.schema.json",
+      "sha256": "fa8e7ff5c464c3b496c5f7448315a433d63523152da4ca3058589c04753fae05",
+      "feature": "documents"
+    },
+    {
+      "path": "docs/workstreams.yaml",
+      "sha256": "1a908a63a4081c7dc38a0e655abbe2bc5a5e2189ffa149dedb5ac899358aab0c",
+      "feature": "workstreams"
+    },
+    {
+      "path": ".idea-realization/schemas/workstreams.schema.json",
+      "sha256": "9a1ad72f845cc24dc56589a81b6fc9475bdf885968b8c2efc40a1591466ef7f2",
+      "feature": "workstreams"
+    },
+    {
+      "path": ".idea-realization/schemas/review-verdict.schema.json",
+      "sha256": "6fa627457c9a84dec6c117c5a9200e1b79f6fb144d6fa4a017090ffd27a87db2",
+      "feature": "reviews"
+    },
+    {
+      "path": ".idea-realization/product.yaml",
+      "sha256": "88d5dfb3d40ec752a491d3c336f7e9789b4b5b7efa2c334dcf76d3b6cc6a89a3",
+      "feature": "product"
+    },
+    {
+      "path": ".idea-realization/schemas/product.schema.json",
+      "sha256": "585a0797e07472c7262986d9a843250c0e964d3858d0f37879f5077e73a1df15",
+      "feature": "product"
+    }
+  ],
+  "directories": [
+    {
+      "path": ".idea-realization/staging",
+      "feature": "partition"
+    },
+    {
+      "path": "docs/reviews",
+      "feature": "reviews"
+    }
+  ],
+  "consent": []
+}

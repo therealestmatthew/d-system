@@ -1,0 +1,44 @@
+schema_version: 1
+# Owner keys name an accountable role. Every document's and every system's owner is one of them.
+# A developer is an owner whose value lists their git author emails; the key is their handle
+# (see plugins/idea-realization/docs/workstreams.md). Add one entry per developer, for example:
+#   ana:
+#     description: Ana, user interface workstream.
+#     emails: [ana@example.com]
+owners:
+  repository-owner: The person accountable for this repository.
+# One entry per independently changeable capability, with the paths that locate it. A path with
+# the prefix product: is in the product repository.
+systems:
+- id: sys-pipeline
+  name: Idea realization plugin
+  domain: governance
+  status: implemented
+  owner: repository-owner
+  paths: [plugins/idea-realization/]
+  depends_on: []
+  description: The vendored plugin that carries ideas through plans, phases and review to delivery, adapted for a control and a product repository.
+- id: sys-agents
+  name: Agents and permissions
+  domain: governance
+  status: implemented
+  owner: repository-owner
+  paths: [.claude/]
+  depends_on: []
+  description: The planner, review-gate and AWS agent definitions and the permission rules that bound them.
+- id: sys-control-tools
+  name: Control repository tools
+  domain: governance
+  status: implemented
+  owner: repository-owner
+  paths: [tools/]
+  depends_on: []
+  description: The confidentiality check, the git hooks and the AWS sandbox wrapper.
+- id: sys-governance-docs
+  name: Governance documents
+  domain: governance
+  status: implemented
+  owner: repository-owner
+  paths: [docs/governance/]
+  depends_on: []
+  description: The repository's governing documents, including the placeholders for the standing rules and the anti-pattern procedures.

@@ -1,0 +1,3 @@
+schema_version: 1
+# One entry per workstream: the paths one developer owns. Claim with workstreams.py.
+workstreams: []

@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Product repository record",
+  "description": "The product repository a control repository drives. Only what is the same on every machine; the local checkout path is configured per machine, never tracked.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "name", "remote", "integration_branch"],
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "description": "Record contract version."
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[-_][a-z0-9]+)*$",
+      "description": "Short product name, used in prose and in the default product worktree directory."
+    },
+    "remote": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Git URL of the product repository. A product checkout whose origin differs is refused."
+    },
+    "integration_branch": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^-]",
+      "description": "The product repository's integration branch, which phase branches merge into."
+    },
+    "ci_workflow": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The forge workflow file the CI gate polls, or none."
+    }
+  }
+}

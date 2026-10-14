@@ -1,0 +1,343 @@
+# The phase catalog and the lock table every developer reads. Claim with session-start.
+schema_version: 1
+updated: '2026-10-14'
+max_active: 5
+next_up: []
+items:
+- id: phase-boot-01
+  title: Author-scoped document codes, session codes and phase ids
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-pipeline
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Make every allocated document and session code carry the allocating developer's handle, and phase
+    ids too.
+  - Keep code reservations for one developer's concurrent agents on one machine.
+  acceptance:
+  - Two developers allocating a plan code offline receive different codes.
+  - The documents check accepts the author-scoped forms and rejects a code without a handle.
+  verification:
+  - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - plugins/idea-realization/scripts/codes.py
+  - plugins/idea-realization/scripts/reservations.py
+  - plugins/idea-realization/templates/codes.yaml
+  - plugins/idea-realization/schemas/
+  - plugins/idea-realization/test/
+  next_action: Read scripts/codes.py's allocation and decide the code form with the owner before changing
+    it.
+- id: phase-boot-02
+  title: Generated workstream board with a staleness check
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-pipeline
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Generate docs/board.md from the workstream registry, the backlog and git history.
+  - Fail the check while the committed board is stale.
+  acceptance:
+  - The board shows each workstream's owner, status, paths and active phases.
+  - Editing the registry without regenerating the board fails the check.
+  verification:
+  - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - plugins/idea-realization/scripts/board.py
+  - plugins/idea-realization/scripts/checks/
+  - plugins/idea-realization/test/
+  - docs/board.md
+  next_action: Read scripts/workstreams.py and the catalog generator, and reuse the catalog's staleness
+    pattern.
+- id: phase-boot-03
+  title: Review runner, test baseline, diff patterns and CI gate for the product stack
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-control-tools
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Run the phase's verification in the product worktree and record the evidence the reviewers read.
+  - Compare test results against the product integration branch, refuse risky diff patterns, and poll
+    the product CI.
+  acceptance:
+  - A review can cite the runner's recorded output instead of re-running every command.
+  - A test that passed on the integration branch and fails on the branch blocks the merge.
+  verification:
+  - 'control: uv run pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - tools/
+  next_action: Wait until the product's language and test runner are chosen, then adapt the existing review
+    runner design to them.
+- id: phase-boot-04
+  title: Stale-claim evidence and system path checks from the product repository
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-pipeline
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Read stale-claim evidence (agent branches and worktrees) from the product repository.
+  - 'Check repository: product systems'' paths against the product checkout.'
+  acceptance:
+  - A claim whose product branch has gone stale is reported as stale.
+  - A product system path that does not exist is reported when the product checkout is configured.
+  verification:
+  - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - plugins/idea-realization/scripts/checks/backlog.py
+  - plugins/idea-realization/scripts/documents.py
+  - plugins/idea-realization/test/
+  next_action: Read claim_evidence in scripts/checks/backlog.py and route it through product.verify.
+- id: phase-boot-05
+  title: Workstream transfer and the full two-layer protocol for teammates
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-pipeline
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add a transfer command that hands a workstream to another developer.
+  - Write the two-layer protocol for teammates who run a single agent.
+  acceptance:
+  - A workstream can move from one developer to another in one validated edit.
+  - A teammate can follow the protocol document without other reading.
+  verification:
+  - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - plugins/idea-realization/scripts/workstreams.py
+  - plugins/idea-realization/docs/workstreams.md
+  - plugins/idea-realization/test/
+  next_action: Ask the owner whether a transfer needs the owner's approval as well as both developers'.
+- id: phase-boot-06
+  title: Multi-session, coordinator and Session Manager documents for two repositories
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-pipeline
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Rewrite docs/multi-session.md, docs/coordinator.md and docs/session-manager-messages.md for a control
+    and a product repository.
+  - Describe the shadow review judge.
+  acceptance:
+  - Each document names which repository's primary checkout a turn locks.
+  - No document describes a single repository as the only case.
+  verification:
+  - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - plugins/idea-realization/docs/multi-session.md
+  - plugins/idea-realization/docs/coordinator.md
+  - plugins/idea-realization/docs/session-manager-messages.md
+  next_action: Read the three documents and list each single-repository assumption before editing.
+- id: phase-boot-07
+  title: Triage and partition over product code
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-pipeline
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Let the triage and partition agents also search the product repository for related code.
+  acceptance:
+  - A triage finding can cite a product file.
+  - Without a product checkout, triage still runs over the control repository.
+  verification:
+  - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - plugins/idea-realization/agents/idea-triage.md
+  - plugins/idea-realization/skills/idea-triage/
+  - plugins/idea-realization/scripts/idea_corpus.py
+  - plugins/idea-realization/test/
+  next_action: Decide how a product path is passed to the triage agent without widening its write access.
+- id: phase-boot-08
+  title: Git hooks and a pointer CLAUDE.md in the product repository
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-control-tools
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Install the confidentiality hook in the product repository with the developer's consent.
+  - Write a short CLAUDE.md there that points at the control repository.
+  acceptance:
+  - A commit in the product repository runs the confidentiality check.
+  - An agent opened in the product repository is told to start from the control repository.
+  verification:
+  - 'control: uv run pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - tools/
+  next_action: Ask the owner who owns the product repository's CLAUDE.md before writing one.
+- id: phase-boot-09
+  title: Planning standards for this repository
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-governance-docs
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the plan-quality standard, promoted-plan staging, the planning reference, the planning protocol
+    and single-session orchestration for this repository.
+  acceptance:
+  - Each document states current rules only, with no history.
+  - The documents check passes with each document registered.
+  verification:
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - docs/governance/
+  next_action: Start from the plugin's docs and ask the owner which of the five documents the team needs
+    first.
+- id: phase-boot-10
+  title: The standing rules, extracted with the owner
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-governance-docs
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Extract the standing rules into the standing-rules document, one rule at a time, each approved by
+    the owner before it is written.
+  acceptance:
+  - Every rule in the document was approved by the owner in the session.
+  - The document carries no history and no dated rulings.
+  verification:
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - docs/governance/GOV-001-standing-rules.md
+  next_action: Schedule a session with the owner; this phase is never worked without them.
+- id: phase-boot-11
+  title: The anti-pattern procedures, approved one by one by the owner
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-governance-docs
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write each anti-pattern procedure only after the owner approves it.
+  acceptance:
+  - Every procedure in the document was approved by the owner in the session.
+  - The document states current rules only, with nothing dated.
+  verification:
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - docs/governance/GOV-002-anti-pattern-procedures.md
+  next_action: Schedule a session with the owner; this phase is never worked without them.
+- id: phase-boot-12
+  title: Browser validator agent
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-agents
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add a read-only agent that checks browser-facing deliverables in a real browser.
+  acceptance:
+  - The agent can load a page from a product worktree and report what it sees.
+  - It changes no file.
+  verification:
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - .claude/agents/
+  next_action: Wait until the user interface is designed, then write the agent against it.
+- id: phase-boot-13
+  title: Instance and history scanners over the whole repository
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-pipeline
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Run the plugin's instance and history scanners over the whole control repository.
+  - Skip lockfiles, whose hashes contain digit runs that are not identifiers.
+  acceptance:
+  - An identifier from another repository anywhere in this one fails the scan.
+  - uv.lock produces no finding.
+  verification:
+  - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - plugins/idea-realization/test/
+  next_action: Read test/test_no_source_references.py and add a root option and a lockfile exclusion.
+- id: phase-boot-14
+  title: Checkpoint skill for two repositories
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-pipeline
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Write the checkpoint skill for a session record in the control worktree that records the product branch's
+    state.
+  acceptance:
+  - A checkpoint records both branches' tips.
+  - It still never marks a phase complete.
+  verification:
+  - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
+  deliverables:
+  - plugins/idea-realization/skills/checkpoint/
+  next_action: Read skills/checkpoint/SKILL.md and list each place it assumes one repository.
