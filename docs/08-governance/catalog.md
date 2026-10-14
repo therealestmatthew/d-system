@@ -67,6 +67,7 @@ CI regenerates it and fails on any difference.
 | GOV-020 | governance | active | repository-owner | docs/08-governance/GOV-020-agentic-ai-planning-reference.md |
 | GOV-021 | governance | draft | repository-owner | docs/08-governance/GOV-021-planning-protocol.md |
 | GOV-022 | governance | draft | repository-owner | docs/08-governance/GOV-022-single-session-orchestration-protocol.md |
+| GOV-023 | governance | active | repository-owner | docs/08-governance/GOV-023-fleet-model.md |
 | OPS-001 | operation | active | repository-owner | docs/08-governance/OPS-001-operations.md |
 | OPS-002 | operation | active | repository-owner | docs/08-governance/OPS-002-rebuild-db.md |
 | OPS-003 | operation | active | repository-owner | docs/08-governance/OPS-003-load-context.md |
@@ -586,8 +587,7 @@ CI regenerates it and fails on any difference.
 | ADR-004 | reserved | Membership authority decision; deliverable of phase-rel-04. |
 | ADR-005 | reserved | Projection publication decision; deliverable of phase-rel-05. |
 | GOV-012 | reserved | Idea metrics command and generated-page rule; deliverable of phase-idg-08. |
-| GOV-023 | reserved | Fleet model governance document (PLAN-054); deliverable of phase-rep-01. |
 | OPS-034 | reserved | Operations document for tools/fleet.py (PLAN-054); deliverable of phase-rep-02, phase-rep-03 and phase-rep-04. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-484 documents — adr: 28, architecture: 12, governance: 20, operation: 29, plan: 82, prompt: 43, requirement: 37, session: 233.
+485 documents — adr: 28, architecture: 12, governance: 21, operation: 29, plan: 82, prompt: 43, requirement: 37, session: 233.

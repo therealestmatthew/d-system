@@ -617,17 +617,25 @@ systems:
 - id: sys-fleet
   name: Agent fleet and Replicator
   domain: governance
-  status: planned
+  status: scaffold
   owner: repository-owner
   paths:
   - docs/01-plans/PLAN-054-agent-replicator.md
+  - docs/08-governance/GOV-023-fleet-model.md
+  - docs/08-governance/fleet/
+  - schemas/fleet.schema.json
+  - schemas/fleet-definition.schema.json
+  - schemas/fleet-system.schema.json
+  - test/test_fleet_files.py
   depends_on:
   - sys-governance
   description: The fleet tracker files (agent definitions, orchestration systems, typed role
     relationships), the append-only fleet event log, the tools/fleet.py core with its bash and
-    PowerShell shells, and the double-click restart of every agent session (PLAN-054). Planned
-    only; no code exists yet. Registered at planning time, as sys-auto-gateway was, so phase-rep-*
-    phases lock this system rather than all of sys-governance; phase-rep-01 adds the real paths.
+    PowerShell shells, and the double-click restart of every agent session (PLAN-054). The model
+    document GOV-023, the three fleet schemas, fleet.yaml, definitions.yaml and their tests exist
+    (phase-rep-01); the system files, the core, the shells and the launcher do not yet. Registered
+    at planning time, as sys-auto-gateway was, so phase-rep-* phases lock this system rather than
+    all of sys-governance.
 - id: sys-realization
   name: Idea realization pipeline
   domain: governance

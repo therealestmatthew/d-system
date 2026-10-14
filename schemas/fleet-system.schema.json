@@ -1,0 +1,327 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "fleet-system.schema.json",
+  "title": "Fleet orchestration system",
+  "description": "docs/08-governance/fleet/systems/<id>.yaml (GOV-023 Orchestration systems, REQ-039 R02, R12). Roles, static edges, declared resources, messages, lifecycle hooks, governing documents, an optional roster reference and kill preconditions. Value lists come from fleet.schema.json; references between them are checked by test/test_fleet_files.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "title",
+    "governing_documents",
+    "roles",
+    "edges",
+    "resources",
+    "messages",
+    "hooks",
+    "kill_preconditions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "id": {
+      "$ref": "fleet.schema.json#/definitions/id"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "governing_documents": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Repository-relative paths."
+    },
+    "roster": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "document",
+        "section"
+      ],
+      "description": "The table, in a governing document, that lists this system's roles one per row.",
+      "properties": {
+        "document": {
+          "type": "string",
+          "minLength": 1
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/role"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/edge"
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/resource"
+      }
+    },
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "from_roles",
+          "meaning"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "from_roles": {
+            "type": "array",
+            "items": {
+              "$ref": "fleet.schema.json#/definitions/id"
+            }
+          },
+          "meaning": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "hooks": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "wind_down_role": {
+          "$ref": "fleet.schema.json#/definitions/id"
+        },
+        "restart_ready_message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kickoff_role": {
+          "$ref": "fleet.schema.json#/definitions/id"
+        },
+        "kickoff_template": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resume_default": {
+          "type": "string",
+          "enum": [
+            "new",
+            "resume"
+          ]
+        }
+      }
+    },
+    "kill_preconditions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "fleet.schema.json#/definitions/predicate"
+      }
+    }
+  },
+  "definitions": {
+    "role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "group",
+        "cardinality",
+        "lifecycle"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "fleet.schema.json#/definitions/id"
+        },
+        "definition": {
+          "$ref": "fleet.schema.json#/definitions/id"
+        },
+        "fleet_role": {
+          "$ref": "fleet.schema.json#/definitions/id"
+        },
+        "group": {
+          "$ref": "fleet.schema.json#/definitions/role_group"
+        },
+        "cardinality": {
+          "$ref": "fleet.schema.json#/definitions/cardinality"
+        },
+        "lifecycle": {
+          "$ref": "fleet.schema.json#/definitions/lifecycle_control"
+        },
+        "session_names": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "governing_row": {
+          "type": "string",
+          "minLength": 1
+        },
+        "not_in_governing_table": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "definition"
+          ],
+          "not": {
+            "required": [
+              "fleet_role"
+            ]
+          }
+        },
+        {
+          "required": [
+            "fleet_role"
+          ],
+          "not": {
+            "required": [
+              "definition"
+            ]
+          }
+        }
+      ]
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "type"
+      ],
+      "properties": {
+        "from": {
+          "$ref": "fleet.schema.json#/definitions/id"
+        },
+        "to": {
+          "$ref": "fleet.schema.json#/definitions/id"
+        },
+        "type": {
+          "allOf": [
+            {
+              "$ref": "fleet.schema.json#/definitions/edge_type"
+            },
+            {
+              "not": {
+                "const": "holds"
+              }
+            }
+          ]
+        },
+        "authority": {
+          "$ref": "fleet.schema.json#/definitions/authority"
+        },
+        "cardinality": {
+          "type": "string",
+          "minLength": 1
+        },
+        "max_cycles": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "launches",
+                  "kills",
+                  "restarts"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "authority"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "authority"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "granted_by"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "fleet.schema.json#/definitions/id"
+        },
+        "kind": {
+          "$ref": "fleet.schema.json#/definitions/resource_kind"
+        },
+        "capacity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "granted_by": {
+          "$ref": "fleet.schema.json#/definitions/id"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "slot-pool"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "capacity"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

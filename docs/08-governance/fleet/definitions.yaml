@@ -1,0 +1,91 @@
+# Agent definitions: how to start each agent (GOV-023 Agent definitions). A subagent definition
+# points at its .claude/agents file, which supplies model, effort and tools. Checked by
+# schemas/fleet-definition.schema.json and test/test_fleet_files.py.
+schema_version: 1
+definitions:
+# --- sessions ---
+- id: repo-session
+  kind: session
+  status: available
+  permission_mode: auto
+  cwd: .
+  remote_control: true
+  launcher: tab
+  notes: An interactive session in the primary checkout with the default model. The interim
+    roster (_working/session-manager/sessions.json) starts eight sessions this way.
+- id: advisor
+  kind: session
+  status: available
+  model: fable
+  effort: medium
+  permission_mode: dontAsk
+  allowed_tools:
+  - Read
+  - Grep
+  - Glob
+  - WebSearch
+  - WebFetch
+  - ToolSearch
+  - ListAgents
+  - SendMessage
+  - Bash(git log *)
+  - Bash(git show *)
+  - Bash(git diff *)
+  - Bash(git status *)
+  - Bash(git worktree list *)
+  - Bash(git ls-remote *)
+  - Bash(git rev-parse *)
+  - Bash(git branch --list *)
+  - Bash(ls *)
+  - Bash(cat *)
+  - Bash(head *)
+  - Bash(tail *)
+  - Bash(wc *)
+  - Bash(grep *)
+  - Bash(rg *)
+  disallowed_tools: [Edit, Write, NotebookEdit, Agent, Workflow, Artifact]
+  cwd: .
+  remote_control: true
+  launcher: tab
+  notes: Read-only advisor, as _working/session-manager/open-advisor.sh launches it.
+- id: replicator
+  kind: session
+  status: available
+  permission_mode: manual
+  cwd: .
+  remote_control: true
+  launcher: tab
+  notes: The Agent Replicator (PLAN-054 D10). Manual mode, so the owner approves every launch and kill.
+- id: owner-terminal
+  kind: owner-manual
+  status: available
+  permission_mode: manual
+  cwd: ..
+  remote_control: true
+  launcher: tab
+  notes: The Owner Terminal (GOV-017). Started by the owner in the directory above the repository.
+# --- subagents with an agent file ---
+- {id: demo-adversary, kind: subagent, status: available, agent_file: .claude/agents/demo-adversary.md}
+- {id: demo-agent-evidence-checker, kind: subagent, status: available, agent_file: .claude/agents/demo-agent-evidence-checker.md}
+- {id: demo-agent-objection-panel, kind: subagent, status: available, agent_file: .claude/agents/demo-agent-objection-panel.md}
+- {id: demo-creator-docs, kind: subagent, status: available, agent_file: .claude/agents/demo-creator-docs.md}
+- {id: demo-creator-py, kind: subagent, status: available, agent_file: .claude/agents/demo-creator-py.md}
+- {id: demo-creator-web, kind: subagent, status: available, agent_file: .claude/agents/demo-creator-web.md}
+- {id: demo-orch-content, kind: subagent, status: available, agent_file: .claude/agents/demo-orch-content.md}
+- {id: demo-orch-data, kind: subagent, status: available, agent_file: .claude/agents/demo-orch-data.md}
+- {id: demo-orch-stage, kind: subagent, status: available, agent_file: .claude/agents/demo-orch-stage.md}
+- {id: demo-validator-check, kind: subagent, status: available, agent_file: .claude/agents/demo-validator-check.md}
+- {id: demo-validator-code, kind: subagent, status: available, agent_file: .claude/agents/demo-validator-code.md}
+- {id: demo-validator-web, kind: subagent, status: available, agent_file: .claude/agents/demo-validator-web.md}
+- {id: idea-planner, kind: subagent, status: available, agent_file: .claude/agents/idea-planner.md}
+- {id: idea-triage, kind: subagent, status: available, agent_file: .claude/agents/idea-triage.md}
+- {id: partition-adversary, kind: subagent, status: available, agent_file: .claude/agents/partition-adversary.md}
+- {id: partition-analyst, kind: subagent, status: available, agent_file: .claude/agents/partition-analyst.md}
+- {id: review-judge, kind: subagent, status: available, agent_file: .claude/agents/review-judge.md}
+# --- subagents GOV-014 names that have no agent file yet ---
+- {id: realization-phase-fit, kind: subagent, status: planned, notes: GOV-014 Phase-fit.}
+- {id: realization-mapper, kind: subagent, status: planned, notes: GOV-014 Mapper.}
+- {id: realization-test-author, kind: subagent, status: planned, notes: GOV-014 Test Author.}
+- {id: realization-developer, kind: subagent, status: planned, notes: GOV-014 Developer.}
+- {id: realization-validator, kind: subagent, status: planned, notes: GOV-014 Validator.}
+- {id: realization-coordinator, kind: subagent, status: planned, notes: GOV-014 Realization.}

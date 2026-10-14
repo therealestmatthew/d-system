@@ -1,0 +1,221 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "fleet-definition.schema.json",
+  "title": "Fleet agent definitions",
+  "description": "docs/08-governance/fleet/definitions.yaml (GOV-023 Agent definitions, REQ-039 R02, R05). A definition says how to start an agent. A subagent definition points at its .claude/agents file and never copies model, effort or tools from it. Value lists come from fleet.schema.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "definitions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "definitions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/definition"
+      }
+    }
+  },
+  "definitions": {
+    "definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "fleet.schema.json#/definitions/id"
+        },
+        "kind": {
+          "$ref": "fleet.schema.json#/definitions/definition_kind"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "available",
+            "planned"
+          ]
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effort": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ]
+        },
+        "permission_mode": {
+          "$ref": "fleet.schema.json#/definitions/permission_mode"
+        },
+        "allowed_tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "disallowed_tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "agent_file": {
+          "type": "string",
+          "pattern": "^\\.claude/agents/[a-z0-9-]+\\.md$"
+        },
+        "prompt_file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cwd": {
+          "type": "string",
+          "minLength": 1
+        },
+        "remote_control": {
+          "type": "boolean"
+        },
+        "launcher": {
+          "$ref": "fleet.schema.json#/definitions/launcher"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "subagent"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "model"
+                  ]
+                },
+                {
+                  "required": [
+                    "effort"
+                  ]
+                },
+                {
+                  "required": [
+                    "allowed_tools"
+                  ]
+                },
+                {
+                  "required": [
+                    "disallowed_tools"
+                  ]
+                },
+                {
+                  "required": [
+                    "permission_mode"
+                  ]
+                },
+                {
+                  "required": [
+                    "launcher"
+                  ]
+                },
+                {
+                  "required": [
+                    "remote_control"
+                  ]
+                },
+                {
+                  "required": [
+                    "cwd"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "subagent"
+              },
+              "status": {
+                "const": "available"
+              }
+            },
+            "required": [
+              "kind",
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "agent_file"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "session",
+                  "owner-manual"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "permission_mode",
+              "cwd",
+              "remote_control",
+              "launcher"
+            ],
+            "not": {
+              "required": [
+                "agent_file"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "owner-manual"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "permission_mode": {
+                "const": "manual"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

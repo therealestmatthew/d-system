@@ -1,0 +1,282 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "fleet.schema.json",
+  "title": "Fleet file",
+  "description": "docs/08-governance/fleet/fleet.yaml (GOV-023, REQ-039 R02): host facts, enabled orchestration systems, launch defaults, the path of the fleet model document, and the fleet-level roles that belong to no one system. Also the single home of every fleet value list, under definitions; GOV-023 defines each value and a test keeps the two in agreement. Relational checks (every reference resolves) live in test/test_fleet_files.py, since JSON Schema cannot express them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "model_document",
+    "host",
+    "enabled_systems",
+    "defaults",
+    "fleet_roles"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "model_document": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Repository-relative path of the governance document that defines the fleet model."
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "os",
+        "terminal_launcher",
+        "projects_dir",
+        "repo_root"
+      ],
+      "properties": {
+        "os": {
+          "type": "string",
+          "enum": [
+            "linux",
+            "windows",
+            "macos"
+          ]
+        },
+        "terminal_launcher": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The program the shell uses to open a tab, e.g. gnome-terminal or wt.exe."
+        },
+        "projects_dir": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Claude Code's projects directory on this host."
+        },
+        "repo_root": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Absolute path of the primary checkout; every definition's cwd is relative to it."
+        }
+      }
+    },
+    "enabled_systems": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      },
+      "description": "System ids; each needs systems/<id>.yaml beside this file."
+    },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "permission_mode",
+        "remote_control",
+        "launcher"
+      ],
+      "properties": {
+        "permission_mode": {
+          "$ref": "#/definitions/permission_mode"
+        },
+        "remote_control": {
+          "type": "boolean"
+        },
+        "launcher": {
+          "$ref": "#/definitions/launcher"
+        }
+      }
+    },
+    "fleet_roles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/fleet_role"
+      }
+    }
+  },
+  "definitions": {
+    "permission_mode": {
+      "$comment": "section: Permission modes",
+      "type": "string",
+      "description": "GOV-023 Permission modes. No bypass value, by design (REQ-039 R05).",
+      "enum": [
+        "auto",
+        "manual",
+        "dontAsk",
+        "plan"
+      ]
+    },
+    "definition_kind": {
+      "$comment": "section: Definition kinds",
+      "type": "string",
+      "description": "GOV-023 Definition kinds.",
+      "enum": [
+        "session",
+        "subagent",
+        "owner-manual"
+      ]
+    },
+    "launcher": {
+      "$comment": "section: Launchers",
+      "type": "string",
+      "description": "GOV-023 Launchers.",
+      "enum": [
+        "tab",
+        "background"
+      ]
+    },
+    "role_group": {
+      "$comment": "section: Role groups",
+      "type": "string",
+      "description": "GOV-023 Role groups.",
+      "enum": [
+        "meta",
+        "execution",
+        "owner",
+        "support"
+      ]
+    },
+    "lifecycle_control": {
+      "$comment": "section: Lifecycle control",
+      "type": "string",
+      "description": "GOV-023 Lifecycle control.",
+      "enum": [
+        "replicator",
+        "owner-only",
+        "parent"
+      ]
+    },
+    "resource_kind": {
+      "$comment": "section: Resource kinds",
+      "type": "string",
+      "description": "GOV-023 Resource kinds.",
+      "enum": [
+        "lock",
+        "slot-pool"
+      ]
+    },
+    "edge_type": {
+      "$comment": "section: Edge types",
+      "type": "string",
+      "description": "GOV-023 Edge types. holds is runtime only; a static edge may not use it.",
+      "enum": [
+        "coordinates",
+        "delegates-to",
+        "reviews",
+        "hands-off-to",
+        "messages",
+        "shares-resource",
+        "holds",
+        "approves",
+        "launches",
+        "kills",
+        "restarts"
+      ]
+    },
+    "authority": {
+      "$comment": "section: Authority values",
+      "type": "string",
+      "description": "GOV-023 Authority values, carried by launches, kills and restarts edges.",
+      "enum": [
+        "request",
+        "execute"
+      ]
+    },
+    "lifecycle_event": {
+      "$comment": "section: Lifecycle events",
+      "type": "string",
+      "description": "GOV-023 Lifecycle events, used by the event log.",
+      "enum": [
+        "defined",
+        "registered",
+        "launched",
+        "acked",
+        "busy",
+        "idle",
+        "safe",
+        "wind-down-requested",
+        "restart-ready",
+        "killed",
+        "respawned",
+        "failed",
+        "orphan-detected",
+        "retired",
+        "deregistered"
+      ]
+    },
+    "predicate": {
+      "$comment": "section: Predicates",
+      "type": "string",
+      "description": "GOV-023 Predicates: the fixed kill-precondition vocabulary (REQ-039 R12).",
+      "enum": [
+        "lock_free",
+        "target_safe",
+        "target_idle",
+        "coordinator_restart_ready",
+        "resource_free"
+      ]
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "cardinality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "fleet_role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "definition",
+        "group",
+        "cardinality",
+        "lifecycle",
+        "session_names"
+      ],
+      "description": "A role that serves every system. Owner-only by rule (REQ-039 R13).",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "definition": {
+          "$ref": "#/definitions/id"
+        },
+        "group": {
+          "$ref": "#/definitions/role_group"
+        },
+        "cardinality": {
+          "$ref": "#/definitions/cardinality"
+        },
+        "lifecycle": {
+          "const": "owner-only"
+        },
+        "session_names": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
