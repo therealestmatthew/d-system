@@ -27,7 +27,7 @@ Run in `../d-system-worktrees/phase-rep-01` on 2026-10-14, after the rebase onto
 
 ```
 $ uv run pytest test/test_fleet_files.py
-40 passed, 1 warning in 1.17s
+41 passed, 1 warning in 1.21s
 
 $ ! grep -n "Session Manager\|GOV-017" test/test_fleet_files.py
 (no output; exit 0)
@@ -65,13 +65,16 @@ in 630.67s`). `uv run python -m src.governance --containment phase-rep-01` repor
   `test_every_broken_case_has_an_expected_error` keeps that table complete.
 - The test code names no session, role, system or document — **Met.** The negated grep exits 0. The
   model document is found through `fleet.yaml`'s `model_document`, and each value list through its
-  schema `$comment`.
+  schema `$comment`. `test_this_test_names_nothing_the_fleet_files_supply` makes the same check
+  inside the suite, against every name the tracked fleet files supply. A probe copy with
+  `# Owner Terminal` appended failed it with `AssertionError: assert ['Owner Terminal'] == []`, and
+  the probe was deleted.
 
 ## Backlog
 
 `phase-rep-01`: `status: active`, `agent: agent-standby-3`. `session`, `completion_evidence` and
-`result` are recorded on the branch. `next_action`: build review requested from the Session Manager;
-then `READY`; completion at the merge, under `GOV-017`.
+`result` are recorded on the branch. `next_action`: `READY`; completion at the merge, under
+`GOV-017`.
 
 ## Unresolved
 
@@ -80,6 +83,26 @@ then `READY`; completion at the merge, under `GOV-017`.
   declaration amendment, owner-approved 2026-10-14, at `dev` `bf39e7c1`, which also covers
   `phase-rep-02` for `OPS-034`.
 - `fleet.yaml` enables no system yet. `phase-rep-07` adds the three system files and enables them.
+
+## Review
+
+Dispatched by the Session Manager at `c864d660`; the runner passed (`_working/review-checks/phase-rep-01/c864d660cea8/`).
+
+- `docs/08-governance/reviews/verdicts/2026-10-14-phase-rep-01-demo-adversary.json` — gating,
+  verdict `pass`, no findings.
+- `docs/08-governance/reviews/verdicts/2026-10-14-phase-rep-01-review-judge.json` — shadow, verdict
+  `pass`, two minor findings:
+  - **F01** "sys-fleet's paths in systems.yaml omit test/fixtures/fleet/." **Fixed:**
+    `test/fixtures/fleet/` added to `sys-fleet`'s paths.
+  - **F02** "The review runner did not run the phase's negated-grep verification." The runner's
+    `is_command` (`tools/run_review_checks.py`) skips a line that starts with `!`. The Session
+    Manager confirmed it and is sending the runner defect to Ideation, since it also affects the
+    `! grep` lines in `phase-rep-02`, `-03` and `-04`. **Fixed for this phase:** the same check
+    is now `test_this_test_names_nothing_the_fleet_files_supply`, which the runner does run through
+    `uv run pytest test/test_fleet_files.py`. The probe above showed it fails on a planted name.
+
+The owner confirmed on 2026-10-14 the permission-mode order in GOV-023's overlay section (`plan`,
+`dontAsk`, `manual`, `auto`); no change.
 
 ## Decisions
 

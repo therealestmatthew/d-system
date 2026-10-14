@@ -627,6 +627,7 @@ systems:
   - schemas/fleet-definition.schema.json
   - schemas/fleet-system.schema.json
   - test/test_fleet_files.py
+  - test/fixtures/fleet/
   depends_on:
   - sys-governance
   description: The fleet tracker files (agent definitions, orchestration systems, typed role

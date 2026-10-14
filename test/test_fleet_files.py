@@ -293,6 +293,32 @@ def test_tracked_schema_value_lists_agree_with_the_model_document() -> None:
     assert enum_disagreements(_tracked_model_document(), lists) == []
 
 
+def _names_the_fleet_supplies(loaded: dict[str, Any]) -> set[str]:
+    """Every session name, role, system, definition and document code the fleet files supply."""
+    names: set[str] = {item["id"] for item in loaded["definitions"]["definitions"]}
+    documents = [loaded["fleet"]["model_document"]]
+    for role in loaded["fleet"]["fleet_roles"]:
+        names |= {role["id"], *role["session_names"]}
+    for system in loaded["systems"].values():
+        names.add(system["id"])
+        documents += system["governing_documents"]
+        for role in system["roles"]:
+            names |= {role["id"], *role.get("session_names", [])}
+    for document in documents:
+        code = re.match(r"[A-Z]+-[0-9]+", Path(document).name)
+        if code:
+            names.add(code.group(0))
+    return names
+
+
+def test_this_test_names_nothing_the_fleet_files_supply() -> None:
+    """REQ-039 R06 for this file: the fleet files supply every name, so none is written here."""
+    source = Path(__file__).read_text(encoding="utf-8")
+    names = _names_the_fleet_supplies(load_fleet(FLEET_DIR))
+    assert names, "the tracked fleet supplies no names"
+    assert sorted(name for name in names if name in source) == []
+
+
 def test_fleet_level_roles_are_owner_only() -> None:
     fleet = load_fleet(FLEET_DIR)["fleet"]
     assert {role["lifecycle"] for role in fleet["fleet_roles"]} <= {"owner-only"}
