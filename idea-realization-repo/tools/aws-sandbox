@@ -1,0 +1,154 @@
+#!/usr/bin/env python3
+"""Run an AWS CLI command against the one sandbox profile configured for this machine.
+
+Every AWS command an agent runs goes through this wrapper; `.claude/settings.json` denies the bare
+`aws` command. The wrapper:
+
+- reads the profile and region from per-machine configuration that is never committed: the
+  environment variables IDEA_REALIZATION_AWS_PROFILE and IDEA_REALIZATION_AWS_REGION, or else the
+  `aws_profile` and `aws_region` values that `plugins/idea-realization/scripts/paths.py` prints;
+- refuses to run when either is missing, or when the profile is `default`;
+- refuses a command that passes its own `--profile`, `--region` or `--endpoint-url`, and removes
+  credential environment variables, so the configured profile is the only source of credentials;
+- in `read` mode, runs only read operations (describe, list, get and the like) and refuses the
+  read operations that reveal a secret.
+
+Usage:
+
+    tools/aws-sandbox read <service> <operation> [args...]     reads only; never asks
+    tools/aws-sandbox write <service> <operation> [args...]    create and update (aws-deploy only)
+    tools/aws-sandbox exec <command> [args...]                 another tool (cdk, sam) with the
+                                                               profile and region in its env
+    tools/aws-sandbox whoami                                   profile, region and caller identity
+
+Deleting anything, and any write to IAM, Organizations, account or billing services, is matched
+by `ask` rules in `.claude/settings.json`, so a person approves each one when it is requested.
+
+These rules match command text. They are guardrails for agents that follow their briefs, not a
+security boundary: the sandbox account's own permissions are the boundary.
+"""
+
+from __future__ import annotations
+
+import os
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+PATHS_SCRIPT = ROOT / "plugins" / "idea-realization" / "scripts" / "paths.py"
+
+PROFILE_ENV = "IDEA_REALIZATION_AWS_PROFILE"
+REGION_ENV = "IDEA_REALIZATION_AWS_REGION"
+
+# Operations allowed in read mode, by prefix of the operation name.
+READ_PREFIXES = ("describe-", "list-", "get-", "head-", "batch-get-", "lookup-", "search-",
+                 "validate-", "estimate-", "simulate-", "filter-", "preview-")
+# Whole operations allowed in read mode.
+READ_OPERATIONS = {"ls", "tail", "query", "scan", "wait"}
+# Read operations that would put a secret or a credential in the transcript. Refused in every mode.
+SECRET_OPERATIONS = {
+    ("secretsmanager", "get-secret-value"),
+    ("secretsmanager", "batch-get-secret-value"),
+    ("ssm", "get-parameter"),
+    ("ssm", "get-parameters"),
+    ("ssm", "get-parameters-by-path"),
+    ("ecr", "get-login-password"),
+    ("ecr", "get-authorization-token"),
+    ("sts", "get-session-token"),
+    ("sts", "get-federation-token"),
+    ("iam", "get-credential-report"),
+    ("kms", "decrypt"),
+    ("lambda", "get-function-configuration"),
+    ("lambda", "get-function"),
+    ("ec2", "get-password-data"),
+}
+FORBIDDEN_OPTIONS = ("--profile", "--region", "--endpoint-url")
+CREDENTIAL_ENV = ("AWS_PROFILE", "AWS_DEFAULT_PROFILE", "AWS_ACCESS_KEY_ID",
+                  "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN", "AWS_REGION",
+                  "AWS_DEFAULT_REGION")
+
+
+class Refused(Exception):
+    """The command is not run; the message says why."""
+
+
+def configured(env: dict[str, str]) -> tuple[str, str]:
+    """The sandbox profile and region, from the environment or else the plugin's configuration."""
+    values = {"aws_profile": env.get(PROFILE_ENV, ""), "aws_region": env.get(REGION_ENV, "")}
+    if not all(values.values()) and PATHS_SCRIPT.is_file() and shutil.which("uv"):
+        result = subprocess.run(["uv", "run", "--quiet", str(PATHS_SCRIPT)], cwd=ROOT,
+                                capture_output=True, text=True, check=False)
+        for line in result.stdout.splitlines():
+            key, _, value = line.partition(":")
+            if key.strip() in values and not values[key.strip()]:
+                values[key.strip()] = value.strip()
+    profile, region = values["aws_profile"], values["aws_region"]
+    if not profile:
+        raise Refused(f"no sandbox profile configured: set {PROFILE_ENV} or the aws_profile "
+                      "plugin option on this machine")
+    if profile == "default":
+        raise Refused("the sandbox profile is 'default'; name a dedicated sandbox profile")
+    if not region:
+        raise Refused(f"no sandbox region configured: set {REGION_ENV} or the aws_region "
+                      "plugin option on this machine")
+    return profile, region
+
+
+def check_options(args: list[str]) -> None:
+    for arg in args:
+        if any(arg == opt or arg.startswith(opt + "=") for opt in FORBIDDEN_OPTIONS):
+            raise Refused(f"{arg.split('=')[0]} is set by the wrapper; do not pass it")
+
+
+def check_aws(mode: str, args: list[str]) -> None:
+    if len(args) < 2:
+        raise Refused(f"usage: tools/aws-sandbox {mode} <service> <operation> [args...]")
+    service, operation = args[0], args[1]
+    check_options(args)
+    if (service, operation) in SECRET_OPERATIONS:
+        raise Refused(f"{service} {operation} reveals a secret; it is not run through agents")
+    if service == "configure":
+        raise Refused("aws configure changes this machine's AWS configuration; a person does that")
+    if mode == "read" and not (operation.startswith(READ_PREFIXES)
+                               or operation in READ_OPERATIONS):
+        raise Refused(f"{service} {operation} is not a read operation; read mode runs "
+                      "describe/list/get-style operations only")
+
+
+def build(argv: list[str], env: dict[str, str]) -> tuple[list[str], dict[str, str]]:
+    """The command to run and its environment, or Refused."""
+    if not argv or argv[0] not in {"read", "write", "exec", "whoami"}:
+        raise Refused("usage: tools/aws-sandbox read|write|exec|whoami ...")
+    mode, args = argv[0], argv[1:]
+    profile, region = configured(env)
+    clean = {k: v for k, v in env.items() if k not in CREDENTIAL_ENV}
+    if mode == "whoami":
+        print(f"profile: {profile}\nregion: {region}")
+        return ["aws", "sts", "get-caller-identity", "--profile", profile,
+                "--region", region], clean
+    if mode == "exec":
+        if not args:
+            raise Refused("usage: tools/aws-sandbox exec <command> [args...]")
+        if re.fullmatch(r"(.*/)?aws", args[0]):
+            raise Refused("run the AWS CLI with read or write, not exec")
+        check_options(args)
+        return args, {**clean, "AWS_PROFILE": profile, "AWS_REGION": region,
+                      "AWS_DEFAULT_REGION": region}
+    check_aws(mode, args)
+    return ["aws", *args, "--profile", profile, "--region", region], clean
+
+
+def main(argv: list[str]) -> int:
+    try:
+        command, env = build(argv, dict(os.environ))
+    except Refused as refused:
+        print(f"aws-sandbox: refused: {refused}", file=sys.stderr)
+        return 2
+    return subprocess.run(command, env=env, check=False).returncode
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
