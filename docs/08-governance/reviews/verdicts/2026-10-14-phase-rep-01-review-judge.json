@@ -1,0 +1,32 @@
+{
+  "verdict_id": "2026-10-14-phase-rep-01-review-judge",
+  "date": "2026-10-14",
+  "phase": "phase-rep-01",
+  "reviewed_commit": "c864d660cea87c4d7c16404e975575c1367e1563",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "review-judge",
+    "definition_sha256": "6936af43c576f0339deff59f32c2d8c2469ecaa949eaf01bb316ada2f2a7ae44"
+  },
+  "verdict": "pass",
+  "gating": false,
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "minor",
+      "title": "sys-fleet's paths in systems.yaml omit test/fixtures/fleet/.",
+      "evidence": "docs/08-governance/systems.yaml:617-629 lists test/test_fleet_files.py but not its fixture directory, a declared deliverable.",
+      "consequence": "A later phase editing the fixtures may not collide with sys-fleet by path."
+    },
+    {
+      "id": "F02",
+      "severity": "minor",
+      "title": "The review runner did not run the phase's negated-grep verification.",
+      "evidence": "Manifest _working/review-checks/phase-rep-01/c864d660cea8/: `! grep -n \"Session Manager\\|GOV-017\" test/test_fleet_files.py` -> ran false, not run: not a command.",
+      "consequence": "Acceptance 4 had no runner evidence; the judge checked it by reading the file. Process gap in tools/run_review_checks.py, not a phase defect."
+    }
+  ],
+  "raw_reply_sha256": "13a6255898d5860a8c50915a383408717da3ac69543340847f1c4928534d79a5",
+  "notes": "Shadow review, dispatched by the Session Manager after the runner finished (manifest _working/review-checks/phase-rep-01/c864d660cea8/, passed). F02 confirmed by the Session Manager: is_command (tools/run_review_checks.py:129-136) accepts only cd or a program on PATH, so a line starting with ! is skipped; recorded as an idea. Raw reply at _working/session-manager/review-replies/phase-rep-01-c864d660-review-judge.md."
+}

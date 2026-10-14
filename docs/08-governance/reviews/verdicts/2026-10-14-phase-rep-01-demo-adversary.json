@@ -1,0 +1,17 @@
+{
+  "verdict_id": "2026-10-14-phase-rep-01-demo-adversary",
+  "date": "2026-10-14",
+  "phase": "phase-rep-01",
+  "reviewed_commit": "c864d660cea87c4d7c16404e975575c1367e1563",
+  "model": "sonnet (agent definition default; claude-sonnet family)",
+  "outcomes": [],
+  "reviewer": {
+    "type": "demo-adversary",
+    "definition_sha256": "ba20e5c3f9bcb1242c03d059eed7a5986105b8db96cb299c686b6cf9723bf042"
+  },
+  "verdict": "pass",
+  "gating": true,
+  "findings": [],
+  "raw_reply_sha256": "340a67fc785226e5900e01d4d674356bddaf765af7e90bbb31118e29b67383e8",
+  "notes": "Gating functional review, dispatched by the Session Manager in its own scratch clone at c864d660. No findings. It raised one documentation point, the permission-mode order in GOV-023-fleet-model.md:250-251 (plan, dontAsk, manual, auto), unstated in REQ-039 and PLAN-054; the owner confirmed that order on 2026-10-14 in the SM session. The harness flagged the reply for the pattern bypass-permissions: the reviewer was discussing the schema's rejected bypassPermissions value. Raw reply at _working/session-manager/review-replies/phase-rep-01-c864d660-demo-adversary.md."
+}
