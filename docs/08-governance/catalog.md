@@ -492,6 +492,7 @@ CI regenerates it and fails on any difference.
 | SESS-2026-10-08-20 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-08-20-schema-owned-slots-structural-eligibility.md |
 | SESS-2026-10-09-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-09-01-phase-template-schema.md |
 | SESS-2026-10-12-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-12-01-requirement-plan-schemas.md |
+| SESS-2026-10-14-01 | session | active | repository-owner | docs/03-sessions/SESS-2026-10-14-01-fleet-model-files.md |
 
 ## Plans and their phases
 
@@ -590,4 +591,4 @@ CI regenerates it and fails on any difference.
 | OPS-034 | reserved | Operations document for tools/fleet.py (PLAN-054); deliverable of phase-rep-02, phase-rep-03 and phase-rep-04. |
 | PLAN-011 | retired | Issued three times on dev in one day — course production, course extraction, then the ephemeral-plan policy — violating GOV-005. The surviving document is PLAN-015. Never reissued. |
 
-485 documents — adr: 28, architecture: 12, governance: 21, operation: 29, plan: 82, prompt: 43, requirement: 37, session: 233.
+486 documents — adr: 28, architecture: 12, governance: 21, operation: 29, plan: 82, prompt: 43, requirement: 37, session: 234.

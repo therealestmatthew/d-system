@@ -18511,6 +18511,7 @@ items:
   owner: repository-owner
   status: active
   agent: agent-standby-3
+  session: doc-session-fleet-model-files
   priority: 2
   session_budget: 1
   depends_on: []
@@ -18552,9 +18553,21 @@ items:
   - test/fixtures/fleet/
   - docs/08-governance/systems.yaml
   - docs/08-governance/codes.yaml
-  next_action: PLAN-054 approved at G3 on 2026-10-13. Read REQ-039, PLAN-054 D1-D4, D6, D7, D10, D11 and D15, and
-    _working/session-manager/open-advisor.sh and sessions.json for the current launch settings. phase-mode-01 and
-    phase-mode-02 also add schemas and governance files; rebase onto whichever merged first.
+  completion_evidence:
+  - docs/08-governance/GOV-023-fleet-model.md
+  - docs/08-governance/fleet/fleet.yaml
+  - docs/08-governance/fleet/definitions.yaml
+  - schemas/fleet.schema.json
+  - schemas/fleet-definition.schema.json
+  - schemas/fleet-system.schema.json
+  - test/test_fleet_files.py
+  - test/fixtures/fleet/README.md
+  - docs/03-sessions/SESS-2026-10-14-01-fleet-model-files.md
+  result: 'Built on agent/phase-rep-01. test/test_fleet_files.py 40 passed (schemas valid, tracked files pass and
+    resolve, enum lists agree with GOV-023 both ways, 17 broken-reference fixtures each reported once with the
+    expected text, 11 schema-invalid fixtures fail); the negated grep exits 0; ruff clean; governance OK; full
+    suite 2308 passed before the rebase onto bf39e7c1; containment shows no undeclared changes.'
+  next_action: Build review requested from the Session Manager; then READY. Completion at the merge under GOV-017.
 - id: phase-rep-07
   title: The three orchestration system files - GOV-017 multi-session, the live-demo build and idea-realization - and
     the roster test against each governing table
