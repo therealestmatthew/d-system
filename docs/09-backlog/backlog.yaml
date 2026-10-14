@@ -1,5 +1,5 @@
 schema_version: 1
-updated: '2026-10-13'
+updated: '2026-10-14'
 decision_record: doc-backlog-decisions
 max_active: 4
 next_up:
@@ -18548,6 +18548,7 @@ items:
   - test/test_fleet_files.py
   - test/fixtures/fleet/
   - docs/08-governance/systems.yaml
+  - docs/08-governance/codes.yaml
   next_action: PLAN-054 approved at G3 on 2026-10-13. Read REQ-039, PLAN-054 D1-D4, D6, D7, D10, D11 and D15, and
     _working/session-manager/open-advisor.sh and sessions.json for the current launch settings. phase-mode-01 and
     phase-mode-02 also add schemas and governance files; rebase onto whichever merged first.
@@ -18658,6 +18659,7 @@ items:
   - test/test_fleet_core.py
   - test/fixtures/fleet/
   - docs/08-governance/OPS-034-fleet.md
+  - docs/08-governance/codes.yaml
   next_action: Waits for phase-rep-07. OPS-034 was allocated at planning time and is named after the tool stem, as
     AGENTS.md requires.
 - id: phase-rep-03
