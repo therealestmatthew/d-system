@@ -7,7 +7,7 @@ kind: governance
 status: active
 owner: repository-owner
 created: '2026-09-16'
-updated: '2026-10-05'
+updated: '2026-10-12'
 systems: [sys-realization, sys-governance]
 depends_on: [doc-idea-realization-system, doc-idea-realization-system-requirements, doc-irs-orchestrator-design]
 ---

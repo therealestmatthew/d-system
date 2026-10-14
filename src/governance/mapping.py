@@ -36,6 +36,11 @@ _LOCKED_FIELDS = ("depends_on", "systems")
 
 
 def _block_lines(field: str, values: list[str]) -> list[str]:
+    if not values:
+        # A bare "  field:" header has no following "  - " lines, which YAML reads as null,
+        # not an empty array -- the schema requires an array, so an empty lock must stay
+        # inline as "  field: []" (F01, round 1).
+        return [f"  {field}: []\n"]
     lines = [f"  {field}:\n"]
     lines.extend(f"  - {value}\n" for value in values)
     return lines

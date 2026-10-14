@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import yaml
 from jsonschema import Draft7Validator, FormatChecker
 
 from src.governance.mapping import (
@@ -91,6 +92,60 @@ def test_write_locks_text_edits_only_named_phases_fields():
     )
 
 
+def test_write_locks_text_empty_list_round_trips_as_an_array_not_null():
+    """F01, round 1: a bare "  depends_on:" header with no "  - " lines following it parses as
+    YAML null, not []. 122 of 357 real phases carry an empty depends_on or systems lock, so this
+    must stay inline as "  field: []"."""
+    rewritten = write_locks_text(
+        BACKLOG_TEXT,
+        {"phase-gamma": {"depends_on": [], "systems": []}},
+    )
+    parsed = yaml.safe_load(rewritten)
+    gamma = next(item for item in parsed["items"] if item["id"] == "phase-gamma")
+    assert gamma["depends_on"] == []
+    assert gamma["systems"] == []
+    assert isinstance(gamma["depends_on"], list)
+    assert isinstance(gamma["systems"], list)
+
+
+def _type_checking_validator(root: Path) -> list[str]:
+    """A stand-in for the real governance validator's array-type rule: every phase's
+    depends_on/systems must be a list, never null -- the exact shape F01's bug broke."""
+    parsed = yaml.safe_load(read_backlog(root))
+    errors = []
+    for item in parsed["items"]:
+        for field in ("depends_on", "systems"):
+            if not isinstance(item.get(field), list):
+                errors.append(f"{item['id']}: {field} {item.get(field)!r} is not of type 'array'")
+    return errors
+
+
+def test_apply_phase_locks_empty_lists_write_as_arrays_and_pass_governance(tmp_path):
+    root = write_backlog(tmp_path)
+    code, lines = apply_phase_locks(
+        root,
+        {"phase-gamma": {"depends_on": [], "systems": ["sys-gamma"]}},
+        validate=_type_checking_validator,
+    )
+    assert code == 0, lines
+    parsed = yaml.safe_load(read_backlog(root))
+    gamma = next(item for item in parsed["items"] if item["id"] == "phase-gamma")
+    assert gamma["depends_on"] == []
+
+
+def test_apply_phase_locks_empty_systems_writes_as_an_array_and_passes_governance(tmp_path):
+    root = write_backlog(tmp_path)
+    code, lines = apply_phase_locks(
+        root,
+        {"phase-gamma": {"depends_on": ["phase-alpha"], "systems": []}},
+        validate=_type_checking_validator,
+    )
+    assert code == 0, lines
+    parsed = yaml.safe_load(read_backlog(root))
+    gamma = next(item for item in parsed["items"] if item["id"] == "phase-gamma")
+    assert gamma["systems"] == []
+
+
 def test_apply_phase_locks_leaves_next_up_byte_identical(tmp_path):
     root = write_backlog(tmp_path)
     original = read_backlog(root)
@@ -155,8 +210,8 @@ def test_build_ordering_validates_against_the_def_and_carries_reasons():
     schema = load_schema()
     doc = build_ordering(
         [
-            ("phase-alpha", "No dependencies; nothing blocks it."),
-            ("phase-beta", "Depends on phase-alpha, which lands first."),
+            ("phase-alpha-01", "No dependencies; nothing blocks it."),
+            ("phase-beta-01", "Depends on phase-alpha-01, which lands first."),
         ]
     )
     problems = validate_ordering(doc["ordering"], schema)
@@ -166,7 +221,15 @@ def test_build_ordering_validates_against_the_def_and_carries_reasons():
 
 def test_validate_ordering_rejects_an_entry_missing_a_reason():
     schema = load_schema()
-    problems = validate_ordering([{"phase": "phase-alpha", "reason": ""}], schema)
+    problems = validate_ordering([{"phase": "phase-alpha-01", "reason": ""}], schema)
+    assert problems != []
+
+
+def test_validate_ordering_rejects_a_malformed_phase_id():
+    schema = load_schema()
+    problems = validate_ordering(
+        [{"phase": "not-a-valid-phase-id", "reason": "Some reason."}], schema
+    )
     assert problems != []
 
 
@@ -200,7 +263,7 @@ def test_decision_line_accepts_a_valid_ordering():
     schema = load_schema()
     validator = Draft7Validator(schema, format_checker=FormatChecker())
     decision = existing_decision_line()
-    decision["ordering"] = build_ordering([("phase-alpha", "Goes first.")])["ordering"]
+    decision["ordering"] = build_ordering([("phase-alpha-01", "Goes first.")])["ordering"]
     assert list(validator.iter_errors(decision)) == []
 
 
@@ -208,7 +271,15 @@ def test_decision_line_rejects_a_malformed_ordering():
     schema = load_schema()
     validator = Draft7Validator(schema, format_checker=FormatChecker())
     decision = existing_decision_line()
-    decision["ordering"] = [{"phase": "phase-alpha"}]  # missing required "reason"
+    decision["ordering"] = [{"phase": "phase-alpha-01"}]  # missing required "reason"
+    assert list(validator.iter_errors(decision)) != []
+
+
+def test_decision_line_rejects_an_ordering_with_a_malformed_phase_id():
+    schema = load_schema()
+    validator = Draft7Validator(schema, format_checker=FormatChecker())
+    decision = existing_decision_line()
+    decision["ordering"] = [{"phase": "PHASE_ALPHA", "reason": "Goes first."}]
     assert list(validator.iter_errors(decision)) != []
 
 
@@ -229,7 +300,7 @@ def test_cli_emits_ordering_to_out_path_after_a_clean_write(tmp_path, monkeypatc
     )
     ordering_path = tmp_path / "ordering.json"
     ordering_path.write_text(
-        json.dumps([{"phase": "phase-gamma", "reason": "Needs phase-alpha first."}]),
+        json.dumps([{"phase": "phase-gamma-01", "reason": "Needs phase-alpha first."}]),
         encoding="utf-8",
     )
     out_path = tmp_path / "proposed-ordering.json"
@@ -247,6 +318,6 @@ def test_cli_emits_ordering_to_out_path_after_a_clean_write(tmp_path, monkeypatc
     assert code == 0
     emitted = json.loads(out_path.read_text(encoding="utf-8"))
     assert emitted == {
-        "ordering": [{"phase": "phase-gamma", "reason": "Needs phase-alpha first."}]
+        "ordering": [{"phase": "phase-gamma-01", "reason": "Needs phase-alpha first."}]
     }
     assert read_backlog(root).split("items:")[0] == BACKLOG_TEXT.split("items:")[0]

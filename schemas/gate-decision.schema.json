@@ -18,7 +18,8 @@
           "phase": {
             "type": "string",
             "minLength": 1,
-            "description": "A backlog phase id (docs/09-backlog/backlog.yaml)."
+            "pattern": "^phase-[a-z]+-[0-9]{2}$",
+            "description": "A backlog phase id (docs/09-backlog/backlog.yaml), in the same shape backlog.schema.json's own phase-id properties require."
           },
           "reason": {
             "type": "string",
