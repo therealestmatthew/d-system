@@ -29329,8 +29329,36 @@ OPS/documentation verified:
 
 ## 000697 · run_review_checks.py silently skips verification lines that start with `!`, so negated checks never run
 
-**Created 2026-10-14T03:27:47-04:00 · Status: `open`**
+**Created 2026-10-14T03:27:47-04:00 · Status: `triaged`**
 
 tools/run_review_checks.py is_command (lines 129-136) accepts only `cd` or a program on PATH, so a phase verification line starting with `!` (e.g. `! grep -n "X" file`, used to assert no match) is recorded "not run: not a command" and silently skipped; the review manifest still passes. PLAN-054's phase-rep-01..04 rely on `! grep` verifications. Fix: treat a leading `!` (and other shell keywords) as a command, or require such checks as tests.
 
 From Session Manager, 2026-10-14; found by the review-judge on phase-rep-01.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-14T03:31:16-04:00): ## Verified findings
+
+**is_command function (lines 129-136).** The function checks whether the first word of a verification entry, after any `NAME=value` assignments, is `cd` or a program found on PATH (via `shutil.which`). A line starting with `!` (shell negation operator, e.g. `! grep -n "X" file`) fails this check because `!` is not on PATH, so `is_command` returns False.
+
+**Skipped entries don't affect manifest pass/fail.** When `is_command` returns False, the entry is marked with a note at line 154 (`entry.note = "not run: not a command"`), then skipped in the execution loop (lines 232-234: `if entry.note is not None: continue`). The manifest's pass/fail result at line 248 (`failed = any(entry.ran and entry.exit_code != 0 for entry in entries)`) only includes entries where `entry.ran == True`; entries with a note have `ran = False`, so they do not affect whether the manifest reports passed or failed. A review that relies on a negated check will see it marked "not run" in the manifest, but the manifest will still report "passed" as long as the commands that did run all exited 0.
+
+**Four unfinished backlog phases (one active, three queued) have negated checks that will be skipped.** Verified via backlog.yaml:
+- phase-rep-01 (active, part of PLAN-054): `! grep -n "Session Manager\|GOV-017" test/test_fleet_files.py`
+- phase-rep-02 (queued, PLAN-054): `! grep -n "Session Manager\|GOV-017" tools/fleet.py`
+- phase-rep-03 (queued, PLAN-054): `! grep -rn "pkill\|killall" tools/fleet/`
+- phase-rep-07 (queued, PLAN-054): `! grep -n "Session Manager\|GOV-017" test/test_fleet_systems.py`
+
+**These phases are subject to review under OPS-029 (via REQ-030's requirement R02 and PLAN-047 D2).** PLAN-047 states that `phase-asr-02` delivers the run_review_checks.py tool and its operations document (OPS-029). That phase is now complete. All four rep-* phases are part of PLAN-054 (Agent Replicator) and will be reviewed using this runner. The acceptance records in PLAN-054's table (lines 270-291) name the grep-based checks: R10 in phase-rep-03 explicitly requires "The grep for `pkill` and `killall`" as evidence for the `! grep` check.
+
+**Test coverage gap.** The test suite in phase-asr-02 (test_run_review_checks.py) includes parametrized tests for `is_command` (lines 280-290), covering valid commands, prose entries, and shell builtins, but does not test entries starting with `!` or other shell keywords (`if`, `for`, `[`, `test`, `((`, `[[`). The negated-check case went undetected during phase-asr-02's review and acceptance.
+
+**Scope of the bug.** The runner's design (OPS-029 and PLAN-047 D2) intentionally splits judgment and command execution: commands run, prose is read by the reviewer. A negated check like `! grep` is currently treated as prose ("not run: not a command") and listed in the manifest for the reviewer to read. The issue is that a reviewer relying on automated evidence in the manifest (which names each check that ran and its result) will not see this evidence executed; the check is recorded as not run, and the manifest still reports passed. The owner ruling in OPS-029 ("Any other entry is prose and is listed as not run") appears to intend this behavior for true prose, not for shell operators that the backlog author meant to execute as commands.
+
+**Fix approaches.** The issue names two: (1) treat a leading `!` (and other shell keywords like `if`, `for`, `[`, `test`, etc.) as a command rather than prose, by wrapping them in `bash -c '…'` or detecting and rewriting them; (2) require such checks as tests (pytest fixtures or dedicated test functions) rather than verification lines. PLAN-054's phases use approach 1 (inline grep checks), which the current runner blocks. Approach 2 would move the checks into test/ and test them through the gate check `uv run pytest`.
+
+</details>
