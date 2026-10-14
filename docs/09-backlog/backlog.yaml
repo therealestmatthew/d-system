@@ -15063,8 +15063,7 @@ items:
   systems:
   - sys-fw-templates
   owner: repository-owner
-  agent: agent-builder-a
-  status: active
+  status: queued
   priority: 2
   session_budget: 1
   depends_on: []
@@ -15087,8 +15086,12 @@ items:
   - docs/00-working/framework/05-schemas/session-record.template.md
   - docs/00-working/framework/05-schemas/examples
   - docs/00-working/framework/05-schemas/check_schemas.py
-  next_action: List the fields PLAN-041's three analysis phases actually need to extract before
-    writing the schema, so the required-field list is derived from a real downstream reader.
+  next_action: Resume from branch agent/phase-fwt-04 at c0de15ed (built; worktree kept), released
+    2026-10-14 when priorities changed. Review round 1 rejected it (gating). Owner rulings to apply
+    before re-review - every required section must be non-empty, with "None." counting as content;
+    make the Completion evidence sample bullets long enough to be compared (they are under
+    MIN_SAMPLE); fix the stale document count in the session record. After this phase merges,
+    rewrite phase-fwa-03 against the session-record schema.
 
 - id: phase-fwt-05
   title: GitHub issue and pull request templates
