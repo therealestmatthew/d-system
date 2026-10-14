@@ -96,7 +96,7 @@ Dispatched by the Session Manager at `c864d660`; the runner passed (`_working/re
     `test/fixtures/fleet/` added to `sys-fleet`'s paths.
   - **F02** "The review runner did not run the phase's negated-grep verification." The runner's
     `is_command` (`tools/run_review_checks.py`) skips a line that starts with `!`. The Session
-    Manager confirmed it and is sending the runner defect to Ideation, since it also affects the
+    Manager confirmed it, and Ideation recorded the runner defect as `000697`; it also affects the
     `! grep` lines in `phase-rep-02`, `-03` and `-04`. **Fixed for this phase:** the same check
     is now `test_this_test_names_nothing_the_fleet_files_supply`, which the runner does run through
     `uv run pytest test/test_fleet_files.py`. The probe above showed it fails on a planted name.
