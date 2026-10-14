@@ -1,0 +1,3 @@
+schema_version: 1
+definitions:
+- {id: fx-owner-manual, kind: owner-manual, status: available, permission_mode: auto, cwd: .., remote_control: true, launcher: tab}

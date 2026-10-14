@@ -1,0 +1,3 @@
+schema_version: 1
+definitions:
+- {id: fx-session, kind: session, status: available, permission_mode: bypassPermissions, cwd: ., remote_control: true, launcher: tab}

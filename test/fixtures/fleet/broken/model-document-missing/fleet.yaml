@@ -1,0 +1,7 @@
+schema_version: 1
+model_document: test/fixtures/fleet/valid/no-such-model.md
+host: {os: linux, terminal_launcher: gnome-terminal, projects_dir: ~/.claude/projects, repo_root: /tmp/fixture}
+enabled_systems: [sample]
+defaults: {permission_mode: auto, remote_control: true, launcher: tab}
+fleet_roles:
+- {id: fx-owner, definition: fx-owner-manual, group: owner, cardinality: {min: 0, max: 1}, lifecycle: owner-only, session_names: [Fixture Owner]}

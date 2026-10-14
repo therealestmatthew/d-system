@@ -1,0 +1,3 @@
+schema_version: 1
+definitions:
+- {id: fx-subagent, kind: subagent, status: available, agent_file: .claude/agents/review-judge.md, model: sonnet}

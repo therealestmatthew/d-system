@@ -1,0 +1,7 @@
+schema_version: 1
+definitions:
+- {id: fx-session, kind: session, status: available, permission_mode: auto, cwd: ., remote_control: true, launcher: tab, prompt_file: test/fixtures/fleet/valid/prompt.md}
+- {id: fx-owner-manual, kind: owner-manual, status: available, permission_mode: manual, cwd: .., remote_control: true, launcher: tab}
+- {id: fx-subagent, kind: subagent, status: available, agent_file: .claude/agents/review-judge.md}
+- {id: fx-planned, kind: subagent, status: planned}
+- {id: fx-planned, kind: subagent, status: planned, notes: duplicate}

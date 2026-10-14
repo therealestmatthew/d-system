@@ -1,0 +1,20 @@
+schema_version: 1
+id: sample
+title: Fixture system
+governing_documents: [test/fixtures/fleet/valid/governing.md]
+roster: {document: test/fixtures/fleet/valid/governing.md, section: Roster}
+roles:
+- {id: lead, definition: fx-session, group: meta, cardinality: {min: 1, max: 1}, lifecycle: replicator, session_names: [Fixture Lead], governing_row: Fixture Lead}
+- {id: owner, fleet_role: fx-owner, group: owner, cardinality: {min: 0, max: 1}, lifecycle: owner-only, governing_row: Fixture Owner}
+- {id: helper, definition: fx-subagent, group: execution, cardinality: {min: 0, max: 3}, lifecycle: parent}
+- {id: helper, definition: fx-planned, group: support, cardinality: {min: 0, max: 1}, lifecycle: parent}
+edges:
+- {from: lead, to: helper, type: delegates-to}
+- {from: owner, to: lead, type: approves}
+- {from: lead, to: lead, type: restarts, authority: request}
+resources:
+- {id: checkout-lock, kind: lock, granted_by: lead}
+messages:
+- {type: PING, from_roles: [lead], meaning: Fixture message}
+hooks: {wind_down_role: lead, restart_ready_message: READY-TO-RESTART, kickoff_role: lead, kickoff_template: 'Resume from {restart_file}', resume_default: resume}
+kill_preconditions: [lock_free, resource_free]

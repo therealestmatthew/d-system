@@ -1,0 +1,5 @@
+schema_version: 1
+model_document: test/fixtures/fleet/valid/model.md
+enabled_systems: []
+defaults: {permission_mode: auto, remote_control: true, launcher: tab}
+fleet_roles: []

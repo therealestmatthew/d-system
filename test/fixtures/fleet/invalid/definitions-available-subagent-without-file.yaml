@@ -1,0 +1,3 @@
+schema_version: 1
+definitions:
+- {id: fx-subagent, kind: subagent, status: available}
