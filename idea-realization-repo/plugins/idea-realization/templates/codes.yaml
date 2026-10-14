@@ -1,0 +1,63 @@
+schema_version: 1
+# The code register. Series definitions are the only source of truth for prefix, numbering and
+# location; locations are relative to the document root. Never edit a code into a document by
+# hand: allocate it with the next-code command.
+series:
+- code: PLAN
+  kind: plan
+  locations:
+  - plans/
+  numbering: counter
+  sub_codes: true
+- code: REQ
+  kind: requirement
+  locations:
+  - requirements/
+  numbering: counter
+  sub_codes: false
+- code: ADR
+  kind: adr
+  locations:
+  - decisions/
+  numbering: counter
+  sub_codes: false
+- code: ARCH
+  kind: architecture
+  locations:
+  - architecture/
+  numbering: counter
+  sub_codes: false
+- code: PROMPT
+  kind: prompt
+  locations:
+  - prompts/
+  numbering: counter
+  sub_codes: false
+- code: OPS
+  kind: operation
+  locations:
+  - governance/
+  numbering: counter
+  sub_codes: false
+- code: GOV
+  kind: governance
+  locations:
+  - governance/
+  numbering: counter
+  sub_codes: false
+- code: SESS
+  kind: session
+  locations:
+  - sessions/
+  numbering: dated
+  sub_codes: false
+- code: WALK
+  kind: walkthrough
+  locations:
+  - sessions/
+  numbering: dated
+  sub_codes: false
+# Codes held for a planned document before it exists. Allocation skips these.
+reserved: []
+# Codes withdrawn from use. Never reissued.
+retired: []

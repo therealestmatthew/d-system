@@ -1,0 +1,6 @@
+schema_version: 1
+# Owner keys name an accountable role. Every document's and every system's owner is one of them.
+owners:
+  repository-owner: The person accountable for this repository.
+# One entry per independently changeable capability, with the paths that locate it.
+systems: []
