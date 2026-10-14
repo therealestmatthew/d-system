@@ -34,8 +34,8 @@ from pathlib import Path
 WRAPPER = "tools/aws-sandbox"
 DEPLOY_AGENT = "aws-deploy"
 
-AWS_TOOLS = {"aws", "cdk", "aws-cdk", "cdktf", "sam", "terraform", "tofu", "pulumi", "aws-vault", "copilot",
-             "eb", "sst", "serverless", "sls", "amplify", "chalice", "zappa"}
+AWS_TOOLS = {"aws", "cdk", "aws-cdk", "cdktf", "sam", "terraform", "tofu", "pulumi", "aws-vault",
+             "copilot", "eb", "sst", "serverless", "sls", "amplify", "chalice", "zappa"}
 SDK = re.compile(r"(?<![\w-])(boto3|botocore|aioboto3|aiobotocore|awscli|aws_cdk|aws-cdk-lib|"
                  r"@aws-sdk|aws-sdk|@aws-cdk|cdktf|aws_lambda_powertools)(?![\w-])")
 AWS_FILES = re.compile(r"(~|\$HOME|\$\{HOME\}|/home/[^/\s]+|/root|/Users/[^/\s]+)/\.aws(/|\b)")

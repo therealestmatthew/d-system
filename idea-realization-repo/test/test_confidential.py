@@ -71,7 +71,8 @@ def test_unstaged_file_is_not_checked(repo: Path) -> None:
     assert check.main(repo) == 0
 
 
-def test_force_added_confidential_file_fails(repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_force_added_confidential_file_fails(
+        repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
     deny(repo, "acme")
     git(repo, "add", "-f", ".private/deny-list.txt")
     assert check.main(repo) == 1

@@ -35,6 +35,14 @@ uv run plugins/idea-realization/scripts/check.py      # ideas, backlog, document
 uv run plugins/idea-realization/scripts/doctor.py     # every scaffolded file unchanged
 ```
 
+After cloning, run the plugin's scaffold once. It recreates the gitignored
+`.idea-realization/staging/` directory, which `doctor.py` otherwise reports missing; it never
+overwrites a file that exists:
+
+```bash
+uv run plugins/idea-realization/scripts/scaffold.py --feature all
+```
+
 Per machine, never committed:
 
 - **The private-content deny-list**, `.private/deny-list.txt`: one identifier per line (client
