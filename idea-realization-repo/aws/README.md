@@ -1,10 +1,33 @@
 # AWS sandbox setup
 
 How the team's sandbox account is set up so that agents can work in it safely. **The two IAM roles
-below are the security boundary.** The wrapper (`tools/aws-sandbox`), the PreToolUse hook
+below, together with the machine rule, are the security boundary.** The wrapper (`tools/aws-sandbox`), the PreToolUse hook
 (`tools/hooks/aws_guard.py`) and the permission rules in `.claude/settings.json` keep agents on the
 right path, but they match command text; what an agent can actually do is decided by the role its
 profile assumes.
+
+## The machine rule
+
+**A machine that runs agents holds no default or ambient AWS credentials.** No `[default]` or
+`[profile default]` section in `~/.aws/config` or `~/.aws/credentials`; no `AWS_ACCESS_KEY_ID`,
+`AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`, `AWS_PROFILE` or container-credential variables in the
+environment; no EC2 instance role, container task role or other credentials the instance metadata
+service hands out. Only the two named sandbox profiles exist.
+
+The AWS SDKs and CLI fall back to exactly those sources when no profile is named. With none of
+them present, a command that gets past the hook or the permission rules finds no credentials at
+all, or at most the deploy role, which cannot touch IAM, Organizations, account or billing.
+
+Check it on each machine, after setup and whenever its AWS configuration changes:
+
+```bash
+uv run python tools/check_aws_machine.py --probe
+```
+
+It reports each default profile, ambient variable and reachable metadata service, and with
+`--probe` asks AWS whom the default credential chain resolves to; it exits 1 if it finds anything.
+`tools/aws-sandbox` runs the file and environment checks on every call and prints what it finds as
+warnings.
 
 ## The two roles
 
@@ -81,7 +104,10 @@ own credentials; bootstrap the account once as an administrator. Reference execu
    `IDEA_REALIZATION_AWS_REGION` in your shell, or the plugin options `aws_read_profile`,
    `aws_deploy_profile` and `aws_region`. `uv run plugins/idea-realization/scripts/paths.py`
    prints what this machine resolves.
-3. Check it: `tools/aws-sandbox whoami` prints both profile names and the read role's identity.
+3. Remove any default or ambient credentials (the machine rule above), then check:
+   `uv run python tools/check_aws_machine.py --probe` must print OK.
+4. Check the profiles: `tools/aws-sandbox whoami` prints both profile names and the read role's
+   identity.
 
 ## What agents may do
 
@@ -93,3 +119,18 @@ own credentials; bootstrap the account once as an administrator. Reference execu
   person created under `/app/`.
 - No agent reads or changes `~/.aws/`, sets an `AWS_` variable, or runs the AWS CLI, an AWS SDK or a
   deployment tool outside the wrapper; the hook refuses each of these.
+
+## Residual risk
+
+- **The hook is best effort.** It matches command text and reads the scripts it can see. A
+  determined or confused agent can still find a command it does not recognise. The IAM roles and
+  the machine rule are the boundary; the hook and the permission rules only keep agents on the
+  intended path.
+- **The deploy role can destroy data.** Deleting through `tools/aws-sandbox write` prompts a person,
+  but a deploy script run with `tools/aws-sandbox exec`, or a stack update that replaces a
+  resource, runs under the deploy role without a prompt. A delete or a destructive data call
+  inside such a script is limited only by the deploy role's permissions. Keep nothing in the
+  sandbox that cannot be recreated.
+- **Read reaches data.** `ReadOnlyAccess` can read object contents and table items. Keep production
+  or personal data out of the sandbox.
+

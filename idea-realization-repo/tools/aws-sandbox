@@ -167,7 +167,19 @@ def build(argv: list[str], env: dict[str, str]) -> tuple[list[str], dict[str, st
     return ["aws", *args, "--profile", profile, "--region", region], clean
 
 
+def warn_ambient(env: dict[str, str]) -> None:
+    """Print the machine-rule findings (tools/check_aws_machine.py) as warnings; never refuse."""
+    sys.path.insert(0, str(ROOT / "tools"))
+    try:
+        import check_aws_machine
+    except ImportError:
+        return
+    for finding in check_aws_machine.static_findings(env):
+        print(f"aws-sandbox: warning: {finding}", file=sys.stderr)
+
+
 def main(argv: list[str]) -> int:
+    warn_ambient(dict(os.environ))
     try:
         command, env = build(argv, dict(os.environ))
     except Refused as refused:

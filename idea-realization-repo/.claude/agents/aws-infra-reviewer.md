@@ -30,8 +30,12 @@ it is unsafe, fragile, wasteful or not what the requirement asked for.
 
 ## AWS rules every AWS agent follows
 
-- **The IAM roles are the boundary.** The sandbox has two roles (`aws/README.md`): a read-only
-  role and a deploy role that cannot touch IAM, Organizations, account or billing settings.
+- **The IAM roles and the machine rule are the boundary.** The sandbox has two roles
+  (`aws/README.md`): a read-only role and a deploy role that cannot touch IAM, Organizations,
+  account or billing settings. The machine you run on holds no default or ambient AWS credentials
+  — no `default` profile, no `AWS_` credential variables, no instance or container role — only the
+  two named sandbox profiles. If `tools/aws-sandbox` prints a warning about ambient credentials,
+  stop and report it before running anything else.
   `tools/aws-sandbox` runs `read` and `whoami` with the read role's profile and `write` and `exec`
   with the deploy role's, taken from this machine's untracked configuration; it refuses a missing
   or `default` profile, or one profile for both roles. Run `tools/aws-sandbox whoami` first and

@@ -95,9 +95,14 @@ deliverables inside your own workstream or in shared ground. Your agent id on a 
 
 ## AWS
 
-- **The IAM roles are the boundary.** The sandbox has a read-only role and a deploy role with no
-  IAM, Organizations, account or billing permissions (`aws/README.md`). Each machine has one named
-  profile for each, in untracked configuration.
+- **The IAM roles and the machine rule are the boundary.** The sandbox has a read-only role and a
+  deploy role with no IAM, Organizations, account or billing permissions (`aws/README.md`). Each
+  machine has one named profile for each, in untracked configuration.
+- **Machine rule: a machine that runs agents holds no default or ambient AWS credentials** — no
+  `default` profile, no `AWS_` credential or profile variables, no instance or container role —
+  only the two named sandbox profiles. Then a command that gets past the hook finds no credentials
+  but the sandbox roles. `uv run python tools/check_aws_machine.py --probe` checks it, and
+  `tools/aws-sandbox` warns on every call when it finds a default profile or `AWS_` variables.
 - Every AWS command goes through `tools/aws-sandbox`, which runs `read` and `whoami` with the read
   profile and `write` and `exec` with the deploy profile, and refuses a missing or `default`
   profile or one profile used for both. Never run the AWS CLI, an AWS SDK or a deployment tool any

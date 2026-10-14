@@ -51,8 +51,8 @@ the output that carries information, and do not block on a question that can wai
 - `.private/` is confidential and untracked, and holds the deny-list. Nothing from it is ever written
   into a tracked file.
 - Every AWS command goes through `tools/aws-sandbox`, never the bare `aws` command. The two
-  sandbox IAM roles are the boundary (`aws/README.md`); the hook and permission rules are
-  guardrails.
+  sandbox IAM roles and the machine rule (no default or ambient AWS credentials on a machine that
+  runs agents) are the boundary (`aws/README.md`); the hook and permission rules are guardrails.
 
 ## Project
 
