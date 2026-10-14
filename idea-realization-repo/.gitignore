@@ -1,0 +1,15 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Per-machine and confidential: the deny-list, AWS settings and anything else private.
+.private/
+.claude/settings.local.json
+
+# Plugin staging (partition drafts, corpora) and ephemeral working notes.
+.idea-realization/staging/
+_working/

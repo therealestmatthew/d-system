@@ -1,0 +1,36 @@
+[project]
+name = "idea-realization-repo"
+version = "0.1.0"
+description = "Control repository for the idea realization system: ideas, plans, backlog, reviews, agents and governance."
+requires-python = ">=3.12"
+dependencies = [
+    "pyyaml>=6.0",
+    "jsonschema>=4.0",
+    "filelock==4.0.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.5",
+    "mypy>=1.10",
+    "types-pyyaml",
+    "types-jsonschema",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+explicit_package_bases = true
+mypy_path = "tools"
+
+[tool.pytest.ini_options]
+testpaths = ["test", "plugins/idea-realization/test"]
+addopts = "-p no:cacheprovider"
