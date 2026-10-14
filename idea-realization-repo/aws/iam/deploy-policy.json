@@ -2,16 +2,84 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "AllowDeployingInTheSandbox",
+      "Sid": "AllowDeployingExceptIdentityOrganizationAccountAndBilling",
       "Effect": "Allow",
-      "Action": "*",
+      "NotAction": [
+        "iam:*",
+        "organizations:*",
+        "account:*",
+        "billing:*",
+        "budgets:*",
+        "ce:*",
+        "cur:*",
+        "aws-portal:*",
+        "payments:*",
+        "tax:*",
+        "invoicing:*",
+        "purchase-orders:*",
+        "freetier:*",
+        "savingsplans:*",
+        "sso:*",
+        "sso-directory:*",
+        "identitystore:*",
+        "sts:AssumeRole",
+        "sts:GetFederationToken"
+      ],
       "Resource": "*"
     },
     {
-      "Sid": "DenyIdentityOrganizationAccountAndBilling",
+      "Sid": "AllowAttachingAppRolesCreatedByAPerson",
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole",
+        "iam:GetRole"
+      ],
+      "Resource": "arn:aws:iam::*:role/app/*"
+    },
+    {
+      "Sid": "AllowListingRoles",
+      "Effect": "Allow",
+      "Action": "iam:ListRoles",
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyPassingOrReadingRolesOutsideApp",
       "Effect": "Deny",
       "Action": [
-        "iam:*",
+        "iam:PassRole",
+        "iam:GetRole"
+      ],
+      "NotResource": "arn:aws:iam::*:role/app/*"
+    },
+    {
+      "Sid": "DenyEveryIamChange",
+      "Effect": "Deny",
+      "Action": [
+        "iam:Add*",
+        "iam:Attach*",
+        "iam:Change*",
+        "iam:Create*",
+        "iam:Deactivate*",
+        "iam:Delete*",
+        "iam:Detach*",
+        "iam:Enable*",
+        "iam:Generate*",
+        "iam:Put*",
+        "iam:Remove*",
+        "iam:Reset*",
+        "iam:Resync*",
+        "iam:Set*",
+        "iam:Tag*",
+        "iam:Untag*",
+        "iam:Update*",
+        "iam:Upload*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyOrganizationAccountAndBilling",
+      "Effect": "Deny",
+      "Action": [
         "organizations:*",
         "account:*",
         "billing:*",

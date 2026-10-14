@@ -17,43 +17,47 @@ profile assumes.
   reads that reveal a secret or a credential (secret values, decrypted parameters, login tokens,
   function environments) and the calls that cost money or run code (model invocation, Lambda
   invocation, assuming another role).
-- `deploy-policy.json` allows everything in the account except: any IAM, Organizations, account,
-  billing, budget, cost or identity-center action; assuming another role; turning off CloudTrail,
-  Config or GuardDuty; reading secret values; and any regional action outside the sandbox region.
-  An explicit Deny cannot be overridden by any Allow.
+- `deploy-policy.json` allows everything in the account except IAM, Organizations, account,
+  billing, budget, cost and identity-center actions and assuming another role. Of IAM it allows
+  exactly three actions: `iam:PassRole` and `iam:GetRole` on roles under the path `/app/`, and
+  `iam:ListRoles`. Explicit Denies, which no Allow can override, refuse every IAM change (create,
+  delete, attach, put, update and the rest), passing or reading any role outside `/app/`, the
+  Organizations, account, billing and identity actions, turning off CloudTrail, Config or
+  GuardDuty, reading secret values, and any regional action outside the sandbox region.
 
-## Before you create the deploy role: one decision for the owner
+## What the deploy role can and cannot deploy
 
-The deploy role denies all of IAM, as ruled. Two consequences for what can be deployed with it:
+**Execution roles are created by a person, under `/app/`.** The deploy role cannot create or change
+any IAM role or policy. It can attach (pass) a role, and read it, only when the role's path is
+`/app/` — for example `arn:aws:iam::<account>:role/app/orders-api-lambda`. So a stack that needs a
+Lambda, ECS or Step Functions execution role works like this:
 
-1. **No stack can create or attach an IAM role.** A Lambda function, an ECS task or a Step
-   Functions state machine needs an execution role. Creating one needs `iam:CreateRole`, and
-   attaching an existing one needs `iam:PassRole`; both are denied. Options:
-   - **(a)** Keep the full IAM deny. A person creates every role the product needs, by hand, before
-     the deploy that uses it, and the deploy role is still unable to pass it. In practice this
-     blocks Lambda, ECS and Step Functions deploys by agents.
-   - **(b)** Narrow the deny to allow `iam:PassRole`, `iam:GetRole` and `iam:ListRoles` only on roles
-     under the path `/app/`. A person creates those roles; agents can attach but not create or
-     change them.
-   - **(c)** Also allow `iam:CreateRole`, `iam:PutRolePolicy` and `iam:AttachRolePolicy` on roles
-     under `/app/`, with a required permissions boundary that caps what any such role can do.
-     Agents can then deploy normal serverless stacks; no role they create can exceed the boundary.
-2. **CDK's default synthesizer assumes bootstrap roles**, which `sts:AssumeRole` denies. Use
-   `CliCredentialsStackSynthesizer` in the product's CDK app, so CDK deploys with the deploy
-   profile's own credentials, and bootstrap the account once as an administrator.
+1. A person creates the role under the path `/app/`, with the trust policy for its service (for
+   example `lambda.amazonaws.com`) and only the permissions the function needs.
+2. The stack references that role by ARN instead of creating one.
+3. `aws-deploy` deploys the stack; the deploy role passes the existing role to the service.
 
-CloudFormation dynamic references to Secrets Manager (`{{resolve:secretsmanager:...}}`) are also
-resolved with the caller's permissions, which deny `GetSecretValue`; pass secrets to the
-application at run time instead.
+A stack that tries to create a role fails with an access-denied error naming `iam:CreateRole`;
+`aws-deploy` reports it, and a person creates the role.
+
+**CDK.** The default CDK synthesizer assumes bootstrap roles, which `sts:AssumeRole` denies. Use
+`CliCredentialsStackSynthesizer` in the product's CDK app, so CDK deploys with the deploy profile's
+own credentials; bootstrap the account once as an administrator. Reference execution roles with
+`Role.fromRoleArn(...)` rather than `new Role(...)`.
+
+**Secrets.** CloudFormation dynamic references to Secrets Manager
+(`{{resolve:secretsmanager:...}}`) are resolved with the caller's permissions, which deny
+`GetSecretValue`; give secrets to the application at run time instead.
 
 ## Setup (the owner, once per sandbox account)
 
 1. In `iam/deploy-policy.json`, replace `REPLACE_WITH_SANDBOX_REGION` with the sandbox region.
 2. Create the read role: attach `ReadOnlyAccess` and a customer-managed policy from
    `iam/read-only-guard-policy.json`.
-3. Create the deploy role with a customer-managed policy from `iam/deploy-policy.json` (as decided
-   above).
-4. Let each developer's sandbox identity assume both roles: the roles' trust policies name the
+3. Create the deploy role with a customer-managed policy from `iam/deploy-policy.json`.
+4. Create the execution roles the product needs under the path `/app/` (section above), as the
+   product's plans name them.
+5. Let each developer's sandbox identity assume both roles: the roles' trust policies name the
    developers' principals (IAM Identity Center permission sets or IAM users in the sandbox).
 
 ## Setup (each developer, once per machine)
@@ -84,7 +88,8 @@ application at run time instead.
 - Reads run freely through `tools/aws-sandbox read`, with the read role.
 - Only the `aws-deploy` agent runs `tools/aws-sandbox write` or `exec`, with the deploy role. The
   hook refuses them from any other agent and from the main session.
-- Deleting anything prompts a person for approval each time. IAM, Organizations, account and
-  billing changes are refused by the deploy role itself.
+- Deleting anything prompts a person for approval each time. IAM changes, and Organizations,
+  account and billing actions, are refused by the deploy role itself; it can only attach roles a
+  person created under `/app/`.
 - No agent reads or changes `~/.aws/`, sets an `AWS_` variable, or runs the AWS CLI, an AWS SDK or a
   deployment tool outside the wrapper; the hook refuses each of these.
