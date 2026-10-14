@@ -10,6 +10,11 @@ requirements, so a template and its schema cannot drift apart unnoticed, and tha
 listed in PLACEHOLDER_FREE carries none of the templates' placeholders (REQ-024 R04: a filled,
 placeholder-free instance).
 
+A session record must carry every section its schema requires, so the script also removes each
+required section in turn from SESSION_EXAMPLE and checks that the copy fails. The list of
+sections comes from session-record.schema.json itself, so a section added there is covered
+without editing this script.
+
 A backlog phase is a YAML item in backlog.yaml, not a Markdown document, so it is checked
 separately (REQ-024 R03): the item named by REFERENCE_PHASE is cut out of backlog.yaml as text,
 unchanged, and parsed as its own YAML document; it must validate, and copies with a required
@@ -72,10 +77,15 @@ CASES: list[tuple[str, str, bool]] = [
     ("plan.valid.md", "plan.schema.json", True),
     ("plan.no-scope.md", "plan.schema.json", False),
     ("plan.no-phases.md", "plan.schema.json", False),
+    # A filled session record passes; SESSION_EXAMPLE's omission cases cover each section.
+    ("session.valid.md", "session-record.schema.json", True),
 ]
 
+# The filled session record that each required section is removed from in turn.
+SESSION_EXAMPLE = "session.valid.md"
+
 # Examples that must be filled instances of their template, with no placeholder left in them.
-PLACEHOLDER_FREE: list[str] = ["requirement.valid.md", "plan.valid.md"]
+PLACEHOLDER_FREE: list[str] = ["requirement.valid.md", "plan.valid.md", "session.valid.md"]
 
 # The schema for each document kind the --document mode accepts.
 KINDS: dict[str, str] = {
@@ -83,6 +93,7 @@ KINDS: dict[str, str] = {
     "protocol": "protocol.schema.json",
     "requirement": "requirement.schema.json",
     "plan": "plan.schema.json",
+    "session": "session-record.schema.json",
 }
 
 # (example file, kind, must pass): the --document check, schema and placeholders together.
@@ -101,9 +112,14 @@ DOCUMENT_CASES: list[tuple[str, str, bool]] = [
     ("req-case-only.md", "requirement", False),
     # requirement.valid.md saved with a UTF-8 byte-order mark.
     ("requirement.bom.md", "requirement", True),
+    ("session.valid.md", "session", True),
+    # The session template with only code, created and the title line filled in, and the same
+    # copy with every comment and "Example:" lead-in removed.
+    ("session.boilerplate.md", "session", False),
+    ("session.stripped-sample.md", "session", False),
 ]
 
-# The placeholder forms the four --document templates use: a NNN code, a YYYY-MM-DD date, a
+# The placeholder forms the --document templates use: a NNN code, a YYYY-MM-DD date, a
 # [Bracketed Name] in the title line, an HTML comment, and an "Example:" lead-in. Angle-bracket
 # slots are not included: of the Markdown templates only phase.template.md uses them, phase is
 # not a --document kind, and a filled document may contain one in a code span.
@@ -115,6 +131,7 @@ TEMPLATES: list[tuple[str, str]] = [
     ("protocol.template.md", "protocol.schema.json"),
     ("requirement.template.md", "requirement.schema.json"),
     ("plan.template.md", "plan.schema.json"),
+    ("session-record.template.md", "session-record.schema.json"),
 ]
 
 # (field removed from the reference phase, reason the copy must fail)
@@ -185,7 +202,7 @@ def template_sample(kind: str) -> tuple[str, list[str]]:
     with "Example:" lead-ins removed, each normalized (_normalize), and sentences shorter than
     MIN_SAMPLE after normalizing dropped."""
     front_matter, sections = split_document(
-        (HERE / f"{kind}.template.md").read_text(encoding="utf-8"))
+        (HERE / KINDS[kind].replace(".schema.json", ".template.md")).read_text(encoding="utf-8"))
     sentences: list[str] = []
     for _, body in sections:
         body = re.sub(r"^Example:", "", body, flags=re.MULTILINE)
@@ -264,6 +281,33 @@ def template_yaml_keys(text: str) -> set[str]:
         return set()
     block = yaml.safe_load(match.group(1))
     return set(block[0]) if isinstance(block, list) and block else set()
+
+
+def without_section(text: str, heading: str) -> str:
+    """The document with one level-2 section, its heading and body, removed."""
+    lines = text.splitlines(keepends=True)
+    start = lines.index(f"## {heading}\n")
+    end = next((i for i in range(start + 1, len(lines)) if lines[i].startswith("## ")),
+               len(lines))
+    return "".join(lines[:start] + lines[end:])
+
+
+def check_session_omissions() -> int:
+    """Each section session-record.schema.json requires: SESSION_EXAMPLE without it must fail."""
+    failures = 0
+    schema = load_schema(KINDS["session"])
+    text = (EXAMPLES / SESSION_EXAMPLE).read_text(encoding="utf-8")
+    required = [rule["contains"]["const"]
+                for rule in schema["properties"]["sections"]["allOf"]]
+    for heading in required:
+        errors = describe_errors(schema, to_instance(without_section(text, heading)))
+        ok = f"missing section: {heading!r}" in errors
+        failures += not ok
+        print(f"{'PASS' if ok else 'FAIL'}  {SESSION_EXAMPLE} without {heading!r} against "
+              f"{KINDS['session']}: {'invalid' if errors else 'valid'} (expected invalid)")
+        for message in errors:
+            print(f"        {message}")
+    return failures
 
 
 def check_phases() -> int:
@@ -361,6 +405,7 @@ def main() -> int:
         for message in errors:
             print(f"        {message}")
 
+    failures += check_session_omissions()
     failures += check_phases()
 
     print(f"\n{failures} failure(s)")

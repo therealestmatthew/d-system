@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "session-record.schema.json",
+  "title": "Session record",
+  "description": "Validates a session record after check_schemas.py has converted it to {front_matter, sections}: front_matter is the parsed YAML front matter, sections is the list of level-2 heading texts in document order. A session record is the account one working session leaves behind: what it was for, whether the phase's acceptance held, what was decided, what it found that belongs to later work, and the evidence. Each required section is listed below with what it must carry. A section with nothing to report stays in the record and says None, so a reader can tell 'nothing found' from 'not recorded'. The schema checks that each section exists, not what it says; other level-2 sections are allowed.",
+  "type": "object",
+  "required": ["front_matter", "sections"],
+  "additionalProperties": false,
+  "properties": {
+    "front_matter": {
+      "type": "object",
+      "required": ["code", "title", "kind", "status", "created"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z]+-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}$",
+          "description": "The session's code: a prefix, the session's date and a two-digit sequence number for that date, e.g. SESS-2026-10-12-01."
+        },
+        "title": {"type": "string", "minLength": 1},
+        "kind": {"const": "session"},
+        "status": {"enum": ["draft", "active", "complete", "superseded"]},
+        "created": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "phase": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "The backlog phase the session worked, when it worked one."
+        },
+        "agent": {"type": "string", "minLength": 1}
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true,
+      "allOf": [
+        {"contains": {"const": "Summary"}, "description": "What the session set out to do and what it delivered."},
+        {"contains": {"const": "Acceptance"}, "description": "Each acceptance condition of the phase, marked met or not met, with the evidence."},
+        {"contains": {"const": "Decisions"}, "description": "Choices made during the session, who made each, and why."},
+        {"contains": {"const": "New requirements"}, "description": "Needs discovered that no existing requirement covers, and where each was recorded."},
+        {"contains": {"const": "Deferred and out of scope"}, "description": "Work noticed but deliberately left for later or outside the phase, and where each was recorded."},
+        {"contains": {"const": "Open investigations"}, "description": "Questions the session raised and did not answer."},
+        {"contains": {"const": "Outstanding actions"}, "description": "Concrete steps someone still has to take, with who should take them."},
+        {"contains": {"const": "Verification"}, "description": "The verification commands run and their real output, pasted, not summarised."},
+        {"contains": {"const": "Completion evidence"}, "description": "The files the phase created or changed, by path."}
+      ]
+    }
+  }
+}

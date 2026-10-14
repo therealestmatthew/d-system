@@ -1,167 +1,97 @@
 ---
-schema_version: 1
-code: SESS-YYYY-MM-DD-agent-NN
-title: "[phase-id] Brief description"
+code: SESS-YYYY-MM-DD-NN
+title: "Short name of the session's work"
 kind: session
+status: draft
 created: YYYY-MM-DD
 phase: phase-id
 agent: agent-name
-status: complete
 ---
 
-# Session Record
+# [Session Title]
+
+<!--
+A session record is the account one working session leaves behind: what it was for, whether the
+phase's acceptance held, what was decided, what it found that belongs to later work, and the
+evidence. It is read later by people and tools looking for decisions and loose ends, so each kind
+of item has its own section rather than being mixed into narrative.
+
+Checked by session-record.schema.json via check_schemas.py: the front matter above and the nine
+level-2 headings below are required, spelled exactly as written. A section with nothing to report
+stays in the record and says "None." so a reader can tell "nothing found" from "not recorded".
+Other level-2 sections (for example Review, Timeline or Notes for the next agent) may be added; the
+schema does not check them. `phase` and `agent` may be left out when the session worked no phase.
+-->
 
 ## Summary
 
-<!-- 1-2 sentences: what was accomplished this session -->
+<!-- What the session set out to do and what it delivered. Two to four sentences. -->
 
-## Acceptance Verification
+Example: Built the route ordering module for phase-route-01. Stops are ordered by nearest
+neighbour, and the module returns the ordered stops with the total distance.
 
-<!-- List each acceptance criterion from the phase -->
-<!-- Mark each as ✓ met or ✗ not met -->
+## Acceptance
 
-✓ Acceptance criterion 1: Brief description of verification  
-✓ Acceptance criterion 2: Brief description of verification  
-✓ Acceptance criterion 3: Brief description of verification
+<!-- Each acceptance condition of the phase, marked met or not met, with the evidence for it. -->
 
-## Verification Results
+Example:
 
-<!-- Paste actual command output from all verification steps -->
+- REQ-012 R01, every stop visited exactly once — **Met.** The visits-every-stop test passes for
+  routes of zero, one and ten stops.
 
-### Tests
-```bash
-$ uv run pytest test/test_file.py -v
-test_file.py::test_one PASSED
-test_file.py::test_two PASSED
-test_file.py::test_three PASSED
-======================== 3 passed in 0.12s ========================
+## Decisions
+
+<!-- Choices made during the session: what was chosen, who chose it, and why. -->
+
+Example:
+
+- **Nearest neighbour, not an exact solver** (owner, this session): ten stops is small enough that
+  the simpler ordering meets the latency target.
+
+## New requirements
+
+<!-- Needs discovered that no existing requirement covers, and where each was recorded. -->
+
+Example: Routes need a maximum stop count, so an oversized request is refused rather than slow.
+Recorded as idea 000214.
+
+## Deferred and out of scope
+
+<!-- Work noticed but deliberately left for later or outside the phase, and where each was
+recorded. -->
+
+Example: Caching distances between requests was left out of scope by the plan. Recorded as idea
+000215.
+
+## Open investigations
+
+<!-- Questions the session raised and did not answer. -->
+
+Example: Whether stops closer than ten metres should be merged before ordering.
+
+## Outstanding actions
+
+<!-- Concrete steps someone still has to take, with who should take them. -->
+
+Example: The owner provisions the routing service's credentials before phase-route-02 starts.
+
+## Verification
+
+<!-- The verification commands run and their real output, pasted, not summarised. A failing
+result is recorded here as it happened. -->
+
+Example:
+
+```text
+$ uv run pytest test/test_route_optimizer.py
+6 passed in 0.41s
 ```
 
-### Type Checking
-```bash
-$ uv run mypy src/file.py
-Success: no issues found in 1 source file
-```
+## Completion evidence
 
-### Linting
-```bash
-$ uv run ruff check src/
-All checks passed!
-```
+<!-- The files the phase created or changed, by path. -->
 
-## Completion Evidence
+Example:
 
-Files that exist and are part of this phase's deliverables:
-
-- `src/path/feature.py` — Core implementation
-- `test/path/test_feature.py` — Test suite
-- `docs/path/FEATURE.md` — Documentation (if applicable)
-
-## Work Summary
-
-### What Was Built
-- Bullet point 1: Feature or fix
-- Bullet point 2: Feature or fix
-- Bullet point 3: Component or test
-
-### Key Decisions Made
-- Decision 1: Chose approach X over Y because Z
-- Decision 2: Used library A instead of B (reason)
-
-### Scope Compliance
-- Phase scope declared: "Build X, don't do Y"
-- Actual work: Stayed within scope ✓
-- (If any deviation, explain why)
-
-## Blockers / Unresolved Issues
-
-### None
-<!-- If no blockers: just say "None" -->
-
-### Or, if there are blockers:
-- **Blocker 1**: Description of what's stuck
-  - Impact: What's delayed?
-  - Mitigation: What we did instead or waiting for?
-  - Next step: (e.g., "waiting for team lead to provision AWS", "defer to phase-xyz-01")
-
-## New Requirements Discovered
-
-### During this session, we discovered:
-- Requirement A (e.g., "API needs rate limiting")
-- Requirement B (e.g., "Frontend needs dark mode for demo")
-
-These are captured as ideas: [idea-NNN](../../_data/ideas.jsonl), [idea-MMM]
-
-### Or: None
-<!-- If no new requirements: just say "None" -->
-
-## Out-of-Scope / Deferred Items
-
-### Noted for later:
-- "Refactor authentication module" → idea-XXX, post-hackathon
-- "Add caching layer" → idea-YYY, depends on phase-perf-01
-
-### Or: None
-
-## Testing Notes
-
-<!-- Any testing caveats, edge cases, manual testing done, etc. -->
-
-- Manual testing: Tested login flow with 5 different password variations
-- Edge case: What happens when AWS Location API times out? → Falls back to static routing (tested)
-- Not tested: Mobile browser (out of scope)
-
-## Session Timeline
-
-- Started: YYYY-MM-DD HH:MM
-- Paused: (if applicable)
-- Resumed: (if applicable)
-- Completed: YYYY-MM-DD HH:MM
-
-**Total time:** X hours
-
-## Session Notes
-
-<!-- Free-form notes: things learned, surprises, things that went well, things that were hard -->
-
-- **Went well**: Setup was clean, dependencies resolved quickly
-- **Surprise**: AWS API response format different than docs, took 30 min to debug
-- **Learning**: JWT expiration timing is tricky, documented approach in code comments
-- **Blocker resolved**: Couldn't run tests locally until uv sync --extra dev
-- **Next agent should know**: The location API has a 2-second timeout; set your retry logic accordingly
-
-## Dependencies & Handoff
-
-### This phase is ready for:
-- Integration to `dev` ✓ All tests pass, no blockers
-
-### Next phase can start:
-- `phase-xyz-01` (no blocker, doesn't depend on this)
-- `phase-abc-02` (depends on this) — ready to claim once this is integrated
-
-### Before next phase:
-- Make sure to rebuild DB: `uv run python tools/rebuild_db.py` (new schema in this phase)
-
-## Recommendations for Next Agent
-
-If picking up related work:
-- Read the code comments in `src/api/routes/auth.py` (documents JWT approach)
-- Run the test suite first to verify setup: `uv run pytest`
-- If modifying authentication, check the edge cases in test_auth.py (fixtures are all there)
-
----
-
-## Checklist for Session Close
-
-Before marking phase complete:
-
-- [x] All acceptance criteria verified
-- [x] All verification commands output captured above
-- [x] Session record written (this file)
-- [x] New requirements captured as ideas
-- [x] Deferred items documented
-- [x] No _tmpagent/ claims left open
-- [x] Branch rebased on latest dev
-- [x] Phase marked complete in backlog.yaml
-- [x] PR opened to team lead
-- [x] Ready for integration
+- `src/route/order.py`
+- `test/test_route_optimizer.py`
