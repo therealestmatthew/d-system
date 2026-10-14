@@ -577,7 +577,7 @@ CI regenerates it and fails on any difference.
 | PLAN-050.05 | doc-system-boundary-study-decision-report | draft | 0 | 0 | 1 | agent-boundary-study |
 | PLAN-051 | doc-session-autonomy-configuration | draft | 3 | 0 | 0 | — |
 | PLAN-052 | doc-plugin-audit-remediation | approved | 4 | 0 | 2 | agent-builder-a, agent-standby-3 |
-| PLAN-054 | doc-agent-replicator | approved | 7 | 0 | 0 | — |
+| PLAN-054 | doc-agent-replicator | approved | 6 | 1 | 0 | agent-standby-3 |
 
 ## Held codes
 
