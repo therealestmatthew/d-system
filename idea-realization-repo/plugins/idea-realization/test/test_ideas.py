@@ -22,12 +22,13 @@ from pathlib import Path
 from typing import Any
 
 import idea
-import ideas
 import identity as identity_module
 import paths
 import pytest
 import yaml  # type: ignore[import-untyped]
-from conftest import PLUGIN_ROOT, SCRIPTS
+from conftest import PLUGIN_ROOT, SCRIPTS, as_developer
+
+import ideas
 from ideas import IdeaError, fold, identity, link_diagnostics, load_events
 
 EPOCH = dt.datetime(2030, 1, 1, tzinfo=dt.UTC)
@@ -56,7 +57,7 @@ def isolated_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     for name in list(os.environ):
         if name.startswith(("IDEA_REALIZATION_", "CLAUDE_PLUGIN_OPTION_", "CLAUDE_PROJECT_DIR")):
             monkeypatch.delenv(name)
-    monkeypatch.setenv(identity_module.HANDLE_ENV, ANA)
+    as_developer(monkeypatch, ANA)
 
 
 def register(root: Path, *handles: str) -> Path:
@@ -977,7 +978,7 @@ def test_the_cli_allocates_under_the_resolved_handle(
     tmp_path: Path, log: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     assert cli(tmp_path, "add", "--title", "T", "--body", "B") == 0
-    monkeypatch.setenv(identity_module.HANDLE_ENV, "ben")
+    as_developer(monkeypatch, "ben")
     assert cli(tmp_path, "add", "--title", "T", "--body", "B") == 0
     assert cli(tmp_path, "add", "--title", "T", "--body", "B") == 0
     assert sorted(state_of(log)) == [iid(1), iid(1, "ben"), iid(2, "ben")]
@@ -990,7 +991,7 @@ def test_add_without_a_resolvable_handle_exits_1_and_writes_nothing(
 ) -> None:
     """An unregistered handle, or none and no matching git email, is refused before any write."""
     root = register(tmp_path / "repo")
-    monkeypatch.setenv(identity_module.HANDLE_ENV, handle)
+    as_developer(monkeypatch, handle, f"{handle or 'nobody'}@example.com")
     assert cli(root, "add", "--title", "T", "--body", "B") == 1
     assert "developer" in capsys.readouterr().err
     assert not log_of(root).exists()

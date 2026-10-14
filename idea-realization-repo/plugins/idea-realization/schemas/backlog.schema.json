@@ -263,6 +263,11 @@
                 }
               }
             }
+          },
+          "product_merge": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$",
+            "description": "The full product commit the phase merged as. Required to complete a phase when a product repository is set up; it must equal the passing gating verdict's reviewed_commit."
           }
         }
       }

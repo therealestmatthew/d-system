@@ -17,10 +17,10 @@ object with ``emails``::
         description: Ana, user interface workstream.
         emails: [ana@example.com]
 
-The handle is resolved in this order:
-
-1. the environment variable ``IDEA_REALIZATION_HANDLE`` (it must still name a developer);
-2. the owner whose ``emails`` contain ``git config user.email`` in the repository root.
+The handle is the owner whose ``emails`` contain ``git config user.email`` in the repository root.
+The git email is the identity; nothing else can name a developer. The environment variable
+``IDEA_REALIZATION_HANDLE`` may state the expected handle, and is refused unless the git email
+belongs to that same developer, so it can assert an identity but never assume another one.
 
 A handle is lower-case letters and digits, starting with a letter, at most 16 characters, so it can
 sit inside an identifier without ambiguity.
@@ -80,10 +80,8 @@ def handle(config: paths.Config, env: Mapping[str, str] | None = None) -> str:
         if not HANDLE_PATTERN.match(name):
             raise IdentityError(f"developer handle {name!r} must match {HANDLE_PATTERN.pattern}")
     chosen = env.get(HANDLE_ENV, "").strip()
-    if chosen:
-        if chosen not in team:
-            raise IdentityError(f"{HANDLE_ENV}={chosen!r} is not a developer in {REGISTRY} owners")
-        return chosen
+    if chosen and chosen not in team:
+        raise IdentityError(f"{HANDLE_ENV}={chosen!r} is not a developer in {REGISTRY} owners")
     email = git_email(config.root)
     if not email:
         raise IdentityError("git config user.email is not set, so no developer handle resolves")
@@ -91,6 +89,9 @@ def handle(config: paths.Config, env: Mapping[str, str] | None = None) -> str:
     if len(matches) != 1:
         reason = "no" if not matches else "more than one"
         raise IdentityError(f"{reason} developer in {REGISTRY} owners lists the email {email!r}")
+    if chosen and chosen != matches[0]:
+        raise IdentityError(f"{HANDLE_ENV}={chosen!r}, but git config user.email {email!r} "
+                            f"belongs to {matches[0]!r}; a handle never overrides the git identity")
     return matches[0]
 
 

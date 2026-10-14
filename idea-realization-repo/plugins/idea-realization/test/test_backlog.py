@@ -14,6 +14,8 @@ from typing import Any
 
 import paths
 import pytest
+from checks import backlog as feature
+
 from backlog import (
     STALE_CLAIM_DAYS,
     claim_report_state,
@@ -21,7 +23,6 @@ from backlog import (
     render_backlog,
     stale_claim_signal,
 )
-from checks import backlog as feature
 
 PH = "phase"
 TODAY = date(2030, 1, 5)

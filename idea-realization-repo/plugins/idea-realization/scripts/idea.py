@@ -110,6 +110,10 @@ from typing import Any
 import paths
 import yaml  # type: ignore[import-untyped]
 from filelock import FileLock, Timeout
+from identity import IdentityError
+from identity import handle as developer_handle
+from jsonschema import Draft7Validator  # type: ignore[import-untyped]
+
 from ideas import (
     ANNOTATION_KINDS,
     CLASSIFICATION_FIELDS,
@@ -128,9 +132,6 @@ from ideas import (
     load_events,
     new_eid,
 )
-from identity import IdentityError
-from identity import handle as developer_handle
-from jsonschema import Draft7Validator  # type: ignore[import-untyped]
 
 POINTER_KINDS = ("doc", "phase", "commit")
 PATH_KEYS = ("ideas_path", "docs_root", "backlog_path", "exempt_files")

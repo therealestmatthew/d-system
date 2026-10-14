@@ -14,6 +14,7 @@ from typing import Any
 
 import pytest
 from conftest import PLUGIN_ROOT
+
 from ideas import INVERSE_LINK_TYPE, SCHEMA, legal_transitions
 
 VOCABULARY = PLUGIN_ROOT / "docs" / "vocabulary.md"

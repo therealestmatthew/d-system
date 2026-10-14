@@ -24,9 +24,9 @@ phase to `status: complete` when, and only when, **all three** of these hold:
 2. **A gating review passed.** A dedicated reviewer agent that did not share this session's context
    judged the diff against the phase's `acceptance` and returned `pass`, and every finding is fixed
    or explicitly accepted by the developer who owns the workstream, with the disposition recorded.
-3. **The branches are integrated.** The product branch was fast-forwarded into the product
-   integration branch, and the control branch into the control integration branch, after that
-   pass. **A passing gating review is the approval for both merges**; no separate per-merge
+3. **The branches are integrated.** The control branch is fast-forwarded into the control
+   integration branch with the completion record, then the product branch into the product
+   integration branch, after that pass. **A passing gating review is the approval for both merges**; no separate per-merge
    approval is asked for.
 
 Where any one is unmet, the phase stays `active` (or `queued`, if handed off unfinished): say
@@ -129,43 +129,35 @@ record's path, and each disposition. Commit the record and the session record on
 
 Write these as narrative someone could read in six months, not as a restatement of the scope.
 
-## 6. Integrate — only on a passing verdict
+## 6. Prepare the product merge — locally, not pushed
 
-Confirm each primary checkout is clean (`git -C <checkout> status --short` shows nothing). Never
-stash a peer's uncommitted work and never force an integration around it.
-
-**Product first**, from the product primary checkout on its integration branch:
+Only on a passing verdict. Confirm each primary checkout is clean (`git -C <checkout> status
+--short` shows nothing). Never stash a peer's uncommitted work and never force an integration
+around it. In the product primary checkout, on its integration branch:
 
 ```bash
 git -C <product checkout> pull --ff-only
 git -C <product checkout> merge --ff-only agent/<phase-id>
-git -C <product checkout> push
+git -C <product checkout> rev-parse HEAD
 ```
 
-**Then control**, from the control primary checkout on its integration branch:
+**Do not push yet.** The printed commit must equal the verdict's `reviewed_commit`; that is the
+**product merge**. If the merge is not a fast-forward, or the commit differs, the product
+integration branch moved or the branch gained a commit after the review: reset the product
+checkout to its upstream (`git -C <product checkout> reset --hard @{u}`, which discards only this
+local merge), go back to step 2, rebase, re-run the verification and review the new `HEAD`.
 
-```bash
-git pull --ff-only
-git merge --ff-only agent/<phase-id>
-```
+## 7. Record completion in the control repository first — the only step that may write `status: complete`
 
-If either merge is not a fast-forward, its integration branch moved since the rebase: go back to
-step 2, rebase, re-run the verification, and if the product diff changed, review again. Never
-resolve it with a merge commit that skips the green run.
-
-## 7. Decide completion — the only step that may write `status: complete`
-
-Only if **all three** conditions hold: on the control integration branch, set the phase's
+The control record goes first, so product code never lands without one. Only if **all three**
+conditions hold, on the control branch in the control worktree: set the phase's
 `status: complete`, with `session`, `completion_evidence` (files that exist; product files written
-`product:<path>`) and `result` (the actual verification and review outcome, naming the product
-merge commit), and remove it from `next_up`. Update the record's `## Backlog` to match.
+`product:<path>`), `product_merge` (the full product merge commit from step 6) and `result` (the
+actual verification and review outcome), and remove it from `next_up`. Update the record's
+`## Backlog` to match. The check refuses a complete phase without a passing gating verdict whose
+`reviewed_commit` equals its `product_merge`.
 
-An unclaimed session completes nothing, however clean its review: there is no phase line to write.
-
-If any condition does not hold, the phase stays open with a `next_action` that names exactly what
-remains, including anything the review surfaced. Closing honestly incomplete is a correct outcome.
-
-## 8. Regenerate the catalog, confirm the check is green, push
+Regenerate the catalog and run the check in the control worktree:
 
 ```bash
 CLAUDE_PLUGIN_OPTION_DOCS_ROOT='${user_config.docs_root}' \
@@ -177,13 +169,39 @@ CLAUDE_PLUGIN_OPTION_BACKLOG_PATH='${user_config.backlog_path}' \
 CLAUDE_PLUGIN_OPTION_DOCS_ROOT='${user_config.docs_root}' \
 CLAUDE_PLUGIN_OPTION_EXEMPT_FILES='${user_config.exempt_files}' \
 CLAUDE_PLUGIN_OPTION_INTEGRATION_BRANCH='${user_config.integration_branch}' \
-CLAUDE_PLUGIN_OPTION_PRODUCT_ROOT='${user_config.product_root}' \
 uv run "${CLAUDE_PLUGIN_ROOT}/scripts/check.py"
 ```
 
-Commit the completion edit and the regenerated catalog together and push the control integration
-branch. If the check fails, fix the cause first; never close a session on a failing tree. Then
-remove both worktrees and both `agent/<phase-id>` branches, copying any ignored content out first.
+Commit the completion edit and the catalog together on the control branch, then, from the control
+primary checkout on its integration branch:
+
+```bash
+git pull --ff-only
+git merge --ff-only agent/<phase-id>
+git push
+```
+
+If the control merge is not a fast-forward, rebase the control branch, regenerate the catalog, run
+the check and try again. If the control push fails, stop: nothing has reached the product
+repository yet, so reset the local product merge (`git -C <product checkout> reset --hard @{u}`)
+and report it.
+
+An unclaimed session completes nothing, however clean its review: there is no phase line to write.
+If any condition does not hold, the phase stays open with a `next_action` that names exactly what
+remains, including anything the review surfaced. Closing honestly incomplete is a correct outcome.
+
+## 8. Push the product merge, then clean up
+
+```bash
+git -C <product checkout> push
+```
+
+Then run the check again with the product checkout configured: it must not report the phase as
+stranded. **If the product push is rejected**, the control repository now records a merge that has
+not landed, and the check reports the phase as stranded. Follow *A stranded phase* in
+`docs/two-repositories.md` before doing anything else.
+
+Remove both worktrees and both `agent/<phase-id>` branches, copying any ignored content out first.
 
 ## 9. Report
 

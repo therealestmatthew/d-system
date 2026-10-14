@@ -24,12 +24,14 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-import backlog
 import documents
 import paths
+import product
 import regression
 import yaml
 from jsonschema import Draft7Validator, FormatChecker
+
+import backlog
 
 SCHEMA = paths.PLUGIN_ROOT / "schemas" / "backlog.schema.json"
 #: Path parts a phase may never declare: git's own directory and a virtual environment.
@@ -106,6 +108,9 @@ def audit(config: paths.Config, today: date | None = None,
     errors, catalog = load_catalog(config)
     if errors:
         return errors
+    product_root, refused = product.verified_root(config)
+    if refused:
+        return [f"product checkout refused, so product paths cannot be checked: {refused}"]
     docs_root = config.path("docs_root")
     if not (docs_root / documents.REGISTER).exists() and \
             not (docs_root / documents.REGISTRY).exists():
@@ -121,7 +126,7 @@ def audit(config: paths.Config, today: date | None = None,
                 "backlog resolves its plans, systems and owners through it"]
     root = config.root
     errors = inspect(root, catalog, scanned.documents, set(scanned.systems),
-                     set(scanned.owners), today or date.today(), config.product_root())
+                     set(scanned.owners), today or date.today(), product_root)
     record = catalog.get("decision_record")
     if record is None:
         note("status-regression not run: the backlog names no decision_record, so a reopened "

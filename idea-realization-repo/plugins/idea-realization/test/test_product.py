@@ -164,3 +164,27 @@ def test_product_evidence_is_taken_as_given_without_a_checkout(repos: tuple[Path
     assert evidence_errors(control, None, "product:src/api.py") == []
     escaped = evidence_errors(control, None, "product:../outside.py")
     assert any("expected repository-relative path" in e for e in escaped)
+
+
+def test_a_refused_checkout_fails_the_backlog_check(repos: tuple[Path, Path]) -> None:
+    """A product_root whose origin is another repository never makes product paths pass."""
+    control, checkout = repos
+    git(checkout, "remote", "set-url", "origin", "git@forge.example.com:team/other.git")
+    (control / "backlog").mkdir()
+    (control / "backlog/backlog.yaml").write_text(json.dumps(
+        {"schema_version": 1, "updated": TODAY.isoformat(), "items": []}))
+    (control / "docs").mkdir()
+    (control / "docs/codes.yaml").write_text("schema_version: 1\nseries: []\n")
+    (control / "docs/systems.yaml").write_text(
+        "schema_version: 1\nowners:\n  repository-owner: Owner.\nsystems: []\n")
+    errors = feature.audit(config(control, checkout))
+    assert any("product checkout refused" in error for error in errors)
+    assert product.verified_root(config(control, checkout))[0] is None
+
+
+def test_resolve_never_returns_a_path_in_a_refused_checkout(repos: tuple[Path, Path]) -> None:
+    control, checkout = repos
+    assert product.resolve(config(control, checkout), "product:src/a.py")[1] == checkout.resolve(
+    ) / "src/a.py"
+    git(checkout, "remote", "set-url", "origin", "git@forge.example.com:team/other.git")
+    assert product.resolve(config(control, checkout), "product:src/a.py") == ("product", None)

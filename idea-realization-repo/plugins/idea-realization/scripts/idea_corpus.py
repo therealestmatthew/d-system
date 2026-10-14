@@ -64,6 +64,8 @@ from pathlib import Path
 from typing import Any
 
 import paths
+from jsonschema import Draft7Validator  # type: ignore[import-untyped]
+
 from ideas import (
     IDEA_ID,
     IDEA_ID_PATTERN,
@@ -74,7 +76,6 @@ from ideas import (
     legal_transitions,
     load_events,
 )
-from jsonschema import Draft7Validator  # type: ignore[import-untyped]
 
 PATH_KEYS = ("ideas_path", "ideas_view_path", "priority_path", "docs_root", "staging_dir",
              "partitions_dir")

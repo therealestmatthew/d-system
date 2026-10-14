@@ -13,7 +13,7 @@ import pytest
 import workstreams
 import yaml
 from checks import workstreams as feature
-from conftest import SCRIPTS
+from conftest import SCRIPTS, as_developer
 
 SYSTEMS = {
     "schema_version": 1,
@@ -46,7 +46,8 @@ def phase(phase_id: str, agent: str, deliverables: list[str], **changes: Any) ->
 @pytest.fixture
 def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     for key in ("IDEA_REALIZATION_HANDLE", "IDEA_REALIZATION_ROOT", "CLAUDE_PROJECT_DIR",
-                "IDEA_REALIZATION_DOCS_ROOT", "IDEA_REALIZATION_BACKLOG_PATH"):
+                "IDEA_REALIZATION_DOCS_ROOT", "IDEA_REALIZATION_BACKLOG_PATH",
+                "GIT_CONFIG_COUNT", "GIT_CONFIG_KEY_0", "GIT_CONFIG_VALUE_0"):
         monkeypatch.delenv(key, raising=False)
     (tmp_path / "docs").mkdir()
     (tmp_path / "backlog").mkdir()
@@ -207,7 +208,7 @@ def run(root: Path, *args: str) -> int:
 def test_claim_by_environment_handle(repo: Path, monkeypatch: pytest.MonkeyPatch,
                                      capsys: pytest.CaptureFixture[str]) -> None:
     write_registry(repo, [stream("ui", "product:web/"), stream("api", "product:api/")])
-    monkeypatch.setenv("IDEA_REALIZATION_HANDLE", "ana")
+    as_developer(monkeypatch, "ana")
     assert run(repo, "claim", "ui") == 0
     claimed = registry(repo)["workstreams"]
     assert claimed[0]["owner"] == "ana" and claimed[0]["status"] == "claimed"
@@ -231,7 +232,7 @@ def test_claim_of_a_claimed_workstream_is_refused(
         repo: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
     path = write_registry(repo, [stream("ui", "product:web/", "ana")])
     before = path.read_text()
-    monkeypatch.setenv("IDEA_REALIZATION_HANDLE", "ben")
+    as_developer(monkeypatch, "ben")
     assert run(repo, "claim", "ui") == 1
     assert "already claimed by ana" in capsys.readouterr().err
     assert path.read_text() == before
@@ -240,7 +241,7 @@ def test_claim_of_a_claimed_workstream_is_refused(
 def test_claim_of_an_unknown_workstream_is_refused(
         repo: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
     write_registry(repo, [stream("ui", "product:web/")])
-    monkeypatch.setenv("IDEA_REALIZATION_HANDLE", "ben")
+    as_developer(monkeypatch, "ben")
     assert run(repo, "claim", "absent") == 1
     assert "unknown workstream 'absent'" in capsys.readouterr().err
 
@@ -248,7 +249,7 @@ def test_claim_of_an_unknown_workstream_is_refused(
 def test_claim_without_an_identity_fails(repo: Path, monkeypatch: pytest.MonkeyPatch,
                                          capsys: pytest.CaptureFixture[str]) -> None:
     write_registry(repo, [stream("ui", "product:web/")])
-    monkeypatch.setenv("IDEA_REALIZATION_HANDLE", "carla")
+    as_developer(monkeypatch, "carla")
     assert run(repo, "claim", "ui") == 1
     assert "carla" in capsys.readouterr().err
 
@@ -257,7 +258,7 @@ def test_release_by_a_non_owner_is_refused(repo: Path, monkeypatch: pytest.Monke
                                            capsys: pytest.CaptureFixture[str]) -> None:
     path = write_registry(repo, [stream("ui", "product:web/", "ana")])
     before = path.read_text()
-    monkeypatch.setenv("IDEA_REALIZATION_HANDLE", "ben")
+    as_developer(monkeypatch, "ben")
     assert run(repo, "release", "ui") == 1
     assert "only its owner may release it" in capsys.readouterr().err
     assert path.read_text() == before
@@ -265,7 +266,7 @@ def test_release_by_a_non_owner_is_refused(repo: Path, monkeypatch: pytest.Monke
 
 def test_release_by_the_owner(repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     write_registry(repo, [stream("ui", "product:web/", "ana")])
-    monkeypatch.setenv("IDEA_REALIZATION_HANDLE", "ana")
+    as_developer(monkeypatch, "ana")
     assert run(repo, "release", "ui") == 0
     released = registry(repo)["workstreams"][0]
     assert released["owner"] == "" and released["status"] == "open"
@@ -277,7 +278,7 @@ def test_a_claim_that_fails_validation_restores_the_file(
     path.write_text("# hand-written comment\n" + path.read_text())
     before = path.read_text()
     write_backlog(repo, [phase("phase-api", "ben/agent-builder", ["product:web/app.tsx"])])
-    monkeypatch.setenv("IDEA_REALIZATION_HANDLE", "ana")
+    as_developer(monkeypatch, "ana")
     assert run(repo, "claim", "ui") == 1
     assert "registry was restored" in capsys.readouterr().err
     assert path.read_text() == before

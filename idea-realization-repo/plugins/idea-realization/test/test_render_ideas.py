@@ -13,11 +13,12 @@ import subprocess
 from pathlib import Path
 
 import idea
-import ideas
 import paths
 import pytest
 import render_ideas
 from checks import ideas as ideas_check
+
+import ideas
 from ideas import fold, load_events
 
 TODAY = dt.date(2030, 1, 10)

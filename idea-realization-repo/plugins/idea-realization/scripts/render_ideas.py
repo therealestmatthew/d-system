@@ -23,6 +23,7 @@ from typing import Any
 
 import paths
 import yaml  # type: ignore[import-untyped]
+
 from ideas import (
     AXES,
     INVERSE_LINK_TYPE,

@@ -47,6 +47,7 @@ from typing import Any
 
 import codes
 import paths
+import product
 import yaml
 from jsonschema import Draft7Validator, FormatChecker
 
@@ -237,9 +238,12 @@ def _read_registers(config: paths.Config, result: Scan) -> bool:
             result.errors.append(f"{item['id']}: implemented or scaffold system requires paths")
         for value in item["paths"]:
             if value.startswith(PRODUCT_PREFIX):
-                product_root = config.product_root()
-                # A product path is checked only where this machine has the product checkout.
-                if product_root is not None and \
+                # A product path is checked only in a verified product checkout on this machine.
+                product_root, refused = product.verified_root(config)
+                if refused:
+                    result.errors.append(f"{item['id']}: product path {value} not checked: "
+                                         f"{refused}")
+                elif product_root is not None and \
                         not (product_root / value.removeprefix(PRODUCT_PREFIX)).exists():
                     result.errors.append(f"{item['id']}: missing product path {value}")
             elif not (config.root / value).exists():

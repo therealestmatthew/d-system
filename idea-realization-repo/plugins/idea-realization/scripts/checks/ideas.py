@@ -20,9 +20,10 @@ from typing import Any
 
 import paths
 import yaml  # type: ignore[import-untyped]
-from ideas import SCHEMA, IdeaError, fold, load_events
 from jsonschema import Draft7Validator  # type: ignore[import-untyped]
 from render_ideas import stale_view_errors
+
+from ideas import SCHEMA, IdeaError, fold, load_events
 
 PRIORITY_SCHEMA = paths.PLUGIN_ROOT / "schemas" / "idea-priority.schema.json"
 

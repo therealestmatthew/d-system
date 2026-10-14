@@ -142,16 +142,26 @@ def verify(config: paths.Config) -> Product:
     return product
 
 
+def verified_root(config: paths.Config) -> tuple[Path | None, str | None]:
+    """The product checkout for a check to read: ``(root, None)`` once verified, ``(None, None)``
+    when this machine has no product checkout configured, and ``(None, reason)`` when one is
+    configured but refused. A check never reads product paths from a refused checkout."""
+    if read_record(config.root) is None or config.product_root() is None:
+        return None, None
+    try:
+        return verify(config).root, None
+    except ProductError as error:
+        return None, str(error)
+
+
 def resolve(config: paths.Config, value: str) -> tuple[str, Path | None]:
     """Where a declared path lives: (repository, absolute path), with None for an unconfigured
     product checkout. The path is not checked for existence."""
     repository, relative = split(value)
     if repository == "control":
         return repository, config.root / relative
-    try:
-        return repository, load(config).root / relative
-    except ProductError:
-        return repository, None
+    root, _ = verified_root(config)
+    return repository, None if root is None else root / relative
 
 
 @paths.exits_on_path_error

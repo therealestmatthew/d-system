@@ -17,9 +17,10 @@ import paths
 import pytest
 from conftest import PLUGIN_ROOT
 from idea_corpus import CorpusError, Layout
-from ideas import IDEA_ID_PATTERN
 from jsonschema import Draft7Validator
 from test_no_source_references import scan
+
+from ideas import IDEA_ID_PATTERN
 
 SKILL = PLUGIN_ROOT / "skills" / "partition-ideas" / "SKILL.md"
 PACK = PLUGIN_ROOT / "docs" / "partition-pack.md"

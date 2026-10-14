@@ -60,8 +60,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import identity  # noqa: E402
 import paths  # noqa: E402
 import yaml  # noqa: E402
-from backlog import path_conflict  # noqa: E402
 from jsonschema import Draft7Validator  # noqa: E402
+
+from backlog import path_conflict  # noqa: E402
 
 SCHEMA = paths.PLUGIN_ROOT / "schemas" / "workstreams.schema.json"
 REGISTRY = "workstreams.yaml"

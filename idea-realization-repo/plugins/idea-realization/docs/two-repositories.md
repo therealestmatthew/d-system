@@ -50,8 +50,9 @@ configured and stops.
 | The phase's code, tests and verification commands | product | `agent/<phase-id>` in `<product worktree dir>/<phase-id>` |
 | The session record, checkpoints, review verdict records | control | the paired `agent/<phase-id>` in `<worktree dir>/<phase-id>` |
 | The gating review | both | judges the product diff against the control documents |
-| The merge | product, then control | fast-forward, after a passing gating review |
-| The completion edit | control | primary checkout, after both merges |
+| The product merge, prepared | product | fast-forwarded locally, not yet pushed |
+| The completion record | control | on the control branch, merged and pushed first |
+| The product push | product | after the control push |
 
 The `session-start` and `session-close` skills carry out these steps in order.
 
@@ -82,3 +83,23 @@ verification:
 A passing gating review approves the product merge and the control merge that carries the
 phase's records. There is no separate per-merge approval. The owner keeps every decision the
 backlog protocol reserves, such as accepting plans and ranking the queue.
+
+## A stranded phase
+
+`session-close` pushes the control record before the product merge, so product code never lands
+without a record. The one state that can be left behind is the reverse: the control repository
+records a phase complete with a `product_merge` that is not on the product integration branch,
+because the product push failed. The check reports it as `stranded` wherever a product checkout is
+configured.
+
+Recover it in this order:
+
+1. If the product checkout still holds the prepared merge (`git -C <product checkout> log -1`
+   shows the `product_merge` commit) and the integration branch has not moved, push it. The check
+   then reports nothing.
+2. Otherwise, reopen the phase in the control repository: set it back to `active` with a
+   `next_action` naming the stranded merge, and remove its `product_merge`, in one commit. Then
+   rebase the product branch, run the verification, review the new `HEAD`, and close the session
+   again.
+
+Never edit `product_merge` to a commit the recorded verdict did not judge.
