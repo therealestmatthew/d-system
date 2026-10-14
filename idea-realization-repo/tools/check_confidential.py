@@ -5,8 +5,9 @@ Run before committing, or let the pre-commit hook run it:
 
     uv run python tools/check_confidential.py
 
-It reads `git ls-files`, so it sees committed and staged files only: stage your changes first, or
-an unstaged file is simply not checked.
+It checks the index, the content the next commit will carry: each tracked file's staged blob,
+read with `git cat-file`, never the copy on disk. A change that is not staged is not checked, and a
+staged identifier is caught even if the file on disk was edited back afterwards.
 
 Two checks:
 
@@ -44,11 +45,35 @@ DEFAULT_DENY_LIST = Path(PRIVATE_DIR) / "deny-list.txt"
 SKIP_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".pdf", ".ico", ".zip", ".gz", ".woff", ".woff2"}
 
 
-def tracked_files(root: Path) -> list[str]:
-    result = subprocess.run(
-        ["git", "ls-files"], cwd=root, capture_output=True, text=True, check=True
-    )
-    return [line for line in result.stdout.splitlines() if line]
+def staged_blobs(root: Path) -> dict[str, str]:
+    """Every path in the index, mapped to the object id of its staged blob."""
+    result = subprocess.run(["git", "ls-files", "--stage", "-z"], cwd=root,
+                            capture_output=True, check=True)
+    blobs: dict[str, str] = {}
+    for entry in result.stdout.decode("utf-8", errors="surrogateescape").split("\0"):
+        if entry:
+            meta, path = entry.split("\t", 1)
+            mode, object_id, _stage = meta.split()
+            if mode != "160000":  # a submodule has no blob to read
+                blobs[path] = object_id
+    return blobs
+
+
+def read_blobs(root: Path, object_ids: list[str]) -> dict[str, bytes]:
+    """The content of each blob, read in one `git cat-file --batch` call."""
+    if not object_ids:
+        return {}
+    unique = list(dict.fromkeys(object_ids))
+    result = subprocess.run(["git", "cat-file", "--batch"], cwd=root, check=True,
+                            input="\n".join(unique).encode() + b"\n", capture_output=True)
+    out, contents, position = result.stdout, {}, 0
+    for object_id in unique:
+        header_end = out.index(b"\n", position)
+        size = int(out[position:header_end].split()[2])
+        start = header_end + 1
+        contents[object_id] = out[start:start + size]
+        position = start + size + 1
+    return contents
 
 
 def deny_list_path(root: Path) -> Path:
@@ -73,24 +98,25 @@ def check_paths(files: list[str]) -> list[str]:
             for f in files if f == PRIVATE_DIR.rstrip("/") or f.startswith(PRIVATE_DIR)]
 
 
-def check_content(root: Path, files: list[str], identifiers: set[str]) -> list[str]:
+def check_content(root: Path, blobs: dict[str, str], identifiers: set[str]) -> list[str]:
+    if not identifiers:
+        return []
     patterns = {i: re.compile(r"(?<!\w)" + re.escape(i.lower()) + r"(?!\w)")
                 for i in identifiers}
+    scanned = {f: object_id for f, object_id in blobs.items()
+               if not f.startswith(PRIVATE_DIR) and Path(f).suffix.lower() not in SKIP_SUFFIXES}
+    contents = read_blobs(root, list(scanned.values()))
     violations: list[str] = []
-    for f in files:
+    for f in blobs:
         if f.startswith(PRIVATE_DIR):
             continue  # reported by check_paths
         lowered = f.lower()
         for identifier, pattern in patterns.items():
             if pattern.search(lowered):
                 violations.append(f"{f}: path matches deny-listed identifier '{identifier}'")
-        path = root / f
-        if path.suffix.lower() in SKIP_SUFFIXES or not path.is_file():
+        if f not in scanned:
             continue
-        try:
-            text = path.read_text(encoding="utf-8", errors="ignore").lower()
-        except OSError:
-            continue
+        text = contents[scanned[f]].decode("utf-8", errors="ignore").lower()
         for identifier, pattern in patterns.items():
             if pattern.search(text):
                 violations.append(f"{f}: matches deny-listed identifier '{identifier}'")
@@ -98,7 +124,8 @@ def check_content(root: Path, files: list[str], identifiers: set[str]) -> list[s
 
 
 def main(root: Path = ROOT) -> int:
-    files = tracked_files(root)
+    blobs = staged_blobs(root)
+    files = list(blobs)
     violations = check_paths(files)
 
     deny_list = deny_list_path(root)
@@ -107,7 +134,7 @@ def main(root: Path = ROOT) -> int:
         print(f"note: deny-list {deny_list} not found — content check skipped "
               "(path check still ran)")
         identifiers = set()
-    violations += check_content(root, files, identifiers)
+    violations += check_content(root, blobs, identifiers)
 
     if violations:
         print("check_confidential: FAILED")

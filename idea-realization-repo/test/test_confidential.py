@@ -86,3 +86,27 @@ def test_deny_list_path_from_environment(
     elsewhere.write_text("public\n", encoding="utf-8")
     monkeypatch.setenv("PRIVATE_DENY_LIST", str(elsewhere))
     assert check.main(repo) == 1
+
+
+def test_staged_identifier_caught_after_disk_copy_is_reverted(
+        repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    deny(repo, "acme")
+    (repo / "notes.md").write_text("Meeting with acme.\n", encoding="utf-8")
+    git(repo, "add", "notes.md")
+    (repo / "notes.md").write_text("Meeting with a client.\n", encoding="utf-8")
+    assert check.main(repo) == 1
+    assert "notes.md: matches deny-listed identifier 'acme'" in capsys.readouterr().out
+
+
+def test_identifier_only_on_disk_is_not_reported(repo: Path) -> None:
+    deny(repo, "acme")
+    (repo / "README.md").write_text("acme\n", encoding="utf-8")
+    assert check.main(repo) == 0
+
+
+def test_staged_deletion_is_not_scanned(repo: Path) -> None:
+    deny(repo, "acme")
+    (repo / "old.md").write_text("acme\n", encoding="utf-8")
+    git(repo, "add", "old.md")
+    git(repo, "rm", "-q", "--cached", "old.md")
+    assert check.main(repo) == 0
