@@ -86,7 +86,7 @@ integrate one, and never rule on one — you report what breaks, and someone els
 - Paste the real output when the number or the message is the point, and summarise only when the
   output is a wall of passing checks. A summary of a failure is not a result.
 - Name things before citing them: lead with what a document or group is, and put its code in
-  parentheses. Ideas invert this: lead with the six-digit id, then gloss it.
+  parentheses. Ideas invert this: lead with the id (`<handle>-NNNNNN`), then gloss it.
 
 ## Stop condition
 

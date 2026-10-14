@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import time
 from pathlib import Path
 from typing import Any
@@ -23,6 +24,12 @@ from typing import Any
 import paths
 
 SCHEMA = paths.PLUGIN_ROOT / "schemas" / "idea.schema.json"
+
+#: An idea id without anchors, for searching text: ``<handle>-NNNNNN``, the developer handle
+#: that recorded the idea and a six-digit sequence counting that developer's own ideas.
+#: Mirrors the ``idea`` pattern in schemas/idea.schema.json.
+IDEA_ID_PATTERN = r"[a-z][a-z0-9]{0,15}-[0-9]{6}"
+IDEA_ID = re.compile(rf"^{IDEA_ID_PATTERN}$")
 
 #: The one author whose annotations may be of any kind; every other author is an agent.
 OWNER = "repository-owner"
@@ -83,6 +90,21 @@ AXES = ("ontological", "epistemic", "lifecycle", "temporal")
 
 class IdeaError(Exception):
     """A refusal the caller can act on, printed without a traceback."""
+
+
+def id_key(idea: str) -> tuple[str, int]:
+    """An idea id's sort key: its handle, then its sequence, so each author's ideas stay in
+    the order that author recorded them. An id the schema would refuse sorts by its whole text,
+    so a malformed log line is reported by the check rather than crashing a reader."""
+    if not IDEA_ID.match(idea):
+        return idea, -1
+    handle, _, sequence = idea.rpartition("-")
+    return handle, int(sequence)
+
+
+def format_id(handle: str, sequence: int) -> str:
+    """The idea id for ``handle``'s ``sequence``-th idea."""
+    return f"{handle}-{sequence:06d}"
 
 
 def canonical_bytes(event: dict[str, Any]) -> bytes:

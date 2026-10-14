@@ -23,6 +23,7 @@ from typing import Any
 
 import idea
 import ideas
+import identity as identity_module
 import paths
 import pytest
 import yaml  # type: ignore[import-untyped]
@@ -32,9 +33,13 @@ from ideas import IdeaError, fold, identity, link_diagnostics, load_events
 EPOCH = dt.datetime(2030, 1, 1, tzinfo=dt.UTC)
 
 
-def iid(n: int) -> str:
+#: The developer handle every fixture idea is recorded under unless a test names another.
+ANA = "ana"
+
+
+def iid(n: int, handle: str = ANA) -> str:
     """An idea id, built rather than written, so no six-digit literal appears in the suite."""
-    return f"{n:06d}"
+    return f"{handle}-{n:06d}"
 
 
 def at(hours: int = 0, seconds: int = 0) -> str:
@@ -51,10 +56,22 @@ def isolated_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     for name in list(os.environ):
         if name.startswith(("IDEA_REALIZATION_", "CLAUDE_PLUGIN_OPTION_", "CLAUDE_PROJECT_DIR")):
             monkeypatch.delenv(name)
+    monkeypatch.setenv(identity_module.HANDLE_ENV, ANA)
+
+
+def register(root: Path, *handles: str) -> Path:
+    """Write ``root``'s developer registry naming ``handles`` (``ana`` and ``ben`` by default)."""
+    team = {name: {"description": f"Developer {name}.", "emails": [f"{name}@example.com"]}
+            for name in handles or (ANA, "ben")}
+    registry = root / "docs" / identity_module.REGISTRY
+    registry.parent.mkdir(parents=True, exist_ok=True)
+    registry.write_text(yaml.safe_dump({"owners": team}), encoding="utf-8")
+    return root
 
 
 @pytest.fixture
 def config(tmp_path: Path) -> paths.Config:
+    register(tmp_path)
     return paths.resolve({"root": str(tmp_path)}, env={})
 
 
@@ -80,7 +97,7 @@ def cli(root: Path, *args: str) -> int:
 
 def test_status_change_appends_a_line_and_modifies_none(log: Path) -> None:
     """A status change appends one line; no existing line is rewritten."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     before = lines(log)
 
     idea.change_status(ONE, "triaged", log=log)
@@ -93,7 +110,7 @@ def test_status_change_appends_a_line_and_modifies_none(log: Path) -> None:
 
 def test_illegal_transition_is_refused_and_names_the_attempt(log: Path) -> None:
     """An illegal move names the attempted pair and leaves the log unchanged."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     idea.change_status(ONE, "reviewing", log=log)
 
     with pytest.raises(IdeaError) as excinfo:
@@ -105,7 +122,7 @@ def test_illegal_transition_is_refused_and_names_the_attempt(log: Path) -> None:
 
 def test_promotion_must_name_what_the_idea_became(log: Path) -> None:
     """open -> promoted without promoted_to is refused; with it, the target is recorded."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
 
     with pytest.raises(IdeaError, match="promoted-to"):
         idea.change_status(ONE, "promoted", log=log)
@@ -132,7 +149,7 @@ def test_promotion_without_promoted_to_is_refused_by_the_cli(tmp_path: Path, log
 
 def test_a_second_discard_after_a_revisit_is_permanent(log: Path) -> None:
     """Once revisited and discarded again, the idea can be neither revisited nor moved."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     idea.change_status(ONE, "discarded", log=log)
     idea.revisit(ONE, log=log)
     assert state_of(log)[ONE]["status"] == "reviewing"
@@ -151,7 +168,7 @@ def test_a_second_discard_after_a_revisit_is_permanent(log: Path) -> None:
 
 def test_only_a_discarded_idea_can_be_revisited(log: Path) -> None:
     """A revisit reopens a discarded idea and nothing else."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
 
     with pytest.raises(IdeaError, match="not discarded"):
         idea.revisit(ONE, log=log)
@@ -248,7 +265,7 @@ def test_a_broken_log_is_reported_by_the_check(config: paths.Config, log: Path) 
 
 def test_sibling_amendments_to_title_and_body_both_survive(log: Path) -> None:
     """Two amendments correcting different fields of one event both survive."""
-    idea.add("Original title", "Original body", log)
+    idea.add("Original title", "Original body", log, ANA)
 
     idea.amend(ONE, title="Corrected title", log=log)
     idea.amend(ONE, body="Corrected body", log=log)
@@ -263,7 +280,7 @@ def test_a_second_amendment_to_the_same_field_wins_without_reverting_the_first(
     log: Path,
 ) -> None:
     """Two amendments to the same field apply in append order; nothing is lost silently."""
-    idea.add("Original title", "Body", log)
+    idea.add("Original title", "Body", log, ANA)
     idea.amend(ONE, title="First correction", log=log)
     idea.amend(ONE, title="Second correction", log=log)
 
@@ -274,7 +291,7 @@ def test_a_second_amendment_to_the_same_field_wins_without_reverting_the_first(
 
 def test_amend_requires_at_least_one_field(log: Path) -> None:
     """An amendment that corrects nothing is refused before the append."""
-    idea.add("Title", "Body", log)
+    idea.add("Title", "Body", log, ANA)
     with pytest.raises(IdeaError, match="at least one"):
         idea.amend(ONE, log=log)
     assert len(lines(log)) == 1, "a refused amendment must not reach the log"
@@ -288,7 +305,7 @@ def test_amend_refuses_an_unknown_idea(log: Path) -> None:
 
 def test_a_cleared_required_field_is_refused_by_the_schema(log: Path) -> None:
     """Required fields cannot be cleared: `field_shape.value` has no way to be null."""
-    idea.add("Title", "Body", log)
+    idea.add("Title", "Body", log, ANA)
     cleared = {
         "idea": ONE, "event": "amended", "at": at(0), "eid": "clear1",
         "amends": identity(json.loads(lines(log)[0])),
@@ -413,7 +430,7 @@ def test_amend_survives_the_real_cli_and_is_refused_before_append_on_a_bad_targe
 
 def test_annotations_accumulate_and_an_amendment_corrects_only_one(log: Path) -> None:
     """Correcting one annotation leaves its siblings untouched."""
-    idea.add("Title", "Body", log)
+    idea.add("Title", "Body", log, ANA)
     idea.annotate(ONE, ideas.OWNER, "note", "first thought", log=log)
     idea.annotate(ONE, ideas.OWNER, "assessment", "looks promising", log=log)
 
@@ -429,14 +446,14 @@ def test_annotations_accumulate_and_an_amendment_corrects_only_one(log: Path) ->
 
 def test_amend_annotation_refuses_an_unknown_annotation(log: Path) -> None:
     """Only an annotation on the named idea can be corrected."""
-    idea.add("Title", "Body", log)
+    idea.add("Title", "Body", log, ANA)
     with pytest.raises(IdeaError, match="no annotation"):
         idea.amend_annotation(ONE, "missing", "text", log=log)
 
 
 def test_annotations_are_permitted_on_terminal_ideas(log: Path) -> None:
     """An annotation extends the record, not the state machine."""
-    idea.add("Title", "Body", log)
+    idea.add("Title", "Body", log, ANA)
     idea.change_status(ONE, "discarded", log=log)
 
     idea.annotate(ONE, ideas.OWNER, "note", "why this was right to discard", log=log)
@@ -448,7 +465,7 @@ def test_annotations_are_permitted_on_terminal_ideas(log: Path) -> None:
 
 def test_a_non_owner_author_is_restricted_to_finding(log: Path) -> None:
     """An agent writes findings only, so the owner's voice stays unambiguous."""
-    idea.add("Title", "Body", log)
+    idea.add("Title", "Body", log, ANA)
 
     with pytest.raises(IdeaError, match="finding"):
         idea.annotate(ONE, "agent-blue", "note", "text", log=log)
@@ -459,7 +476,7 @@ def test_a_non_owner_author_is_restricted_to_finding(log: Path) -> None:
 
 def test_an_unknown_annotation_kind_is_refused_by_the_schema(log: Path) -> None:
     """An unknown kind fails validation rather than being accepted as free text."""
-    idea.add("Title", "Body", log)
+    idea.add("Title", "Body", log, ANA)
     with pytest.raises(IdeaError, match="refusing to append"):
         idea.append({
             "idea": ONE, "event": "annotated", "at": at(0), "eid": "x",
@@ -469,8 +486,8 @@ def test_an_unknown_annotation_kind_is_refused_by_the_schema(log: Path) -> None:
 
 def test_a_link_is_asserted_and_the_inverse_is_derived_not_stored(log: Path) -> None:
     """A link is stored once, on the idea asserting it."""
-    idea.add("First", "Body", log)
-    idea.add("Second", "Body two", log)
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body two", log, ANA)
 
     event, diagnostics = idea.link(ONE, "extends", TWO, log=log)
     assert diagnostics == []
@@ -486,8 +503,8 @@ def test_a_link_is_asserted_and_the_inverse_is_derived_not_stored(log: Path) -> 
 
 def test_a_link_never_mutates_its_target_only_retraction_is_legal(log: Path) -> None:
     """No shape repoints a link; retraction clears it and appends a correction."""
-    idea.add("First", "Body", log)
-    idea.add("Second", "Body two", log)
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body two", log, ANA)
     event, _ = idea.link(ONE, "relates_to", TWO, log=log)
     link_eid = identity(event)
 
@@ -507,9 +524,9 @@ def test_a_link_never_mutates_its_target_only_retraction_is_legal(log: Path) -> 
 
 def test_selective_retraction_leaves_sibling_links_intact(log: Path) -> None:
     """Retracting one link by identity leaves the others live."""
-    idea.add("First", "Body", log)
-    idea.add("Second", "Body two", log)
-    idea.add("Third", "Body three", log)
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body two", log, ANA)
+    idea.add("Third", "Body three", log, ANA)
     kept, _ = idea.link(ONE, "relates_to", TWO, log=log)
     dropped, _ = idea.link(ONE, "relates_to", THREE, log=log)
 
@@ -522,14 +539,14 @@ def test_selective_retraction_leaves_sibling_links_intact(log: Path) -> None:
 
 def test_retract_link_refuses_an_unknown_link(log: Path) -> None:
     """Only a link on the named idea can be retracted."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     with pytest.raises(IdeaError, match="no link"):
         idea.retract_link(ONE, "missing", log=log)
 
 
 def test_link_refuses_a_self_link_and_an_unknown_target(log: Path) -> None:
     """A link points at another idea that exists."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     with pytest.raises(IdeaError, match="itself"):
         idea.link(ONE, "relates_to", ONE, log=log)
     with pytest.raises(IdeaError, match="not a known idea"):
@@ -538,8 +555,8 @@ def test_link_refuses_a_self_link_and_an_unknown_target(log: Path) -> None:
 
 def test_an_extends_cycle_is_flagged_but_capture_still_succeeds(log: Path) -> None:
     """A cycle is a diagnostic, never a refusal: capture always wins."""
-    idea.add("First", "Body", log)
-    idea.add("Second", "Body two", log)
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body two", log, ANA)
     idea.link(ONE, "extends", TWO, log=log)
 
     _, diagnostics = idea.link(TWO, "extends", ONE, log=log)
@@ -550,8 +567,8 @@ def test_an_extends_cycle_is_flagged_but_capture_still_succeeds(log: Path) -> No
 
 def test_a_supersedes_edge_is_flagged_while_its_target_stays_working(log: Path) -> None:
     """Superseding a live idea is flagged until the target is discarded."""
-    idea.add("Replacement", "Body", log)
-    idea.add("Old", "Body two", log)
+    idea.add("Replacement", "Body", log, ANA)
+    idea.add("Old", "Body two", log, ANA)
 
     _, diagnostics = idea.link(ONE, "supersedes", TWO, log=log)
     assert any("not discarded" in d for d in diagnostics)
@@ -566,7 +583,7 @@ def test_promoted_to_accepts_an_array_and_a_legacy_scalar_reads_as_a_singleton(
     log: Path,
 ) -> None:
     """`promoted_to` folds to a list whether written as a list or a scalar."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     idea.change_status(ONE, "promoted", promoted_to=["DOC-020", "DOC-004"], log=log)
     assert state_of(log)[ONE]["promoted_to"] == ["DOC-020", "DOC-004"]
 
@@ -588,7 +605,7 @@ def write_document(config: paths.Config, code: str, name: str = "doc.md") -> Non
 def test_a_document_link_needs_an_existing_code(config: paths.Config, log: Path) -> None:
     """A link may point at a document code that a document under the root declares."""
     write_document(config, "DOC-001")
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
 
     with pytest.raises(IdeaError, match="not a governed document code"):
         idea.link(ONE, "relates_to", None, log=log, target_code="DOC-002", config=config)
@@ -606,7 +623,7 @@ def test_only_extends_and_relates_to_may_point_at_a_document(config: paths.Confi
                                                             log: Path) -> None:
     """A supersedes or component_of edge points at an idea, never a document."""
     write_document(config, "DOC-001")
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     with pytest.raises(IdeaError, match="cannot point at a document"):
         idea.link(ONE, "supersedes", None, log=log, target_code="DOC-001", config=config)
 
@@ -614,8 +631,8 @@ def test_only_extends_and_relates_to_may_point_at_a_document(config: paths.Confi
 def test_a_link_names_exactly_one_target(config: paths.Config, log: Path) -> None:
     """An idea target and a document target are exclusive."""
     write_document(config, "DOC-001")
-    idea.add("First", "Body", log)
-    idea.add("Second", "Body", log)
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body", log, ANA)
     with pytest.raises(IdeaError, match="exactly one"):
         idea.link(ONE, "relates_to", TWO, log=log, target_code="DOC-001", config=config)
     with pytest.raises(IdeaError, match="exactly one"):
@@ -626,7 +643,7 @@ def test_a_document_link_is_retracted_by_clearing_its_code(config: paths.Config,
                                                            log: Path) -> None:
     """Retracting a document link clears `target_code`, and the fold marks it retracted."""
     write_document(config, "DOC-001")
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     event, _ = idea.link(ONE, "extends", None, log=log, target_code="DOC-001", config=config)
 
     idea.retract_link(ONE, identity(event), log=log)
@@ -683,7 +700,7 @@ def write_backlog(config: paths.Config, *phase_ids: str) -> None:
 @pytest.mark.parametrize("target", ["delivered", "resolved", "absorbed"])
 def test_a_close_needs_a_pointer(config: paths.Config, log: Path, target: str) -> None:
     """delivered, resolved and absorbed each name where the delivery happened."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     with pytest.raises(IdeaError, match="needs a pointer"):
         idea.change_status(ONE, target, log=log, config=config)
     assert len(lines(log)) == 1
@@ -692,7 +709,7 @@ def test_a_close_needs_a_pointer(config: paths.Config, log: Path, target: str) -
 def test_a_pointer_belongs_only_to_a_close(config: paths.Config, log: Path) -> None:
     """Any other transition refuses a pointer."""
     write_document(config, "DOC-001")
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     with pytest.raises(IdeaError, match="pointer belongs to"):
         idea.change_status(ONE, "triaged", log=log, closes_with=[{"doc": "DOC-001"}],
                            config=config)
@@ -701,7 +718,7 @@ def test_a_pointer_belongs_only_to_a_close(config: paths.Config, log: Path) -> N
 def test_a_document_pointer_must_resolve(config: paths.Config, log: Path) -> None:
     """A doc pointer names a code that a document declares."""
     write_document(config, "DOC-001")
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     with pytest.raises(IdeaError, match="not a governed document code"):
         idea.change_status(ONE, "delivered", log=log, closes_with=[{"doc": "DOC-009"}],
                            config=config)
@@ -716,7 +733,7 @@ def test_a_document_pointer_must_resolve(config: paths.Config, log: Path) -> Non
 def test_a_phase_pointer_must_resolve(config: paths.Config, log: Path) -> None:
     """A phase pointer names an id in the backlog."""
     write_backlog(config, PHASE)
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     with pytest.raises(IdeaError, match="not a phase in the backlog"):
         idea.change_status(ONE, "resolved", log=log, closes_with=[{"phase": "phase-" + "x-2"}],
                            config=config)
@@ -736,7 +753,7 @@ def test_a_commit_pointer_must_resolve(tmp_path: Path, config: paths.Config,
                                        log: Path) -> None:
     """A commit pointer names a commit in the repository's history."""
     head = commit_once(tmp_path)
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     with pytest.raises(IdeaError, match="not a commit"):
         idea.change_status(ONE, "absorbed", log=log, closes_with=[{"commit": "0" * 40}],
                            config=config)
@@ -779,7 +796,7 @@ KNOWLEDGE: dict[str, Any] = {
 
 def test_the_latest_classification_replaces_the_whole_of_the_one_before(log: Path) -> None:
     """An axis the reclassification leaves out is not inherited from the earlier one."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     idea.classify(ONE, "agent-blue", KNOWLEDGE, log)
     first = state_of(log)[ONE]["classification"]
     assert first["ontological"] == "concept"
@@ -797,7 +814,7 @@ def test_the_latest_classification_replaces_the_whole_of_the_one_before(log: Pat
 
 def test_a_classification_is_checked_against_the_schema(log: Path) -> None:
     """A knowledge record carries every axis; any other kind carries none."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     missing_axis = {k: v for k, v in KNOWLEDGE.items() if k != "temporal"}
     with pytest.raises(IdeaError, match="refusing to append"):
         idea.classify(ONE, "agent-blue", missing_axis, log)
@@ -924,8 +941,8 @@ def test_no_help_text_offers_a_time_option(args: list[str],
 def test_list_and_show_write_nothing(tmp_path: Path, log: Path,
                                      capsys: pytest.CaptureFixture[str]) -> None:
     """`list` and `show` print the folded state and never append."""
-    idea.add("First", "Body", log)
-    idea.add("Second", "Body", log)
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body", log, ANA)
     idea.change_status(TWO, "triaged", log=log)
     idea.amend(ONE, title="First corrected", log=log)
     before = lines(log)
@@ -939,10 +956,92 @@ def test_list_and_show_write_nothing(tmp_path: Path, log: Path,
     assert lines(log) == before
 
 
+# --- Idea ids are author-scoped ------------------------------------------------------------
+
+
+def test_two_handles_allocate_independent_sequences(log: Path) -> None:
+    """Each developer counts only their own ideas, so two first ideas never collide."""
+    first = idea.add("Ana's idea", "Body", log, ANA)
+    other = idea.add("Ben's idea", "Body", log, "ben")
+    assert (first["idea"], other["idea"]) == (iid(1), iid(1, "ben"))
+    assert sorted(state_of(log)) == [iid(1), iid(1, "ben")]
+
+
+def test_a_second_add_by_the_same_handle_takes_the_next_sequence(log: Path) -> None:
+    idea.add("First", "Body", log, ANA)
+    idea.add("Ben's", "Body", log, "ben")
+    assert idea.add("Second", "Body", log, ANA)["idea"] == iid(2)
+
+
+def test_the_cli_allocates_under_the_resolved_handle(
+    tmp_path: Path, log: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    assert cli(tmp_path, "add", "--title", "T", "--body", "B") == 0
+    monkeypatch.setenv(identity_module.HANDLE_ENV, "ben")
+    assert cli(tmp_path, "add", "--title", "T", "--body", "B") == 0
+    assert cli(tmp_path, "add", "--title", "T", "--body", "B") == 0
+    assert sorted(state_of(log)) == [iid(1), iid(1, "ben"), iid(2, "ben")]
+
+
+@pytest.mark.parametrize("handle", ["", "zed"])
+def test_add_without_a_resolvable_handle_exits_1_and_writes_nothing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+    handle: str,
+) -> None:
+    """An unregistered handle, or none and no matching git email, is refused before any write."""
+    root = register(tmp_path / "repo")
+    monkeypatch.setenv(identity_module.HANDLE_ENV, handle)
+    assert cli(root, "add", "--title", "T", "--body", "B") == 1
+    assert "developer" in capsys.readouterr().err
+    assert not log_of(root).exists()
+
+
+def test_commands_other_than_add_need_no_handle(
+    tmp_path: Path, log: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body", log, "ben")
+    monkeypatch.setenv(identity_module.HANDLE_ENV, "zed")
+    assert cli(tmp_path, "status", ONE, "triaged") == 0
+    assert cli(tmp_path, "link", iid(1, "ben"), "--type", "relates_to", "--target", ONE) == 0
+    assert cli(tmp_path, "list") == 0
+
+
+def test_a_link_between_two_handles_ideas_is_accepted(log: Path) -> None:
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body", log, "ben")
+    event, _ = idea.link(iid(1, "ben"), "extends", ONE, log=log)
+    assert event["target"] == ONE
+    assert state_of(log)[iid(1, "ben")]["links"][0]["target"] == ONE
+
+
+@pytest.mark.parametrize("bad", [f"{1:06d}", "Ana-" + f"{1:06d}", "9ana-" + f"{1:06d}",
+                                 "ana-" + f"{1:05d}", "a" * 17 + "-" + f"{1:06d}"])
+def test_an_id_without_a_valid_handle_is_refused_by_the_schema(bad: str) -> None:
+    """A bare sequence, or one under a handle the registry could never hold, never validates."""
+    created = idea.build_created(bad, "T", "B", at(), "e1")
+    with pytest.raises(IdeaError, match="refusing to append"):
+        idea.validate(created)
+    linked = idea.build_linked(ONE, "relates_to", bad, at(), "e2")
+    with pytest.raises(IdeaError, match="refusing to append"):
+        idea.validate(linked)
+
+
+def test_list_orders_ideas_by_handle_then_sequence(
+    tmp_path: Path, log: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    for title, handle in (("b1", "ben"), ("a1", ANA), ("b2", "ben"), ("a2", ANA)):
+        idea.add(title, "Body", log, handle)
+    capsys.readouterr()
+    assert cli(tmp_path, "list") == 0
+    listed = [line.split(" | ")[0] for line in capsys.readouterr().out.splitlines()]
+    assert listed == [iid(1), iid(2), iid(1, "ben"), iid(2, "ben")]
+
+
 # --- The fold matches the source fold, and the schema's enums match the source schema -------
 
 def _iid(number: int) -> str:
-    return f"{number:06d}"
+    return f"ana-{number:06d}"
 
 
 def _at(minute: int) -> str:
@@ -1142,7 +1241,7 @@ def log_of(root: Path) -> Path:
 def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """A git repository whose integration branch is its current branch, so no warning prints."""
     monkeypatch.setenv("IDEA_REALIZATION_INTEGRATION_BRANCH", "trunk")
-    return git_repo(tmp_path / "repo")
+    return register(git_repo(tmp_path / "repo"))
 
 
 def fold_held_at(barrier: threading.Barrier, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -1282,7 +1381,7 @@ def test_a_linked_worktree_warns_and_still_writes(
 ) -> None:
     monkeypatch.setenv("IDEA_REALIZATION_INTEGRATION_BRANCH", "trunk")
     primary = git_repo(tmp_path / "repo")
-    worktree = linked_worktree(primary, tmp_path / "wt", "side")
+    worktree = register(linked_worktree(primary, tmp_path / "wt", "side"))
     assert cli(worktree, "add", "--title", "First", "--body", "Body") == 0
     err = capsys.readouterr().err
     assert WARNING in err and "side" in err and str(worktree.resolve()) in err
@@ -1293,7 +1392,7 @@ def test_the_primary_checkout_on_another_branch_warns(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     monkeypatch.setenv("IDEA_REALIZATION_INTEGRATION_BRANCH", "trunk")
-    primary = git_repo(tmp_path / "repo", branch="feature")
+    primary = register(git_repo(tmp_path / "repo", branch="feature"))
     assert cli(primary, "add", "--title", "First", "--body", "Body") == 0
     err = capsys.readouterr().err
     assert WARNING in err and "feature" in err

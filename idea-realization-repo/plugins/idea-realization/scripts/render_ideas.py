@@ -23,7 +23,15 @@ from typing import Any
 
 import paths
 import yaml  # type: ignore[import-untyped]
-from ideas import AXES, INVERSE_LINK_TYPE, IdeaError, fold, link_diagnostics, load_events
+from ideas import (
+    AXES,
+    INVERSE_LINK_TYPE,
+    IdeaError,
+    fold,
+    id_key,
+    link_diagnostics,
+    load_events,
+)
 
 HEADER = "# Ideas\n\nGenerated from the idea log. Never edit by hand; re-render it.\n"
 PATH_KEYS = ("ideas_path", "ideas_view_path", "priority_path")
@@ -120,7 +128,7 @@ def _closes_with(entry: dict[str, Any]) -> str:
 
 
 def render(state: dict[str, dict[str, Any]], next_up: list[str] | None = None) -> str:
-    """The full file: priority queue first (if any), then every idea in identifier order."""
+    """The full file: priority queue first (if any), then every idea by handle and sequence."""
     parts = [HEADER]
     if next_up:
         parts.append("\n## Priority queue\n\nIdeas that jump the queue, in order.\n\n")
@@ -128,7 +136,7 @@ def render(state: dict[str, dict[str, Any]], next_up: list[str] | None = None) -
             title = state[idea]["title"] if idea in state else "unknown idea"
             parts.append(f"{rank}. `{idea}` — {title}\n")
     inbound = _inbound_links(state)
-    for idea in sorted(state):
+    for idea in sorted(state, key=id_key):
         entry = state[idea]
         stamp = f"**Created {entry['created']} · Status: `{entry['status']}`"
         if entry["revisits"]:

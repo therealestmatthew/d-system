@@ -29,7 +29,7 @@ checkout's ``git status``; the skill compares it before and after its writes the
 
 **The corpus.** ``build`` selects the ideas whose folded status is in ``--status`` (one status or
 a comma-separated list, default ``triaged``), minus the ids an optional ``--exclude`` file lists
-(one six-digit id per line, ``#`` comments allowed; no file means no exclusions). It writes two
+(one idea id per line, ``#`` comments allowed; no file means no exclusions). It writes two
 files that differ only in what they carry, so the control analyst cannot tell its input differs:
 
     corpus-R1.md   title, body, links, findings
@@ -64,7 +64,16 @@ from pathlib import Path
 from typing import Any
 
 import paths
-from ideas import INVERSE_LINK_TYPE, IdeaError, fold, legal_transitions, load_events
+from ideas import (
+    IDEA_ID,
+    IDEA_ID_PATTERN,
+    INVERSE_LINK_TYPE,
+    IdeaError,
+    fold,
+    id_key,
+    legal_transitions,
+    load_events,
+)
 from jsonschema import Draft7Validator  # type: ignore[import-untyped]
 
 PATH_KEYS = ("ideas_path", "ideas_view_path", "priority_path", "docs_root", "staging_dir",
@@ -75,7 +84,6 @@ CHECK_KEYS = ("ideas_path", "ideas_view_path", "priority_path")
 PACK = paths.PLUGIN_ROOT / "docs" / "partition-pack.md"
 SCHEMA = paths.PLUGIN_ROOT / "schemas" / "idea-partition-record.schema.json"
 DEFAULT_STATUS = "triaged"
-IDEA_ID = re.compile(r"^[0-9]{6}$")
 PLACEHOLDER = re.compile(r"\{([a-z_]+)\}")
 SECTIONS = ("R1", "R4", "A1", "S", "A2", "G")
 
@@ -252,7 +260,8 @@ def load_exclusions(path: Path | None) -> set[str]:
         if not value:
             continue
         if not IDEA_ID.match(value):
-            raise CorpusError(f"{path.name} line {number}: {value!r} is not a six-digit idea id")
+            raise CorpusError(f"{path.name} line {number}: {value!r} is not an idea id "
+                              "(<handle>-NNNNNN)")
         ids.add(value)
     return ids
 
@@ -329,7 +338,8 @@ def render(corpus: dict[str, dict[str, Any]], *, analyst: str, include_findings:
     head = HEADER.format(analyst=analyst, count=len(corpus),
                          note=LAYERED_NOTE if include_findings else PLAIN_NOTE)
     body = "".join(render_idea(idea, corpus[idea], inbound, include_findings=include_findings,
-                               layered=idea in layered) for idea in sorted(corpus))
+                               layered=idea in layered)
+                   for idea in sorted(corpus, key=id_key))
     return head + "\n" + body
 
 
@@ -545,7 +555,7 @@ def check_pair(markdown_path: Path, record_path: Path, corpus: Path,
     manifest = read_manifest(corpus)
     if manifest is None:
         return [f"no manifest in {corpus}"]
-    corpus_ids = set(re.findall(r"^## (\d{6}) — ", (corpus / "corpus-R1.md")
+    corpus_ids = set(re.findall(rf"^## ({IDEA_ID_PATTERN}) — ", (corpus / "corpus-R1.md")
                                 .read_text(encoding="utf-8"), re.M))
     placed = [i for t in record["tracks"] for g in t["groups"] for i in g["ideas"]]
     placed += [u["id"] for u in record["unbatched"]]
@@ -560,7 +570,8 @@ def check_pair(markdown_path: Path, record_path: Path, corpus: Path,
                                                          if placed.count(i) > 1})]
     problems += [f"missing from the record: {i}" for i in sorted(corpus_ids - set(placed))]
     problems += [f"not in the corpus: {i}" for i in sorted(set(placed) - corpus_ids)]
-    in_markdown = set(re.findall(r"\b(\d{6})\b", markdown)) & corpus_ids
+    mentioned = re.findall(rf"(?<![\w-])({IDEA_ID_PATTERN})(?![\w-])", markdown)
+    in_markdown = set(mentioned) & corpus_ids
     problems += [f"in the record, not the markdown: {i}"
                  for i in sorted(set(placed) - in_markdown)]
     problems += [f"in the markdown, not the record: {i}"

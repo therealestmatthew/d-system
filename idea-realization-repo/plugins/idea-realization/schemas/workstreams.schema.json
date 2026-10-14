@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "workstreams.schema.json",
+  "title": "Workstream registry",
+  "description": "The workstream registry: which developer owns which repository paths. A workstream is an ownership declaration, not a lock — other developers' phases must keep their deliverables out of a claimed workstream's paths unless its owner approved the crossing. A claim is made by committing this file on the integration branch; a rejected push is the race signal. Cross-entry rules (unique ids, owners that are developer handles, non-overlapping paths, phases that stay out) are the workstreams check's, not this schema's.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "workstreams"],
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "description": "Registry contract version."
+    },
+    "workstreams": {
+      "type": "array",
+      "description": "One entry per workstream, in the order the team chose. May be empty.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "owner", "status", "paths"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,31}$",
+            "description": "Permanent workstream id: unique in the registry and never reused for another workstream."
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Display name, such as 'User interface'."
+          },
+          "owner": {
+            "type": "string",
+            "description": "Developer handle (an owners key in the systems registry that lists emails) when claimed; the empty string when open."
+          },
+          "status": {
+            "type": "string",
+            "enum": ["open", "claimed"],
+            "description": "open: nobody owns the paths yet; claimed: owner holds them."
+          },
+          "paths": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "description": "Paths this workstream owns. A 'product:' prefix names a path in the product repository; an unprefixed path is in this repository.",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "One owned path, a file or a directory prefix."
+            }
+          },
+          "interfaces": {
+            "type": "array",
+            "description": "Documents describing what this workstream provides to the others.",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "description": "A document path or identifier."
+            }
+          }
+        }
+      }
+    }
+  }
+}

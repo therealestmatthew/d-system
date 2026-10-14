@@ -1,0 +1,8 @@
+schema_version: 1
+# The product repository this control repository drives. Only what is the same on every machine:
+# each developer sets the local checkout path with IDEA_REALIZATION_PRODUCT_ROOT, never here.
+# product.py verify refuses to act until remote names the real product repository.
+name: product
+remote: REPLACE-WITH-THE-PRODUCT-REPOSITORY-GIT-URL
+integration_branch: main
+ci_workflow: none

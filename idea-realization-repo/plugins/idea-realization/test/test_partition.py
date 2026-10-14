@@ -17,6 +17,7 @@ import paths
 import pytest
 from conftest import PLUGIN_ROOT
 from idea_corpus import CorpusError, Layout
+from ideas import IDEA_ID_PATTERN
 from jsonschema import Draft7Validator
 from test_no_source_references import scan
 
@@ -26,9 +27,13 @@ SCHEMA = PLUGIN_ROOT / "schemas" / "idea-partition-record.schema.json"
 STAGING = ".idea-realization/staging"
 
 
-def iid(n: int) -> str:
+#: The developer handle every fixture idea is recorded under unless a test names another.
+ANA = "ana"
+
+
+def iid(n: int, handle: str = ANA) -> str:
     """An idea id, built rather than written, so no six-digit literal appears in the suite."""
-    return f"{n:06d}"
+    return f"{handle}-{n:06d}"
 
 
 def a_date() -> str:
@@ -68,7 +73,7 @@ def fixture_log(root: Path) -> Path:
     """Four ideas: two triaged (one with two findings), one open, one discarded."""
     log = config_for(root).path("ideas_path")
     for n in range(1, 5):
-        idea.add(f"Idea {n}", f"Body of idea {n}.", log)
+        idea.add(f"Idea {n}", f"Body of idea {n}.", log, ANA)
     for n in (1, 2):
         idea.change_status(iid(n), "triaged", log=log)
     idea.annotate(iid(1), "agent-scout", "finding", "Relates to the export work.", log)
@@ -98,8 +103,8 @@ def test_status_open_selects_open_ideas_and_the_manifest_records_it(where: Layou
     manifest = json.loads((where.corpus / "manifest.json").read_text())
     assert manifest["status"] == ["open"]
     assert manifest["corpus_size"] == 1 == facts["corpus_size"]
-    assert re.findall(r"^## (\d{6}) — ", (where.corpus / "corpus-R1.md").read_text(), re.M) \
-        == [iid(3)]
+    corpus = (where.corpus / "corpus-R1.md").read_text()
+    assert re.findall(rf"^## ({IDEA_ID_PATTERN}) — ", corpus, re.M) == [iid(3)]
 
 
 def test_default_status_is_triaged_through_the_command_line(where: Layout, root: Path) -> None:
@@ -126,7 +131,7 @@ def test_an_exclusion_file_is_optional_and_leaves_its_ids_out(where: Layout,
     facts = idea_corpus.build(where.idea_log, where.corpus, frozenset({"triaged"}), exclusions)
     assert facts["excluded"] == [iid(2)] and facts["corpus_size"] == 1
     exclusions.write_text("not-an-id\n")
-    with pytest.raises(CorpusError, match="not a six-digit idea id"):
+    with pytest.raises(CorpusError, match="not an idea id"):
         idea_corpus.build(where.idea_log, where.corpus, frozenset({"triaged"}), exclusions)
 
 
@@ -288,6 +293,15 @@ def test_a_record_with_a_seven_digit_id_fails() -> None:
     assert errors and all("does not match" in e for e in errors)
 
 
+def test_a_record_with_a_bare_sequence_fails_and_any_handle_validates() -> None:
+    """An id must carry its author: a bare sequence fails, another developer's id validates."""
+    record = a_record([iid(1), iid(1, "ben")], f"idea-partition-{a_date()}.md")
+    assert list(validator().iter_errors(record)) == []
+    record = a_record([iid(1), f"{2:06d}"], f"idea-partition-{a_date()}.md")
+    errors = [e.message for e in validator().iter_errors(record)]
+    assert errors and all("does not match" in e for e in errors)
+
+
 def draft_pair(where: Layout, ids: list[str]) -> tuple[Path, Path]:
     manifest = idea_corpus.read_manifest(where.corpus)
     assert manifest is not None
@@ -309,6 +323,17 @@ def test_the_pair_check_passes_a_complete_draft_and_names_a_missing_id(where: La
     record.write_text(json.dumps(data))
     assert f"missing from the record: {iid(2)}" in idea_corpus.check_pair(markdown, record,
                                                                           where.corpus)
+
+
+def test_the_pair_check_finds_ideas_from_two_handles(where: Layout) -> None:
+    """The corpus and the markdown are searched for every developer's ids, not one counter's."""
+    other = idea.add("Ben's idea", "Body.", where.idea_log, "ben")["idea"]
+    idea.change_status(other, "triaged", log=where.idea_log)
+    idea_corpus.build(where.idea_log, where.corpus, frozenset({"triaged"}))
+    corpus = (where.corpus / "corpus-R1.md").read_text()
+    assert re.findall(rf"^## ({IDEA_ID_PATTERN}) — ", corpus, re.M) == [iid(1), iid(2), other]
+    markdown, record = draft_pair(where, [iid(1), iid(2), other])
+    assert idea_corpus.check_pair(markdown, record, where.corpus) == []
 
 
 def test_accept_copies_the_pair_into_the_partitions_directory(where: Layout) -> None:

@@ -20,7 +20,9 @@ saved path that itself contains a single quote is not supported.
 
 Ask with the AskUserQuestion tool which features to set up, as a multi-select: `ideas` (the idea
 log, rendered view and priority file), `partition` (the staging directory), `backlog` (the phase
-catalog) and `documents` (the document root, code register and systems registry). Recommend `all`
+catalog), `documents` (the document root, code register and systems registry), `workstreams` (the
+workstream ownership registry), `reviews` (the directory for review verdict records) and `product`
+(the record naming the product repository, whose `remote` must then be filled in). Recommend `all`
 for a repository adopting the whole pipeline.
 
 ## 2. Dry run

@@ -193,7 +193,7 @@
             },
             "uniqueItems": true,
             "minItems": 1,
-            "description": "Planned repository paths; existence is required only in completion_evidence."
+            "description": "Planned paths; a product: prefix names a path in the product repository. Existence is required only in completion_evidence."
           },
           "next_action": {
             "type": "string",
@@ -203,8 +203,8 @@
           "agent": {
             "type": "string",
             "minLength": 1,
-            "description": "Claim identity of the working agent; names its branch agent/<phase-id>.",
-            "pattern": "^agent-[a-z0-9]+(?:-[a-z0-9]+)*$"
+            "description": "Claim identity of the working agent, prefixed by its developer's handle in a team repository (<handle>/agent-<name>); names its branch agent/<phase-id>.",
+            "pattern": "^(?:[a-z][a-z0-9]{0,15}/)?agent-[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "blocked_reason": {
             "type": "string",
@@ -231,12 +231,38 @@
             },
             "uniqueItems": true,
             "minItems": 1,
-            "description": "Existing files proving completion; separate from future deliverables."
+            "description": "Existing files proving completion; separate from future deliverables. A product: prefix names a file in the product repository, checked when its checkout is configured."
           },
           "result": {
             "type": "string",
             "minLength": 1,
             "description": "Actual verification result and outcome; required on completion."
+          },
+          "cross_workstream": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "description": "Workstreams owned by another developer that this phase may change, each with that owner's recorded approval.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "workstream",
+                "approved_by"
+              ],
+              "properties": {
+                "workstream": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Workstream id from the workstream registry."
+                },
+                "approved_by": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Handle of the workstream's owner, who approved this phase's changes there."
+                }
+              }
+            }
           }
         }
       }

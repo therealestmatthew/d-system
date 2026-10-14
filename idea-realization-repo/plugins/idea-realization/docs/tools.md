@@ -38,6 +38,13 @@ kept. ``worktree_dir`` must resolve outside the primary checkout. ``integration_
 start with ``-`` and must pass ``git check-ref-format --branch``. Each script's ``main`` turns a
 ``PathError`` into exit 2 with its message (``exits_on_path_error``).
 
+``product_root`` and ``product_worktree_dir`` name the product repository this control repository
+drives (see ``product.py``). They differ per machine, may be unset, and must resolve outside the
+control repository. ``product_worktree_dir`` resolves against the product checkout, and
+``<product>`` in it is the product checkout's directory name. ``aws_read_profile``,
+``aws_deploy_profile`` and ``aws_region`` are plain text, may be unset, and are read by the cloud
+agents, which refuse to run without them.
+
 ## `backlog.py`
 
 ```bash
@@ -274,6 +281,12 @@ The caller supplies prose. This script generates the identifier, the timestamp a
 event shape, validates the result against the plugin's ``schemas/idea.schema.json``, and
 appends it.
 
+**An idea id is author-scoped: ``<handle>-NNNNNN``.** The handle names the developer who
+recorded the idea (``identity.py`` resolves it from ``<docs_root>/systems.yaml``), and the
+six-digit sequence counts that developer's own ideas, so developers adding ideas in separate
+clones never allocate the same id. Only ``add`` allocates an id, so only ``add`` needs the
+handle; when it cannot be resolved, ``add`` exits 1 and appends nothing.
+
 **There is deliberately no way to supply a timestamp.** A log whose times can be chosen is
 not evidence of anything. The ``at`` values below are generated internally and the CLI
 exposes no option that reaches them.
@@ -341,8 +354,8 @@ never blocks the next one. ``list`` and ``show`` take no lock.
 **Ideas are recorded only on the integration branch in the primary checkout.** Run anywhere
 else in a git repository — a linked worktree, or the primary checkout on another branch — a
 mutating subcommand warns on stderr, naming the branch and checkout, and then writes. The lock
-serializes writers on one machine; it cannot stop two branches from each taking the same id
-and merging.
+serializes writers on one machine; it cannot stop one developer's two branches from each taking
+the same id and merging.
 
 **Prose never belongs in a shell argument.** A ``--title``, ``--body`` or ``--text`` containing a
 backtick or ``$(`` is evaluated by the calling shell before this script sees it, and the log
@@ -354,33 +367,33 @@ argument at all. Prefer it for anything longer than a short, plain-text title.
 | `--title` | one-line summary; omit to read title and body together (see --file) |  |  |  |
 | `--body` | the idea in full; read from stdin when omitted |  |  |  |
 | `--file` | read the title (first line) and body (the rest) from a file — bypasses the shell entirely, so it is the safe route for prose that might contain backticks, $(...), quotes or newlines |  |  |  |
-| `idea` | six-digit idea id |  |  |  |
+| `idea` | idea id, <handle>-NNNNNN |  |  |  |
 | `to` |  |  |  |  |
 | `--promoted-to` | one or more governed document codes, required when promoting |  |  |  |
-| `idea` | six-digit idea id |  |  |  |
-| `idea` | six-digit idea id |  |  |  |
+| `idea` | idea id, <handle>-NNNNNN |  |  |  |
+| `idea` | idea id, <handle>-NNNNNN |  |  |  |
 | `--title` | the corrected title |  |  |  |
 | `--body` | the corrected body |  |  |  |
-| `idea` | six-digit idea id |  |  |  |
+| `idea` | idea id, <handle>-NNNNNN |  |  |  |
 | `--author` |  |  |  | yes |
 | `--kind` |  |  |  | yes |
 | `--text` | the contribution itself, for short plain text |  |  |  |
 | `--file` | read the contribution from a file |  |  |  |
-| `idea` | six-digit idea id |  |  |  |
+| `idea` | idea id, <handle>-NNNNNN |  |  |  |
 | `eid` | identity of the annotation to correct |  |  |  |
 | `--text` | the corrected text, for short plain text |  |  |  |
 | `--file` | read the corrected text from a file |  |  |  |
-| `idea` | six-digit idea id |  |  |  |
+| `idea` | idea id, <handle>-NNNNNN |  |  |  |
 | `--type` |  |  |  | yes |
-| `--target` | six-digit idea id this edge points to |  |  |  |
+| `--target` | idea id (<handle>-NNNNNN) this edge points to |  |  |  |
 | `--target-code` | governed document code this edge points to; extends and relates_to only |  |  |  |
-| `idea` | six-digit idea id |  |  |  |
+| `idea` | idea id, <handle>-NNNNNN |  |  |  |
 | `eid` | identity of the link to retract |  |  |  |
-| `idea` | six-digit idea id |  |  |  |
+| `idea` | idea id, <handle>-NNNNNN |  |  |  |
 | `--author` |  |  |  | yes |
 | `--file` | a JSON object of classification fields; read from stdin when omitted |  |  |  |
 | `--status` | only ideas in this status |  |  |  |
-| `idea` | six-digit idea id |  |  |  |
+| `idea` | idea id, <handle>-NNNNNN |  |  |  |
 
 Shared configuration flags: every configured path and value, resolved by the shared configuration precedence rule.
 
@@ -419,7 +432,7 @@ checkout's ``git status``; the skill compares it before and after its writes the
 
 **The corpus.** ``build`` selects the ideas whose folded status is in ``--status`` (one status or
 a comma-separated list, default ``triaged``), minus the ids an optional ``--exclude`` file lists
-(one six-digit id per line, ``#`` comments allowed; no file means no exclusions). It writes two
+(one idea id per line, ``#`` comments allowed; no file means no exclusions). It writes two
 files that differ only in what they carry, so the control analyst cannot tell its input differs:
 
     corpus-R1.md   title, body, links, findings
@@ -474,6 +487,39 @@ schema, where the transition table is declared.
 
 No command-line arguments.
 
+## `identity.py`
+
+```bash
+uv run "${CLAUDE_PLUGIN_ROOT}/scripts/identity.py"
+```
+
+Who is working: the developer handle that scopes every identifier a developer allocates.
+
+A team of developers on separate machines cannot coordinate identifier allocation through files a
+branch cannot see, so each identifier carries its author instead: an idea id, a phase's agent and a
+workstream's owner all name a developer handle.
+
+A developer is an entry in the ``owners`` map of ``<docs_root>/systems.yaml`` whose value is an
+object with ``emails``::
+
+    owners:
+      repository-owner: The person accountable for this repository.
+      ana:
+        description: Ana, user interface workstream.
+        emails: [ana@example.com]
+
+The handle is resolved in this order:
+
+1. the environment variable ``IDEA_REALIZATION_HANDLE`` (it must still name a developer);
+2. the owner whose ``emails`` contain ``git config user.email`` in the repository root.
+
+A handle is lower-case letters and digits, starting with a letter, at most 16 characters, so it can
+sit inside an identifier without ambiguity.
+
+Shared configuration flags: `--root`, `--docs-root`, resolved by the shared configuration precedence rule.
+
+Exit codes found in source: 0, 1.
+
 ## `plan_check.py`
 
 ```bash
@@ -525,6 +571,43 @@ Exit codes: 0 when everything required is present, 1 when something is still mis
 |---|---|---|---|---|
 | `--feature` | the features that will be used; triage and partition need claude | ideas, triage, partition, backlog, documents, all | [] |  |
 | `--yes` | install every missing required item; without it nothing is installed |  |  |  |
+
+Exit codes found in source: 0, 1.
+
+## `product.py`
+
+```bash
+uv run "${CLAUDE_PLUGIN_ROOT}/scripts/product.py"
+```
+
+The product repository this control repository drives.
+
+The control repository holds every governed record: ideas, plans, the backlog, session and review
+records. The code is built in a separate product repository. What is the same on every machine is
+tracked in ``.idea-realization/product.yaml``::
+
+    schema_version: 1
+    name: <product name>
+    remote: <git URL of the product repository>
+    integration_branch: main
+    ci_workflow: none
+
+Where the product checkout sits differs per machine, so it is configured, never tracked: the
+``product_root`` key (``--product-root``, ``IDEA_REALIZATION_PRODUCT_ROOT``, then the plugin
+option). ``product_worktree_dir`` names where product worktrees go, beside the product checkout.
+
+A declared path names its repository with a prefix: ``product:src/api/`` is a path in the product
+repository, and a path with no prefix is a path in the control repository.
+
+Before any script acts on the product checkout it calls ``verify``, which refuses unless the
+checkout's ``origin`` is the tracked ``remote``, so a wrong path cannot send work into the wrong
+repository.
+
+| Flag | Help | Choices | Default | Required |
+|---|---|---|---|---|
+| `command` |  |  |  |  |
+
+Shared configuration flags: `--root`, `--product-root`, `--product-worktree-dir`, resolved by the shared configuration precedence rule.
 
 Exit codes found in source: 0, 1.
 
@@ -692,3 +775,59 @@ Exit codes: 0 on success, 2 on a usage error.
 Shared configuration flags: every configured path and value, resolved by the shared configuration precedence rule.
 
 Exit codes found in source: 0, 2.
+
+## `workstreams.py`
+
+```bash
+uv run "${CLAUDE_PLUGIN_ROOT}/scripts/workstreams.py"
+```
+
+Show, claim and release workstreams, and check the registry that records them.
+
+A workstream is an ownership layer, not a lock: ``<docs_root>/workstreams.yaml`` declares the paths
+one developer owns, and every other developer's phases must keep their deliverables out of them::
+
+    schema_version: 1
+    workstreams:
+      - id: ui
+        title: User interface
+        owner: ""            # developer handle when claimed; "" when open
+        status: open         # open | claimed
+        paths: [product:web/]
+        interfaces: []
+
+A claim is made by committing that file on the integration branch. Developers work on separate
+machines, so a rejected push is the race signal: the developer pulls with rebase and runs ``check``
+again. This script only edits the file and validates it; it never commits or pushes.
+
+Subcommands:
+
+- ``show`` prints one line per workstream: id, status, owner or ``-``, title and paths.
+- ``claim <id>`` gives an open workstream to the current developer (``identity.handle``), then
+  validates the result and restores the original file when validation fails.
+- ``release <id>`` lets the current owner give a workstream back.
+- ``check`` prints every problem ``problems`` finds.
+
+``problems`` reports, one line each and sorted: schema violations; duplicate ids; a claimed
+workstream whose owner is not a developer handle, or an open one with an owner; two workstreams
+whose paths overlap; and an ``active`` or ``blocked`` phase whose agent is ``<handle>/<anything>``
+and which declares a deliverable inside a workstream claimed by another developer, unless its
+``cross_workstream`` list holds ``{workstream: <id>, approved_by: <owner>}`` for that workstream.
+Paths outside every workstream are shared ground. Once the registry defines a workstream, an
+``active`` or ``blocked`` phase whose agent carries no handle (``agent-builder`` rather than
+``ana/agent-builder``) is a problem too, because nobody can tell whose paths it may touch. An
+absent registry means the feature is not in use, and nothing is reported.
+
+Writing the file uses ``yaml.safe_dump`` in the file's own key order, so comments are not kept.
+
+Exit codes: 0 on success; 1 when a problem is found, the workstream is unknown, already claimed or
+owned by someone else, the current developer cannot be resolved, or the claim fails validation;
+2 when a configured path is refused.
+
+| Flag | Help | Choices | Default | Required |
+|---|---|---|---|---|
+| `id` | workstream id |  |  |  |
+
+Shared configuration flags: `--root`, `--docs-root`, `--backlog-path`, resolved by the shared configuration precedence rule.
+
+Exit codes found in source: 0, 1.

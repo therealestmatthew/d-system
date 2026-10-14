@@ -20,11 +20,41 @@
         "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
       },
       "additionalProperties": {
-        "type": "string",
-        "minLength": 1,
-        "description": "Accountable role or person; no fabricated approval."
+        "oneOf": [
+          {
+            "type": "string",
+            "minLength": 1,
+            "description": "Accountable role or person; no fabricated approval."
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "description",
+              "emails"
+            ],
+            "description": "A developer: an accountable person whose key is the handle that scopes the identifiers they allocate.",
+            "properties": {
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Who the developer is and what they own."
+              },
+              "emails": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 3
+                },
+                "description": "Git author emails that identify this developer."
+              }
+            }
+          }
+        ]
       },
-      "description": "Owner directory: key to the accountable role. Every document and system names one of these keys."
+      "description": "Owner directory: key to the accountable role, or to a developer with git author emails. Every document and system names one of these keys."
     },
     "systems": {
       "type": "array",

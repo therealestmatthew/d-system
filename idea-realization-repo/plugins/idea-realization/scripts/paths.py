@@ -32,6 +32,13 @@ inside the root it is taken from, with no ``.git`` component; an absolute path i
 kept. ``worktree_dir`` must resolve outside the primary checkout. ``integration_branch`` must not
 start with ``-`` and must pass ``git check-ref-format --branch``. Each script's ``main`` turns a
 ``PathError`` into exit 2 with its message (``exits_on_path_error``).
+
+``product_root`` and ``product_worktree_dir`` name the product repository this control repository
+drives (see ``product.py``). They differ per machine, may be unset, and must resolve outside the
+control repository. ``product_worktree_dir`` resolves against the product checkout, and
+``<product>`` in it is the product checkout's directory name. ``aws_read_profile``,
+``aws_deploy_profile`` and ``aws_region`` are plain text, may be unset, and are read by the cloud
+agents, which refuse to run without them.
 """
 
 from __future__ import annotations
@@ -73,10 +80,13 @@ class Key:
 
 
 #: Keys that hold plain text rather than a path. A ``multiple`` key is a list of paths.
-TEXT_KEYS = {"integration_branch"}
+TEXT_KEYS = {"integration_branch", "aws_read_profile", "aws_deploy_profile", "aws_region"}
 
 #: Keys that resolve against the primary checkout rather than the current one.
 PRIMARY_KEYS = {"worktree_dir"}
+
+#: Keys that locate the product repository; they may be unset and resolve outside this repository.
+PRODUCT_KEYS = {"product_root", "product_worktree_dir"}
 
 
 def load_keys(manifest: Path = MANIFEST) -> dict[str, Key]:
@@ -213,9 +223,33 @@ class Config:
     def path(self, name: str) -> Path:
         value = self.values[name]
         assert isinstance(value, str) and KEYS[name].kind == "path", name
+        if name in PRODUCT_KEYS:
+            root = self.product_root()
+            if root is None:
+                raise PathError("product_root", "", "is not set on this machine")
+            return root if name == "product_root" else self.product_worktree_dir(root)
         if name in PRIMARY_KEYS:
             return _outside(name, value, primary_checkout(self.root))
         return _contained(name, value, self.root)
+
+    def product_root(self) -> Path | None:
+        """The product checkout on this machine, or None when it is not configured."""
+        value = self.values["product_root"]
+        assert isinstance(value, str)
+        if not value:
+            return None
+        return _outside("product_root", value, primary_checkout(self.root))
+
+    def product_worktree_dir(self, product_root: Path) -> Path:
+        """Where product worktrees go: beside the product checkout, never inside either one."""
+        value = self.values["product_worktree_dir"]
+        assert isinstance(value, str)
+        path = _to_path(product_root, value.replace("<product>", product_root.name))
+        for checkout in (product_root, primary_checkout(self.root)):
+            if _inside(checkout, path) is not None:
+                raise PathError("product_worktree_dir", value,
+                                f"resolves inside {checkout}; it must name a directory beside it")
+        return path.resolve()
 
     def paths(self, name: str) -> list[Path]:
         value = self.values[name]
@@ -231,6 +265,8 @@ class Config:
         """Every key that fails validation, in manifest order. Reads only."""
         found = []
         for name, key in KEYS.items():
+            if name in PRODUCT_KEYS and not self.values["product_root"]:
+                continue
             reader = {"path": self.path, "paths": self.paths, "text": self.text}[key.kind]
             try:
                 reader(name)
@@ -274,7 +310,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     config = resolve(parser.parse_args(argv))
     print(f"root: {config.root}")
     for name, key in KEYS.items():
-        if key.kind == "path":
+        if name in PRODUCT_KEYS and config.product_root() is None:
+            print(f"{name}: (not set)")
+        elif key.kind == "path":
             print(f"{name}: {config.path(name)}")
         elif key.kind == "paths":
             print(f"{name}: {', '.join(str(p) for p in config.paths(name))}")

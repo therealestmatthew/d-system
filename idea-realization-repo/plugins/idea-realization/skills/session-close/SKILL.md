@@ -1,31 +1,37 @@
 ---
 name: session-close
-description: Finalize the session record, run an independent adversarial review of the branch against the phase's acceptance, and mark the phase complete only when verification ran green, the review found no unresolved discrepancy, and the branch is integrated with the owner's approval. Use when a phase's work is finished and ready to hand off or close.
+description: Finalize the session record, run the verification, have a dedicated gating reviewer judge the product diff against the phase's acceptance, merge the product and control branches only on a passing review, and mark the phase complete only when all three conditions hold. Use when a phase's work is finished and ready to hand off or close.
 ---
 
 # Close the session
 
-Finishes the session record the `checkpoint` skill maintains, adds what a checkpoint skips, and is
-the **only** procedure that may mark a phase complete.
+Finishes the session record the `checkpoint` skill maintains, runs the review gate, integrates on a
+pass, and is the **only** procedure that may mark a phase complete.
+
+**Two repositories.** The code is in the product worktree, on `agent/<phase-id>` in the product
+repository; the session record and review records are in the control worktree, on
+`agent/<phase-id>` in the control repository (see `session-start` and `docs/two-repositories.md`).
+A repository with no `.idea-realization/product.yaml` has only the control branch: skip every
+product step below.
 
 ## When a phase may be marked complete
 
-An agent never completes a phase on its own judgement that the work looks finished. A coordinator
-— the owner, or an agent running this skill — may set a phase to `status: complete` when, and only
-when, **all three** of these hold:
+An agent never completes a phase on its own judgement that the work looks finished. It may set a
+phase to `status: complete` when, and only when, **all three** of these hold:
 
-1. **Verification ran green.** Every command in the phase's `verification` list ran, and its real
-   output is recorded in the session record.
-2. **An independent review found no unresolved discrepancy.** An adversarial review of the
-   branch's diff against the phase's `acceptance` ran in a separate agent that did not share this
-   session's context, and every finding is fixed or explicitly reported as accepted by the owner.
-3. **The branch is integrated with the owner's approval.** The owner approved merging this
-   branch into the integration branch, for this phase, and the merge happened.
+1. **Verification ran green.** Every command in the phase's `verification` list ran, after the
+   rebase, and its real output is recorded in the session record.
+2. **A gating review passed.** A dedicated reviewer agent that did not share this session's context
+   judged the diff against the phase's `acceptance` and returned `pass`, and every finding is fixed
+   or explicitly accepted by the developer who owns the workstream, with the disposition recorded.
+3. **The branches are integrated.** The product branch was fast-forwarded into the product
+   integration branch, and the control branch into the control integration branch, after that
+   pass. **A passing gating review is the approval for both merges**; no separate per-merge
+   approval is asked for.
 
-Together these substitute for the owner's synchronous judgement, so none is optional. **Where any
-one is unmet, the phase stays `active`** (or `queued`, if handed off unfinished): say plainly that
-the session looks done, run `checkpoint` to record where it stands, and stop. The review in step 3
-is never skipped, and the completion step exists nowhere else.
+Where any one is unmet, the phase stays `active` (or `queued`, if handed off unfinished): say
+plainly that the session looks done, run `checkpoint` to record where it stands, and stop. The
+review is never skipped, and the completion step exists nowhere else.
 
 ## Values
 
@@ -37,11 +43,19 @@ CLAUDE_PLUGIN_OPTION_BACKLOG_PATH='${user_config.backlog_path}' \
 CLAUDE_PLUGIN_OPTION_DOCS_ROOT='${user_config.docs_root}' \
 CLAUDE_PLUGIN_OPTION_INTEGRATION_BRANCH='${user_config.integration_branch}' \
 CLAUDE_PLUGIN_OPTION_WORKTREE_DIR='${user_config.worktree_dir}' \
+CLAUDE_PLUGIN_OPTION_PRODUCT_ROOT='${user_config.product_root}' \
+CLAUDE_PLUGIN_OPTION_PRODUCT_WORKTREE_DIR='${user_config.product_worktree_dir}' \
 uv run "${CLAUDE_PLUGIN_ROOT}/scripts/paths.py"
+
+CLAUDE_PLUGIN_OPTION_PRODUCT_ROOT='${user_config.product_root}' \
+CLAUDE_PLUGIN_OPTION_PRODUCT_WORKTREE_DIR='${user_config.product_worktree_dir}' \
+uv run "${CLAUDE_PLUGIN_ROOT}/scripts/product.py" verify
 ```
 
-Use `backlog_path` as **the backlog** and `integration_branch` as **the integration branch**, exactly
-as printed.
+Use `backlog_path` as **the backlog** and `integration_branch` as **the control integration
+branch**; from `product.py verify`, `root` as **the product checkout** and `integration_branch` as
+**the product integration branch**, exactly as printed. If `product.py verify` fails, stop and
+report it: nothing below may act on a product checkout it refuses.
 
 ## 1. Identify the phase and run the checkpoint first
 
@@ -51,68 +65,107 @@ conditions, and completes nothing. Never invent or retroactively claim a phase, 
 this against a phase that already closed earlier in the conversation.
 
 Run every step of the `checkpoint` skill now, against the current state, so `## Phase` through
-`## Unresolved` reflect the repository as it stands at close.
+`## Unresolved` reflect both repositories as they stand at close.
 
-## 2. Name the diff to review
+## 2. Rebase both branches and run the verification
 
-- Work on `agent/<phase-id>` (or `agent/<slug>` for unclaimed work): the range is
-  `<integration branch>...HEAD`.
-- Work made directly on the integration branch: find the commit that set this phase active
-  (`git log --oneline -- <the backlog>`) and use `<that commit>..HEAD`.
+1. In the product worktree: `git fetch` and `git rebase origin/<product integration branch>`.
+2. In the control worktree: `git rebase <control integration branch>` after pulling it in the
+   control primary checkout.
+3. Run every command in the phase's `verification` list and keep the real output. A command runs in
+   the product worktree unless it starts with `control:`, which runs the rest in the control
+   worktree. A failing check is a result to record, not a step to retry until quiet.
+4. Run the control check (the `backlog` skill's check command) in the control worktree.
 
-## 3. Run an independent review
+**This run, after the rebase and against peers' merged work, is the one the review judges.** If it
+fails, fix it on the branch and run it again before going on.
 
-Launch a **fresh agent that does not inherit this session's context** — never a fork of this
-session, which carries its conclusions and defeats the point. Prefer a dedicated reviewer or
-adversary agent type when the repository defines one. Give it, in its prompt:
+## 3. Run the gating review
 
-- the phase id with its `scope`, `acceptance` and `verification` lists pasted in (for an unclaimed
-  session: the owner's instruction as given, the self-declared conditions, and a plain statement
-  that the session being reviewed wrote them, so the reviewer also judges whether they are a fair
-  reading of the instruction);
-- the exact range from step 2, with instructions to run `git diff` and `git log` on it itself;
-- the session record's path and content;
-- its job: decide independently, from the diff and its own run of the verification commands,
-  whether each condition holds — not whether the record says so — and flag anything the record
-  claims that the diff or a rerun does not support. "No discrepancies found" is a valid finding.
+Launch a **fresh agent of a dedicated reviewer type** — `phase-adversary` for most phases,
+`validator-code` when the phase is a narrow code change judged against one requirement. Never a fork
+of this session, which carries its conclusions, and never a general-purpose agent. Give it, in its
+prompt:
 
-Wait for its report. Never paraphrase away an uncomfortable finding, and never proceed as if the
+- the phase id with its `scope`, `acceptance`, `verification` and `deliverables` pasted in (for an
+  unclaimed session: the instruction as given, the self-declared conditions, and a plain statement
+  that the session being reviewed wrote them);
+- the product worktree path and the range `origin/<product integration branch>...HEAD` there, and
+  the control worktree path and `<control integration branch>...HEAD` there, with instructions to
+  run `git diff` and `git log` on each itself;
+- the paths of the requirement and plan documents the phase names, in the control worktree;
+- the step 2 output, as evidence it may re-run but must not take on trust;
+- its job: decide independently, from the diffs and its own run of the verification, whether each
+  acceptance condition holds, and end its reply with `VERDICT: pass` or `VERDICT: reject`.
+  "No findings" is a valid result.
+
+Wait for its reply. Never paraphrase away an uncomfortable finding, and never proceed as if the
 review passed before it returns.
 
-## 4. Record the review verbatim
+## 4. Record the verdict
 
-Add `## Review` after the sections `checkpoint` maintains, with the reviewer's findings condition
-by condition, quoted rather than summarised, and each finding's disposition: fixed (with the
-change), or accepted (with who accepted it).
+Write the reply as a verdict record in the control worktree:
+`<docs_root>/reviews/<date>-<phase-id>-<reviewer type>.json`, valid against
+`.idea-realization/schemas/review-verdict.schema.json`. `repository` is `product`,
+`reviewed_commit` is the full product `HEAD` the reviewer judged, `gating` is `true`,
+`definition_sha256` is `sha256sum` of the reviewer's agent definition file, and the findings are
+copied as written. Then:
+
+- **Fix or accept every finding.** A fix is a new commit on the branch; a fix that changes the
+  product diff needs a fresh review of the new `HEAD`, recorded as a second record (`…-2.json`). An
+  acceptance names who accepted it — the developer who owns the workstream the finding is in.
+  Record each finding's `disposition`.
+- **A `reject` stands until a later review passes.** Two rejects in a row on the same finding: stop,
+  leave the phase `active`, and report it to the owner rather than trying a third time.
+
+Add `## Review` to the session record with the reviewer's findings quoted, not summarised, the
+record's path, and each disposition. Commit the record and the session record on the control branch.
 
 ## 5. Record what a checkpoint skips
 
-- `## Decisions` — what was decided and why, including where the owner overrode a recommendation.
+- `## Decisions` — what was decided and why, including where a recommendation was overridden.
 - `## Corrections` — mistakes made and fixed during the session; omit only if there were none.
 - `## Left undone` — what remains and why it was left, for whoever picks it up next.
 
 Write these as narrative someone could read in six months, not as a restatement of the scope.
 
-## 6. Hand off for integration
+## 6. Integrate — only on a passing verdict
 
-Rebase onto the integration branch, re-run the check and the repository's tests, and ask the owner
-whether to integrate, as the `session-start` skill's hand-off describes. Under the plugin's
-`docs/multi-session.md`, the owner's approval arrives relayed as `GRANTED merge`. Until the owner approves and
-the merge happens, condition 3 is unmet and the phase stays `active`.
+Confirm each primary checkout is clean (`git -C <checkout> status --short` shows nothing). Never
+stash a peer's uncommitted work and never force an integration around it.
+
+**Product first**, from the product primary checkout on its integration branch:
+
+```bash
+git -C <product checkout> pull --ff-only
+git -C <product checkout> merge --ff-only agent/<phase-id>
+git -C <product checkout> push
+```
+
+**Then control**, from the control primary checkout on its integration branch:
+
+```bash
+git pull --ff-only
+git merge --ff-only agent/<phase-id>
+```
+
+If either merge is not a fast-forward, its integration branch moved since the rebase: go back to
+step 2, rebase, re-run the verification, and if the product diff changed, review again. Never
+resolve it with a merge commit that skips the green run.
 
 ## 7. Decide completion — the only step that may write `status: complete`
 
-After the owner-approved merge, and only if **all three** conditions above hold and the recomputed
-acceptance verdicts are all `Met`: on the integration branch, set the phase's `status: complete`,
-with `session`, `completion_evidence` (files that exist) and `result` (the actual verification and
-review outcome), and remove it from `next_up`. Update the record's `## Backlog` to match.
+Only if **all three** conditions hold: on the control integration branch, set the phase's
+`status: complete`, with `session`, `completion_evidence` (files that exist; product files written
+`product:<path>`) and `result` (the actual verification and review outcome, naming the product
+merge commit), and remove it from `next_up`. Update the record's `## Backlog` to match.
 
 An unclaimed session completes nothing, however clean its review: there is no phase line to write.
 
 If any condition does not hold, the phase stays open with a `next_action` that names exactly what
 remains, including anything the review surfaced. Closing honestly incomplete is a correct outcome.
 
-## 8. Regenerate the catalog and confirm the check is green
+## 8. Regenerate the catalog, confirm the check is green, push
 
 ```bash
 CLAUDE_PLUGIN_OPTION_DOCS_ROOT='${user_config.docs_root}' \
@@ -124,14 +177,16 @@ CLAUDE_PLUGIN_OPTION_BACKLOG_PATH='${user_config.backlog_path}' \
 CLAUDE_PLUGIN_OPTION_DOCS_ROOT='${user_config.docs_root}' \
 CLAUDE_PLUGIN_OPTION_EXEMPT_FILES='${user_config.exempt_files}' \
 CLAUDE_PLUGIN_OPTION_INTEGRATION_BRANCH='${user_config.integration_branch}' \
+CLAUDE_PLUGIN_OPTION_PRODUCT_ROOT='${user_config.product_root}' \
 uv run "${CLAUDE_PLUGIN_ROOT}/scripts/check.py"
 ```
 
-Commit the completion edit and the regenerated catalog together. If the check fails, fix the cause
-first; never close a session on a failing tree.
+Commit the completion edit and the regenerated catalog together and push the control integration
+branch. If the check fails, fix the cause first; never close a session on a failing tree. Then
+remove both worktrees and both `agent/<phase-id>` branches, copying any ignored content out first.
 
 ## 9. Report
 
 State plainly whether the phase reached complete or stayed open and why, the review's actual
-verdict, the session record's code, and the commits made. This is the one report in the session's
-life that should read as a finished account.
+verdict and record path, the session record's code, and the commits made in each repository. This
+is the one report in the session's life that should read as a finished account.

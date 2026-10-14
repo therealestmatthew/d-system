@@ -36,6 +36,10 @@ SCHEMA = paths.PLUGIN_ROOT / "schemas" / "backlog.schema.json"
 REFUSED_PARTS = {".git", ".venv", "node_modules"}
 
 
+#: Prefix of a path in the product repository rather than this one (see product.py).
+PRODUCT_PREFIX = "product:"
+
+
 def repository_path(root: Path, value: str) -> Path:
     """Resolve a declared path inside the repository, refusing escapes and symlinks."""
     path = Path(value)
@@ -74,10 +78,23 @@ def load_catalog(config: paths.Config) -> tuple[list[str], dict[str, Any]]:
 
 
 def inspect(root: Path, catalog: dict[str, Any], documents: dict[str, Any], systems: set[str],
-            owners: set[str], today: date) -> list[str]:
-    """Every rule in ``backlog.inspect_backlog``, with declared paths resolved under ``root``."""
-    return backlog.inspect_backlog(catalog, documents, systems, owners,
-                                   lambda value: repository_path(root, value).is_file(), today)
+            owners: set[str], today: date, product_root: Path | None = None) -> list[str]:
+    """Every rule in ``backlog.inspect_backlog``, with declared paths resolved under ``root``.
+
+    A ``product:`` path resolves under ``product_root``. Without a product checkout on this machine
+    its shape is still validated, and its existence is taken as given.
+    """
+
+    def exists(value: str) -> bool:
+        if value.startswith(PRODUCT_PREFIX):
+            relative_path = value.removeprefix(PRODUCT_PREFIX)
+            if product_root is None:
+                repository_path(Path("."), relative_path)
+                return True
+            return repository_path(product_root, relative_path).is_file()
+        return repository_path(root, value).is_file()
+
+    return backlog.inspect_backlog(catalog, documents, systems, owners, exists, today)
 
 
 def audit(config: paths.Config, today: date | None = None,
@@ -104,7 +121,7 @@ def audit(config: paths.Config, today: date | None = None,
                 "backlog resolves its plans, systems and owners through it"]
     root = config.root
     errors = inspect(root, catalog, scanned.documents, set(scanned.systems),
-                     set(scanned.owners), today or date.today())
+                     set(scanned.owners), today or date.today(), config.product_root())
     record = catalog.get("decision_record")
     if record is None:
         note("status-regression not run: the backlog names no decision_record, so a reopened "

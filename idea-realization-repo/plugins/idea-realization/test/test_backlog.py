@@ -667,8 +667,8 @@ def test_session_close_states_the_three_completion_conditions() -> None:
     text = skill("session-close")
     assert "all three" in text
     for condition in ("Verification ran green",
-                      "An independent review found no unresolved discrepancy",
-                      "The branch is integrated with the owner's approval"):
+                      "A gating review passed",
+                      "The branches are integrated"):
         assert condition in text, condition
 
 

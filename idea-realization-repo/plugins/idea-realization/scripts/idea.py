@@ -13,6 +13,12 @@ The caller supplies prose. This script generates the identifier, the timestamp a
 event shape, validates the result against the plugin's ``schemas/idea.schema.json``, and
 appends it.
 
+**An idea id is author-scoped: ``<handle>-NNNNNN``.** The handle names the developer who
+recorded the idea (``identity.py`` resolves it from ``<docs_root>/systems.yaml``), and the
+six-digit sequence counts that developer's own ideas, so developers adding ideas in separate
+clones never allocate the same id. Only ``add`` allocates an id, so only ``add`` needs the
+handle; when it cannot be resolved, ``add`` exits 1 and appends nothing.
+
 **There is deliberately no way to supply a timestamp.** A log whose times can be chosen is
 not evidence of anything. The ``at`` values below are generated internally and the CLI
 exposes no option that reaches them.
@@ -80,8 +86,8 @@ never blocks the next one. ``list`` and ``show`` take no lock.
 **Ideas are recorded only on the integration branch in the primary checkout.** Run anywhere
 else in a git repository — a linked worktree, or the primary checkout on another branch — a
 mutating subcommand warns on stderr, naming the branch and checkout, and then writes. The lock
-serializes writers on one machine; it cannot stop two branches from each taking the same id
-and merging.
+serializes writers on one machine; it cannot stop one developer's two branches from each taking
+the same id and merging.
 
 **Prose never belongs in a shell argument.** A ``--title``, ``--body`` or ``--text`` containing a
 backtick or ``$(`` is evaluated by the calling shell before this script sees it, and the log
@@ -114,12 +120,16 @@ from ideas import (
     SCHEMA,
     IdeaError,
     fold,
+    format_id,
+    id_key,
     identity,
     legal_transitions,
     link_diagnostics,
     load_events,
     new_eid,
 )
+from identity import IdentityError
+from identity import handle as developer_handle
 from jsonschema import Draft7Validator  # type: ignore[import-untyped]
 
 POINTER_KINDS = ("doc", "phase", "commit")
@@ -163,8 +173,14 @@ def _now() -> str:
     return dt.datetime.now().astimezone().replace(microsecond=0).isoformat()
 
 
-def _next_id(state: dict[str, dict[str, Any]]) -> str:
-    return f"{max((int(k) for k in state), default=0) + 1:06d}"
+def _next_id(state: dict[str, dict[str, Any]], handle: str) -> str:
+    """``handle``'s next id: one past the highest sequence that handle has already taken.
+
+    Each developer counts only their own ideas, so two developers adding ideas in separate
+    clones never allocate the same id.
+    """
+    taken = (sequence for owner, sequence in map(id_key, state) if owner == handle)
+    return format_id(handle, max(taken, default=0) + 1)
 
 
 def _require(state: dict[str, dict[str, Any]], idea: str) -> dict[str, Any]:
@@ -403,9 +419,11 @@ def off_integration_warning(config: paths.Config) -> str | None:
 # --- Operations -----------------------------------------------------------------------------
 
 
-def add(title: str, body: str, log: Path) -> dict[str, Any]:
+def add(title: str, body: str, log: Path, handle: str) -> dict[str, Any]:
+    """Record a new idea under ``handle``, the developer allocating its id."""
     state = fold(load_events(log))
-    event = build_created(_next_id(state), title.strip(), body.strip(), _now(), new_eid())
+    event = build_created(_next_id(state, handle), title.strip(), body.strip(), _now(),
+                          new_eid())
     append(event, log)
     return event
 
@@ -675,12 +693,12 @@ def _pointers(args: argparse.Namespace) -> list[dict[str, str]] | None:
 
 
 def list_ideas(log: Path, status: str | None = None) -> list[str]:
-    """One line per idea, in id order: id, status and effective title."""
+    """One line per idea, ordered by handle then sequence: id, status and effective title."""
     state = fold(load_events(log))
     return [
-        f"{idea} | {entry['status']} | {entry['title']}"
-        for idea, entry in sorted(state.items())
-        if status is None or entry["status"] == status
+        f"{idea} | {state[idea]['status']} | {state[idea]['title']}"
+        for idea in sorted(state, key=id_key)
+        if status is None or state[idea]["status"] == status
     ]
 
 
@@ -711,7 +729,7 @@ def _parser() -> argparse.ArgumentParser:
     )
 
     moved = command("status", "move an idea's status")
-    moved.add_argument("idea", help="six-digit idea id")
+    moved.add_argument("idea", help="idea id, <handle>-NNNNNN")
     moved.add_argument("to", choices=sorted({t for _, t in legal_transitions()}))
     moved.add_argument(
         "--promoted-to", nargs="+",
@@ -729,17 +747,17 @@ def _parser() -> argparse.ArgumentParser:
         )
 
     again = command("revisit", "reopen a discarded idea; permitted once")
-    again.add_argument("idea", help="six-digit idea id")
+    again.add_argument("idea", help="idea id, <handle>-NNNNNN")
 
     corrected = command("amend", "correct an idea's title and/or body without rewriting it")
-    corrected.add_argument("idea", help="six-digit idea id")
+    corrected.add_argument("idea", help="idea id, <handle>-NNNNNN")
     corrected.add_argument("--title", help="the corrected title")
     corrected.add_argument("--body", help="the corrected body")
 
     annotated = command(
         "annotate", "add a note, finding, assessment or lineage; permitted on any idea"
     )
-    annotated.add_argument("idea", help="six-digit idea id")
+    annotated.add_argument("idea", help="idea id, <handle>-NNNNNN")
     annotated.add_argument("--author", required=True, help=f"{OWNER} or an agent name")
     annotated.add_argument("--kind", required=True, choices=ANNOTATION_KINDS)
     annotated.add_argument("--text", help="the contribution itself, for short plain text")
@@ -748,16 +766,16 @@ def _parser() -> argparse.ArgumentParser:
     annotation_fix = command(
         "amend-annotation", "correct one annotation's text by its own identity"
     )
-    annotation_fix.add_argument("idea", help="six-digit idea id")
+    annotation_fix.add_argument("idea", help="idea id, <handle>-NNNNNN")
     annotation_fix.add_argument("eid", help="identity of the annotation to correct")
     annotation_fix.add_argument("--text", help="the corrected text, for short plain text")
     annotation_fix.add_argument("--file", type=Path, help="read the corrected text from a file")
 
     linked = command("link", "assert a typed edge to another idea")
-    linked.add_argument("idea", help="six-digit idea id")
+    linked.add_argument("idea", help="idea id, <handle>-NNNNNN")
     linked.add_argument("--type", required=True, dest="type_", choices=LINK_TYPES)
     linked_target = linked.add_mutually_exclusive_group(required=True)
-    linked_target.add_argument("--target", help="six-digit idea id this edge points to")
+    linked_target.add_argument("--target", help="idea id (<handle>-NNNNNN) this edge points to")
     linked_target.add_argument(
         "--target-code",
         help="governed document code this edge points to; extends and relates_to only",
@@ -766,11 +784,11 @@ def _parser() -> argparse.ArgumentParser:
     retracted = command(
         "retract-link", "clear a link's target by its own identity — never repoint one"
     )
-    retracted.add_argument("idea", help="six-digit idea id")
+    retracted.add_argument("idea", help="idea id, <handle>-NNNNNN")
     retracted.add_argument("eid", help="identity of the link to retract")
 
     classified = command("classify", "record an idea's record kind and axis values")
-    classified.add_argument("idea", help="six-digit idea id")
+    classified.add_argument("idea", help="idea id, <handle>-NNNNNN")
     classified.add_argument("--author", required=True, help=f"{OWNER} or an agent name")
     classified.add_argument(
         "--file", type=Path,
@@ -781,7 +799,7 @@ def _parser() -> argparse.ArgumentParser:
     listed.add_argument("--status", help="only ideas in this status")
 
     shown = command("show", "print one idea's folded state as JSON; writes nothing")
-    shown.add_argument("idea", help="six-digit idea id")
+    shown.add_argument("idea", help="idea id, <handle>-NNNNNN")
     return parser
 
 
@@ -791,7 +809,11 @@ def _operation(
     """Read every input first, so the lock is never held while waiting on a file or stdin."""
     if args.command == "add":
         title, body = _read_add_input(args)
-        return lambda: (add(title, body, log), [])
+        try:
+            handle = developer_handle(config)
+        except IdentityError as exc:
+            raise IdeaError(str(exc)) from exc
+        return lambda: (add(title, body, log, handle), [])
     if args.command == "status":
         pointers = _pointers(args)
         return lambda: (change_status(args.idea, args.to, args.promoted_to, log=log,

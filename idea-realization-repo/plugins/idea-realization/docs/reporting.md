@@ -27,7 +27,7 @@ Names are looked up, not invented:
 
 ## Ideas are named id first
 
-An idea is the exception. Its six-digit id is the lookup handle and its title is prose, so the id
+An idea is the exception. Its id (`<handle>-NNNNNN`) is the lookup handle and its title is prose, so the id
 comes first and a short gloss follows in parentheses: `<id> (<short title>)`, not
 "the <short title> (`<id>`)". This form applies wherever an idea is named: in prose, in commit
 messages and in finding annotations.

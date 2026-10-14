@@ -9,8 +9,8 @@
   "definitions": {
     "idea_id": {
       "type": "string",
-      "pattern": "^[0-9]{6}$",
-      "description": "A six-digit idea id from the idea log."
+      "pattern": "^[a-z][a-z0-9]{0,15}-[0-9]{6}$",
+      "description": "An idea id from the idea log: `<handle>-NNNNNN`."
     },
     "idea_ids": {
       "type": "array",

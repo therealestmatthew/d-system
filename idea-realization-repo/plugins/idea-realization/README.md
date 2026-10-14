@@ -21,7 +21,7 @@ Then, once per repository:
 1. **Check the machine.** `/idea-realization:prerequisites` checks Python 3.12+, `uv`, `git` and,
    for triage and partition, the `claude` CLI. It installs nothing without a yes.
 2. **Scaffold.** `/idea-realization:scaffold` asks which features to set up (`ideas`,
-   `partition`, `backlog`, `documents`, or all four), shows a dry run, and asks separately before
+   `partition`, `backlog`, `documents`, `workstreams`, `reviews`, `product`, or all), shows a dry run, and asks separately before
    adding the staging directory to `.gitignore`. It never overwrites a file; running it again
    reports every path as `skipped … (exists)` and creates nothing.
 3. **Confirm.** `/idea-realization:doctor` reports every recorded file as unchanged, drifted or

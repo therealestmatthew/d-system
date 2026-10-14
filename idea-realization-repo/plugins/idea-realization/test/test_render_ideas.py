@@ -23,9 +23,13 @@ from ideas import fold, load_events
 TODAY = dt.date(2030, 1, 10)
 
 
-def iid(n: int) -> str:
+#: The developer handle every fixture idea is recorded under unless a test names another.
+ANA = "ana"
+
+
+def iid(n: int, handle: str = ANA) -> str:
     """An idea id, built rather than written, so no six-digit literal appears in the suite."""
-    return f"{n:06d}"
+    return f"{handle}-{n:06d}"
 
 
 ONE, TWO, NINE = iid(1), iid(2), iid(9)
@@ -81,7 +85,7 @@ def section(rendered: str, idea_id: str) -> str:
 
 def test_rendered_findings_collapse_and_notes_stay_visible(log: Path) -> None:
     """Notes stay visible; a hundred findings collapse into one details block."""
-    idea.add("Title", "Body", log)
+    idea.add("Title", "Body", log, ANA)
     idea.annotate(ONE, ideas.OWNER, "note", "an owner note", log=log)
     for i in range(100):
         idea.annotate(ONE, "agent-blue", "finding", f"finding {i}", log=log)
@@ -97,8 +101,8 @@ def test_rendered_findings_collapse_and_notes_stay_visible(log: Path) -> None:
 
 def test_rendered_links_show_the_derived_inverse(log: Path) -> None:
     """The asserting idea shows the edge; its target shows the derived inverse."""
-    idea.add("First", "Body", log)
-    idea.add("Second", "Body two", log)
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body two", log, ANA)
     idea.link(ONE, "extends", TWO, log=log)
 
     rendered = render_ideas.render(state_of(log))
@@ -109,8 +113,8 @@ def test_rendered_links_show_the_derived_inverse(log: Path) -> None:
 
 def test_a_retracted_link_is_not_rendered(log: Path) -> None:
     """A retracted edge shows on neither side."""
-    idea.add("First", "Body", log)
-    idea.add("Second", "Body two", log)
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body two", log, ANA)
     event, _ = idea.link(ONE, "relates_to", TWO, log=log)
     idea.retract_link(ONE, ideas.identity(event), log=log)
 
@@ -121,10 +125,10 @@ def test_a_retracted_link_is_not_rendered(log: Path) -> None:
 
 def test_the_view_reflects_a_revisit_and_a_promotion(log: Path) -> None:
     """The status line carries the revisit count and what the idea became."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     idea.change_status(ONE, "discarded", log=log)
     idea.revisit(ONE, log=log)
-    idea.add("Second", "Body two", log)
+    idea.add("Second", "Body two", log, ANA)
     idea.change_status(TWO, "promoted", promoted_to=["DOC-016"], log=log)
 
     rendered = render_ideas.render(state_of(log))
@@ -150,7 +154,7 @@ def test_the_view_shows_a_document_link_classification_and_closing_pointers(
     head = subprocess.run(["git", "-C", str(tmp_path), "rev-parse", "HEAD"],
                           capture_output=True, text=True, check=True).stdout.strip()
 
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     idea.link(ONE, "relates_to", None, log=log, target_code="DOC-001", config=config)
     idea.classify(ONE, "agent-blue", {
         "record_kind": "knowledge",
@@ -190,8 +194,8 @@ def test_an_empty_log_renders_to_the_header_alone(tmp_path: Path) -> None:
 
 def test_rendering_twice_over_a_fixture_log_is_byte_identical(tmp_path: Path, log: Path) -> None:
     """Two runs of the renderer over the same log write the same bytes."""
-    idea.add("First", "Body", log)
-    idea.add("Second", "Body two", log)
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body two", log, ANA)
     idea.annotate(ONE, "agent-blue", "finding", "a finding", log=log)
     idea.link(TWO, "extends", ONE, log=log)
     view = paths.resolve({"root": str(tmp_path)}, env={}).path("ideas_view_path")
@@ -208,7 +212,7 @@ def test_rendering_twice_over_a_fixture_log_is_byte_identical(tmp_path: Path, lo
 
 def test_a_current_view_passes(config: paths.Config, log: Path) -> None:
     """A view matching a fresh render has no error."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     write_view(config)
     assert render_ideas.stale_view_errors(config) == []
     assert ideas_check.check(config, TODAY) == []
@@ -218,9 +222,9 @@ def test_an_idea_appended_without_rerendering_fails_naming_the_view(
     config: paths.Config, log: Path
 ) -> None:
     """An append the view does not reflect is reported until the view is re-rendered."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     write_view(config)
-    idea.add("Scratch idea for the staleness test", "Appended without re-rendering.", log)
+    idea.add("Scratch idea for the staleness test", "Appended without re-rendering.", log, ANA)
 
     errors = render_ideas.stale_view_errors(config)
     assert len(errors) == 1
@@ -232,7 +236,7 @@ def test_an_idea_appended_without_rerendering_fails_naming_the_view(
 
 def test_a_missing_view_fails(config: paths.Config, log: Path) -> None:
     """A log without its view is reported as missing."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     errors = render_ideas.stale_view_errors(config)
     assert errors and errors[0].startswith("ideas/ideas.md is missing")
 
@@ -240,7 +244,7 @@ def test_a_missing_view_fails(config: paths.Config, log: Path) -> None:
 def test_a_hand_edit_to_the_view_is_reported(tmp_path: Path, config: paths.Config, log: Path,
                                              capsys: pytest.CaptureFixture[str]) -> None:
     """Editing the rendered file makes the check name the view and `--check` exit 1."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     view = write_view(config)
     view.write_text(view.read_text(encoding="utf-8").replace(f"## {ONE}", f"## {ONE} (edited)"),
                     encoding="utf-8")
@@ -272,8 +276,8 @@ def test_a_schema_invalid_line_is_reported(config: paths.Config, log: Path) -> N
 
 def test_render_lists_the_priority_queue_first_in_order(log: Path) -> None:
     """The queue comes before every idea section, in the order given."""
-    idea.add("First", "Body", log)
-    idea.add("Second", "Body two", log)
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body two", log, ANA)
 
     rendered = render_ideas.render(state_of(log), [TWO, ONE])
 
@@ -286,7 +290,7 @@ def test_render_lists_the_priority_queue_first_in_order(log: Path) -> None:
 
 def test_render_with_no_priority_queue_omits_the_section(log: Path) -> None:
     """An empty or absent queue renders no queue section."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     state = state_of(log)
 
     assert "## Priority queue" not in render_ideas.render(state, [])
@@ -295,8 +299,8 @@ def test_render_with_no_priority_queue_omits_the_section(log: Path) -> None:
 
 def test_the_view_renders_the_priority_file(config: paths.Config, log: Path) -> None:
     """The priority file on disk feeds the rendered queue."""
-    idea.add("First", "Body", log)
-    idea.add("Second", "Body two", log)
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body two", log, ANA)
     write_priority(config, [TWO])
     assert render_ideas.load_next_up(config.path("priority_path")) == [TWO]
     assert f"1. `{TWO}` — Second" in render_ideas.render_view(config)
@@ -332,8 +336,8 @@ def test_inspect_idea_priority_rejects_a_future_updated_date() -> None:
 
 def test_a_valid_priority_queue_passes_the_check(config: paths.Config, log: Path) -> None:
     """A queue of open and triaged ideas, dated today, with a current view, is clean."""
-    idea.add("First", "Body", log)
-    idea.add("Second", "Body two", log)
+    idea.add("First", "Body", log, ANA)
+    idea.add("Second", "Body two", log, ANA)
     idea.change_status(TWO, "triaged", log=log)
     write_priority(config, [TWO, ONE])
     write_view(config)
@@ -343,7 +347,7 @@ def test_a_valid_priority_queue_passes_the_check(config: paths.Config, log: Path
 def test_a_queue_naming_an_unknown_idea_fails_the_check(config: paths.Config,
                                                         log: Path) -> None:
     """The check names the unknown id."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     write_priority(config, [ONE, NINE])
     write_view(config)
     errors = ideas_check.check(config, TODAY)
@@ -353,7 +357,7 @@ def test_a_queue_naming_an_unknown_idea_fails_the_check(config: paths.Config,
 def test_a_queue_naming_a_promoted_idea_fails_the_check(config: paths.Config,
                                                         log: Path) -> None:
     """The check names the queued idea that is no longer open or triaged."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     idea.change_status(ONE, "promoted", promoted_to=["DOC-001"], log=log)
     write_priority(config, [ONE])
     write_view(config)
@@ -364,7 +368,7 @@ def test_a_queue_naming_a_promoted_idea_fails_the_check(config: paths.Config,
 
 def test_a_queue_dated_in_the_future_fails_the_check(config: paths.Config, log: Path) -> None:
     """The check names the future date."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     future = TODAY + dt.timedelta(days=1)
     write_priority(config, [ONE], updated=future)
     write_view(config)
@@ -375,9 +379,41 @@ def test_a_queue_dated_in_the_future_fails_the_check(config: paths.Config, log: 
 
 def test_a_queue_failing_its_schema_fails_the_check(config: paths.Config, log: Path) -> None:
     """A malformed queue is reported by its schema before any cross-file check."""
-    idea.add("First", "Body", log)
+    idea.add("First", "Body", log, ANA)
     priority = config.path("priority_path")
     priority.write_text("schema_version: 1\nnext_up: ['1']\n", encoding="utf-8")
     write_view(config)
     errors = ideas_check.check(config, TODAY)
     assert errors and all(error.startswith("ideas/priority.yaml") for error in errors)
+
+
+# --- Author-scoped ids ----------------------------------------------------------------------
+
+
+def test_a_queue_of_two_handles_ideas_passes_the_check(config: paths.Config, log: Path) -> None:
+    """Priority lists accept every developer's ids."""
+    idea.add("First", "Body", log, ANA)
+    idea.add("Ben's", "Body", log, "ben")
+    write_priority(config, [iid(1, "ben"), ONE])
+    write_view(config)
+    assert ideas_check.check(config, TODAY) == []
+
+
+def test_a_queue_naming_a_bare_sequence_fails_its_schema(config: paths.Config,
+                                                         log: Path) -> None:
+    """An id without its author's handle is refused before any cross-file check."""
+    idea.add("First", "Body", log, ANA)
+    write_priority(config, [f"{1:06d}"])
+    write_view(config)
+    errors = ideas_check.check(config, TODAY)
+    assert errors and all("does not match" in error for error in errors)
+
+
+def test_ideas_render_by_handle_then_sequence(log: Path) -> None:
+    """Each developer's ideas sit together, in the order that developer recorded them."""
+    for title, handle in (("b1", "ben"), ("a1", ANA), ("b2", "ben"), ("a2", ANA)):
+        idea.add(title, "Body", log, handle)
+    rendered = render_ideas.render(state_of(log))
+    order = [iid(1), iid(2), iid(1, "ben"), iid(2, "ben")]
+    positions = [rendered.index(f"## {idea_id} ·") for idea_id in order]
+    assert positions == sorted(positions)

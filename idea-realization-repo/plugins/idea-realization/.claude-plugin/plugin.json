@@ -5,7 +5,12 @@
   "author": {
     "name": "idea-realization maintainers"
   },
-  "keywords": ["ideas", "backlog", "planning", "governance"],
+  "keywords": [
+    "ideas",
+    "backlog",
+    "planning",
+    "governance"
+  ],
   "userConfig": {
     "ideas_path": {
       "type": "string",
@@ -54,7 +59,9 @@
       "title": "Triage search list",
       "description": "Directories and files the triage agent searches for related material, relative to the repository root.",
       "multiple": true,
-      "default": ["docs"]
+      "default": [
+        "docs"
+      ]
     },
     "exempt_files": {
       "type": "string",
@@ -74,6 +81,36 @@
       "title": "Partitions directory",
       "description": "Directory the accepted idea partitions are copied into, relative to the repository root.",
       "default": "ideas/partitions"
+    },
+    "product_root": {
+      "type": "string",
+      "title": "Product checkout",
+      "description": "This machine's checkout of the product repository the control repository drives. It must resolve outside this repository; leave it empty when no product repository is used. Never tracked, because it differs per machine.",
+      "default": ""
+    },
+    "product_worktree_dir": {
+      "type": "string",
+      "title": "Product worktree directory",
+      "description": "Directory that holds one product worktree per session. A relative value is taken from the product checkout, so the default names a directory beside it; it must resolve outside both checkouts. <product> is replaced by the product checkout's directory name.",
+      "default": "../<product>-worktrees"
+    },
+    "aws_read_profile": {
+      "type": "string",
+      "title": "AWS read profile",
+      "description": "The named AWS CLI profile for the sandbox's read-only role, used by the read-only cloud agents on this machine; never the default profile. The agents refuse to run while it is empty.",
+      "default": ""
+    },
+    "aws_deploy_profile": {
+      "type": "string",
+      "title": "AWS deploy profile",
+      "description": "The named AWS CLI profile for the sandbox's deploy role, which has no IAM, Organizations or billing rights; used only by the deploying agent. Never the default profile. The deploying agent refuses to run while it is empty.",
+      "default": ""
+    },
+    "aws_region": {
+      "type": "string",
+      "title": "AWS region",
+      "description": "The AWS region the cloud agents use on this machine. The agents refuse to run while it is empty.",
+      "default": ""
     }
   }
 }

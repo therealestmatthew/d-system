@@ -53,6 +53,8 @@ from jsonschema import Draft7Validator, FormatChecker
 CATALOG = "catalog.md"
 REGISTER = "codes.yaml"
 REGISTRY = "systems.yaml"
+#: Prefix of a path in the product repository rather than this one (see product.py).
+PRODUCT_PREFIX = "product:"
 
 #: The lifecycle statuses each kind may use. The schema's ``status`` enum is their union; this
 #: table is the one place a kind's own subset is stated.
@@ -234,7 +236,13 @@ def _read_registers(config: paths.Config, result: Scan) -> bool:
         if item["status"] in {"implemented", "scaffold"} and not item["paths"]:
             result.errors.append(f"{item['id']}: implemented or scaffold system requires paths")
         for value in item["paths"]:
-            if not (config.root / value).exists():
+            if value.startswith(PRODUCT_PREFIX):
+                product_root = config.product_root()
+                # A product path is checked only where this machine has the product checkout.
+                if product_root is not None and \
+                        not (product_root / value.removeprefix(PRODUCT_PREFIX)).exists():
+                    result.errors.append(f"{item['id']}: missing product path {value}")
+            elif not (config.root / value).exists():
                 result.errors.append(f"{item['id']}: missing path {value}")
         for dependency in item["depends_on"]:
             if dependency not in result.systems:

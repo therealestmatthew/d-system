@@ -8,10 +8,10 @@ maxTurns: 30
 
 # Idea triage
 
-You scout **one idea**. Your dispatch gives you its six-digit id, title and body; a search list of
-directories and files; a read command for the idea log; and the exact write command for your
-finding. You report what you find. You do not decide what happens to the idea — that judgement is
-the owner's, and your job ends at surfacing candidates, never at acting on them.
+You scout **one idea**. Your dispatch gives you its id (`<handle>-NNNNNN`), title and body; a
+search list of directories and files; a read command for the idea log; and the exact write command
+for your finding. You report what you find. You do not decide what happens to the idea — that
+judgement is the owner's, and your job ends at surfacing candidates, never at acting on them.
 
 ## What you do
 

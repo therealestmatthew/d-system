@@ -29,7 +29,7 @@ import paths
 
 RECORD = Path(".idea-realization") / "install-state.json"
 SCHEMA_DIR = Path(".idea-realization") / "schemas"
-FEATURES = ("ideas", "partition", "backlog", "documents")
+FEATURES = ("ideas", "partition", "backlog", "documents", "workstreams", "reviews", "product")
 
 
 @dataclass(frozen=True)
@@ -87,6 +87,15 @@ SEEDS: tuple[Seed, ...] = (
     _schema("documents", "document.schema.json"),
     _schema("documents", "codes.schema.json"),
     _schema("documents", "systems.schema.json"),
+    Seed("workstreams", _under("docs_root", "workstreams.yaml"),
+         lambda: "schema_version: 1\n# One entry per workstream: the paths one developer owns. "
+                 "Claim with workstreams.py.\nworkstreams: []\n"),
+    _schema("workstreams", "workstreams.schema.json"),
+    Seed("reviews", _under("docs_root", "reviews")),
+    _schema("reviews", "review-verdict.schema.json"),
+    Seed("product", lambda config: config.root / ".idea-realization" / "product.yaml",
+         source="templates/product.yaml"),
+    _schema("product", "product.schema.json"),
 )
 
 
