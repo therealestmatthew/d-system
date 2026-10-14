@@ -29373,6 +29373,11 @@ Our next steps are to reprioritize to support my AWS+Anthropic Innovation Allian
 
 Owner, 2026-10-14, PRIORITY; relayed by Session Manager.
 
+**Links**
+
+- relates_to ← `000699`
+- relates_to ← `000700`
+
 ---
 
 ## 000699 · Hackathon repo: extract GOV-003's standing rules in a dedicated owner sign-off session, one ruling at a time
@@ -29385,6 +29390,10 @@ Context relayed by Session Manager: GOV-003's standing rules are to be extracted
 
 Owner, 2026-10-14; relayed by Session Manager.
 
+**Links**
+
+- relates_to → `000698`
+
 ---
 
 ## 000700 · Hackathon repo: review the brain/procedures anti-pattern rules in a dedicated owner session, approving each before it enters the repo
@@ -29396,3 +29405,7 @@ Owner, 2026-10-14; relayed by Session Manager.
 Context relayed by Session Manager: this concerns the 23 brain/procedures anti-pattern rules, for the new hackathon control repository (000698), treated the same way as GOV-003's rulings.
 
 Owner, 2026-10-14; relayed by Session Manager.
+
+**Links**
+
+- relates_to → `000698`
