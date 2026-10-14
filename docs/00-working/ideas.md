@@ -29291,8 +29291,36 @@ The annotation is proposed as a finding only. No decision follows from it; the o
 
 ## 000696 · A ts/ vitest test failed once under machine load and passed on reruns; find the load-sensitive test
 
-**Created 2026-10-14T00:55:00-04:00 · Status: `open`**
+**Created 2026-10-14T00:55:00-04:00 · Status: `triaged`**
 
 a ts/ frontend test failed once ("1 failed | 296 passed (297)") on fwt-03 tip f3481aac while two full pytest runs were loading the machine, and passed 297/297 on two reruns; the failing test was not captured. Possible load-sensitive (timing) flaky test in the vitest suite; find it (e.g. run npm test under parallel load and record which test fails).
 
 From Session 1 - Builder A, relayed by Session Manager, 2026-10-13.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-14T00:58:08-04:00): **Primary candidate: `ts/src/workbench/BarElement.test.tsx` line 230**
+
+The test at line 217-247 (`it.each(Object.keys(PANEL_REGISTRY))('%s renders no more bar elements than it declares', ...)`) uses a hardcoded 50ms `setTimeout` to wait for panel component mount-time fetch operations to settle before asserting the rendered bar element count. Under machine load (e.g., pytest running in parallel), fetch operations and React rendering may take longer than 50ms, causing the test to check the DOM before elements have finished rendering, leading to inconsistent assertion results.
+
+Verified through code inspection:
+- `ts/src/workbench/BarElement.test.tsx:230` contains `await new Promise((resolve) => setTimeout(resolve, 50))` within an `act()` call
+- This is the only explicit setTimeout with a hardcoded timeout in the test suite
+- The test is parameterized over all PANEL_REGISTRY entries and runs 15+ assertions per test (it.each pattern), increasing the likelihood of hitting the condition during one execution
+
+Secondary candidate: `ts/src/stage/NotesStripRegion.test.tsx` timer management
+
+The 46 lines using `waitFor` across the test files rely on React Testing Library's default polling timeout; `NotesStripRegion.test.tsx` uniquely mixes `vi.useFakeTimers()` (lines 363, 420, 455) with `vi.useRealTimers()` (line 146 in afterEach). Under load, the timing of React's internal scheduler and the animation stub (`FakeAnimation.playState`, `animation.finish()`) may diverge from test expectations. The test suite has 8 cases in the "rotating between entries never interrupts a scroll" describe block that depend on precise timer manipulation.
+
+Related ideas: 000691 (Vite dev server 404 behavior affecting test setup), 000692 (kill -9 of vitest unnoticed), 000694 (pytest exit 144 on worktrees), 000553 (test_cli_check_exits_two_on_sigterm timing flake).
+
+OPS/documentation verified:
+- `ts/vitest.config.ts` uses jsdom environment with no custom testTimeout
+- `ts/package.json` "test" script runs `vitest` with no parallelization flag, so vitest uses its default worker pool (worker count not checked)
+- No existing flaky test guards (retries, extended timeouts) are in place
+
+</details>
