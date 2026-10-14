@@ -29324,3 +29324,13 @@ OPS/documentation verified:
 - No existing flaky test guards (retries, extended timeouts) are in place
 
 </details>
+
+---
+
+## 000697 · run_review_checks.py silently skips verification lines that start with `!`, so negated checks never run
+
+**Created 2026-10-14T03:27:47-04:00 · Status: `open`**
+
+tools/run_review_checks.py is_command (lines 129-136) accepts only `cd` or a program on PATH, so a phase verification line starting with `!` (e.g. `! grep -n "X" file`, used to assert no match) is recorded "not run: not a command" and silently skipped; the review manifest still passes. PLAN-054's phase-rep-01..04 rely on `! grep` verifications. Fix: treat a leading `!` (and other shell keywords) as a command, or require such checks as tests.
+
+From Session Manager, 2026-10-14; found by the review-judge on phase-rep-01.
