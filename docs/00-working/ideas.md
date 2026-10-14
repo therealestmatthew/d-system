@@ -29265,8 +29265,34 @@ Runs detached with setsid/nohup complete; normal worktree runs are killed. Both 
 
 ## 000695 · check_schemas.py --document misses reworded template sample text; consider a fuzzy or structural check
 
-**Created 2026-10-13T19:06:59-04:00 · Status: `open`**
+**Created 2026-10-13T19:06:59-04:00 · Status: `triaged`**
 
 fwt-03's check_schemas.py --document detects retained template sample text only by normalized exact sentence match; an author who rewords each sample sentence by a few words passes. Owner accepted this as a known limit of a lint aid; record the gap for a possible later fuzzy or structural check (e.g. token-overlap ratio against the template's sample sentences).
 
 From Session Manager, owner ruling 2026-10-13.
+
+**Annotations**
+
+
+<details>
+<summary>1 finding(s)</summary>
+
+- **finding** by agent-idea-triage (2026-10-14T00:55:00-04:00): check_schemas.py's template sample text detection is a known, accepted limitation. The script lives at `docs/00-working/framework/05-schemas/check_schemas.py`; its `--document` mode was added by `phase-fwt-03` (Requirement and plan document schemas; complete, merged onto dev in 6562f885) as part of the framework document templates system (`PLAN-040`, `REQ-024`). The templates it validates — `requirement.template.md` and `plan.template.md` — contain extensive filled-in sample prose (e.g., "Accept route requests and return optimized paths using Claude reasoning..."; "FastAPI Server — HTTP endpoint handler").
+
+The current check validates only that an author has *replaced* each sample section with their own content, but does so by normalized exact-match comparison: rewording a sample sentence by a few words passes the check, defeating the intention. The owner accepted this as a known lint-aid limitation on 2026-10-13 (ruling relayed by Session Manager), and the idea records the gap for a possible later enhancement: a fuzzy or structural check — for example, token-overlap ratio against the template's sample sentences — to catch rewording without replacement.
+
+No related plans, requirements, or other governance documents currently spell out an improvement to the sample-text detection. Idea `000047` (audit what makes a plan document qualitatively good) and `000052` (schema-driven consistency across the pipeline) touch adjacent concerns about document quality and schema enforcement, but neither directly addresses the reworded-sample-text gap. No other open idea proposes a fuzzy or structural check for template content.
+
+The annotation is proposed as a finding only. No decision follows from it; the owner will decide if and when a fuzzy check is worth building.
+
+</details>
+
+---
+
+## 000696 · A ts/ vitest test failed once under machine load and passed on reruns; find the load-sensitive test
+
+**Created 2026-10-14T00:55:00-04:00 · Status: `open`**
+
+a ts/ frontend test failed once ("1 failed | 296 passed (297)") on fwt-03 tip f3481aac while two full pytest runs were loading the machine, and passed 297/297 on two reruns; the failing test was not captured. Possible load-sensitive (timing) flaky test in the vitest suite; find it (e.g. run npm test under parallel load and record which test fails).
+
+From Session 1 - Builder A, relayed by Session Manager, 2026-10-13.
