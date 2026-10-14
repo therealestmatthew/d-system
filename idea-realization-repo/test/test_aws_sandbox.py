@@ -15,8 +15,9 @@ assert spec is not None
 sandbox = module_from_spec(spec)
 loader.exec_module(sandbox)
 
-ENV = {"IDEA_REALIZATION_AWS_PROFILE": "team-sandbox", "IDEA_REALIZATION_AWS_REGION": "us-east-1",
-       "PATH": "/usr/bin"}
+ENV = {"IDEA_REALIZATION_AWS_READ_PROFILE": "sandbox-read",
+       "IDEA_REALIZATION_AWS_DEPLOY_PROFILE": "sandbox-deploy",
+       "IDEA_REALIZATION_AWS_REGION": "us-east-1", "PATH": ""}
 
 
 def build(*argv: str, env: dict[str, str] | None = None) -> tuple[list[str], dict[str, str]]:
@@ -33,7 +34,7 @@ def refused(*argv: str, env: dict[str, str] | None = None) -> str:
 def test_read_runs_with_the_configured_profile_and_region() -> None:
     command, _ = build("read", "ec2", "describe-instances", "--max-items", "5")
     assert command == ["aws", "ec2", "describe-instances", "--max-items", "5",
-                       "--profile", "team-sandbox", "--region", "us-east-1"]
+                       "--profile", "sandbox-read", "--region", "us-east-1"]
 
 
 @pytest.mark.parametrize("operation", ["list-buckets", "get-caller-identity", "ls", "tail",
@@ -48,24 +49,40 @@ def test_read_mode_refuses_writes(operation: str) -> None:
     assert "not a read operation" in refused("read", "svc", operation)
 
 
-def test_write_mode_allows_create() -> None:
+def test_write_mode_uses_the_deploy_profile() -> None:
     command, _ = build("write", "s3api", "create-bucket", "--bucket", "demo")
-    assert command[:3] == ["aws", "s3api", "create-bucket"]
+    assert command == ["aws", "s3api", "create-bucket", "--bucket", "demo",
+                       "--profile", "sandbox-deploy", "--region", "us-east-1"]
 
 
-def test_missing_profile_refused() -> None:
-    assert "no sandbox profile configured" in refused(
-        "read", "s3", "ls", env={"IDEA_REALIZATION_AWS_REGION": "us-east-1", "PATH": ""})
+def test_read_mode_never_gets_the_deploy_profile() -> None:
+    for operation in ("describe-stacks", "list-buckets", "get-caller-identity"):
+        command, _ = build("read", "svc", operation)
+        assert "sandbox-deploy" not in command
 
 
-def test_default_profile_refused() -> None:
-    assert "'default'" in refused(
-        "read", "s3", "ls", env={**ENV, "IDEA_REALIZATION_AWS_PROFILE": "default"})
+@pytest.mark.parametrize("missing", ["IDEA_REALIZATION_AWS_READ_PROFILE",
+                                     "IDEA_REALIZATION_AWS_DEPLOY_PROFILE",
+                                     "IDEA_REALIZATION_AWS_REGION"])
+def test_any_missing_value_refused_in_every_mode(missing: str) -> None:
+    env = {k: v for k, v in ENV.items() if k != missing}
+    for mode in ("read", "write"):
+        assert "is not configured" in refused(mode, "s3", "ls", env=env)
 
 
-def test_missing_region_refused() -> None:
-    assert "no sandbox region configured" in refused(
-        "read", "s3", "ls", env={"IDEA_REALIZATION_AWS_PROFILE": "team-sandbox", "PATH": ""})
+@pytest.mark.parametrize("variable", ["IDEA_REALIZATION_AWS_READ_PROFILE",
+                                      "IDEA_REALIZATION_AWS_DEPLOY_PROFILE"])
+def test_default_profile_refused(variable: str) -> None:
+    assert "'default'" in refused("read", "s3", "ls", env={**ENV, variable: "default"})
+
+
+def test_one_profile_for_both_roles_refused() -> None:
+    assert "the same profile" in refused(
+        "read", "s3", "ls", env={**ENV, "IDEA_REALIZATION_AWS_DEPLOY_PROFILE": "sandbox-read"})
+
+
+def test_read_mode_refuses_sync_delete() -> None:
+    assert "--delete is not a read" in refused("read", "s3", "ls", "--delete")
 
 
 @pytest.mark.parametrize("option", ["--profile", "--profile=other", "--region", "--endpoint-url"])
@@ -91,14 +108,21 @@ def test_credentials_in_the_environment_are_removed() -> None:
     assert not {"AWS_PROFILE", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"} & set(env)
 
 
-def test_exec_sets_profile_and_region_for_other_tools() -> None:
+def test_exec_gives_other_tools_the_deploy_profile() -> None:
     command, env = build("exec", "cdk", "deploy", env={**ENV, "AWS_PROFILE": "default"})
     assert command == ["cdk", "deploy"]
-    assert env["AWS_PROFILE"] == "team-sandbox" and env["AWS_REGION"] == "us-east-1"
+    assert env["AWS_PROFILE"] == "sandbox-deploy" and env["AWS_REGION"] == "us-east-1"
 
 
-def test_exec_refuses_the_aws_cli() -> None:
-    assert "not exec" in refused("exec", "/usr/local/bin/aws", "s3", "ls")
+def test_exec_of_the_aws_cli_gets_the_write_checks() -> None:
+    command, _ = build("exec", "/usr/local/bin/aws", "s3api", "create-bucket")
+    assert command[-4:] == ["--profile", "sandbox-deploy", "--region", "us-east-1"]
+    assert "reveals a secret" in refused("exec", "aws", "secretsmanager", "get-secret-value")
+    assert "set by the wrapper" in refused("exec", "aws", "s3", "ls", "--profile", "x")
+
+
+def test_exec_refuses_a_caller_profile() -> None:
+    assert "set by the wrapper" in refused("exec", "cdk", "deploy", "--profile", "other")
 
 
 def test_unknown_mode_refused() -> None:

@@ -50,7 +50,9 @@ the output that carries information, and do not block on a question that can wai
 - Every session works in its own worktree; the primary checkout's branch is never switched.
 - `.private/` is confidential and untracked, and holds the deny-list. Nothing from it is ever written
   into a tracked file.
-- Every AWS command goes through `tools/aws-sandbox`, never the bare `aws` command.
+- Every AWS command goes through `tools/aws-sandbox`, never the bare `aws` command. The two
+  sandbox IAM roles are the boundary (`aws/README.md`); the hook and permission rules are
+  guardrails.
 
 ## Project
 
@@ -70,6 +72,7 @@ pipeline's tools, skills and protocol.
 | `.claude/settings.json` | Permission rules, including the AWS rules |
 | `plugins/idea-realization/` | The plugin: scripts, skills, schemas, templates, protocol documents and its tests |
 | `.idea-realization/` | Product-repository settings, install state and schema copies |
-| `tools/` | The private-content check, the AWS sandbox wrapper and the git hooks |
+| `tools/` | The confidentiality check, the AWS sandbox wrapper, the AWS PreToolUse hook and the git hooks |
+| `aws/` | The sandbox's two IAM role policies and their setup page |
 | `test/` | Tests for `tools/` |
 | `.private/` | Untracked: the deny-list and other per-machine confidential files |

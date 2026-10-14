@@ -70,7 +70,11 @@
       "Bash(tools/aws-sandbox exec *rm*)",
       "Bash(./tools/aws-sandbox exec *rm*)",
       "Bash(tools/aws-sandbox exec *nuke*)",
-      "Bash(./tools/aws-sandbox exec *nuke*)"
+      "Bash(./tools/aws-sandbox exec *nuke*)",
+      "Bash(tools/aws-sandbox write * --delete*)",
+      "Bash(tools/aws-sandbox exec * --delete*)",
+      "Bash(./tools/aws-sandbox write * --delete*)",
+      "Bash(./tools/aws-sandbox exec * --delete*)"
     ],
     "deny": [
       "Edit(/AGENTS.md)",
@@ -101,6 +105,19 @@
       "Bash(sam *)",
       "Bash(terraform *)",
       "Bash(pulumi *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/tools/hooks/aws_guard.py\""
+          }
+        ]
+      }
     ]
   }
 }

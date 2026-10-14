@@ -32,23 +32,28 @@ differ by region and account.
 
 ## AWS rules every AWS agent follows
 
-- **One profile, never the default.** Every AWS command goes through `tools/aws-sandbox`, which
-  takes the sandbox profile and region from this machine's untracked configuration and refuses
-  to run without them or with the `default` profile. Run `tools/aws-sandbox whoami` first and
-  report the account and region it prints. Never run the bare `aws` command, never pass
-  `--profile`, `--region` or `--endpoint-url` yourself, never set or export an `AWS_` variable,
-  and never read or change anything under `~/.aws/`.
+- **The IAM roles are the boundary.** The sandbox has two roles (`aws/README.md`): a read-only
+  role and a deploy role that cannot touch IAM, Organizations, account or billing settings.
+  `tools/aws-sandbox` runs `read` and `whoami` with the read role's profile and `write` and `exec`
+  with the deploy role's, taken from this machine's untracked configuration; it refuses a missing
+  or `default` profile, or one profile for both roles. Run `tools/aws-sandbox whoami` first and
+  report the account, region and profiles it prints.
+- **Everything goes through the wrapper.** Never run the AWS CLI, an AWS SDK (boto3, the JavaScript
+  SDK) or a deployment tool (CDK, SAM, Terraform) any other way; never pass `--profile`, `--region`
+  or `--endpoint-url`; never set an `AWS_` variable; never read or change anything under `~/.aws/`.
+  A PreToolUse hook refuses each of these.
 - **Reads are free.** `tools/aws-sandbox read <service> <operation> ...` runs describe, list and
-  get-style operations. It refuses the reads that reveal a secret (secret values, decrypted
-  parameters, login tokens, function environments); never look for another way to read one.
-- **Only `aws-deploy` creates or updates**, with `tools/aws-sandbox write` or `exec`.
-- **Deleting anything, and any change to IAM, Organizations, account or billing settings, needs a
-  person's approval each time.** Before you request one, say in your reply exactly what will be
-  deleted or changed and why; the permission prompt is the approval. A refused prompt means stop,
-  not retry another way.
-- **Guardrails are not a sandbox.** The settings rules match command text; they hold because you
-  follow them. Never route around one (a shell wrapper, an absolute path, another tool), and report
-  any rule that blocks legitimate work instead of working around it.
+  get-style operations. It refuses the reads that reveal a secret, and the read role denies them
+  too; never look for another way to read one.
+- **Only `aws-deploy` creates or updates**, with `tools/aws-sandbox write` or `exec`. The hook
+  refuses both from every other agent and from the main session.
+- **Deleting anything needs a person's approval each time.** Before you request one, say in your
+  reply exactly what will be deleted and why; the permission prompt is the approval. A refused
+  prompt means stop, not retry another way. IAM, Organizations, account and billing changes are
+  refused by the deploy role; do not try them.
+- **The hook and the permission rules are guardrails, not the boundary.** They match command text.
+  Never route around one, and report any that blocks legitimate work instead of working around
+  it.
 
 ## What you must never do
 

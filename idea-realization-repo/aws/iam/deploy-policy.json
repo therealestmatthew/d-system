@@ -1,0 +1,81 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowDeployingInTheSandbox",
+      "Effect": "Allow",
+      "Action": "*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyIdentityOrganizationAccountAndBilling",
+      "Effect": "Deny",
+      "Action": [
+        "iam:*",
+        "organizations:*",
+        "account:*",
+        "billing:*",
+        "budgets:*",
+        "ce:*",
+        "cur:*",
+        "aws-portal:*",
+        "payments:*",
+        "tax:*",
+        "invoicing:*",
+        "purchase-orders:*",
+        "freetier:*",
+        "savingsplans:*",
+        "sso:*",
+        "sso-directory:*",
+        "identitystore:*",
+        "sts:AssumeRole",
+        "sts:GetFederationToken"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyTurningOffTheAuditTrail",
+      "Effect": "Deny",
+      "Action": [
+        "cloudtrail:StopLogging",
+        "cloudtrail:DeleteTrail",
+        "cloudtrail:UpdateTrail",
+        "config:StopConfigurationRecorder",
+        "config:DeleteConfigurationRecorder",
+        "guardduty:DeleteDetector",
+        "guardduty:UpdateDetector"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenySecretReads",
+      "Effect": "Deny",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:BatchGetSecretValue"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyOtherRegions",
+      "Effect": "Deny",
+      "NotAction": [
+        "iam:*",
+        "sts:*",
+        "organizations:*",
+        "support:*",
+        "cloudfront:*",
+        "route53:*",
+        "waf:*",
+        "health:*",
+        "s3:ListAllMyBuckets"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:RequestedRegion": "REPLACE_WITH_SANDBOX_REGION"
+        }
+      }
+    }
+  ]
+}

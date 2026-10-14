@@ -95,17 +95,22 @@ deliverables inside your own workstream or in shared ground. Your agent id on a 
 
 ## AWS
 
-- Every AWS command goes through `tools/aws-sandbox`, which takes the sandbox profile and region
-  from this machine's untracked configuration and refuses to run without them or with the `default`
-  profile. Never run the bare `aws` command, never pass `--profile` or `--region` yourself, and
-  never read or change anything under `~/.aws/`.
+- **The IAM roles are the boundary.** The sandbox has a read-only role and a deploy role with no
+  IAM, Organizations, account or billing permissions (`aws/README.md`). Each machine has one named
+  profile for each, in untracked configuration.
+- Every AWS command goes through `tools/aws-sandbox`, which runs `read` and `whoami` with the read
+  profile and `write` and `exec` with the deploy profile, and refuses a missing or `default`
+  profile or one profile used for both. Never run the AWS CLI, an AWS SDK or a deployment tool any
+  other way, never pass `--profile` or `--region` yourself, never set an `AWS_` variable, and never
+  read or change anything under `~/.aws/`.
 - Reads (`tools/aws-sandbox read ...`) run freely, except the reads that reveal a secret.
-- Only the `aws-deploy` agent creates or updates resources.
-- Deleting anything, and any change to IAM, Organizations, account or billing settings, needs a
-  person's approval each time; `.claude/settings.json` prompts for it. Say what will change before
-  the prompt appears. A refused prompt means stop.
-- The permission rules match command text. They are guardrails for agents that follow them, not a
-  security boundary; never route around one, and report a rule that blocks legitimate work.
+- Only the `aws-deploy` agent runs `write` or `exec`.
+- Deleting anything needs a person's approval each time; `.claude/settings.json` prompts for it.
+  Say what will be deleted before the prompt appears. A refused prompt means stop.
+- A PreToolUse hook (`tools/hooks/aws_guard.py`) refuses AWS commands outside the wrapper, and
+  `write`/`exec` from anyone but `aws-deploy`; the permission rules repeat the main refusals. Both
+  match command text: they are guardrails, not the boundary. Never route around one, and report a
+  rule that blocks legitimate work.
 
 ## Running the checks
 

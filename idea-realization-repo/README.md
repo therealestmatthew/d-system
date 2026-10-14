@@ -40,10 +40,11 @@ Per machine, never committed:
 - **The private-content deny-list**, `.private/deny-list.txt`: one identifier per line (client
   names, account ids, anything that must never reach a tracked file). The pre-commit hook fails any
   commit that contains one. Ask the owner for the team's list.
-- **The product repository's local path**, and **the AWS sandbox profile and region**: plugin options
-  or environment variables, listed by `uv run plugins/idea-realization/scripts/paths.py`. The AWS
-  values are `IDEA_REALIZATION_AWS_PROFILE` and `IDEA_REALIZATION_AWS_REGION`. The profile must be a
-  named sandbox profile, never `default`.
+- **The product repository's local path**, and **the AWS sandbox read profile, deploy profile and
+  region**: plugin options or environment variables, listed by
+  `uv run plugins/idea-realization/scripts/paths.py`. The AWS values are
+  `IDEA_REALIZATION_AWS_READ_PROFILE`, `IDEA_REALIZATION_AWS_DEPLOY_PROFILE` and
+  `IDEA_REALIZATION_AWS_REGION`; `aws/README.md` sets up the two roles behind them.
 
 Start a Claude Code session in this repository, with the plugin loaded and the product worktree
 reachable:
@@ -71,8 +72,10 @@ The triage and partition agents ship with the plugin.
 
 ## AWS safety
 
-Every AWS command goes through `tools/aws-sandbox`, which uses only the configured sandbox profile
-and region. Reads run freely. Only `aws-deploy` creates or updates. Deleting anything, and any
-change to IAM, Organizations, account or billing settings, prompts a person for approval each time
-(`.claude/settings.json`). These rules match command text: they are guardrails for agents, and the
-sandbox account's own permissions are the real boundary.
+The sandbox has two IAM roles, and they are the boundary (`aws/README.md`): a read-only role, and a
+deploy role with no IAM, Organizations, account or billing permissions. Every AWS command goes
+through `tools/aws-sandbox`, which runs reads with the read profile and writes with the deploy
+profile. A PreToolUse hook refuses AWS commands and SDK use outside the wrapper, and writes from any
+agent but `aws-deploy`. Deleting anything prompts a person for approval each time. The hook and
+the permission rules match command text: they are guardrails on top of the roles, not a substitute
+for them.

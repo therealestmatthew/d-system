@@ -1,0 +1,39 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenySecretAndCredentialReads",
+      "Effect": "Deny",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:BatchGetSecretValue",
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "ssm:GetParametersByPath",
+        "kms:Decrypt",
+        "ecr:GetAuthorizationToken",
+        "sts:GetSessionToken",
+        "sts:GetFederationToken",
+        "iam:GenerateCredentialReport",
+        "iam:GetCredentialReport",
+        "lambda:GetFunction",
+        "lambda:GetFunctionConfiguration",
+        "ec2:GetPasswordData"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyActionsThatCostOrChangeState",
+      "Effect": "Deny",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream",
+        "bedrock:Converse",
+        "bedrock:ConverseStream",
+        "lambda:InvokeFunction",
+        "sts:AssumeRole"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
