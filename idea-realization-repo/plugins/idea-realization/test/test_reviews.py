@@ -166,3 +166,13 @@ def test_a_complete_phase_whose_merge_never_landed_is_stranded(
     assert run(control) == []  # without a checkout on this machine, landing cannot be checked
     git(checkout, "merge", "-q", "--ff-only", "agent/build-api")
     assert run(control, checkout) == []
+
+
+def test_a_refused_product_checkout_is_an_error(two_repos: tuple[Path, Path, str, str]) -> None:
+    """A wrong-origin checkout never lets the reviews check report OK or skip stranding."""
+    control, checkout, _, tip = two_repos
+    complete_phase(control, product_merge=tip)
+    check(control, stamped(phase="build-api", reviewed_commit=tip))
+    git(checkout, "remote", "set-url", "origin", "https://forge.example.com/team/other")
+    errors = run(control, checkout)
+    assert any("product checkout refused" in e for e in errors)

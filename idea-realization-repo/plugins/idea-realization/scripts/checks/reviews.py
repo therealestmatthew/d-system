@@ -76,8 +76,10 @@ def on_integration_branch(root: Path, commit: str, branch: str) -> bool:
 def completion_errors(config: paths.Config, records: list[dict[str, Any]]) -> list[str]:
     """Every complete phase that no passing gating review supports."""
     two_repositories = product.read_record(config.root) is not None
-    product_root, _ = product.verified_root(config) if two_repositories else (None, None)
+    product_root, refused = product.verified_root(config) if two_repositories else (None, None)
     errors = []
+    if refused:
+        errors.append(f"product checkout refused, so product merges cannot be checked: {refused}")
     for phase in completed_phases(config):
         key = phase.get("id", "?")
         passing = [record for record in records if record["phase"] == key
