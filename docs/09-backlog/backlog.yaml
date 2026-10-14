@@ -15063,7 +15063,8 @@ items:
   systems:
   - sys-fw-templates
   owner: repository-owner
-  status: queued
+  agent: agent-builder-a
+  status: active
   priority: 2
   session_budget: 1
   depends_on: []
@@ -15084,6 +15085,8 @@ items:
   deliverables:
   - docs/00-working/framework/05-schemas/session-record.schema.json
   - docs/00-working/framework/05-schemas/session-record.template.md
+  - docs/00-working/framework/05-schemas/examples
+  - docs/00-working/framework/05-schemas/check_schemas.py
   next_action: List the fields PLAN-041's three analysis phases actually need to extract before
     writing the schema, so the required-field list is derived from a real downstream reader.
 
