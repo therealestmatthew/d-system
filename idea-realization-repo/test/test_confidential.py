@@ -111,3 +111,27 @@ def test_staged_deletion_is_not_scanned(repo: Path) -> None:
     git(repo, "add", "old.md")
     git(repo, "rm", "-q", "--cached", "old.md")
     assert check.main(repo) == 0
+
+
+def test_text_content_is_scanned_whatever_its_extension(
+        repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    deny(repo, "acme")
+    (repo / "notes.pdf").write_text("Notes for acme.\n", encoding="utf-8")
+    git(repo, "add", "notes.pdf")
+    assert check.main(repo) == 1
+    assert "notes.pdf: matches deny-listed identifier 'acme'" in capsys.readouterr().out
+
+
+def test_binary_content_is_not_scanned(repo: Path) -> None:
+    deny(repo, "acme")
+    (repo / "image.bin").write_bytes(b"\x00\x01acme\x00")
+    git(repo, "add", "image.bin")
+    assert check.main(repo) == 0
+
+
+def test_submodule_gitlink_under_the_private_directory_fails(
+        repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    commit = "1" * 40
+    git(repo, "update-index", "--add", "--cacheinfo", f"160000,{commit},.private/vault")
+    assert check.main(repo) == 1
+    assert "tracked file under the private directory: .private/vault" in capsys.readouterr().out

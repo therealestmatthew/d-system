@@ -41,21 +41,23 @@ ROOT = Path(__file__).resolve().parent.parent
 PRIVATE_DIR = ".private/"
 DEFAULT_DENY_LIST = Path(PRIVATE_DIR) / "deny-list.txt"
 
-# Binary files a content scan should not open.
-SKIP_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".pdf", ".ico", ".zip", ".gz", ".woff", ".woff2"}
+# A blob with a NUL byte in its first BINARY_PROBE bytes is binary and its content is not scanned.
+# Every other blob is scanned, whatever its file name says it is.
+BINARY_PROBE = 8000
+GITLINK = "160000"
 
 
-def staged_blobs(root: Path) -> dict[str, str]:
-    """Every path in the index, mapped to the object id of its staged blob."""
+def staged_blobs(root: Path) -> dict[str, str | None]:
+    """Every path in the index, mapped to the object id of its staged blob, or None for a
+    submodule gitlink, which has a path to check but no content."""
     result = subprocess.run(["git", "ls-files", "--stage", "-z"], cwd=root,
                             capture_output=True, check=True)
-    blobs: dict[str, str] = {}
+    blobs: dict[str, str | None] = {}
     for entry in result.stdout.decode("utf-8", errors="surrogateescape").split("\0"):
         if entry:
             meta, path = entry.split("\t", 1)
             mode, object_id, _stage = meta.split()
-            if mode != "160000":  # a submodule has no blob to read
-                blobs[path] = object_id
+            blobs[path] = None if mode == GITLINK else object_id
     return blobs
 
 
@@ -98,14 +100,16 @@ def check_paths(files: list[str]) -> list[str]:
             for f in files if f == PRIVATE_DIR.rstrip("/") or f.startswith(PRIVATE_DIR)]
 
 
-def check_content(root: Path, blobs: dict[str, str], identifiers: set[str]) -> list[str]:
+def check_content(root: Path, blobs: dict[str, str | None], identifiers: set[str]) -> list[str]:
     if not identifiers:
         return []
     patterns = {i: re.compile(r"(?<!\w)" + re.escape(i.lower()) + r"(?!\w)")
                 for i in identifiers}
-    scanned = {f: object_id for f, object_id in blobs.items()
-               if not f.startswith(PRIVATE_DIR) and Path(f).suffix.lower() not in SKIP_SUFFIXES}
-    contents = read_blobs(root, list(scanned.values()))
+    candidates = {f: object_id for f, object_id in blobs.items()
+                  if object_id is not None and not f.startswith(PRIVATE_DIR)}
+    contents = read_blobs(root, list(candidates.values()))
+    scanned = {f: object_id for f, object_id in candidates.items()
+               if b"\0" not in contents[object_id][:BINARY_PROBE]}
     violations: list[str] = []
     for f in blobs:
         if f.startswith(PRIVATE_DIR):
