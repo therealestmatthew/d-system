@@ -14436,8 +14436,7 @@ items:
   - sys-backlog
   - sys-governance
   owner: repository-owner
-  agent: agent-batch-runner
-  status: active
+  status: queued
   priority: 2
   session_budget: 1
   depends_on:
@@ -14462,8 +14461,10 @@ items:
   - schemas/gate-decision.schema.json
   - test/test_mapping.py
   - docs/08-governance/GOV-014-realization-role-contracts.md
-  next_action: Define the proposal artifact the owner ratifies - it must read as a decision-ready
-    ordering with reasons, not a diff.
+  next_action: Resume on agent/phase-irs-07 at d0c4959f, a WIP checkpoint of review fix cycle 1 (F01
+    empty lists written as [], F02 ordering phase pattern, J-F01 GOV-014 updated date). Rebase onto
+    dev, run the full pytest in the worktree, run the validator on fd0738fd..tip, then send
+    REVIEW-REQUEST round 2.
 - id: phase-irs-08
   title: Execution loop harness for developer and validator dispatch
   plan: doc-idea-realization-system-plan
