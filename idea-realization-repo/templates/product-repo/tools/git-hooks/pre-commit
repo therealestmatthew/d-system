@@ -1,0 +1,29 @@
+#!/bin/sh
+# Blocks a commit that leaks a deny-listed identifier or a file under the private directory.
+#
+# Never bypass a failure with --no-verify: commit the fix, or, if the check itself is wrong, stop
+# and report it.
+#
+# Installed by tools/install-hooks.sh.
+#
+# The deny-list is untracked, so a worktree has none of its own. Unless PRIVATE_DENY_LIST is set,
+# the hook uses this checkout's .private/deny-list.txt, and in a worktree falls back to the main
+# checkout's copy.
+
+set -e
+top=$(git rev-parse --show-toplevel)
+cd "$top"
+
+if [ -z "$PRIVATE_DENY_LIST" ] && [ ! -f .private/deny-list.txt ]; then
+    main_checkout=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")
+    if [ -f "$main_checkout/.private/deny-list.txt" ]; then
+        PRIVATE_DENY_LIST="$main_checkout/.private/deny-list.txt"
+        export PRIVATE_DENY_LIST
+    fi
+fi
+
+if command -v python3 > /dev/null 2>&1; then
+    python3 tools/check_confidential.py
+else
+    uv run --no-project python tools/check_confidential.py
+fi

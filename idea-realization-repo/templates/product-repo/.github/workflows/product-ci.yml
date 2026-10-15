@@ -1,0 +1,142 @@
+# Product CI. One job, `verify`, which is the required status check on `dev` and `main`
+# (applied by the control repository's tools/github/apply_rulesets.sh). Keep the job id `verify`:
+# renaming it breaks the ruleset and every open pull request waits forever for a check that never
+# reports.
+#
+# This workflow never calls AWS or Bedrock and never deploys. The job holds no AWS credentials and
+# no `id-token` permission, so it cannot assume a role through OIDC either. Deploying is done from
+# a developer machine by the control repository's `aws-deploy` agent.
+#
+# There are no path filters: a required check that a path filter skips leaves the pull request
+# waiting for it. Each stack's steps are skipped instead when the stack's manifest is absent, so the
+# job always reports.
+
+name: product-ci
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: product-ci-${{ github.ref }}
+  # A newer push to a pull request makes the older run useless; runs on dev and main all finish.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  GITLEAKS_VERSION: "8.30.1"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Stops the AWS SDKs and the CDK CLI from asking an instance metadata service for credentials.
+      AWS_EC2_METADATA_DISABLED: "true"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # gitleaks scans the whole history
+
+      - name: No AWS credentials in this job
+        run: |
+          if env | grep -E '^AWS_(ACCESS_KEY_ID|SECRET_ACCESS_KEY|SESSION_TOKEN|PROFILE|ROLE_ARN|WEB_IDENTITY_TOKEN_FILE)=' > /dev/null; then
+            echo "::error::An AWS credential variable is set. Product CI must not hold AWS credentials."
+            exit 1
+          fi
+
+      # ---- Confidential identifiers ---------------------------------------------------------
+      # The deny-list is the repository secret DENY_LIST (one identifier per line, the same file
+      # as .private/deny-list.txt on a developer machine). It is written to $RUNNER_TEMP, outside
+      # the checkout, and handed to the check through PRIVATE_DENY_LIST. Each identifier is
+      # masked first, so a violation line does not print it into the log.
+      - name: Confidential check
+        env:
+          DENY_LIST: ${{ secrets.DENY_LIST }}
+        run: |
+          if [ -z "$DENY_LIST" ]; then
+            echo "::error::The repository secret DENY_LIST is not set. The repository owner sets it: gh secret set DENY_LIST < .private/deny-list.txt"
+            exit 1
+          fi
+          deny="$RUNNER_TEMP/deny-list.txt"
+          printf '%s\n' "$DENY_LIST" | tr -d '\r' > "$deny"
+          while IFS= read -r line; do
+            entry=$(printf '%s' "$line" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            case "$entry" in ''|'#'*) continue ;; esac
+            echo "::add-mask::$entry"
+          done < "$deny"
+          PRIVATE_DENY_LIST="$deny" python3 tools/check_confidential.py
+
+      - name: Secret scan (gitleaks)
+        run: |
+          cd "$RUNNER_TEMP"
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          curl -sSfLO "$base/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfLO "$base/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          grep " gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz\$" "gitleaks_${GITLEAKS_VERSION}_checksums.txt" | sha256sum -c -
+          tar -xzf "gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" gitleaks
+          cd "$GITHUB_WORKSPACE"
+          # A finding that is not a secret goes in .gitleaksignore (its fingerprint), never by
+          # weakening this step. A real secret is rotated first, then ignored.
+          "$RUNNER_TEMP/gitleaks" git --redact --verbose --exit-code 1 .
+
+      # ---- Node (package.json at the root) --------------------------------------------------
+      # REPLACE: move to the web app's directory if it is not the root (set working-directory and
+      # the hashFiles paths), and keep only the scripts the project defines.
+      - name: Set up Node
+        if: hashFiles('package.json') != ''
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: ${{ hashFiles('package-lock.json') != '' && 'npm' || '' }}
+      - name: Node install, lint, test, build
+        if: hashFiles('package.json') != ''
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          npm run lint --if-present
+          npm test --if-present
+          npm run build --if-present
+
+      # ---- Python (pyproject.toml at the root) ----------------------------------------------
+      # REPLACE: keep only the commands the project uses; add a type check if it has one.
+      - name: Set up uv
+        if: hashFiles('pyproject.toml') != ''
+        uses: astral-sh/setup-uv@v10
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/uv.lock"
+      - name: Python install, lint, test
+        if: hashFiles('pyproject.toml') != ''
+        run: |
+          if [ -f uv.lock ]; then uv sync --locked; else uv sync; fi
+          uvx ruff check .
+          # pytest exits 5 when it collects no tests; that is not a failure while the project is new.
+          uv run --with pytest pytest -q || [ $? -eq 5 ]
+
+      # ---- Infrastructure (AWS CDK app in infra/) -------------------------------------------
+      # `cdk synth` only, with no AWS credentials. The CDK app must use
+      # CliCredentialsStackSynthesizer (the sandbox deploy role cannot assume the default
+      # synthesizer's bootstrap roles) and reference execution roles with Role.fromRoleArn under
+      # the IAM path /app/; see the control repository's aws/README.md. Context lookups
+      # (for example Vpc.fromLookup) need a committed infra/cdk.context.json, because synth here
+      # cannot reach AWS to fill it.
+      # This assumes a TypeScript or JavaScript CDK app (infra/package.json). For a Python CDK
+      # app, replace the Node steps with setup-uv and `uv sync` in infra/, and run
+      # `npx aws-cdk synth`, since no local CDK package is installed to provide `cdk`.
+      - name: Set up Node for CDK
+        if: hashFiles('infra/cdk.json') != ''
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: ${{ hashFiles('infra/package-lock.json') != '' && 'npm' || '' }}
+          cache-dependency-path: infra/package-lock.json
+      - name: CDK synth (no AWS credentials)
+        if: hashFiles('infra/cdk.json') != ''
+        working-directory: infra
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          npx cdk synth --quiet --no-notices

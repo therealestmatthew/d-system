@@ -1,0 +1,34 @@
+# Per-machine and confidential: the deny-list and anything else private. Never commit these.
+.private/
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+
+# Node
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.vite/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# AWS CDK output
+cdk.out/
+infra/cdk.out/
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+*.log

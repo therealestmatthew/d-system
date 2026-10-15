@@ -1,0 +1,21 @@
+# CODEOWNERS for the product repository.
+#
+# The repository owner fills this in from the control repository's docs/workstreams.yaml: one line
+# per workstream path with the prefix product: removed, owned by the GitHub username of the
+# developer who holds that workstream (workstreams.yaml records the developer's handle; map each
+# handle to a GitHub username). Then rename this file to .github/CODEOWNERS.
+#
+# The product rulesets require 0 approvals (the gating review is the approval), so CODEOWNERS
+# requests reviews and shows ownership; it does not block a merge. Later lines take precedence.
+
+# Default owner of everything not listed below.
+*               @REPLACE-WITH-OWNER-GITHUB-USERNAME
+
+# One line per workstream, for example:
+# /web/         @REPLACE-WITH-UI-DEVELOPER
+# /api/         @REPLACE-WITH-BACKEND-DEVELOPER
+# /infra/       @REPLACE-WITH-INFRA-DEVELOPER
+
+# CI and repository settings stay with the repository owner.
+/.github/       @REPLACE-WITH-OWNER-GITHUB-USERNAME
+/tools/         @REPLACE-WITH-OWNER-GITHUB-USERNAME
