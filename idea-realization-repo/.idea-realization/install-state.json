@@ -3,7 +3,7 @@
   "plugin": "idea-realization",
   "plugin_version": "0.1.0",
   "installed_at": "2026-10-14T23:06:45Z",
-  "updated_at": "2026-10-15T02:05:33Z",
+  "updated_at": "2026-10-15T02:15:58Z",
   "features": [
     "backlog",
     "brain",
@@ -32,28 +32,8 @@
       "feature": "ideas"
     },
     {
-      "path": ".idea-realization/schemas/idea.schema.json",
-      "sha256": "3ab558892c4acb274fa7f909bcf18560be5239704a5b241e6031b233cf0e2174",
-      "feature": "ideas"
-    },
-    {
-      "path": ".idea-realization/schemas/idea-priority.schema.json",
-      "sha256": "665146ee75edd2bb7912700b6b3f81fbc20508c734f4ea119105711740310ded",
-      "feature": "ideas"
-    },
-    {
-      "path": ".idea-realization/schemas/idea-partition-record.schema.json",
-      "sha256": "2cf7ee7062b5d632ad5add19ab6800f474aa9f3ab8a8cd298fe54a580455cc01",
-      "feature": "partition"
-    },
-    {
       "path": "backlog/backlog.yaml",
       "sha256": "5356ecb416b6e1b7f82a268a47d2407c1da6a1e8c4f01355c78eddc1819e0956",
-      "feature": "backlog"
-    },
-    {
-      "path": ".idea-realization/schemas/backlog.schema.json",
-      "sha256": "ff39bdd8605fd3d81de015b5a75197a6176b221611011880956e4a551f44feda",
       "feature": "backlog"
     },
     {
@@ -67,43 +47,13 @@
       "feature": "documents"
     },
     {
-      "path": ".idea-realization/schemas/document.schema.json",
-      "sha256": "7feebf7815a18f4d565c597e26b482c565a9868342af47d292f35294b0a04d69",
-      "feature": "documents"
-    },
-    {
-      "path": ".idea-realization/schemas/codes.schema.json",
-      "sha256": "565d9592e20d4b71884f0ab6e3a2704189503d1dc59decebfb1002b469f7cd52",
-      "feature": "documents"
-    },
-    {
-      "path": ".idea-realization/schemas/systems.schema.json",
-      "sha256": "df509e41e8dcfd51d6ac01b14b44274e4e92e814e95f387f46121d907f8801cf",
-      "feature": "documents"
-    },
-    {
       "path": "docs/workstreams.yaml",
       "sha256": "1a908a63a4081c7dc38a0e655abbe2bc5a5e2189ffa149dedb5ac899358aab0c",
       "feature": "workstreams"
     },
     {
-      "path": ".idea-realization/schemas/workstreams.schema.json",
-      "sha256": "9a1ad72f845cc24dc56589a81b6fc9475bdf885968b8c2efc40a1591466ef7f2",
-      "feature": "workstreams"
-    },
-    {
-      "path": ".idea-realization/schemas/review-verdict.schema.json",
-      "sha256": "6fa627457c9a84dec6c117c5a9200e1b79f6fb144d6fa4a017090ffd27a87db2",
-      "feature": "reviews"
-    },
-    {
       "path": ".idea-realization/product.yaml",
       "sha256": "88d5dfb3d40ec752a491d3c336f7e9789b4b5b7efa2c334dcf76d3b6cc6a89a3",
-      "feature": "product"
-    },
-    {
-      "path": ".idea-realization/schemas/product.schema.json",
-      "sha256": "b28de79d0cbf9fdd15b7c06bec5af308fe787680e3605dced105dcb454f92fd1",
       "feature": "product"
     },
     {
@@ -117,11 +67,6 @@
       "feature": "brain"
     },
     {
-      "path": ".idea-realization/schemas/brain-entry.schema.json",
-      "sha256": "79a993dca9ff25c212d018e87a10f9bef57ebb15449347371be8a279dcd9b686",
-      "feature": "brain"
-    },
-    {
       "path": ".idea-realization/project.yaml",
       "sha256": "82a727a5e4f1f67fb37fca156be949a38e0fb52d6b167987da39c43929d09351",
       "feature": "project"
@@ -132,21 +77,85 @@
       "feature": "project"
     },
     {
+      "path": ".idea-realization/schemas/backlog.schema.json",
+      "sha256": "5b04ebfb508a0658df4423e65b6ad7b43e4f027ba631d04fc258cc6ffdfd2b3d",
+      "feature": "backlog",
+      "owner": "plugin"
+    },
+    {
+      "path": ".idea-realization/schemas/idea.schema.json",
+      "sha256": "3ab558892c4acb274fa7f909bcf18560be5239704a5b241e6031b233cf0e2174",
+      "feature": "ideas",
+      "owner": "plugin"
+    },
+    {
+      "path": ".idea-realization/schemas/idea-priority.schema.json",
+      "sha256": "665146ee75edd2bb7912700b6b3f81fbc20508c734f4ea119105711740310ded",
+      "feature": "ideas",
+      "owner": "plugin"
+    },
+    {
+      "path": ".idea-realization/schemas/idea-partition-record.schema.json",
+      "sha256": "2cf7ee7062b5d632ad5add19ab6800f474aa9f3ab8a8cd298fe54a580455cc01",
+      "feature": "partition",
+      "owner": "plugin"
+    },
+    {
+      "path": ".idea-realization/schemas/document.schema.json",
+      "sha256": "7feebf7815a18f4d565c597e26b482c565a9868342af47d292f35294b0a04d69",
+      "feature": "documents",
+      "owner": "plugin"
+    },
+    {
+      "path": ".idea-realization/schemas/codes.schema.json",
+      "sha256": "565d9592e20d4b71884f0ab6e3a2704189503d1dc59decebfb1002b469f7cd52",
+      "feature": "documents",
+      "owner": "plugin"
+    },
+    {
+      "path": ".idea-realization/schemas/systems.schema.json",
+      "sha256": "df509e41e8dcfd51d6ac01b14b44274e4e92e814e95f387f46121d907f8801cf",
+      "feature": "documents",
+      "owner": "plugin"
+    },
+    {
+      "path": ".idea-realization/schemas/workstreams.schema.json",
+      "sha256": "9a1ad72f845cc24dc56589a81b6fc9475bdf885968b8c2efc40a1591466ef7f2",
+      "feature": "workstreams",
+      "owner": "plugin"
+    },
+    {
+      "path": ".idea-realization/schemas/review-verdict.schema.json",
+      "sha256": "6fa627457c9a84dec6c117c5a9200e1b79f6fb144d6fa4a017090ffd27a87db2",
+      "feature": "reviews",
+      "owner": "plugin"
+    },
+    {
+      "path": ".idea-realization/schemas/product.schema.json",
+      "sha256": "b28de79d0cbf9fdd15b7c06bec5af308fe787680e3605dced105dcb454f92fd1",
+      "feature": "product",
+      "owner": "plugin"
+    },
+    {
+      "path": ".idea-realization/schemas/brain-entry.schema.json",
+      "sha256": "79a993dca9ff25c212d018e87a10f9bef57ebb15449347371be8a279dcd9b686",
+      "feature": "brain",
+      "owner": "plugin"
+    },
+    {
       "path": ".idea-realization/schemas/project.schema.json",
       "sha256": "d6641e450ce86fcad8fb52d7f949e16bf275c107a7297850fed5de5523ab5bc7",
-      "feature": "project"
+      "feature": "project",
+      "owner": "plugin"
     },
     {
       "path": ".idea-realization/schemas/local.schema.json",
       "sha256": "21fc400f16e23b076b35fe4a2d690680f56cbfb51b552b05cad695f72b5377b5",
-      "feature": "project"
+      "feature": "project",
+      "owner": "plugin"
     }
   ],
   "directories": [
-    {
-      "path": ".idea-realization/staging",
-      "feature": "partition"
-    },
     {
       "path": "docs/reviews",
       "feature": "reviews"
@@ -170,6 +179,10 @@
     {
       "path": "brain/learnings",
       "feature": "brain"
+    },
+    {
+      "path": ".idea-realization/staging",
+      "feature": "partition"
     }
   ],
   "consent": [

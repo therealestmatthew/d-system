@@ -5,15 +5,32 @@
 """Create the directories and seed files each feature needs in the target repository.
 
 Never overwrites a file that exists: every such path is reported as skipped and left
-byte-identical. Every file written is recorded, with its SHA-256, in
+byte-identical. Every file written is recorded, with its SHA-256 and its owner, in
 ``.idea-realization/install-state.json``. ``--dry-run`` reports the same plan and writes nothing.
+
+Each seeded file has one of two owners, recorded as ``owner`` on its entry:
+
+- ``plugin``: a copy whose content must equal the file this plugin version ships, namely the
+  schema copies under ``.idea-realization/schemas/``. Nobody edits them. ``doctor.py`` reports
+  one as stale when it differs from the plugin's file.
+- ``repository``: a data or configuration file people and agents edit by design: the idea log,
+  its view and priority file, the backlog, the code register, the systems and workstreams
+  registries, the brain README and index, ``product.yaml``, ``project.yaml`` and
+  ``local.example.yaml``. The scaffold only seeds a starting point; ``doctor.py`` reports an
+  edited one as edited, never as drifted, and ``check.py`` validates its content.
+
+``--refresh-schemas`` is the one exception to never overwriting: for the selected features it
+overwrites every plugin-owned copy that differs from the plugin's file with that file, and records
+the new SHA-256 (also when the copy already matches and only the record is out of date). Run it
+after updating the plugin, or when ``doctor.py`` reports a stale or unrecorded copy.
 
 The target's ``.gitignore`` is changed only with ``--consent gitignore``, and that consent is
 recorded. The scaffold never writes ``.claude/settings.json`` or a hook.
 
 ``--consent edit`` records that the configuration files people are expected to fill in
 (``product.yaml`` and ``project.yaml``, for the selected features) will change after the scaffold
-wrote them, so ``doctor.py`` reports them as edited rather than drifted.
+wrote them. Both are repository-owned, so ``doctor.py`` reports them as edited with or without
+it; with it, the doctor's line also names the consent.
 
 Exit codes: 0 on success, 2 on a usage error.
 """
@@ -46,13 +63,20 @@ class Seed:
     """One path the scaffold creates.
 
     ``content`` is the file's text; ``source`` is a plugin file to copy instead, reported as not
-    shipped when this plugin version lacks it; neither means a directory.
+    shipped when this plugin version lacks it; neither means a directory. ``plugin_owned`` marks
+    a copy that must stay equal to ``source`` (owner ``plugin``); every other file is a starting
+    point the repository then edits (owner ``repository``).
     """
 
     feature: str
     target: Callable[[paths.Config], Path]
     content: Callable[[], str] | None = None
     source: str | None = None
+    plugin_owned: bool = False
+
+    @property
+    def owner(self) -> str:
+        return "plugin" if self.plugin_owned else "repository"
 
 
 def today() -> str:
@@ -73,7 +97,7 @@ def _under(name: str, *parts: str) -> Callable[[paths.Config], Path]:
 
 def _schema(feature: str, name: str) -> Seed:
     return Seed(feature, lambda config: config.root / SCHEMA_DIR / name,
-                source=f"schemas/{name}")
+                source=f"schemas/{name}", plugin_owned=True)
 
 
 SEEDS: tuple[Seed, ...] = (
@@ -132,6 +156,17 @@ def relative(config: paths.Config, path: Path) -> str:
         return path.resolve().as_posix()
 
 
+def plugin_owned(config: paths.Config) -> dict[str, Seed]:
+    """Every plugin-owned seed, by the path it is recorded under in ``config``'s repository."""
+    return {relative(config, seed.target(config)): seed for seed in SEEDS if seed.plugin_owned}
+
+
+def owner_of(entry: dict[str, str], owned: dict[str, Seed]) -> str:
+    """The recorded ``owner`` of a file entry; for a record written before owners were recorded,
+    ``plugin`` when the path is a plugin-owned seed's and ``repository`` otherwise."""
+    return entry.get("owner") or ("plugin" if entry["path"] in owned else "repository")
+
+
 def plugin_version() -> str:
     return str(json.loads(paths.MANIFEST.read_text(encoding="utf-8")).get("version", "0"))
 
@@ -158,8 +193,12 @@ def gitignore_lines(config: paths.Config, features: Sequence[str]) -> list[str]:
 
 
 def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = False,
-             consent: Sequence[str] = (), plugin_root: Path = paths.PLUGIN_ROOT) -> list[str]:
-    """Create every missing path for ``features``; return one report line per path."""
+             consent: Sequence[str] = (), plugin_root: Path = paths.PLUGIN_ROOT,
+             refresh_schemas: bool = False) -> list[str]:
+    """Create every missing path for ``features``; return one report line per path.
+
+    With ``refresh_schemas``, also bring every existing plugin-owned copy for ``features`` back
+    to the plugin's file and record its hash."""
     lines: list[str] = []
     record = load_record(config.root)
     files: list[dict[str, str]] = record["files"]  # type: ignore[assignment]
@@ -172,6 +211,38 @@ def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = Fals
 
     def remember(entries: list[dict[str, str]], entry: dict[str, str]) -> None:
         entries[:] = [item for item in entries if item["path"] != entry["path"]] + [entry]
+
+    def refresh(seed: Seed, target: Path, name: str) -> bool:
+        """Bring one existing plugin-owned copy back to the plugin's file; True when the record
+        changed."""
+        assert seed.source is not None
+        source = plugin_root / seed.source
+        if not source.is_file():
+            lines.append(f"skipped  {name} (not shipped by this plugin version)")
+            return False
+        if target.is_symlink() or not target.is_file():
+            lines.append(f"skipped  {name} (not a regular file; remove it and re-run)")
+            return False
+        data = source.read_bytes()
+        digest = hashlib.sha256(data).hexdigest()
+        stale = target.read_bytes() != data
+        recorded = next((entry for entry in files if entry["path"] == name), None)
+        if not stale and recorded is not None and recorded["sha256"] == digest \
+                and recorded.get("owner") == "plugin":
+            lines.append(f"skipped  {name} (current)")
+            return False
+        verb = "refresh" if stale else "record"
+        if dry_run:
+            lines.append(f"would {verb}  {name}")
+            return False
+        if stale:
+            temporary = target.with_name(target.name + ".refresh")
+            temporary.write_bytes(data)
+            temporary.replace(target)
+        remember(files, {"path": name, "sha256": digest, "feature": seed.feature,
+                         "owner": "plugin"})
+        lines.append(f"{'refreshed' if stale else 'recorded'}  {name}")
+        return True
 
     for seed in SEEDS:
         if seed.feature not in features:
@@ -192,6 +263,9 @@ def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = Fals
                 written = True
             continue
         if target.exists() or target.is_symlink():
+            if refresh_schemas and seed.plugin_owned and seed.source is not None:
+                written |= refresh(seed, target, name)
+                continue
             lines.append(f"skipped  {name} (exists)")
             continue
         if seed.source is not None:
@@ -213,7 +287,8 @@ def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = Fals
         except FileExistsError:
             lines[-1] = f"skipped  {name} (appeared during this run)"
             continue
-        remember(files, {"path": name, "sha256": sha256(target), "feature": seed.feature})
+        remember(files, {"path": name, "sha256": sha256(target), "feature": seed.feature,
+                         "owner": seed.owner})
         written = True
 
     if wanted:
@@ -271,6 +346,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--feature", action="append", default=None,
                         choices=[*FEATURES, "all"], help="feature to scaffold; repeatable")
     parser.add_argument("--dry-run", action="store_true", help="report the plan; write nothing")
+    parser.add_argument("--refresh-schemas", action="store_true",
+                        help="replace every schema copy that differs from the plugin's with the "
+                             "plugin's, and record its hash")
     parser.add_argument("--consent", action="append", default=[], choices=list(CONSENTS),
                         help="gitignore: allow the scaffold to change .gitignore; edit: record "
                              "that product.yaml and project.yaml will be filled in; recorded in "
@@ -282,7 +360,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
     features = list(FEATURES) if "all" in args.feature else sorted(set(args.feature))
     config = paths.resolve(args)
-    for line in scaffold(config, features, args.dry_run, args.consent):
+    for line in scaffold(config, features, args.dry_run, args.consent,
+                         refresh_schemas=args.refresh_schemas):
         print(line)
     return 0
 

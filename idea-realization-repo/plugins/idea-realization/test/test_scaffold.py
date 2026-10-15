@@ -209,3 +209,79 @@ def test_edit_consent_on_a_dry_run_records_nothing(tmp_path: Path) -> None:
     lines = scaffold.scaffold(config(tmp_path), ["project"], dry_run=True, consent=["edit"])
     assert "would record  consent to edit .idea-realization/project.yaml" in lines
     assert list(tmp_path.iterdir()) == []
+
+
+# --- owners, and refreshing the plugin-owned schema copies -----------------------------------
+
+
+def test_every_recorded_file_names_its_owner(tmp_path: Path) -> None:
+    scaffold.scaffold(config(tmp_path), list(scaffold.FEATURES))
+    files = record(tmp_path)["files"]
+    assert isinstance(files, list)
+    owners = {entry["path"]: entry["owner"] for entry in files}
+    assert owners[".idea-realization/schemas/backlog.schema.json"] == "plugin"
+    assert owners["backlog/backlog.yaml"] == "repository"
+    assert owners[".idea-realization/project.yaml"] == "repository"
+    assert {path for path, owner in owners.items() if owner == "plugin"} == {
+        path for path in owners if path.startswith(".idea-realization/schemas/")}
+
+
+def fake_plugin(tmp_path: Path, text: str) -> Path:
+    plugin = tmp_path / "plugin"
+    (plugin / "schemas").mkdir(parents=True, exist_ok=True)
+    (plugin / "schemas" / "backlog.schema.json").write_text(text)
+    return plugin
+
+
+def test_refresh_replaces_a_stale_schema_copy_and_records_the_new_hash(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    root.mkdir()
+    plugin = fake_plugin(tmp_path, '{"maximum": 10}\n')
+    scaffold.scaffold(config(root), ["backlog"], plugin_root=plugin)
+    backlog = root / "backlog" / "backlog.yaml"
+    backlog.write_text("edited by a claim\n")
+    fake_plugin(tmp_path, '{"maximum": 15}\n')
+    copy = root / ".idea-realization" / "schemas" / "backlog.schema.json"
+
+    before = listing(root)
+    lines = scaffold.scaffold(config(root), ["backlog"], plugin_root=plugin, dry_run=True,
+                              refresh_schemas=True)
+    assert "would refresh  .idea-realization/schemas/backlog.schema.json" in lines
+    assert listing(root) == before
+
+    lines = scaffold.scaffold(config(root), ["backlog"], plugin_root=plugin,
+                              refresh_schemas=True)
+    assert "refreshed  .idea-realization/schemas/backlog.schema.json" in lines
+    assert "skipped  backlog/backlog.yaml (exists)" in lines
+    assert copy.read_text() == '{"maximum": 15}\n'
+    assert backlog.read_text() == "edited by a claim\n"
+    files = record(root)["files"]
+    assert isinstance(files, list)
+    entry = next(item for item in files if item["path"] == copy.relative_to(root).as_posix())
+    assert entry["sha256"] == hashlib.sha256(copy.read_bytes()).hexdigest()
+    assert entry["owner"] == "plugin"
+
+    lines = scaffold.scaffold(config(root), ["backlog"], plugin_root=plugin,
+                              refresh_schemas=True)
+    assert "skipped  .idea-realization/schemas/backlog.schema.json (current)" in lines
+
+
+def test_without_refresh_a_stale_schema_copy_is_left_alone(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    root.mkdir()
+    plugin = fake_plugin(tmp_path, "old\n")
+    scaffold.scaffold(config(root), ["backlog"], plugin_root=plugin)
+    fake_plugin(tmp_path, "new\n")
+    lines = scaffold.scaffold(config(root), ["backlog"], plugin_root=plugin)
+    assert "skipped  .idea-realization/schemas/backlog.schema.json (exists)" in lines
+    assert (root / ".idea-realization" / "schemas" / "backlog.schema.json").read_text() == "old\n"
+
+
+def test_cli_refresh_schemas(tmp_path: Path) -> None:
+    scaffold.scaffold(config(tmp_path), ["backlog"])
+    copy = tmp_path / ".idea-realization" / "schemas" / "backlog.schema.json"
+    shipped = copy.read_bytes()
+    copy.write_text("{}\n")
+    assert scaffold.main(["--feature", "backlog", "--refresh-schemas",
+                          "--root", str(tmp_path)]) == 0
+    assert copy.read_bytes() == shipped

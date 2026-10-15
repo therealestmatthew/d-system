@@ -68,8 +68,10 @@ Markdown source per workflow. The adapters it writes under `.claude/`, `.agents/
 generated and never edited by hand.
 
 **`.idea-realization/`** — The plugin's own state in the repository. `install-state.json` records
-every file the scaffold wrote so the `doctor` skill can report drift. `schemas/` holds copies of
-the plugin's schemas for people and other tools; the plugin's scripts validate against their own.
+every file the scaffold wrote, and whether the plugin or the repository owns it, so the `doctor`
+skill can report a stale schema copy or a missing file. `schemas/` holds copies of the plugin's
+schemas for people and other tools; the plugin's scripts validate against their own, and
+`scaffold.py --refresh-schemas` brings the copies back in line after a plugin update.
 `staging/` holds partition drafts and corpora and is added to `.gitignore` only with the person's
 consent. A partition sweep writes there in the primary checkout, where its subagents run.
 

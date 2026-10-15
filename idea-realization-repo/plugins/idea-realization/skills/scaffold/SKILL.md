@@ -62,3 +62,11 @@ uv run "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.py" --feature <feature> [--consen
 
 Pass `--consent gitignore` only on a yes in step 3. Report every line as printed, then run the
 `doctor` skill once to confirm the record matches the disk.
+
+## Refreshing the schema copies
+
+The schema copies under `.idea-realization/schemas/` belong to the plugin. When the `doctor` skill
+reports one as `stale` or `unrecorded` (usually after a plugin update), run step 4's command with
+`--refresh-schemas` added and `--feature` set to the feature the doctor's line names. It replaces
+each differing copy with the plugin's file and records the new hash; it never touches a data or
+configuration file.

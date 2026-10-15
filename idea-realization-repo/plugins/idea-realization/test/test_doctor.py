@@ -1,7 +1,8 @@
-"""The doctor names drifted and missing files, exits 1, and changes nothing."""
+"""The doctor names stale and missing files, exits 1 and changes nothing; edited data passes."""
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import doctor
@@ -15,14 +16,14 @@ def listing(root: Path) -> dict[str, bytes | None]:
             for p in sorted(root.rglob("*"))}
 
 
-def test_doctor_reports_drift_and_missing(tmp_path: Path, capsys: object) -> None:
+def test_doctor_reports_edited_and_missing(tmp_path: Path, capsys: object) -> None:
     scaffold.scaffold(paths.resolve({"root": str(tmp_path)}, env={}), ["ideas", "backlog"])
     (tmp_path / "ideas" / "priority.yaml").write_text("edited\n")
     (tmp_path / "backlog" / "backlog.yaml").unlink()
     before = listing(tmp_path)
     assert doctor.main(["--root", str(tmp_path)]) == 1
     output = capsys.readouterr().out  # type: ignore[attr-defined]
-    assert "drifted   ideas/priority.yaml" in output
+    assert "edited    ideas/priority.yaml" in output
     assert "missing   backlog/backlog.yaml" in output
     assert "unchanged ideas/ideas.jsonl" in output
     assert listing(tmp_path) == before
@@ -87,13 +88,14 @@ def test_a_consented_config_edit_is_reported_edited_not_drifted(
     assert "missing   .idea-realization/project.yaml" in capsys.readouterr().out
 
 
-def test_an_edit_without_consent_is_still_drift(tmp_path: Path,
-                                                capsys: pytest.CaptureFixture[str]) -> None:
+def test_a_config_edit_without_consent_is_edited_too(
+        tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """product.yaml is repository-owned; the consent only adds a note to the line."""
     scaffold.scaffold(paths.resolve({"root": str(tmp_path)}, env={}), ["product"])
     product = tmp_path / ".idea-realization" / "product.yaml"
     product.write_text(product.read_text() + "github: team/x\n")
-    assert doctor.main(["--root", str(tmp_path)]) == 1
-    assert "drifted   .idea-realization/product.yaml" in capsys.readouterr().out
+    assert doctor.main(["--root", str(tmp_path)]) == 0
+    assert "edited    .idea-realization/product.yaml  (product)\n" in capsys.readouterr().out
 
 
 def test_doctor_reports_a_control_origin_that_is_not_project_yaml_remote(
@@ -122,3 +124,96 @@ def test_an_invalid_project_yaml_exits_two_without_a_traceback(
     (tmp_path / ".idea-realization" / "project.yaml").write_text("schema_version: 2\n")
     assert doctor.main(["--root", str(tmp_path)]) == 2
     assert "project.yaml" in capsys.readouterr().err
+
+
+# --- plugin-owned schema copies against repository-owned data -----------------------------------
+
+
+def test_data_files_edited_after_scaffold_are_not_drift(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A claim edits the backlog and an allocation the code register: normal use, exit 0."""
+    scaffold.scaffold(paths.resolve({"root": str(tmp_path)}, env={}), list(scaffold.FEATURES))
+    edited = ["backlog/backlog.yaml", "docs/codes.yaml", "docs/systems.yaml",
+              "docs/workstreams.yaml", "ideas/ideas.jsonl", "ideas/ideas.md",
+              "ideas/priority.yaml", "brain/index.md"]
+    for name in edited:
+        with (tmp_path / name).open("a") as handle:
+            handle.write("\n# edited\n")
+    assert doctor.main(["--root", str(tmp_path)]) == 0
+    out = capsys.readouterr().out
+    for name in edited:
+        assert f"edited    {name}  (" in out
+    assert "drifted" not in out.replace("0 drifted", "")
+
+
+def test_a_stale_schema_copy_is_reported_with_the_fix(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    scaffold.scaffold(paths.resolve({"root": str(tmp_path)}, env={}), ["backlog"])
+    copy = tmp_path / ".idea-realization" / "schemas" / "backlog.schema.json"
+    copy.write_text(copy.read_text().replace('"maximum"', '"maximumm"', 1))
+    before = listing(tmp_path)
+    assert doctor.main(["--root", str(tmp_path)]) == 1
+    out = capsys.readouterr().out
+    assert ("stale     .idea-realization/schemas/backlog.schema.json  (backlog, differs from "
+            "the plugin's copy, fix: scaffold.py --feature backlog --refresh-schemas)") in out
+    assert listing(tmp_path) == before
+
+
+def test_a_hand_updated_schema_copy_is_unrecorded_until_refreshed(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The copy matches the plugin but the record still holds the old hash."""
+    plugin = tmp_path / "plugin"
+    (plugin / "schemas").mkdir(parents=True)
+    source = plugin / "schemas" / "backlog.schema.json"
+    source.write_text('{"version": 1}\n')
+    root = tmp_path / "repo"
+    root.mkdir()
+    config = paths.resolve({"root": str(root)}, env={})
+    scaffold.scaffold(config, ["backlog"], plugin_root=plugin)
+    source.write_text('{"version": 2}\n')
+    copy = root / ".idea-realization" / "schemas" / "backlog.schema.json"
+    states = {path: state for state, path, _ in doctor.diagnose(root, config, plugin)}
+    assert states[".idea-realization/schemas/backlog.schema.json"] == "stale"
+    copy.write_text('{"version": 2}\n')
+    states = {path: state for state, path, _ in doctor.diagnose(root, config, plugin)}
+    assert states[".idea-realization/schemas/backlog.schema.json"] == "unrecorded"
+    lines = scaffold.scaffold(config, ["backlog"], plugin_root=plugin, refresh_schemas=True)
+    assert "recorded  .idea-realization/schemas/backlog.schema.json" in lines
+    states = {path: state for state, path, _ in doctor.diagnose(root, config, plugin)}
+    assert states[".idea-realization/schemas/backlog.schema.json"] == "unchanged"
+
+
+def test_a_record_without_owners_is_read_by_path(tmp_path: Path) -> None:
+    """Install-state records written before owners were recorded still classify correctly."""
+    config = paths.resolve({"root": str(tmp_path)}, env={})
+    scaffold.scaffold(config, ["backlog"])
+    state_path = tmp_path / scaffold.RECORD
+    state = json.loads(state_path.read_text())
+    for entry in state["files"]:
+        del entry["owner"]
+    state_path.write_text(json.dumps(state))
+    (tmp_path / "backlog" / "backlog.yaml").write_text("items: []\n")
+    copy = tmp_path / ".idea-realization" / "schemas" / "backlog.schema.json"
+    copy.write_text("{}\n")
+    states = {path: state for state, path, _ in doctor.diagnose(tmp_path, config)}
+    assert states["backlog/backlog.yaml"] == "edited"
+    assert states[".idea-realization/schemas/backlog.schema.json"] == "stale"
+
+
+def test_a_missing_gitignored_directory_is_absent_not_missing(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A fresh clone never has the gitignored staging directory."""
+    git(tmp_path, "init", "-q")
+    scaffold.scaffold(paths.resolve({"root": str(tmp_path)}, env={}), ["partition"],
+                      consent=["gitignore"])
+    (tmp_path / ".idea-realization" / "staging").rmdir()
+    assert doctor.main(["--root", str(tmp_path)]) == 0
+    assert ("absent    .idea-realization/staging/  (partition, gitignored; the scaffold "
+            "recreates it)") in capsys.readouterr().out
+    (tmp_path / ".gitignore").write_text("")
+    assert doctor.main(["--root", str(tmp_path)]) == 1
+    assert "missing   .idea-realization/staging/" in capsys.readouterr().out
