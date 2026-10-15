@@ -154,14 +154,21 @@ fetched, it prints `cannot tell whether product_merge … landed` instead, which
    merged (`gh pr view <n> --json state,mergeCommit` in the product checkout, where `<n>` is the
    phase's product pull request). If the pull request merged as `product_merge`, the product
    integration branch lost the commit; stop and report it to the owner rather than reopening.
-3. Otherwise reopen the phase in the control repository: set it back to `active` with a
-   `next_action` naming the stranded merge, and remove its `product_merge`, in one commit directly
-   on the control integration branch. Then rebase the product branch, run the verification, review
+   If the forge does not answer — `gh pr view` fails, no pull request number is recorded for the
+   phase, or its state does not show whether it merged as `product_merge` — that is also `cannot
+   tell`: stop, report it to the owner, and do not reopen the phase.
+3. Only when the forge shows the pull request did not merge as `product_merge`, reopen the phase
+   in the control repository: set it back to `active` with a `next_action` naming the stranded
+   merge, and remove its `product_merge`, in one commit directly on the control integration branch. Then rebase the product branch, run the verification, review
    the new `HEAD`, and close the session again.
 
 Without any product checkout on this machine (control CI is one such place) the check cannot test
-landing at all, and prints `product_merge … not checked: no product checkout is configured` for
-each complete phase instead.
+landing at all. It still fails a complete phase whose control records do not agree: no passing
+gating verdict for that phase on the product repository, or a `product_merge` or `reviewed_commit`
+that is not a full commit id. A `product_merge` equal to the reviewed commit (a fast-forward)
+passes. Any other `product_merge` can only be a merge commit whose second parent was reviewed,
+which needs the product repository to read, so the check prints `product_merge … not checked: no
+product checkout is configured` for that phase instead of an error.
 
 Never edit `product_merge` to a commit the recorded verdict did not judge: it is the commit the
 verdict judged (a fast-forward) or a merge commit whose second parent is that commit.

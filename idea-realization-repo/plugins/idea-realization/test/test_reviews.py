@@ -255,15 +255,65 @@ def test_a_refused_product_checkout_is_an_error(two_repos: tuple[Path, Path, str
 
 def test_a_completion_without_a_checkout_says_it_was_not_checked(
         two_repos: tuple[Path, Path, str, str], capsys: pytest.CaptureFixture[str]) -> None:
-    """Control CI has no product checkout: a made-up product_merge and verdict cannot be caught
-    there, and the check says so per phase instead of passing silently (workflow-sim M3)."""
+    """Control CI has no product checkout. The gating review's reproduction (workflow-sim M3): a
+    made-up product_merge beside a passing verdict on an unrelated commit. Whether it is a merge
+    commit whose second parent was reviewed needs the product repository, so it is a note, not an
+    error; the note names what could not be checked."""
     control, _, _, _ = two_repos
-    made_up = "1" * 40
+    made_up, unrelated = "f" * 40, "a" * 40
     complete_phase(control, product_merge=made_up)
-    assert check(control, stamped(phase="build-api", reviewed_commit=made_up)) == []
+    assert check(control, stamped(phase="build-api", reviewed_commit=unrelated)) == []
     printed = capsys.readouterr().err
     assert "reviews: build-api: product_merge " + made_up + " not checked" in printed
     assert "no product checkout" in printed
+    assert "is not the reviewed commit " + unrelated in printed
+    assert "second parent" in printed
+
+
+def test_a_fast_forward_completion_without_a_checkout_needs_no_note(
+        two_repos: tuple[Path, Path, str, str], capsys: pytest.CaptureFixture[str]) -> None:
+    """product_merge equal to the reviewed commit is a fast-forward: the control records agree
+    with each other, and nothing about the merge needs the product repository to read."""
+    control, _, _, tip = two_repos
+    complete_phase(control, product_merge=tip)
+    capsys.readouterr()
+    assert check(control, stamped(phase="build-api", reviewed_commit=tip)) == []
+    assert "not checked" not in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(("changes", "merge", "expected"), [
+    ({"phase": "build-ui"}, "f" * 40, "complete without a passing gating verdict"),
+    ({"gating": False}, "f" * 40, "complete without a passing gating verdict"),
+    ({"verdict": "reject"}, "f" * 40, "complete without a passing gating verdict"),
+    ({"repository": "control"}, "f" * 40, "no passing gating verdict judged its product_merge"),
+    ({"reviewed_commit": "a" * 39}, "f" * 40, "reviewed_commit"),
+    ({"reviewed_commit": "A" * 40}, "f" * 40, "reviewed_commit"),
+    ({}, "f" * 39, "is not a full commit id"),
+    ({}, "F" * 40, "is not a full commit id"),
+    ({}, None, "without product_merge"),
+])
+def test_a_completion_without_a_checkout_still_fails_what_needs_no_product_repository(
+        two_repos: tuple[Path, Path, str, str], capsys: pytest.CaptureFixture[str],
+        changes: dict[str, Any], merge: str | None, expected: str) -> None:
+    """Without a product checkout, every check that reads only the control records still runs:
+    a verdict for another phase, a shadow or rejecting verdict, a control-repository verdict, a
+    malformed commit id and a missing product_merge are errors, not a ``not checked`` note."""
+    control, _, _, _ = two_repos
+    complete_phase(control, **({"product_merge": merge} if merge else {}))
+    capsys.readouterr()
+    errors = check(control, stamped(**{"phase": "build-api", "reviewed_commit": "a" * 40,
+                                       **changes}))
+    assert any(expected in e for e in errors), errors
+    assert "not checked" not in capsys.readouterr().err
+
+
+def test_no_verdict_at_all_without_a_checkout_fails(
+        two_repos: tuple[Path, Path, str, str], capsys: pytest.CaptureFixture[str]) -> None:
+    control, _, _, _ = two_repos
+    complete_phase(control, product_merge="f" * 40)
+    capsys.readouterr()
+    assert any("complete without a passing gating verdict" in e for e in run(control))
+    assert "not checked" not in capsys.readouterr().err
 
 
 def peer_merges(checkout: Path, fast_forward: bool) -> str:
@@ -326,3 +376,15 @@ def test_an_unreachable_origin_cannot_tell_stranding(
     capsys.readouterr()
     assert run(control, checkout) == []
     assert "cannot tell" in capsys.readouterr().err
+
+
+def test_the_stranded_recovery_stops_when_the_forge_cannot_tell() -> None:
+    """The reopen step runs only on a forge answer that the pull request did not merge as
+    product_merge; a failed or unclear forge check stops for the owner (gating review of M4)."""
+    text = (paths.PLUGIN_ROOT / "docs" / "two-repositories.md").read_text(encoding="utf-8")
+    section = text.split("## A stranded phase", 1)[1].split("\n## ", 1)[0]
+    confirm, reopen = section.split("\n2. ", 1)[1].split("\n3. ", 1)
+    assert "`gh pr view` fails" in confirm
+    assert "no pull request number is recorded" in confirm
+    assert "do not reopen the phase" in confirm
+    assert reopen.startswith("Only when the forge shows the pull request did not merge")

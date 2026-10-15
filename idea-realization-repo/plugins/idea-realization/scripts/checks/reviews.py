@@ -21,10 +21,13 @@ only when this checkout holds that tip and the commit is not in its history. Whe
 read, or its tip is a commit this checkout has not fetched, it prints a ``cannot tell`` note that
 says to fetch and run the check again.
 
-Without a product checkout on this machine (control CI is always in this state) nothing about the
-product commit can be read: that it exists, that it merged the reviewed commit, or that it landed.
-The check then prints one ``not checked`` note per complete phase, so a completion that rests on
-the control records alone is visible rather than silently clean.
+Without a product checkout on this machine (control CI is always in this state) every check that
+reads only the control records still runs and still fails: a passing gating verdict for this phase
+on the product repository, and full commit ids in ``product_merge`` and ``reviewed_commit``. When
+``product_merge`` is the reviewed commit, a fast-forward, the records agree and nothing more is
+said. Any other ``product_merge`` can only be a merge commit whose second parent was reviewed, and
+its parents are in the product repository, so the check prints a ``not checked`` note for that
+phase naming the reviewed commit, rather than passing it silently.
 
 Notes go to standard error and never change the exit code.
 """
@@ -182,10 +185,16 @@ def completion_errors(config: paths.Config, records: list[dict[str, Any]],
             errors.append(f"{key}: no passing gating verdict judged its product_merge {merge}")
             continue
         if product_root is None:
-            if not refused:
+            # Everything that reads only the control records has run above. A product_merge
+            # equal to a reviewed commit is a fast-forward and the records agree; any other
+            # value can only be a merge commit, and its second parent is in the product
+            # repository.
+            if merge not in reviewed and not refused:
+                judged = ", ".join(sorted(reviewed))
                 note(f"{key}: product_merge {merge} not checked: no product checkout is "
-                     "configured on this machine (product_root), so that the commit exists, "
-                     "merged the reviewed commit and landed rests on the control records alone")
+                     f"configured on this machine (product_root). It is not the reviewed commit "
+                     f"{judged}, so it passes only as a merge commit whose second parent is that "
+                     "commit, and reading its parents needs the product repository")
             continue
         branch = product.load(config).integration_branch
         if known_commit(product_root, merge) and merge not in reviewed \
