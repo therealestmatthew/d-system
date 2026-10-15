@@ -33,6 +33,16 @@ Before any script acts on the product checkout it calls ``verify``, which refuse
 checkout's ``origin`` is the resolved ``product_remote``, so a wrong path cannot send work into the
 wrong repository. While ``product_remote`` is unset (or a ``REPLACE-WITH-`` placeholder) ``verify``
 refuses and names ``local.yaml``; ``show`` prints it as not set.
+
+``merge-route --checkout <path>`` tells session-close how a checkout's branch reaches its
+integration branch. It prints ``local`` when the checkout has no ``origin`` or its ``origin`` is a
+path on this machine (a test repository, local-only use): the local ``git merge --no-ff`` applies.
+Every other ``origin`` is a hosted repository and prints ``pull-request``, but only after ``gh repo
+view`` succeeds in the checkout. When it fails (``gh`` missing, logged out, or not authorised for
+the organization), ``merge-route`` exits 1 and says so: a hosted repository is never merged
+locally, because a local merge pushed to it lands without the pull request and its merge commit.
+The route is decided by the URL, not by whether ``gh`` happens to work, so an ``origin`` behind an
+SSH host alias counts as hosted too.
 """
 
 from __future__ import annotations
@@ -42,7 +52,7 @@ import json
 import re
 import subprocess
 import sys
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -143,6 +153,44 @@ def origin(root: Path) -> str:
     return result.stdout.strip() if result.returncode == 0 else ""
 
 
+def is_local_remote(url: str) -> bool:
+    """True for a remote that is a path on this machine: ``file://``, an absolute or relative
+    path. False for ``scheme://host/...`` and scp-style ``[user@]host:path``."""
+    url = url.strip()
+    if url.startswith("file://"):
+        return True
+    if re.match(r"^[A-Za-z][A-Za-z0-9+.-]*://", url):
+        return False
+    # scp-style: a colon before the first slash, and not a Windows drive letter.
+    head = url.split("/", 1)[0]
+    return not (":" in head and not re.match(r"^[A-Za-z]:$", head))
+
+
+def run_gh(command: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
+    try:
+        return subprocess.run(command, cwd=cwd, capture_output=True, text=True, check=False,
+                              timeout=60)
+    except (OSError, subprocess.TimeoutExpired) as error:
+        return subprocess.CompletedProcess(command, 127, "", str(error))
+
+
+def merge_route(checkout: Path,
+                gh: Callable[[list[str], Path], subprocess.CompletedProcess[str]] = run_gh) -> str:
+    """``local`` or ``pull-request`` for ``checkout`` (see ``merge-route`` above). ``ProductError``
+    when the origin is hosted and ``gh`` cannot reach it."""
+    url = origin(checkout)
+    if not url or is_local_remote(url):
+        return "local"
+    result = gh(["gh", "repo", "view", "--json", "nameWithOwner"], checkout)
+    if result.returncode != 0:
+        reason = (result.stderr or result.stdout).strip().splitlines()
+        raise ProductError(f"{checkout} has the hosted origin {url}, but gh repo view failed"
+                           f"{': ' + reason[-1] if reason else ''}. Stop: fix gh (gh auth "
+                           "status; authorise SSO for the organization) and re-run. A hosted "
+                           "repository is never merged locally.")
+    return "pull-request"
+
+
 def verify(config: paths.Config) -> Product:
     """The product repository, after confirming its checkout's ``origin`` is ``product_remote``."""
     product = load(config)
@@ -186,10 +234,21 @@ def resolve(config: paths.Config, value: str) -> tuple[str, Path | None]:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Show the product repository and check that its checkout matches the record.")
-    parser.add_argument("command", choices=("show", "verify"))
+    parser.add_argument("command", choices=("show", "verify", "merge-route"))
+    parser.add_argument("--checkout", type=Path,
+                        help="merge-route: the worktree or checkout whose branch is merged")
     paths.add_arguments(parser, ["product_root", "product_worktree_dir", "product_remote",
                                  "product_github"])
     args = parser.parse_args(argv)
+    if args.command == "merge-route":
+        if args.checkout is None:
+            parser.error("merge-route needs --checkout <path>")
+        try:
+            print(merge_route(args.checkout))
+        except ProductError as error:
+            print(f"error: {error}", file=sys.stderr)
+            return 1
+        return 0
     config = paths.resolve(args)
     try:
         product = verify(config) if args.command == "verify" else load(config)

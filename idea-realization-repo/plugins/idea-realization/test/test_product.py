@@ -323,3 +323,56 @@ def test_a_placeholder_product_remote_is_refused_like_an_unset_one(
     record.write_text(record.read_text().replace(REMOTE, "REPLACE-WITH-THE-PRODUCT-GIT-URL"))
     with pytest.raises(product.ProductError, match="product_remote is not set"):
         product.verify(config(control, checkout))
+
+
+class FakeGh:
+    """A stand-in for ``gh`` that exits with ``code`` and records each command it is asked."""
+
+    def __init__(self, code: int, stderr: str = "") -> None:
+        self.code, self.stderr, self.calls = code, stderr, list[list[str]]()
+
+    def __call__(self, command: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
+        self.calls.append(command)
+        return subprocess.CompletedProcess(command, self.code, "", self.stderr)
+
+
+@pytest.mark.parametrize("url", [REMOTE, "https://github.com/example-owner/control.git",
+                                 "ssh://git@github.com/example-owner/control.git",
+                                 "git@github-work:example-owner/control.git"])
+def test_a_hosted_origin_is_never_routed_to_a_local_merge_when_gh_fails(
+        tmp_path: Path, url: str) -> None:
+    """The fallback a failing gh used to select: session-close merged onto the integration branch
+    locally and pushed. A hosted origin must stop instead, an SSH host alias included."""
+    git(tmp_path, "init", "-q")
+    git(tmp_path, "remote", "add", "origin", url)
+    gh = FakeGh(1, "HTTP 401: Bad credentials\n")
+    with pytest.raises(product.ProductError, match="never merged locally"):
+        product.merge_route(tmp_path, gh)
+    assert gh.calls == [["gh", "repo", "view", "--json", "nameWithOwner"]]
+
+
+def test_a_hosted_origin_that_gh_reaches_takes_the_pull_request(tmp_path: Path) -> None:
+    git(tmp_path, "init", "-q")
+    git(tmp_path, "remote", "add", "origin", REMOTE)
+    assert product.merge_route(tmp_path, FakeGh(0)) == "pull-request"
+
+
+@pytest.mark.parametrize("url", ["/srv/git/control.git", "../control.git",
+                                 "file:///srv/control.git", "C:/repos/control.git", None])
+def test_a_local_origin_or_none_takes_the_local_merge_without_asking_gh(
+        tmp_path: Path, url: str | None) -> None:
+    git(tmp_path, "init", "-q")
+    if url is not None:
+        git(tmp_path, "remote", "add", "origin", url)
+    gh = FakeGh(1)
+    assert product.merge_route(tmp_path, gh) == "local"
+    assert gh.calls == []
+
+
+def test_cli_merge_route_exits_1_and_names_the_stop(tmp_path: Path, capsys: Any) -> None:
+    git(tmp_path, "init", "-q")
+    git(tmp_path, "remote", "add", "origin", REMOTE)
+    code = product.main(["merge-route", "--checkout", str(tmp_path), "--root", str(tmp_path)])
+    out = capsys.readouterr()
+    # gh is either absent or cannot reach a made-up host; both must stop, never print "local".
+    assert code == 1 and "local" not in out.out and "never merged locally" in out.err

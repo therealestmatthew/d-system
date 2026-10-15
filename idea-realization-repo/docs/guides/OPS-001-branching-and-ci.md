@@ -106,8 +106,10 @@ The sequence, as session-close runs it:
 7. If step 6 fails after the product merged, retry the pull, rebase and push. Never revert the
    product merge. The phase stays `active` until the completion commit lands.
 
-A repository with no GitHub remote (tests, local-only use) uses a local fallback instead: `git merge
---no-ff` into `dev`, then push if a remote exists.
+A repository with no `origin`, or whose `origin` is a path on this machine (tests, local-only use),
+is merged locally instead: `git merge --no-ff` into `dev`, then push if a remote exists.
+`product.py merge-route` decides from the `origin` URL. A hosted `origin` always takes the pull
+request: if `gh` cannot reach it, session-close stops and reports instead of merging locally.
 
 ## 5. Releases: `dev` to `main`, and demo tags
 

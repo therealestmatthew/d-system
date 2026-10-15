@@ -90,7 +90,8 @@ def system(**changes: Any) -> dict[str, Any]:
 
 def test_the_scaffolded_registers_with_no_documents_are_clean(repo: Repo) -> None:
     assert repo.errors() == []
-    assert repo.check() == [f"docs/{documents.CATALOG}: is missing; run the catalog command "
+    cli = documents._relative(repo.config().root, paths.PLUGIN_ROOT / "scripts" / "cli.py")
+    assert repo.check() == [f"docs/{documents.CATALOG}: is missing; run uv run {cli} catalog "
                             "and commit it"]
     assert repo.catalog() == 0
     assert repo.check() == []

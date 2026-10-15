@@ -602,6 +602,8 @@ def test_the_scaffolded_seed_passes_the_check(tmp_path: Path) -> None:
     notes: list[str] = []
     assert feature.audit(fresh, note=notes.append) == []
     assert any("status-regression not run" in line for line in notes)
+    # The note says what to set and where, so a newcomer can act on it.
+    assert any("set decision_record in backlog/backlog.yaml" in line for line in notes)
 
 
 def test_a_document_tree_with_errors_is_reported_not_guessed(target: TargetRepo) -> None:

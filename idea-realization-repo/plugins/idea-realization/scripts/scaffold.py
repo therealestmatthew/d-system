@@ -8,6 +8,10 @@ Never overwrites a file that exists: every such path is reported as skipped and 
 byte-identical. Every file written is recorded, with its SHA-256 and its owner, in
 ``.idea-realization/install-state.json``. ``--dry-run`` reports the same plan and writes nothing.
 
+The record is rewritten only when what it records changes. A run that only recreates paths the
+record already lists, such as the gitignored staging directory on a fresh clone, leaves the tracked
+record byte-identical, so the checkout stays clean.
+
 Each seeded file has one of two owners, recorded as ``owner`` on its entry:
 
 - ``plugin``: a copy whose content must equal the file this plugin version ships, namely the
@@ -202,6 +206,7 @@ def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = Fals
     to the plugin's file and record its hash."""
     lines: list[str] = []
     record = load_record(config.root)
+    recorded_before = json.dumps(record, sort_keys=True)
     files: list[dict[str, str]] = record["files"]  # type: ignore[assignment]
     directories: list[dict[str, str]] = record["directories"]  # type: ignore[assignment]
     written = False
@@ -211,7 +216,12 @@ def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = Fals
     wanted = gitignore_lines(config, features)
 
     def remember(entries: list[dict[str, str]], entry: dict[str, str]) -> None:
-        entries[:] = [item for item in entries if item["path"] != entry["path"]] + [entry]
+        """Record ``entry``, in the place of an entry for the same path if there is one."""
+        for index, item in enumerate(entries):
+            if item["path"] == entry["path"]:
+                entries[index] = entry
+                return
+        entries.append(entry)
 
     def refresh(seed: Seed, target: Path, name: str) -> bool:
         """Bring one existing plugin-owned copy back to the plugin's file; True when the record
@@ -331,9 +341,12 @@ def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = Fals
     if written:
         stamp = now()
         record["installed_at"] = record["installed_at"] or stamp
-        record["updated_at"] = stamp
         record["plugin_version"] = plugin_version()
         record["features"] = sorted(set(record["features"]) | set(features))  # type: ignore[call-overload]
+        if json.dumps(record, sort_keys=True) == recorded_before:
+            lines.append(f"skipped  {RECORD.as_posix()} (already records every path)")
+            return lines
+        record["updated_at"] = stamp
         path = config.root / RECORD
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")

@@ -285,3 +285,25 @@ def test_cli_refresh_schemas(tmp_path: Path) -> None:
     assert scaffold.main(["--feature", "backlog", "--refresh-schemas",
                           "--root", str(tmp_path)]) == 0
     assert copy.read_bytes() == shipped
+
+
+def test_recreating_a_recorded_directory_leaves_the_record_byte_identical(tmp_path: Path) -> None:
+    """A fresh clone has the tracked record but not the gitignored staging directory. Recreating
+    the directory must not rewrite the record, or the checkout is dirty after the scaffold."""
+    scaffold.scaffold(config(tmp_path), list(scaffold.FEATURES))
+    before = (tmp_path / scaffold.RECORD).read_bytes()
+    staging = config(tmp_path).path("staging_dir")
+    staging.rmdir()
+    lines = scaffold.scaffold(config(tmp_path), list(scaffold.FEATURES))
+    assert staging.is_dir()
+    assert (tmp_path / scaffold.RECORD).read_bytes() == before
+    assert f"skipped  {scaffold.RECORD.as_posix()} (already records every path)" in lines
+
+
+def test_a_new_path_still_updates_the_record(tmp_path: Path) -> None:
+    scaffold.scaffold(config(tmp_path), ["ideas"])
+    before = record(tmp_path)
+    scaffold.scaffold(config(tmp_path), ["ideas", "backlog"])
+    after = record(tmp_path)
+    assert "backlog" in after["features"] and after != before
+    assert any(entry["path"] == "backlog/backlog.yaml" for entry in after["files"])

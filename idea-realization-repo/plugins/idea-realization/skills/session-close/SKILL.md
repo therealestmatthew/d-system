@@ -26,7 +26,8 @@ phase to `status: complete` when, and only when, **all three** of these hold:
    or explicitly accepted by the developer who owns the workstream, with the disposition recorded.
 3. **The branches are integrated.** After that pass, the control pull request (the session and
    review records) and then the product pull request were merged into their integration branches
-   with merge commits (in a repository with no GitHub remote, `git merge --no-ff` locally), and
+   with merge commits (in a repository whose `origin` is a path on this machine, or that has
+   none, `git merge --no-ff` locally), and
    the product merge commit's second parent is the reviewed commit. **A passing gating review is
    the approval for both merges**; no separate per-merge approval is asked for.
 
@@ -139,11 +140,23 @@ Only on a passing verdict, and only when the product worktree's `HEAD`
 (`git -C <product worktree> rev-parse HEAD`) still equals the verdict's `reviewed_commit`. If it
 does not, the branch gained a commit after the review: go back to step 2.
 
-**Which path applies.** Each repository is merged through a GitHub pull request when its `origin`
-is a GitHub repository that `gh` can reach: `gh repo view --json nameWithOwner` succeeds when run
-in that repository's worktree. A repository with no GitHub remote (a test repository, local-only
-use) uses the local fallback at the end of this step instead. Say in the session record which path
-each repository took.
+**Which path applies.** The `origin` URL decides it, never whether `gh` happens to work. Run, for
+each repository's worktree:
+
+```bash
+uv run "${CLAUDE_PLUGIN_ROOT}/scripts/product.py" merge-route --checkout <worktree>
+```
+
+- `pull-request`: the `origin` is a hosted repository and `gh` reaches it. Use 6a to 6d.
+- `local`: the worktree has no `origin`, or its `origin` is a path on this machine (a test
+  repository, local-only use). Use the local merge at the end of this step.
+- **Exit 1** (`gh repo view` failed for a hosted `origin`: `gh` missing, logged out, or not
+  authorised for the organization's SSO): **stop and report it.** Do not merge either repository,
+  and never use the local merge instead: merged and pushed locally, the branch lands on the
+  integration branch without its pull request. Leave the phase `active`; once `gh auth status`
+  passes, re-run `merge-route` and continue from here.
+
+Say in the session record which path each repository took.
 
 Every `gh` command below runs inside the worktree it names, so `gh` resolves the repository from
 that worktree's `origin`.
@@ -221,9 +234,9 @@ product integration branch. Together they show that the pull request head, the m
 second parent and the reviewed commit are one commit. The merge commit is the **product merge**.
 If either test fails, stop and report it; do not record completion.
 
-### Local fallback: a repository with no GitHub remote
+### Local merge: a repository whose route is `local`
 
-For each repository without a GitHub remote, in place of 6a to 6d for that repository: confirm its
+Only for a repository `merge-route` printed `local` for, in place of 6a to 6d for that repository: confirm its
 primary checkout is clean (`git -C <checkout> status --short` shows nothing; never stash a peer's
 uncommitted work and never force an integration around it) and is on its integration branch, then:
 

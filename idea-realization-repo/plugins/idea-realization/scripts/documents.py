@@ -399,11 +399,12 @@ def check(config: paths.Config, today: date | None = None) -> list[str]:
         return [f"{_relative(config.root, config.path('backlog_path'))}: {exc}"]
     target = catalog_path(config)
     location = _relative(config.root, target)
+    command = f"uv run {_relative(config.root, paths.PLUGIN_ROOT / 'scripts' / 'cli.py')} catalog"
     if not target.is_file():
-        return [f"{location}: is missing; run the catalog command and commit it"]
+        return [f"{location}: is missing; run {command} and commit it"]
     if target.read_text(encoding="utf-8") != rendered:
-        return [f"{location}: differs from the rendered catalog; run the catalog command and "
-                "commit it, and never edit it by hand"]
+        return [f"{location}: differs from the rendered catalog; run {command} and commit it, "
+                "and never edit it by hand"]
     return []
 
 

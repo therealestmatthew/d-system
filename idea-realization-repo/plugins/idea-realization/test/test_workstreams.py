@@ -299,6 +299,16 @@ def test_a_claim_that_fails_validation_restores_the_file(
     assert path.read_text() == before
 
 
+def test_show_says_so_when_the_registry_defines_no_workstream(
+        repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """The shipped registry is ``workstreams: []``; silence would read as a failure."""
+    write_registry(repo, [])
+    assert run(repo, "show") == 0
+    out = capsys.readouterr().out
+    assert out.startswith("no workstreams defined yet; the owner adds them in ")
+    assert "workstreams.yaml" in out
+
+
 def test_show_and_check(repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
     assert run(repo, "show") == 0
     assert "not in use" in capsys.readouterr().out

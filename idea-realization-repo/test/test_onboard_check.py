@@ -57,6 +57,9 @@ def machine(tmp_path: Path) -> tuple[Path, dict[str, str]]:
           "aws_deploy_profile: sandbox-deploy\naws_region: eu-west-1\nhandle: ana\n"
           f"control_remote: {CONTROL_REMOTE}\nproduct_remote: {REMOTE}\n")
     (control / ".idea-realization" / "staging").mkdir()
+    write(control / ".idea-realization" / "install-state.json",
+          '{"schema_version": 1, "files": [], "consent": [],\n'
+          ' "directories": [{"path": ".idea-realization/staging", "feature": "partition"}]}\n')
     write(control / ".private" / "deny-list.txt", DENIED + "\n")
     write(home / ".aws" / "config",
           "[profile sandbox-read]\nregion = eu-west-1\n[profile sandbox-deploy]\n"
@@ -165,6 +168,28 @@ def test_control_checkout_with_another_origin_is_a_fix(tmp_path: Path) -> None:
     assert "control repository" in fixes(onboard.run_checks(root, env, every_tool, authenticated))
 
 
+def test_missing_aws_cli_is_a_fix(tmp_path: Path) -> None:
+    root, env = machine(tmp_path)
+    lines = onboard.run_checks(root, env, lambda name: None if name == "aws" else every_tool(name),
+                               authenticated)
+    assert set(fixes(lines)) == {"AWS CLI"}
+    assert "install AWS CLI v2" in fixes(lines)["AWS CLI"]
+
+
+def test_doctor_is_a_checked_line(tmp_path: Path) -> None:
+    root, env = machine(tmp_path)
+    lines = onboard.run_checks(root, env, every_tool, authenticated)
+    assert next(line for line in lines if line.item == "doctor").ok
+    (root / ".idea-realization" / "install-state.json").write_text(
+        '{"schema_version": 1, "directories": [], "consent": [],\n'
+        ' "files": [{"path": "ideas/ideas.jsonl", "sha256": "0", "feature": "ideas"}]}\n')
+    found = fixes(onboard.run_checks(root, env, every_tool, authenticated))
+    assert set(found) == {"doctor"} and "ideas/ideas.jsonl missing" in found["doctor"]
+    (root / ".idea-realization" / "install-state.json").unlink()
+    assert "run the scaffold" in fixes(onboard.run_checks(root, env, every_tool,
+                                                          authenticated))["doctor"]
+
+
 def test_missing_scaffold_is_a_fix(tmp_path: Path) -> None:
     root, env = machine(tmp_path)
     (root / ".idea-realization" / "staging").rmdir()
@@ -204,3 +229,4 @@ def test_main_exits_one_and_lists_manual_steps(tmp_path: Path,
     assert code == 1
     assert "FIX  deny-list" in out
     assert "check_aws_machine.py --probe" in out and "aws-sandbox whoami" in out
+    assert "doctor.py" not in out.split("Run by hand")[1]

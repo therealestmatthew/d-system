@@ -769,9 +769,20 @@ checkout's ``origin`` is the resolved ``product_remote``, so a wrong path cannot
 wrong repository. While ``product_remote`` is unset (or a ``REPLACE-WITH-`` placeholder) ``verify``
 refuses and names ``local.yaml``; ``show`` prints it as not set.
 
+``merge-route --checkout <path>`` tells session-close how a checkout's branch reaches its
+integration branch. It prints ``local`` when the checkout has no ``origin`` or its ``origin`` is a
+path on this machine (a test repository, local-only use): the local ``git merge --no-ff`` applies.
+Every other ``origin`` is a hosted repository and prints ``pull-request``, but only after ``gh repo
+view`` succeeds in the checkout. When it fails (``gh`` missing, logged out, or not authorised for
+the organization), ``merge-route`` exits 1 and says so: a hosted repository is never merged
+locally, because a local merge pushed to it lands without the pull request and its merge commit.
+The route is decided by the URL, not by whether ``gh`` happens to work, so an ``origin`` behind an
+SSH host alias counts as hosted too.
+
 | Flag | Help | Choices | Default | Required |
 |---|---|---|---|---|
 | `command` |  |  |  |  |
+| `--checkout` | merge-route: the worktree or checkout whose branch is merged |  |  |  |
 
 Shared configuration flags: `--root`, `--product-root`, `--product-worktree-dir`, `--product-remote`, `--product-github`, resolved by the shared configuration precedence rule.
 
@@ -975,6 +986,10 @@ Create the directories and seed files each feature needs in the target repositor
 Never overwrites a file that exists: every such path is reported as skipped and left
 byte-identical. Every file written is recorded, with its SHA-256 and its owner, in
 ``.idea-realization/install-state.json``. ``--dry-run`` reports the same plan and writes nothing.
+
+The record is rewritten only when what it records changes. A run that only recreates paths the
+record already lists, such as the gitignored staging directory on a fresh clone, leaves the tracked
+record byte-identical, so the checkout stays clean.
 
 Each seeded file has one of two owners, recorded as ``owner`` on its entry:
 

@@ -155,8 +155,9 @@ verification again after rebasing, and that run is the one the review judges.
    until this commit lands.
 8. Removes both worktrees and both local branches, copying out any ignored content first.
 
-A repository with no GitHub remote uses a local `git merge --no-ff` instead; the skill says which
-path applied. Commands for each step and the failure cases are in `OPS-001`, section 4, and
+A repository with no `origin`, or a local-path one, uses a local `git merge --no-ff` instead; a
+hosted `origin` that `gh` cannot reach stops the close rather than merging locally. The skill says
+which path applied. Commands for each step and the failure cases are in `OPS-001`, section 4, and
 `OPS-008`.
 
 Before you run `session-close`, record what the next session should know with the `brain` skill,

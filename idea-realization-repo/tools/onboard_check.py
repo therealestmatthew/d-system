@@ -5,7 +5,8 @@
 
 Prints one line per checklist item it can check on this machine: ``OK`` when the item is done,
 ``FIX`` with what to do when it is not. Then it lists the steps it cannot check without the
-network, to be run by hand.
+network, to be run by hand. The doctor (``doctor.py``) is local, so it is a checked line, not a
+manual step.
 
 It reads local files and runs ``git`` and, for the GitHub CLI, ``gh auth status``. That is its
 only network call. It never prints the deny-list's contents, an AWS credential or the output of
@@ -33,6 +34,7 @@ sys.path.insert(0, str(ROOT / "plugins" / "idea-realization" / "scripts"))
 sys.path.insert(0, str(ROOT / "tools"))
 
 import check_aws_machine  # noqa: E402
+import doctor  # noqa: E402
 import identity  # noqa: E402
 import paths  # noqa: E402
 import product  # noqa: E402
@@ -45,8 +47,8 @@ DENY_LIST = Path(".private") / "deny-list.txt"
 MANUAL = (
     "uv run python tools/check_aws_machine.py --probe   (must print OK)",
     "tools/aws-sandbox whoami                           (prints both profiles and the read role)",
-    "uv run plugins/idea-realization/scripts/doctor.py  (every scaffolded file unchanged)",
 )
+DOCTOR = "uv run plugins/idea-realization/scripts/doctor.py"
 
 
 @dataclass(frozen=True)
@@ -91,6 +93,9 @@ def check_tools(which: Which, run: Runner) -> list[Line]:
                                        "(session-close merges pull requests with gh)"))
     else:
         lines.append(Line(True, "gh", "installed and authenticated (gh auth status)"))
+    lines.append(Line(bool(which("aws")), "AWS CLI", "installed" if which("aws") else
+                      "the aws command is not on PATH; install AWS CLI v2 (tools/aws-sandbox and "
+                      "check_aws_machine.py --probe need it)"))
     return lines
 
 
@@ -161,6 +166,22 @@ def check_config(config: paths.Config) -> list[Line]:
                       f"{staging} is missing; uv run plugins/idea-realization/scripts/"
                       "scaffold.py --feature all"))
     return lines
+
+
+def check_doctor(config: paths.Config) -> Line:
+    """The doctor's verdict on the scaffolded files, without its origin line (the control
+    repository line covers that)."""
+    if not (config.root / doctor.RECORD).is_file():
+        return Line(False, "doctor", f"no {doctor.RECORD.as_posix()}; run the scaffold first")
+    try:
+        results = doctor.diagnose(config.root, config)
+    except (OSError, ValueError, KeyError) as error:
+        return Line(False, "doctor", f"cannot read {doctor.RECORD.as_posix()}: {error}")
+    bad = [f"{path} {state}" for state, path, _ in results if state not in doctor.OK_STATES]
+    if bad:
+        return Line(False, "doctor", f"{len(bad)} not as recorded ({', '.join(bad[:3])}"
+                                     f"{', ...' if len(bad) > 3 else ''}); run {DOCTOR}")
+    return Line(True, "doctor", f"{len(results)} recorded, none drifted")
 
 
 def check_control(config: paths.Config) -> Line:
@@ -246,6 +267,7 @@ def run_checks(root: Path, env: Mapping[str, str], which: Which = shutil.which,
         return lines + [Line(False, "configuration", str(error))]
     lines.append(check_handle(config, env))
     lines += check_config(config)
+    lines.append(check_doctor(config))
     lines.append(check_control(config))
     lines.append(check_product(config))
     lines += check_aws(config, env)

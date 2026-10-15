@@ -230,7 +230,11 @@ def show(config: paths.Config) -> int:
     except LookupError as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
-    for stream in registry.get("workstreams") or []:
+    streams = registry.get("workstreams") or []
+    if not streams:
+        print(f"no workstreams defined yet; the owner adds them in {_shown(config, registry_file)}")
+        return 0
+    for stream in streams:
         owner = stream.get("owner") or "-"
         print(f"{stream.get('id')}  {stream.get('status')}  {owner}  {stream.get('title')}  "
               f"{', '.join(map(str, stream.get('paths') or []))}")

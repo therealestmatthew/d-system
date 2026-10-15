@@ -178,7 +178,9 @@ def audit(config: paths.Config, today: date | None = None,
     record = catalog.get("decision_record")
     if record is None:
         note("status-regression not run: the backlog names no decision_record, so a reopened "
-             "phase has nowhere to be recorded")
+             "phase has nowhere to be recorded. To run it, set decision_record in "
+             f"{relative(root, config.path('backlog_path'))} to the doc- id of the document that "
+             "records reopened phases and open decisions")
         return errors
     document = scanned.documents.get(record)
     if document is None:

@@ -13,7 +13,9 @@ so on a machine that runs agents there must be none of those, only the two named
 Each finding is printed with what to remove. `tools/aws-sandbox` runs the file and environment
 checks on every call and prints the findings as warnings.
 
-Exit codes: 0 when the machine follows the rule; 1 when anything ambient was found.
+Exit codes: 0 when the machine follows the rule; 1 when anything ambient was found; 2 when
+``--probe`` was asked for and could not run because the AWS CLI is not on PATH (and nothing
+ambient was found), so the machine is not shown to follow the rule.
 """
 
 from __future__ import annotations
@@ -93,7 +95,8 @@ def main(argv: list[str] | None = None) -> int:
         findings.append("the instance metadata service answers at 169.254.169.254; an instance "
                         "role may supply credentials — run agents on a machine without one, or "
                         "disable metadata access for this machine")
-    if args.probe:
+    not_probed = args.probe and not shutil.which("aws")
+    if args.probe and not not_probed:
         identity = default_chain_identity(env)
         if identity:
             findings.append(f"the default credential chain resolves to: {identity}")
@@ -102,6 +105,10 @@ def main(argv: list[str] | None = None) -> int:
         for finding in findings:
             print(f"  - {finding}")
         return 1
+    if not_probed:
+        print("check_aws_machine: NOT CHECKED: --probe needs the AWS CLI (aws), which is not on "
+              "PATH; install AWS CLI v2 and re-run")
+        return 2
     print("check_aws_machine: OK (no default or ambient AWS credentials found)")
     return 0
 
