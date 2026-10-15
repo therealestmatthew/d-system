@@ -5,12 +5,15 @@
 # Run once per clone, from anywhere inside it:
 #   tools/install-hooks.sh
 #
-# The pre-commit hook runs tools/check_confidential.py. Put the deny-list at
+# Three hooks run tools/check_confidential.py: pre-commit on the staged files, commit-msg on the
+# commit message, and pre-push on every commit a push sends (messages and added lines), which
+# catches what a rebase, a cherry-pick or --no-verify let past the first two. Put the deny-list at
 # .private/deny-list.txt in the main checkout (never committed; worktrees read it from there), or
 # export PRIVATE_DENY_LIST=<path>; without one, only the private-directory path check runs.
 #
 # If the project adds a hook manager that also sets core.hooksPath (for example husky), call
-# tools/git-hooks/pre-commit from that manager's pre-commit hook instead of running this script.
+# each of tools/git-hooks/pre-commit, commit-msg and pre-push from that manager's hook of the same
+# name instead of running this script.
 
 set -e
 top=$(git rev-parse --show-toplevel)

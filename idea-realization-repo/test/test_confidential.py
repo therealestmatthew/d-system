@@ -312,17 +312,145 @@ def test_the_commit_msg_hook_refuses_a_deny_listed_word_in_a_worktree(
     assert allowed.returncode == 0, allowed.stdout + allowed.stderr
 
 
-def test_both_hook_directories_install_a_commit_msg_hook() -> None:
+# ---- Pushes ----------------------------------------------------------------------------------
+# A rebase, a cherry-pick or --no-verify skips the commit hooks, so pre-push checks every commit a
+# push sends. Each case below is a real push to a bare remote through the shipped hooks.
+
+STUB_CHECK = 'print("check: OK")\n'
+
+
+def install(kind: str, repo: Path) -> None:
+    """The control repository's or the product template's hooks and check script, in ``repo``."""
+    if kind == "control":
+        shutil.copytree(IRR / "tools" / "git-hooks", repo / "tools" / "git-hooks")
+        shutil.copy2(CONTROL_COPY, repo / "tools" / "check_confidential.py")
+        stub = repo / "plugins" / "idea-realization" / "scripts" / "check.py"
+        stub.parent.mkdir(parents=True)
+        stub.write_text(STUB_CHECK, encoding="utf-8")  # the repository check is not under test
+    else:
+        shutil.copytree(TEMPLATE_TOOLS / "git-hooks", repo / "tools" / "git-hooks")
+        shutil.copy2(TEMPLATE_COPY, repo / "tools" / "check_confidential.py")
+    git(repo, "config", "core.hooksPath", "tools/git-hooks")
+
+
+def run_git(root: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    env = {k: v for k, v in os.environ.items() if k != "PRIVATE_DENY_LIST"} | GIT_ENV
+    return subprocess.run(["git", "-c", "commit.gpgsign=false", *args], cwd=root, env=env,
+                          capture_output=True, text=True)
+
+
+def skip_hooks_commit(root: Path, name: str, text: str, message: str) -> None:
+    """A commit the commit hooks never saw, as a rebase or --no-verify makes it."""
+    (root / name).write_text(text, encoding="utf-8")
+    git(root, "add", name)
+    made = run_git(root, "commit", "-q", "--no-verify", "-m", message)
+    assert made.returncode == 0, made.stderr
+
+
+@pytest.fixture(params=["control", "product"])
+def pushing(request: pytest.FixtureRequest, tmp_path: Path,
+            monkeypatch: pytest.MonkeyPatch) -> tuple[Path, Path]:
+    """A clone with the hooks installed and the deny-list in place, its first commit pushed to a
+    bare remote."""
+    monkeypatch.delenv("PRIVATE_DENY_LIST", raising=False)
+    remote, repo = tmp_path / "remote.git", tmp_path / "clone"
+    git(tmp_path, "init", "-q", "--bare", str(remote))
+    git(tmp_path, "init", "-q", "-b", "main", str(repo))
+    git(repo, "remote", "add", "origin", str(remote))
+    install(request.param, repo)
+    deny(repo, "zorblaxian")
+    (repo / "README.md").write_text("A public readme.\n", encoding="utf-8")
+    git(repo, "add", "README.md", "tools", *(["plugins"] if request.param == "control" else []))
+    first = run_git(repo, "commit", "-q", "-m", "initial")
+    assert first.returncode == 0, first.stdout + first.stderr
+    pushed = run_git(repo, "push", "-q", "origin", "main")
+    assert pushed.returncode == 0, pushed.stdout + pushed.stderr
+    return repo, remote
+
+
+def remote_has(remote: Path, ref: str) -> bool:
+    return subprocess.run(["git", "--git-dir", str(remote), "rev-parse", "-q", "--verify", ref],
+                          capture_output=True).returncode == 0
+
+
+def refused(result: subprocess.CompletedProcess[str], expected: str) -> None:
+    output = result.stdout + result.stderr
+    assert result.returncode != 0, output
+    assert expected in output, output
+
+
+def test_a_clean_push_is_accepted(pushing: tuple[Path, Path]) -> None:
+    repo, remote = pushing
+    skip_hooks_commit(repo, "notes.md", "Nothing confidential.\n", "Add notes")
+    result = run_git(repo, "push", "origin", "main")
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "check_confidential: OK (push: 1 commits, 1 identifiers checked)" in result.stdout
+
+
+def test_a_leak_committed_without_the_hooks_is_refused(pushing: tuple[Path, Path]) -> None:
+    repo, remote = pushing
+    before = subprocess.run(["git", "--git-dir", str(remote), "rev-parse", "main"],
+                            capture_output=True, text=True, check=True).stdout
+    skip_hooks_commit(repo, "notes.md", "Call with Zorblaxian on Friday.\n", "Add notes")
+    refused(run_git(repo, "push", "origin", "main"),
+            "notes.md: adds deny-listed identifier 'zorblaxian'")
+    after = subprocess.run(["git", "--git-dir", str(remote), "rev-parse", "main"],
+                           capture_output=True, text=True, check=True).stdout
+    assert after == before
+
+
+def test_a_leak_in_a_message_is_refused(pushing: tuple[Path, Path]) -> None:
+    repo, _ = pushing
+    skip_hooks_commit(repo, "notes.md", "Nothing confidential.\n", "Notes from the Zorblaxian call")
+    refused(run_git(repo, "push", "origin", "main"),
+            "message: matches deny-listed identifier 'zorblaxian'")
+
+
+def test_a_leak_removed_by_a_later_commit_is_still_refused(pushing: tuple[Path, Path]) -> None:
+    repo, _ = pushing
+    skip_hooks_commit(repo, "notes.md", "Call with Zorblaxian on Friday.\n", "Add notes")
+    skip_hooks_commit(repo, "notes.md", "Call on Friday.\n", "fixup! Add notes")
+    refused(run_git(repo, "push", "origin", "main"), "adds deny-listed identifier 'zorblaxian'")
+
+
+def test_pushing_another_branch_checks_that_branch(pushing: tuple[Path, Path]) -> None:
+    repo, remote = pushing
+    git(repo, "switch", "-q", "-c", "other")
+    skip_hooks_commit(repo, "other.md", "Zorblaxian on another branch.\n", "Other work")
+    git(repo, "switch", "-q", "main")
+    refused(run_git(repo, "push", "origin", "other"), "other.md: adds deny-listed identifier")
+    assert not remote_has(remote, "refs/heads/other")
+
+
+def test_a_tag_at_an_unpushed_leaky_commit_is_refused(pushing: tuple[Path, Path]) -> None:
+    repo, remote = pushing
+    git(repo, "switch", "-q", "-c", "scratch")
+    skip_hooks_commit(repo, "conflict.md", "Zorblaxian leaked during a rebase.\n", "Resolve")
+    git(repo, "tag", "leaky-tag")
+    git(repo, "switch", "-q", "main")
+    git(repo, "branch", "-q", "-D", "scratch")
+    refused(run_git(repo, "push", "origin", "leaky-tag"), "conflict.md: adds deny-listed")
+    assert not remote_has(remote, "refs/tags/leaky-tag")
+
+
+def test_an_annotated_tag_message_is_checked(pushing: tuple[Path, Path]) -> None:
+    repo, remote = pushing
+    git(repo, "-c", "tag.gpgsign=false", "tag", "-a", "v1", "-m", "Release for Zorblaxian")
+    refused(run_git(repo, "push", "origin", "v1"), "matches deny-listed identifier 'zorblaxian'")
+    assert not remote_has(remote, "refs/tags/v1")
+
+
+def test_deleting_a_remote_branch_is_not_refused(pushing: tuple[Path, Path]) -> None:
+    repo, remote = pushing
+    git(repo, "switch", "-q", "-c", "gone")
+    assert run_git(repo, "push", "-q", "origin", "gone").returncode == 0
+    git(repo, "switch", "-q", "main")
+    result = run_git(repo, "push", "origin", "--delete", "gone")
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert not remote_has(remote, "refs/heads/gone")
+
+
+def test_both_hook_directories_install_every_hook() -> None:
     for hooks in (IRR / "tools" / "git-hooks", TEMPLATE_TOOLS / "git-hooks"):
-        hook = hooks / "commit-msg"
-        assert hook.is_file() and os.access(hook, os.X_OK), hook
-        assert "check_confidential.py --message" in hook.read_text(encoding="utf-8")
-
-
-def test_the_control_hooks_check_again_before_a_push() -> None:
-    """A rebased commit skips pre-commit, so the push is where the checks must run again."""
-    hook = IRR / "tools" / "git-hooks" / "pre-push"
-    assert hook.is_file() and os.access(hook, os.X_OK)
-    text = hook.read_text(encoding="utf-8")
-    assert "tools/check_confidential.py" in text
-    assert "plugins/idea-realization/scripts/check.py" in text
+        for name in ("pre-commit", "commit-msg", "pre-push"):
+            assert (hooks / name).is_file() and os.access(hooks / name, os.X_OK), hooks / name

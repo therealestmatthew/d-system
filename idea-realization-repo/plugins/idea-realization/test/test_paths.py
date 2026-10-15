@@ -479,7 +479,9 @@ def test_every_git_dash_c_call_drops_the_location_variables() -> None:
     such call in the plugin's scripts and the control repository's tools passes ``git_env``."""
     import ast
 
-    roots = [paths.PLUGIN_ROOT / "scripts", paths.PLUGIN_ROOT.parent.parent / "tools"]
+    control = paths.PLUGIN_ROOT.parent.parent
+    roots = [paths.PLUGIN_ROOT / "scripts", control / "tools",
+             control / "templates" / "product-repo" / "tools"]
     missing = []
     for source in sorted(p for root in roots if root.is_dir() for p in root.rglob("*.py")):
         tree = ast.parse(source.read_text(encoding="utf-8"))

@@ -1,0 +1,23 @@
+#!/bin/sh
+# Blocks a push that would publish a deny-listed identifier or a file under the private directory.
+#
+# git runs pre-commit and commit-msg only for commits made with `git commit`. A commit made by
+# `git rebase`, `git pull --rebase`, `git cherry-pick`, `git rebase --continue` or
+# `git commit --no-verify` skips them. So the push is checked again, by what it sends:
+# check_confidential.py --pre-push reads git's ref lines on standard input and checks every commit
+# the remote does not have yet (its message, and the paths and lines it adds), on every ref being
+# pushed, tags included.
+#
+# Never bypass a failure with --no-verify: reword or drop the commit and push again, or, if the
+# check itself is wrong, stop and report it.
+#
+# Installed by tools/install-hooks.sh.
+
+set -e
+cd "$(git rev-parse --show-toplevel)"
+
+if command -v python3 > /dev/null 2>&1; then
+    python3 tools/check_confidential.py --pre-push "$1"
+else
+    uv run --no-project python tools/check_confidential.py --pre-push "$1"
+fi

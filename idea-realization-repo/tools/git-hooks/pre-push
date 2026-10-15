@@ -1,21 +1,25 @@
 #!/bin/sh
-# Blocks a push when the repository check or the confidentiality check fails on the checkout.
+# Blocks a push that would publish a deny-listed identifier, or that leaves the repository check
+# failing.
 #
-# git runs pre-commit only for commits made with `git commit`. A commit made by `git rebase`,
-# `git pull --rebase`, `git cherry-pick` or `git rebase --continue` skips it, so a claim that a
-# rejected push forced you to rebase would otherwise reach the remote unchecked, overlapping
-# claims included. This hook checks before anything is published.
+# git runs pre-commit and commit-msg only for commits made with `git commit`. A commit made by
+# `git rebase`, `git pull --rebase`, `git cherry-pick`, `git rebase --continue` or
+# `git commit --no-verify` skips them. So the push is checked again, by what it sends:
+# check_confidential.py --pre-push reads git's ref lines on standard input and checks every commit
+# the remote does not have yet (its message, and the paths and lines it adds), on every ref being
+# pushed, tags included.
 #
-# It checks the checkout as it stands. Push the branch you are on with a clean `git status`, so
-# what is checked is what is pushed.
+# check.py then checks the checkout (a claim that a rejected push forced you to rebase, overlapping
+# claims included). It sees the checked-out tree, so push the branch you are on.
 #
-# Never bypass a failure with --no-verify: fix the cause (regenerate the catalog, release one of
-# two overlapping claims) and push again, or, if the check itself is wrong, stop and report it.
+# Never bypass a failure with --no-verify: fix the cause (reword or drop the commit, regenerate the
+# catalog, release one of two overlapping claims) and push again, or, if the check itself is
+# wrong, stop and report it.
 #
 # Installed with the other hooks:
 #   git config core.hooksPath tools/git-hooks
 
 set -e
 cd "$(git rev-parse --show-toplevel)"
-uv run python tools/check_confidential.py
+uv run python tools/check_confidential.py --pre-push "$1"
 uv run plugins/idea-realization/scripts/check.py

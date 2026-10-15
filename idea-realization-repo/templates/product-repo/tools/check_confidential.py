@@ -53,6 +53,18 @@ Two checks:
 
        python3 tools/check_confidential.py --message .git/COMMIT_EDITMSG
 
+4. **Push check** (``--pre-push <remote>``, run by the ``pre-push`` hook, which passes git's
+   ref lines on standard input). The commit hooks see only commits made with ``git commit``; a
+   rebase, a cherry-pick or ``--no-verify`` skips them. So for every ref being pushed (a deleted
+   ref is skipped), every commit the remote does not yet have is checked on its own: its message,
+   and each file it adds or changes, by path and by the lines it adds (against its first parent;
+   a root commit against nothing). A leak a later commit removed is still refused, because the
+   commit that added it is pushed too. A pushed annotated tag's own message is checked as well.
+   The commits are those in ``<remote sha>..<local sha>``; for a new ref, those reachable from it
+   and from no ref the remote is already known to have (``--not --remotes=<remote>``).
+
+       git push   # the hook runs: python3 tools/check_confidential.py --pre-push origin
+
 Exit codes: 0 when nothing leaks; 1 when anything does, or when the deny-list names no
 identifier, one line per violation.
 """
@@ -179,11 +191,76 @@ def identifier_patterns(identifiers: set[str]) -> dict[str, re.Pattern[str]]:
     return {i: re.compile(r"(?<!\w)" + re.escape(i.lower()) + r"(?!\w)") for i in identifiers}
 
 
-def check_message(text: str, identifiers: set[str]) -> list[str]:
+def check_message(text: str, identifiers: set[str], what: str = "commit message") -> list[str]:
     lowered = text.lower()
-    return [f"commit message: matches deny-listed identifier '{identifier}'"
+    return [f"{what}: matches deny-listed identifier '{identifier}'"
             for identifier, pattern in sorted(identifier_patterns(identifiers).items())
             if pattern.search(lowered)]
+
+
+EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+
+
+def git_out(root: Path, *args: str) -> str:
+    return subprocess.run(["git", *args], cwd=root, capture_output=True, check=True,
+                          ).stdout.decode("utf-8", errors="surrogateescape")
+
+
+def pushed_commits(root: Path, remote: str,
+                   ref_lines: list[str]) -> tuple[list[str], list[str]]:
+    """The commits a push would send, oldest first, and the annotated tag objects it pushes.
+    ``ref_lines`` are git's pre-push lines:
+    ``<local ref> <local sha> <remote ref> <remote sha>``."""
+    commits: list[str] = []
+    tags: list[str] = []
+    for line in ref_lines:
+        fields = line.split()
+        if len(fields) != 4 or set(fields[1]) == {"0"}:
+            continue  # malformed, or a delete: nothing is sent
+        local, remote_sha = fields[1], fields[3]
+        if git_out(root, "cat-file", "-t", local).strip() == "tag":
+            tags.append(local)
+        if set(remote_sha) == {"0"}:
+            listed = git_out(root, "rev-list", "--reverse", local, "--not",
+                             f"--remotes={remote}")
+        else:
+            listed = git_out(root, "rev-list", "--reverse", f"{remote_sha}..{local}")
+        for commit in listed.split():
+            if commit not in commits:
+                commits.append(commit)
+    return commits, tags
+
+
+def check_commit(root: Path, commit: str, identifiers: set[str]) -> list[str]:
+    """One commit on its own: its message, and the paths and added lines of what it changes."""
+    short = commit[:12]
+    violations = check_message(git_out(root, "log", "-1", "--format=%B", commit), identifiers,
+                               f"commit {short} message")
+    parents = git_out(root, "rev-list", "--parents", "-n", "1", commit).split()[1:]
+    base = parents[0] if parents else EMPTY_TREE
+    changed = git_out(root, "diff", "--name-only", "-z", "--no-renames", "--diff-filter=AMT",
+                      base, commit).split("\0")
+    patterns = identifier_patterns(identifiers)
+    for path in (p for p in changed if p):
+        violations += [f"commit {short}: {v}" for v in check_paths([path])]
+        for identifier, pattern in patterns.items():
+            if pattern.search(path.lower()):
+                violations.append(f"commit {short}: {path}: path matches deny-listed identifier "
+                                  f"'{identifier}'")
+    if patterns:
+        diff = git_out(root, "diff", "--no-color", "--no-ext-diff", "--no-renames", "-U0", base,
+                       commit)
+        current = "?"
+        for line in diff.splitlines():
+            if line.startswith("+++ "):
+                current = line[6:] if line.startswith("+++ b/") else line[4:]
+            elif line.startswith("+") and not current.startswith(PRIVATE_DIR):
+                lowered = line[1:].lower()
+                for identifier, pattern in patterns.items():
+                    found = f"commit {short}: {current}: adds deny-listed identifier '{identifier}'"
+                    if pattern.search(lowered) and found not in violations:
+                        violations.append(found)
+    return violations
 
 
 def check_content(root: Path, blobs: dict[str, str | None], identifiers: set[str]) -> list[str]:
@@ -238,8 +315,24 @@ def main(root: Path = ROOT, argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
     parser.add_argument("--message", type=Path, metavar="FILE",
                         help="check a commit message file instead of the index")
+    parser.add_argument("--pre-push", metavar="REMOTE",
+                        help="check every commit a push sends; git's ref lines on standard input")
     args = parser.parse_args([] if argv is None else argv)
     violations: list[str] = []
+    if args.pre_push is not None:
+        identifiers = load_identifiers(root, violations)
+        commits, tags = pushed_commits(root, args.pre_push, sys.stdin.read().splitlines())
+        for tag in tags:
+            violations += check_message(git_out(root, "cat-file", "tag", tag), identifiers or set(),
+                                        f"tag {tag[:12]}")
+        for commit in commits:
+            violations += check_commit(root, commit, identifiers or set())
+        if violations:
+            return report_failure(violations)
+        print(f"check_confidential: OK (push: {len(commits)} commits, "
+              + ("content check SKIPPED, no deny-list)" if identifiers is None
+                 else f"{len(identifiers)} identifiers checked)"))
+        return 0
     if args.message is not None:
         identifiers = load_identifiers(root, violations)
         violations += check_message(args.message.read_text(encoding="utf-8", errors="ignore"),

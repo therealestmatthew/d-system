@@ -25,7 +25,7 @@ part lives in a subdirectory, update the manifest paths and `working-directory` 
 git clone <product repository URL>     # from the owner; never written into a tracked file
 cd <product repository directory>
 git switch dev
-tools/install-hooks.sh          # pre-commit hook: the confidential check
+tools/install-hooks.sh          # hooks: the confidential check on commit, message and push
 ```
 
 Put the deny-list (from the repository owner, never committed) at `.private/deny-list.txt`, or
