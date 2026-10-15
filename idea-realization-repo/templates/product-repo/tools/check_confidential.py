@@ -46,12 +46,20 @@ Two checks:
    the check. It would otherwise report OK having checked nothing. This is also how CI catches a
    `DENY_LIST` secret that holds only comments, which the workflows' empty-secret test lets through.
 
+3. **Commit message check** (``--message <file>``, run by the ``commit-msg`` hook). The same
+   deny-list, matched the same way, against the whole message file git hands the hook, comment
+   lines included. A commit message is as permanent and as widely copied as a file, and the
+   content check never sees it. Only the deny-list is consulted; the index is not read.
+
+       python3 tools/check_confidential.py --message .git/COMMIT_EDITMSG
+
 Exit codes: 0 when nothing leaks; 1 when anything does, or when the deny-list names no
 identifier, one line per violation.
 """
 
 from __future__ import annotations
 
+import argparse
 import os
 import re
 import subprocess
@@ -166,11 +174,22 @@ def check_paths(files: list[str]) -> list[str]:
             for f in files if f == PRIVATE_DIR.rstrip("/") or f.startswith(PRIVATE_DIR)]
 
 
+def identifier_patterns(identifiers: set[str]) -> dict[str, re.Pattern[str]]:
+    """Each identifier, matched case-insensitively on word boundaries (against lowered text)."""
+    return {i: re.compile(r"(?<!\w)" + re.escape(i.lower()) + r"(?!\w)") for i in identifiers}
+
+
+def check_message(text: str, identifiers: set[str]) -> list[str]:
+    lowered = text.lower()
+    return [f"commit message: matches deny-listed identifier '{identifier}'"
+            for identifier, pattern in sorted(identifier_patterns(identifiers).items())
+            if pattern.search(lowered)]
+
+
 def check_content(root: Path, blobs: dict[str, str | None], identifiers: set[str]) -> list[str]:
     if not identifiers:
         return []
-    patterns = {i: re.compile(r"(?<!\w)" + re.escape(i.lower()) + r"(?!\w)")
-                for i in identifiers}
+    patterns = identifier_patterns(identifiers)
     candidates = {f: object_id for f, object_id in blobs.items()
                   if object_id is not None and not f.startswith(PRIVATE_DIR)}
     contents = read_blobs(root, list(candidates.values()))
@@ -193,11 +212,9 @@ def check_content(root: Path, blobs: dict[str, str | None], identifiers: set[str
     return violations
 
 
-def main(root: Path = ROOT) -> int:
-    blobs = staged_blobs(root)
-    files = list(blobs)
-    violations = check_paths(files)
-
+def load_identifiers(root: Path, violations: list[str]) -> set[str] | None:
+    """The deny-list's identifiers, or None when there is no deny-list (after the warning). A
+    configured deny-list that is missing, or one that names nothing, is added to ``violations``."""
     deny_list, searched = find_deny_list(root)
     identifiers = read_deny_list(deny_list) if deny_list is not None else None
     if identifiers is None and os.environ.get("PRIVATE_DENY_LIST"):
@@ -207,13 +224,41 @@ def main(root: Path = ROOT) -> int:
     elif not identifiers:
         violations.append(f"the deny-list {deny_list} names no identifiers (it is empty or holds "
                           "only blank lines and comments); nothing would be checked")
+    return identifiers
+
+
+def report_failure(violations: list[str]) -> int:
+    print("check_confidential: FAILED")
+    for violation in violations:
+        print(f"  - {violation}")
+    return 1
+
+
+def main(root: Path = ROOT, argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
+    parser.add_argument("--message", type=Path, metavar="FILE",
+                        help="check a commit message file instead of the index")
+    args = parser.parse_args([] if argv is None else argv)
+    violations: list[str] = []
+    if args.message is not None:
+        identifiers = load_identifiers(root, violations)
+        violations += check_message(args.message.read_text(encoding="utf-8", errors="ignore"),
+                                    identifiers or set())
+        if violations:
+            return report_failure(violations)
+        print("check_confidential: OK (commit message, "
+              + ("content check SKIPPED, no deny-list)" if identifiers is None
+                 else f"{len(identifiers)} identifiers checked)"))
+        return 0
+
+    blobs = staged_blobs(root)
+    files = list(blobs)
+    violations = check_paths(files)
+    identifiers = load_identifiers(root, violations)
     violations += check_content(root, blobs, identifiers or set())
 
     if violations:
-        print("check_confidential: FAILED")
-        for violation in violations:
-            print(f"  - {violation}")
-        return 1
+        return report_failure(violations)
 
     if identifiers is None:
         print(f"check_confidential: OK ({len(files)} tracked files, path check only; "
@@ -225,4 +270,4 @@ def main(root: Path = ROOT) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(argv=sys.argv[1:]))

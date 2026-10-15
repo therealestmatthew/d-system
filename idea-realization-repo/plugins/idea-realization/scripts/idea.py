@@ -236,7 +236,7 @@ def phase_ids(backlog: Path) -> set[str]:
 def _is_commit(value: str, root: Path) -> bool:
     result = subprocess.run(
         ["git", "-C", str(root), "cat-file", "-e", "--end-of-options", f"{value}^{{commit}}"],
-        capture_output=True,
+        env=paths.git_env(), capture_output=True,
         check=False,
     )
     return result.returncode == 0
@@ -352,8 +352,8 @@ def append(event: dict[str, Any], log: Path) -> None:
 
 def _git(root: Path, *args: str) -> str | None:
     """A git command's stripped output, or None when it fails (outside a repository)."""
-    completed = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
-                               check=False)
+    completed = subprocess.run(["git", "-C", str(root), *args], env=paths.git_env(),
+                               capture_output=True, text=True, check=False)
     return completed.stdout.strip() if completed.returncode == 0 else None
 
 

@@ -220,6 +220,23 @@ def raw_value(name: str, flags: Mapping[str, str | None] | None = None,
     return raw_source(name, flags, env, local, project)[0]
 
 
+#: The variables through which git names a repository, exported to the hooks it runs: in a linked
+#: worktree's commit hook, GIT_DIR names that worktree's git directory and GIT_INDEX_FILE its index.
+#: They outrank ``git -C <path>``, so a command that names another checkout with ``-C`` while one
+#: of them is set reads the hook's repository instead (the product check then saw the control
+#: repository's origin and refused every commit in a control worktree).
+GIT_LOCATION_VARIABLES = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_PREFIX",
+                          "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY",
+                          "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_NAMESPACE")
+
+
+def git_env(env: Mapping[str, str] | None = None) -> dict[str, str]:
+    """``env`` (default: this process's environment) without git's location variables. Pass it
+    to every ``git -C <path>`` call, so ``<path>`` alone decides which repository is read."""
+    source = os.environ if env is None else env
+    return {name: value for name, value in source.items() if name not in GIT_LOCATION_VARIABLES}
+
+
 def repository_root(flag: str | None = None, env: Mapping[str, str] | None = None,
                     cwd: Path | None = None) -> Path:
     """Resolve the repository root that relative paths are taken from."""
@@ -250,7 +267,7 @@ def repository_root(flag: str | None = None, env: Mapping[str, str] | None = Non
 def primary_checkout(root: Path) -> Path:
     """The first entry of ``git worktree list``; the root itself outside a git repository."""
     listed = subprocess.run(["git", "-C", str(root), "worktree", "list", "--porcelain"],
-                            capture_output=True, text=True, check=False)
+                            env=git_env(), capture_output=True, text=True, check=False)
     if listed.returncode == 0:
         for line in listed.stdout.splitlines():
             if line.startswith("worktree "):
@@ -262,7 +279,7 @@ def local_record(root: Path) -> Path:
     """Where this machine's ``local.yaml`` is: in the primary checkout, at the root's place
     relative to the git top level, so a session worktree reads the primary checkout's file."""
     top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"],
-                         capture_output=True, text=True, check=False)
+                         env=git_env(), capture_output=True, text=True, check=False)
     offset = Path()
     if top.returncode == 0:
         try:

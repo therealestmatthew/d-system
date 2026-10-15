@@ -376,3 +376,23 @@ def test_cli_merge_route_exits_1_and_names_the_stop(tmp_path: Path, capsys: Any)
     out = capsys.readouterr()
     # gh is either absent or cannot reach a made-up host; both must stop, never print "local".
     assert code == 1 and "local" not in out.out and "never merged locally" in out.err
+
+
+def test_verify_in_a_control_worktree_hook_reads_the_product_origin(
+        repos: tuple[Path, Path], monkeypatch: pytest.MonkeyPatch) -> None:
+    """git runs a commit's hooks in a linked worktree with GIT_DIR (and an absolute
+    GIT_INDEX_FILE) naming the control worktree. A ``git -C <product checkout>`` that inherited
+    them read the control repository's origin, so every control-worktree commit was refused."""
+    control, checkout = repos
+    git(control, "remote", "add", "origin", "git@forge.example.com:team/hack-control.git")
+    git(control, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-q",
+        "--allow-empty", "-m", "init")
+    worktree = control.parent / "control-worktree"
+    git(control, "worktree", "add", "-q", "-b", "agent/x", str(worktree))
+    gitdir = subprocess.run(["git", "rev-parse", "--absolute-git-dir"], cwd=worktree, check=True,
+                            capture_output=True, text=True).stdout.strip()
+    monkeypatch.setenv("GIT_DIR", gitdir)
+    monkeypatch.setenv("GIT_INDEX_FILE", str(Path(gitdir) / "index"))
+    monkeypatch.setenv("GIT_PREFIX", "")
+    assert product.origin(checkout) == REMOTE
+    assert product.verify(config(control, checkout)).root == checkout.resolve()

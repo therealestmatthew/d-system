@@ -466,3 +466,32 @@ def test_this_repository_tracks_no_repository_url() -> None:
     tracked = paths.project_values(repository)
     assert not set(REPOSITORY_KEYS) & set(tracked)
     assert all(config.sources[key] != "project.yaml" for key in REPOSITORY_KEYS)
+
+
+def test_git_env_drops_every_location_variable() -> None:
+    env = {name: "/elsewhere" for name in paths.GIT_LOCATION_VARIABLES}
+    env.update({"HOME": "/home/ana", "GIT_CONFIG_GLOBAL": "/home/ana/.gitconfig"})
+    assert paths.git_env(env) == {"HOME": "/home/ana", "GIT_CONFIG_GLOBAL": "/home/ana/.gitconfig"}
+
+
+def test_every_git_dash_c_call_drops_the_location_variables() -> None:
+    """A ``git -C <path>`` that inherits GIT_DIR reads the hook's repository, not ``<path>``. Every
+    such call in the plugin's scripts and the control repository's tools passes ``git_env``."""
+    import ast
+
+    roots = [paths.PLUGIN_ROOT / "scripts", paths.PLUGIN_ROOT.parent.parent / "tools"]
+    missing = []
+    for source in sorted(p for root in roots if root.is_dir() for p in root.rglob("*.py")):
+        tree = ast.parse(source.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not (isinstance(node, ast.Call) and node.args
+                    and isinstance(node.args[0], ast.List) and len(node.args[0].elts) >= 2):
+                continue
+            first, second = node.args[0].elts[:2]
+            if not (isinstance(first, ast.Constant) and first.value == "git"
+                    and isinstance(second, ast.Constant) and second.value == "-C"):
+                continue
+            env = next((kw.value for kw in node.keywords if kw.arg == "env"), None)
+            if not (isinstance(env, ast.Call) and ast.unparse(env.func).endswith("git_env")):
+                missing.append(f"{source.name}:{node.lineno}")
+    assert missing == []

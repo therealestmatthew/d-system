@@ -1,0 +1,18 @@
+#!/bin/sh
+# Blocks a commit whose message names a deny-listed identifier. The pre-commit hook checks the
+# staged files; a commit message is just as permanent, and only this hook sees it.
+#
+# Never bypass a failure with --no-verify: reword the message, or, if the check itself is wrong,
+# stop and report it.
+#
+# Installed by tools/install-hooks.sh.
+
+set -e
+message=$(cd "$(dirname "$1")" && pwd)/$(basename "$1")
+cd "$(git rev-parse --show-toplevel)"
+
+if command -v python3 > /dev/null 2>&1; then
+    python3 tools/check_confidential.py --message "$message"
+else
+    uv run --no-project python tools/check_confidential.py --message "$message"
+fi

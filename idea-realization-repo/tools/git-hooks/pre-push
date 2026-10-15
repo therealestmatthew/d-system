@@ -1,0 +1,21 @@
+#!/bin/sh
+# Blocks a push when the repository check or the confidentiality check fails on the checkout.
+#
+# git runs pre-commit only for commits made with `git commit`. A commit made by `git rebase`,
+# `git pull --rebase`, `git cherry-pick` or `git rebase --continue` skips it, so a claim that a
+# rejected push forced you to rebase would otherwise reach the remote unchecked, overlapping
+# claims included. This hook checks before anything is published.
+#
+# It checks the checkout as it stands. Push the branch you are on with a clean `git status`, so
+# what is checked is what is pushed.
+#
+# Never bypass a failure with --no-verify: fix the cause (regenerate the catalog, release one of
+# two overlapping claims) and push again, or, if the check itself is wrong, stop and report it.
+#
+# Installed with the other hooks:
+#   git config core.hooksPath tools/git-hooks
+
+set -e
+cd "$(git rev-parse --show-toplevel)"
+uv run python tools/check_confidential.py
+uv run plugins/idea-realization/scripts/check.py

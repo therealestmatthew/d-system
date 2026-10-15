@@ -269,3 +269,60 @@ def test_each_copy_refuses_an_empty_deny_list_from_the_command_line(
                             env=env, capture_output=True, text=True)
     assert result.returncode == 1, result.stdout + result.stderr
     assert "names no identifiers" in result.stdout
+
+
+# ---- Commit messages -------------------------------------------------------------------------
+
+
+def test_identifier_in_a_commit_message_fails(
+        repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    deny(repo, "zorblaxcorp")
+    message = repo / "MSG"
+    message.write_text("Work for ZorblaxCorp client\n", encoding="utf-8")
+    assert check.main(repo, ["--message", str(message)]) == 1
+    assert "commit message: matches deny-listed identifier 'zorblaxcorp'" in capsys.readouterr().out
+
+
+def test_a_clean_commit_message_passes(repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    deny(repo, "zorblaxcorp")
+    message = repo / "MSG"
+    message.write_text("Work for a client, Zorblaxcorpse aside\n", encoding="utf-8")
+    assert check.main(repo, ["--message", str(message)]) == 0
+    assert "commit message, 1 identifiers checked" in capsys.readouterr().out
+
+
+def test_a_commit_message_with_an_empty_deny_list_fails(repo: Path) -> None:
+    deny(repo, "# nothing")
+    message = repo / "MSG"
+    message.write_text("Anything\n", encoding="utf-8")
+    assert check.main(repo, ["--message", str(message)]) == 1
+
+
+def test_the_commit_msg_hook_refuses_a_deny_listed_word_in_a_worktree(
+        hooked_repo: Path, tmp_path_factory: pytest.TempPathFactory) -> None:
+    worktree = tmp_path_factory.mktemp("trees") / "feature"
+    git(hooked_repo, "worktree", "add", "-q", "-b", "feature", str(worktree))
+    (worktree / "clean.md").write_text("Nothing confidential.\n", encoding="utf-8")
+    git(worktree, "add", "clean.md")
+    refused = commit(worktree, "Notes from the Zorblaxian call")
+    assert refused.returncode != 0
+    assert "commit message: matches deny-listed identifier 'zorblaxian'" in (
+        refused.stdout + refused.stderr)
+    allowed = commit(worktree, "Notes from the call")
+    assert allowed.returncode == 0, allowed.stdout + allowed.stderr
+
+
+def test_both_hook_directories_install_a_commit_msg_hook() -> None:
+    for hooks in (IRR / "tools" / "git-hooks", TEMPLATE_TOOLS / "git-hooks"):
+        hook = hooks / "commit-msg"
+        assert hook.is_file() and os.access(hook, os.X_OK), hook
+        assert "check_confidential.py --message" in hook.read_text(encoding="utf-8")
+
+
+def test_the_control_hooks_check_again_before_a_push() -> None:
+    """A rebased commit skips pre-commit, so the push is where the checks must run again."""
+    hook = IRR / "tools" / "git-hooks" / "pre-push"
+    assert hook.is_file() and os.access(hook, os.X_OK)
+    text = hook.read_text(encoding="utf-8")
+    assert "tools/check_confidential.py" in text
+    assert "plugins/idea-realization/scripts/check.py" in text

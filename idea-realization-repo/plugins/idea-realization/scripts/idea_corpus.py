@@ -126,8 +126,8 @@ class CorpusError(Exception):
 
 
 def _git(cwd: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True,
-                          check=False)
+    return subprocess.run(["git", "-C", str(cwd), *args], env=paths.git_env(),
+                          capture_output=True, text=True, check=False)
 
 
 primary_checkout = paths.primary_checkout

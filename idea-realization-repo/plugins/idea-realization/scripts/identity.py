@@ -81,7 +81,7 @@ def approvers(docs_root: Path, what: str) -> set[str]:
 def git_email(root: Path) -> str:
     """``git config user.email`` in ``root``, lower-cased; empty when unset."""
     result = subprocess.run(["git", "-C", str(root), "config", "user.email"],
-                            capture_output=True, text=True, check=False)
+                            env=paths.git_env(), capture_output=True, text=True, check=False)
     return result.stdout.strip().lower()
 
 

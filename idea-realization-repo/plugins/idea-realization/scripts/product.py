@@ -149,7 +149,7 @@ def load(config: paths.Config) -> Product:
 
 def origin(root: Path) -> str:
     result = subprocess.run(["git", "-C", str(root), "remote", "get-url", "origin"],
-                            capture_output=True, text=True, check=False)
+                            env=paths.git_env(), capture_output=True, text=True, check=False)
     return result.stdout.strip() if result.returncode == 0 else ""
 
 

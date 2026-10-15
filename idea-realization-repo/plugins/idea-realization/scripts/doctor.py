@@ -74,7 +74,7 @@ def ignored(root: Path, directory: str) -> bool:
     try:
         result = subprocess.run(["git", "-C", str(root), "check-ignore", "-q", "--",
                                  directory.rstrip("/") + "/"],
-                                capture_output=True, check=False)
+                                env=paths.git_env(), capture_output=True, check=False)
     except OSError:
         return False
     return result.returncode == 0

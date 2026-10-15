@@ -87,14 +87,15 @@ def is_ancestor(root: Path, commit: str, ref: str) -> bool:
     """Whether ``commit`` is reachable from ``ref`` in the product checkout."""
     return subprocess.run(["git", "-C", str(root), "merge-base", "--is-ancestor",
                            "--end-of-options", commit, ref],
-                          capture_output=True, text=True, check=False).returncode == 0
+                          env=paths.git_env(), capture_output=True, text=True,
+                          check=False).returncode == 0
 
 
 def on_integration_branch(root: Path, commit: str, branch: str) -> bool:
     """Whether ``commit`` is reachable from the product integration branch, local or fetched."""
     for ref in (f"refs/remotes/origin/{branch}", f"refs/heads/{branch}"):
         known = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "-q", ref],
-                               capture_output=True, text=True, check=False)
+                               env=paths.git_env(), capture_output=True, text=True, check=False)
         if known.returncode == 0 and is_ancestor(root, commit, ref):
             return True
     return False
@@ -107,7 +108,7 @@ def origin_tip(root: Path, branch: str) -> str | None:
         found = subprocess.run(["git", "-C", str(root), "ls-remote", "--heads", "origin",
                                 f"refs/heads/{branch}"],
                                capture_output=True, text=True, check=False, timeout=60,
-                               env={**os.environ, "GIT_TERMINAL_PROMPT": "0"})
+                               env=paths.git_env({**os.environ, "GIT_TERMINAL_PROMPT": "0"}))
     except (OSError, subprocess.TimeoutExpired):
         return None
     if found.returncode != 0:
@@ -118,14 +119,15 @@ def origin_tip(root: Path, branch: str) -> str | None:
 def known_commit(root: Path, commit: str) -> bool:
     """Whether the product checkout holds ``commit``."""
     return subprocess.run(["git", "-C", str(root), "cat-file", "-e", f"{commit}^{{commit}}"],
-                          capture_output=True, text=True, check=False).returncode == 0
+                          env=paths.git_env(), capture_output=True, text=True,
+                          check=False).returncode == 0
 
 
 def second_parent(root: Path, commit: str) -> str | None:
     """The second parent of a merge commit, or None for a commit with one parent."""
     found = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "-q",
                             f"{commit}^2^{{commit}}"],
-                           capture_output=True, text=True, check=False)
+                           env=paths.git_env(), capture_output=True, text=True, check=False)
     return found.stdout.strip() if found.returncode == 0 else None
 
 

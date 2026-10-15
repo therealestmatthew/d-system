@@ -76,7 +76,7 @@ def run_quietly(command: Sequence[str]) -> int:
 
 def git_config(root: Path, name: str) -> str:
     result = subprocess.run(["git", "-C", str(root), "config", name],
-                            capture_output=True, text=True, check=False)
+                            env=paths.git_env(), capture_output=True, text=True, check=False)
     return result.stdout.strip()
 
 
