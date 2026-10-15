@@ -37,6 +37,9 @@ working-agreement template fills `{{data_root}}` and `{{confidential_dir}}` when
 - `CLAUDE.md` holds only pointers, the instructions an agent needs before anything else, and the
   few facts worth duplicating. Shared conventions live in the working agreement and are linked,
   not copied.
+- A repository may keep one instruction file instead: `CLAUDE.md` with no `AGENTS.md`. Then
+  `CLAUDE.md` is the working agreement and holds both the orientation and the rules, and the
+  bullets above about the split between the two files do not apply.
 - The agent instruction files change only with the owner's explicit approval of that change. An
   agent that finds one wrong quotes the passage, proposes wording and stops.
 

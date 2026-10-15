@@ -24,7 +24,7 @@ on its own reading of a conversation, and a one-time instruction is never record
 rule.
 
 Until rules exist here, the plugin's protocol documents (`plugins/idea-realization/docs/`) and
-`AGENTS.md` govern.
+`CLAUDE.md` govern.
 
 ## Rules
 

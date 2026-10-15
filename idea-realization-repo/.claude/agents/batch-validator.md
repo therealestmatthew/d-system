@@ -63,7 +63,7 @@ before every run (`batches.md` section 3).
   batches file, not a candidate copy.
 - Never compose, re-order, add to or remove from a batch, and never write `next_up`.
 - Never claim a phase, record a check result into the batches file, or dispatch subagents.
-- Never edit `AGENTS.md` or `CLAUDE.md`, and never read or write the confidential directory or the
+- Never edit `CLAUDE.md`, and never read or write the confidential directory or the
   private-content deny-list file.
 - Never run a command against a cloud account.
 

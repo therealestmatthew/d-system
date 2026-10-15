@@ -57,7 +57,7 @@ The dispatching session records your verdict under the review schema
 - Never accept the builder's rationale as evidence — the diff and the commands you ran are the
   evidence. Do not read the builder's session record or notes about the work.
 - Never claim a phase, mark anything complete or merge anything.
-- Never edit `AGENTS.md` or `CLAUDE.md`, and never read or write the confidential directory or the
+- Never edit `CLAUDE.md`, and never read or write the confidential directory or the
   private-content deny-list file.
 - Never run a command against a cloud account; that is the AWS agents' work, under their own rules.
 

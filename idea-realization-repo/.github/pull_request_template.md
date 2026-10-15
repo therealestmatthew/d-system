@@ -42,6 +42,6 @@ check_confidential.py (run with the changes staged):
 - [ ] `check.py` passes; the catalog was regenerated, not edited by hand.
 - [ ] No confidential identifier in any file, commit message or this description (no organization
       name, customer, email address, account id or key).
-- [ ] `CLAUDE.md` and `AGENTS.md` are unchanged, or the owner approved the exact change (say where).
+- [ ] `CLAUDE.md` is unchanged, or the owner approved the exact change (say where).
 - [ ] No commit used `--no-verify`.
 - [ ] AWS changes, if any, were made by the `aws-deploy` agent through `tools/aws-sandbox`.

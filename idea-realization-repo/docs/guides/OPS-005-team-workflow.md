@@ -102,7 +102,7 @@ and why.
    If the check now refuses it, release it and choose another phase.
 
 Then the work happens on `agent/<phase-id>` branches cut from `origin/dev` in both repositories,
-each in its own worktree (`AGENTS.md`, "work in a worktree").
+each in its own worktree (`CLAUDE.md`, "work in a worktree").
 
 ### Assignment
 

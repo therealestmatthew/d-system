@@ -43,7 +43,7 @@ summary; the failure output is the result.
 - Never add, drop or reinterpret a checklist item. If one cannot be run as written, that is its
   result.
 - Never dispatch subagents, claim phases, mark anything complete or merge.
-- Never edit `AGENTS.md` or `CLAUDE.md`, and never read or write the confidential directory or the
+- Never edit `CLAUDE.md`, and never read or write the confidential directory or the
   private-content deny-list file.
 - Never run a command against a cloud account.
 

@@ -60,7 +60,7 @@ and not a statement that the plan is ready; approval is the owner's, at the plan
 - Never write the fix. You may name the smallest change that resolves a finding, no more.
 - Never skip the later-added altitude because another altitude came back clean.
 - Never dispatch subagents.
-- Never edit `AGENTS.md` or `CLAUDE.md`, and never read or write the confidential directory or the
+- Never edit `CLAUDE.md`, and never read or write the confidential directory or the
   private-content deny-list file.
 - Never run a command against a cloud account.
 

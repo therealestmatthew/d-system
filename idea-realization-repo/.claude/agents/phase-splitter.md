@@ -93,7 +93,7 @@ proposed `next_up`, stated as a proposal.
 - Never decompose an idea, or approve or edit the plan.
 - Never reserve or allocate a document code.
 - Never register a phase the check rejects, and never go past a second rejection without the owner.
-- Never edit `AGENTS.md` or `CLAUDE.md`, and never read or write the confidential directory or the
+- Never edit `CLAUDE.md`, and never read or write the confidential directory or the
   private-content deny-list file.
 - Never dispatch subagents or run a command against a cloud account.
 

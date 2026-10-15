@@ -4,7 +4,7 @@ What a new developer needs on the first day: what this repository is, how to set
 to take on work, and where to look when something fails. `uv run python tools/onboard_check.py`
 checks most of the first-day checklist on your machine.
 
-This page is not a governed document. The rules it summarises live in `AGENTS.md` and the guides
+This page is not a governed document. The rules it summarises live in `CLAUDE.md` and the guides
 under `docs/guides/`; where this page and those differ, they win.
 
 ## 1. The system in 60 seconds
@@ -215,7 +215,7 @@ phase, record learnings in the brain, push every branch). The table is in `OPS-0
 - **A `backlog/backlog.yaml` conflict is normal**: keep both sides. Never resolve it with `--ours`
   or `--theirs`.
 - **Build against merged interfaces and mocks**, never against a peer's unmerged branch.
-- **Never edit `CLAUDE.md` or `AGENTS.md`** without the owner's approval of that change.
+- **Never edit `CLAUDE.md`** without the owner's approval of that change.
 - **A new ask that comes up mid-session is recorded as an idea** (`/idea-realization:idea`), not
   folded into the phase in progress.
 - **The control repository's CI fails when the `DENY_LIST` secret is missing.** The owner sets it;
@@ -237,8 +237,7 @@ phase, record learnings in the brain, push every branch). The table is in `OPS-0
 
 | Path | What it holds |
 |---|---|
-| `AGENTS.md` | The working agreement |
-| `CLAUDE.md` | Orientation for Claude Code |
+| `CLAUDE.md` | The instructions for every agent: orientation and the rules |
 | `ONBOARDING.md` | This page |
 | `ideas/` | The append-only idea log, its rendered view, the priority list and accepted partitions |
 | `backlog/backlog.yaml` | Phases, one session each; on `dev` it is also the lock table |

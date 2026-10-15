@@ -1,7 +1,7 @@
 # Reporting to the owner
 
-The working agreement (`AGENTS.md`) governs the work. This document governs how the work is
-reported to the owner.
+The working agreement (`AGENTS.md`, or `CLAUDE.md` in a repository with no `AGENTS.md`) governs
+the work. This document governs how the work is reported to the owner.
 
 ## Name things, then cite them
 

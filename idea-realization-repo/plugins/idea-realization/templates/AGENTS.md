@@ -45,8 +45,9 @@ permission to skip the documents for the next piece of work.
 - **Never write a confidential identifier into a tracked file**: not in code, a document, a commit
   message, or a session record describing the identifiers.
 - **Pushing your own branch needs no approval.** Backing up your own work is not publishing.
-- **Ask before integrating a branch into `{{integration_branch}}`.** The merge that lands work on
-  the trunk is the owner's call; a green branch is ready to integrate, not cleared to.
+- **A passing gating review is the approval for integrating a branch into
+  `{{integration_branch}}`.** A branch merges only on a pass; a green branch without that review
+  is not cleared to merge.
 
 ## Generated files
 

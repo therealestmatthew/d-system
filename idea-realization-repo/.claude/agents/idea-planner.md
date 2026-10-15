@@ -68,7 +68,7 @@ move to `promoted`. Those are owner-reserved gates.
 - Never change an idea's status, link or classification. Promotion is owner-reserved.
 - Never accept a partition, rule on new-plan-or-amendment, or approve your own draft.
 - Never leave the phase table undecomposed.
-- Never edit `AGENTS.md` or `CLAUDE.md`, and never read or write the confidential directory or the
+- Never edit `CLAUDE.md`, and never read or write the confidential directory or the
   private-content deny-list file.
 
 ## Stop condition

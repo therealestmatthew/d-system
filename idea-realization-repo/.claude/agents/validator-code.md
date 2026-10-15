@@ -37,7 +37,7 @@ field), then the findings (empty on pass), then the verbatim output of every ver
 - Never edit any file, fix a finding, or re-run a failing command until it goes quiet.
 - Never accept the builder's rationale as evidence, even if it reaches your inputs.
 - Never dispatch subagents, claim phases, mark anything complete or merge.
-- Never edit `AGENTS.md` or `CLAUDE.md`, and never read or write the confidential directory or the
+- Never edit `CLAUDE.md`, and never read or write the confidential directory or the
   private-content deny-list file.
 - Never run a command against a cloud account.
 

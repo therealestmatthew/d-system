@@ -19,7 +19,8 @@ replacement, and stop.
 
 ## Facts worth knowing before the first command
 
-- Work lands on `{{integration_branch}}`, and only with the owner's approval of each merge.
+- Work lands on `{{integration_branch}}` only after a passing gating review; that review is the
+  approval for the merge.
 - Every session works in its own worktree under `{{worktree_dir}}`; the primary checkout's branch is
   never switched.
 - `{{confidential_dir}}` is confidential and untracked; nothing from it is ever written into a

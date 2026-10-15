@@ -9,8 +9,8 @@ A team that builds a product with this pipeline keeps two repositories.
 - The **product repository** holds the product: its code, its tests and its CI. It carries as
   little process as possible.
 
-Agent sessions start in the control repository, so its agents, skills, `CLAUDE.md` and `AGENTS.md`
-apply, and reach the product worktree with `--add-dir` (or `/add-dir` inside a session).
+Agent sessions start in the control repository, so its agents, skills and instruction files
+(`CLAUDE.md`, and `AGENTS.md` where it has one) apply, and reach the product worktree with `--add-dir` (or `/add-dir` inside a session).
 
 ## Naming the product repository
 

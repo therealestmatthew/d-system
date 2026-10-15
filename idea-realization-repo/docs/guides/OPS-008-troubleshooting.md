@@ -116,9 +116,9 @@ Two rules apply to every entry:
   update goes to the `aws-deploy` agent. Never set an `AWS_` variable or touch `~/.aws/`. If the
   guard blocks a command that is legitimate, report it to the owner; do not rephrase the command
   to get past it.
-- **Symptom C: permission rule.** An edit to `CLAUDE.md`, `AGENTS.md`, `ideas/ideas.jsonl` or
+- **Symptom C: permission rule.** An edit to `CLAUDE.md`, `ideas/ideas.jsonl` or
   anything under `.private/` is denied.
-- **Fix C.** These are denied on purpose. `CLAUDE.md` and `AGENTS.md` change only with the owner's
+- **Fix C.** These are denied on purpose. `CLAUDE.md` changes only with the owner's
   approval of the exact text. The idea log changes only through `/idea-realization:idea`
   (`scripts/idea.py`).
 
