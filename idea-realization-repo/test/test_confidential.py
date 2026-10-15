@@ -230,3 +230,42 @@ def test_the_two_copies_of_the_check_are_identical() -> None:
     assert CONTROL_COPY.read_bytes() == TEMPLATE_COPY.read_bytes(), (
         "tools/check_confidential.py and templates/product-repo/tools/check_confidential.py "
         "differ; change both copies together")
+
+
+@pytest.mark.parametrize("lines", [(), ("",), ("# only a comment", "", "   "), ("#a", "#b")])
+def test_deny_list_with_no_identifiers_fails(
+        repo: Path, lines: tuple[str, ...], capsys: pytest.CaptureFixture[str]) -> None:
+    """A deny-list that exists but names nothing would report OK without checking anything."""
+    (repo / ".private").mkdir(exist_ok=True)
+    (repo / ".private" / "deny-list.txt").write_text("\n".join(lines), encoding="utf-8")
+    assert check.main(repo) == 1
+    out = capsys.readouterr().out
+    assert "check_confidential: FAILED" in out
+    assert "names no identifiers" in out
+
+
+def test_configured_deny_list_with_no_identifiers_fails(
+        repo: Path, tmp_path_factory: pytest.TempPathFactory,
+        monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    """The CI path: a DENY_LIST secret holding only comments is non-empty, so the workflow's
+    own empty-secret check passes it on; the script must refuse it."""
+    secret = tmp_path_factory.mktemp("runner") / "deny-list.txt"
+    secret.write_text("# TODO: fill this in\n\n", encoding="utf-8")
+    monkeypatch.setenv("PRIVATE_DENY_LIST", str(secret))
+    assert check.main(repo) == 1
+    assert "names no identifiers" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("copy", [CONTROL_COPY, TEMPLATE_COPY], ids=["control", "product"])
+def test_each_copy_refuses_an_empty_deny_list_from_the_command_line(
+        repo: Path, copy: Path, tmp_path_factory: pytest.TempPathFactory) -> None:
+    tools = repo / "tools"
+    tools.mkdir()
+    shutil.copy(copy, tools / "check_confidential.py")
+    secret = tmp_path_factory.mktemp("runner") / "deny-list.txt"
+    secret.write_text("# nothing here\n\n", encoding="utf-8")
+    env = {**os.environ, "PRIVATE_DENY_LIST": str(secret)}
+    result = subprocess.run([sys.executable, str(tools / "check_confidential.py")], cwd=repo,
+                            env=env, capture_output=True, text=True)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "names no identifiers" in result.stdout

@@ -82,7 +82,7 @@ prints `OK` or `FIX` for each item it can check, and the commands it cannot run 
      owners:
        ana:
          description: Ana, user interface workstream.
-         emails: [ana@example.com]
+         emails: ["<handle>@<work-domain>"]
      ```
 
    - Check it: `uv run plugins/idea-realization/scripts/identity.py` prints your handle.

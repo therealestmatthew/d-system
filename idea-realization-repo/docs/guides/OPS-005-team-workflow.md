@@ -42,7 +42,7 @@ Each developer, once:
    owners:
      ana:
        description: Ana, user interface workstream.
-       emails: [ana@example.com]
+       emails: ["<handle>@<work-domain>"]
    ```
 
 2. **Claim one workstream.** The owner writes the list of workstreams in `docs/workstreams.yaml`;

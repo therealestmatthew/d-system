@@ -226,6 +226,12 @@ tools/github/apply_rulesets.sh <org>/<product-repo> product user:<owner-login>
 The third argument names who may merge into `main` (below). Use the same value for both
 repositories.
 
+Before it calls GitHub, the script checks that `<org>/<repo>` is the repository this machine's
+`.idea-realization/local.yaml` names for that kind: `control_github` for `control`, `product_github`
+for `product` (or, when those are unset, the GitHub repository in `control_remote` or
+`product_remote`). It refuses when the value is unset or differs, so the control rulesets cannot be
+applied to the product repository or the reverse.
+
 The script needs `gh` signed in as an administrator of the repository. It is safe to run again: a
 ruleset whose name already exists on the repository is updated in place, otherwise it is created.
 It prints each action it took.

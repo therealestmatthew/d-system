@@ -17,6 +17,13 @@
 #   pull request into main and cannot push to it directly; everyone else is refused. The id is
 #   read from GitHub at run time and never written into a tracked file.
 #
+# Before anything reaches GitHub the script checks the target: <owner/repo> must be the repository
+# this machine's configuration names for <kind>, so control rulesets cannot land on the product
+# repository or the reverse. It reads `control_github` or `product_github` (as <org>/<repo>), or,
+# when that is unset, the GitHub repository in `control_remote` or `product_remote`, through the
+# plugin's scripts/paths.py: .idea-realization/local.yaml or IDEA_REALIZATION_<KEY>. The
+# comparison ignores case, as GitHub does. It refuses when the value is unset or differs.
+#
 # The repository owner runs this by hand, with `gh` signed in as an account that administers the
 # repository. Nothing runs it automatically. It is idempotent: a ruleset whose name already exists
 # on the repository is updated in place; otherwise it is created. Rulesets inherited from the
@@ -54,13 +61,43 @@ case "$merger" in
   *) echo "error: third argument must be user:<login> or team:<org>/<team-slug>, got '$merger'" >&2; usage ;;
 esac
 
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+control_root="$(cd "$here/../.." && pwd)"
+ruleset_dir="$control_root/.github/rulesets"
+
+# The GitHub <org>/<repo> in a remote URL on github.com, or nothing.
+github_slug() {
+  printf '%s\n' "$1" | sed -n -E \
+    -e 's#^(git@|ssh://git@)github\.com[:/]([^/]+/[^/]+)$#\2#p' \
+    -e 's#^https://github\.com/([^/]+/[^/]+)$#\1#p' | sed -e 's#\.git$##' -e 's#/$##'
+}
+
+# Verify the target before anything reaches GitHub.
+command -v uv >/dev/null || { echo "error: uv is not installed; it reads the configured repositories" >&2; exit 1; }
+config="$(uv run --quiet "$control_root/plugins/idea-realization/scripts/paths.py" \
+            --root "${IDEA_REALIZATION_ROOT:-$control_root}")" \
+  || { echo "error: could not read the configuration (scripts/paths.py failed)" >&2; exit 1; }
+expected="$(printf '%s\n' "$config" | sed -n "s/^${kind}_github: //p")"
+source_key="${kind}_github"
+if [ -z "$expected" ]; then
+  expected="$(github_slug "$(printf '%s\n' "$config" | sed -n "s/^${kind}_remote: //p")")"
+  source_key="${kind}_remote"
+fi
+if [ -z "$expected" ]; then
+  echo "error: ${kind}_github is not set (nor a github.com ${kind}_remote), so the $kind repository cannot be verified." >&2
+  echo "       Set it in .idea-realization/local.yaml (template: local.example.yaml) and run again." >&2
+  exit 1
+fi
+if [ "$(printf '%s' "$repo" | tr '[:upper:]' '[:lower:]')" != "$(printf '%s' "$expected" | tr '[:upper:]' '[:lower:]')" ]; then
+  echo "error: '$repo' does not match the $kind repository this machine is configured for ($source_key: $expected)." >&2
+  echo "       Refusing: $kind rulesets go only to the $kind repository." >&2
+  exit 1
+fi
+
 command -v gh >/dev/null || { echo "error: gh is not installed" >&2; exit 1; }
 gh auth status >/dev/null 2>&1 || { echo "error: gh is not signed in (run gh auth login)" >&2; exit 1; }
 
-here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ruleset_dir="$(cd "$here/../../.github/rulesets" && pwd)"
-
-echo "repository: $repo ($kind)"
+echo "repository: $repo ($kind, matches $source_key)"
 
 if [ "$actor_type" = User ]; then
   actor_id="$(gh api "users/$actor_ref" --jq .id)" \

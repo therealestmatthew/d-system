@@ -35,8 +35,8 @@ it is unsafe, fragile, wasteful or not what the requirement asked for.
      the product trail's data-event selectors scoped to the tenant buckets and tables;
    - a Bedrock guardrail attached to every model call, Bedrock model-invocation logging on, and
      models called through the US inference profiles (`us.anthropic.claude-sonnet-5`,
-     `us.anthropic.claude-opus-5-5`) with the three-part grant in `aws/README.md`, never a
-     `global.` profile;
+     `us.anthropic.claude-opus-5-5`) with the three-part grant in `aws/README.md`, never any
+     other profile (`global.`, `eu.`, `apac.` and the rest are denied);
    - the workbench on Amplify Hosting with no repository token stored in the stack.
 4. Where the change is deployed, compare the live configuration with the code using
    `tools/aws-sandbox read ...`, and report drift.

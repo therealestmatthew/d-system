@@ -103,16 +103,24 @@
       "Resource": "*"
     },
     {
-      "Sid": "DenyGlobalInferenceProfiles",
+      "Sid": "DenyInferenceProfilesOutsideTheUS",
       "Effect": "Deny",
-      "Action": "bedrock:*",
-      "Resource": [
-        "arn:aws:bedrock:*:*:inference-profile/global.*",
-        "arn:aws:bedrock:::foundation-model/*"
-      ]
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "Null": {
+          "bedrock:InferenceProfileArn": "false"
+        },
+        "ArnNotLike": {
+          "bedrock:InferenceProfileArn": "arn:aws:bedrock:*:*:inference-profile/us.*"
+        }
+      }
     },
     {
-      "Sid": "DenyOtherRegionsExceptInferenceProfileRouting",
+      "Sid": "DenyOtherRegionsExceptUSInferenceProfileRouting",
       "Effect": "Deny",
       "NotAction": [
         "iam:*",
@@ -130,8 +138,8 @@
         "StringNotEquals": {
           "aws:RequestedRegion": "REPLACE_WITH_SANDBOX_REGION"
         },
-        "Null": {
-          "bedrock:InferenceProfileArn": "true"
+        "ArnNotLike": {
+          "bedrock:InferenceProfileArn": "arn:aws:bedrock:*:*:inference-profile/us.*"
         }
       }
     }

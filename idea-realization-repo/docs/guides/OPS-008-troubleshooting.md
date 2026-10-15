@@ -255,7 +255,8 @@ Two rules apply to every entry:
   profile (`us.anthropic.claude-sonnet-5`), since neither Claude Sonnet 5 nor Claude Opus 5.5 has
   an in-region endpoint in a US region; the product's execution role under `/app/` lacks one of
   the three parts of the inference-profile grant (`aws/README.md`, "Bedrock: US inference
-  profiles"); or the call uses a `global.` profile, which the boundary denies.
+  profiles"); or the call uses a profile other than a `us.` one (`global.`, `eu.`, `apac.` ...), which the
+  deploy policy and the boundary deny.
 - **Fix.**
   1. Dispatch `bedrock-claude-advisor` to list the models and inference profiles the account can
      call, and the right id for the product's call. It never invokes a model.

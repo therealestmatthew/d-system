@@ -37,9 +37,17 @@ Two checks:
 
    When none exists the content check is skipped with a warning on standard error and the check
    still passes, so a developer who does not have the file yet can commit; the path check still
-   runs. CI does not reach this case: its workflow fails before the check when the secret is unset.
+   runs. CI does not reach this case: both workflows (`.github/workflows/control-ci.yml` in the
+   control repository and `templates/product-repo/.github/workflows/product-ci.yml` for the
+   product repository) fail before the check when the `DENY_LIST` secret is empty, and always set
+   `PRIVATE_DENY_LIST` when it is not.
 
-Exit codes: 0 when nothing leaks; 1 when anything does, one line per violation.
+   A deny-list that exists but names no identifier (empty, or only blank lines and comments) fails
+   the check. It would otherwise report OK having checked nothing. This is also how CI catches a
+   `DENY_LIST` secret that holds only comments, which the workflows' empty-secret test lets through.
+
+Exit codes: 0 when nothing leaks; 1 when anything does, or when the deny-list names no
+identifier, one line per violation.
 """
 
 from __future__ import annotations
@@ -196,6 +204,9 @@ def main(root: Path = ROOT) -> int:
         violations.append(f"PRIVATE_DENY_LIST is set but {deny_list} does not exist")
     elif identifiers is None:
         warn_no_deny_list(searched)
+    elif not identifiers:
+        violations.append(f"the deny-list {deny_list} names no identifiers (it is empty or holds "
+                          "only blank lines and comments); nothing would be checked")
     violations += check_content(root, blobs, identifiers or set())
 
     if violations:

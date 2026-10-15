@@ -5,8 +5,14 @@
       "Sid": "SandboxOnlyDecryptTenantDataThroughS3AndDynamoDB",
       "Effect": "Allow",
       "Action": "kms:Decrypt",
-      "Resource": "*",
+      "Resource": "arn:aws:kms:*:REPLACE_WITH_SANDBOX_ACCOUNT_ID:key/*",
       "Condition": {
+        "StringEquals": {
+          "aws:ResourceAccount": "REPLACE_WITH_SANDBOX_ACCOUNT_ID"
+        },
+        "ForAnyValue:StringLike": {
+          "kms:ResourceAliases": "alias/REPLACE_WITH_PRODUCT_NAME-tenant-*"
+        },
         "StringLike": {
           "kms:ViaService": [
             "s3.*.amazonaws.com",

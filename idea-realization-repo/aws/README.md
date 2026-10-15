@@ -52,12 +52,19 @@ warnings.
   that cost money or run code (model invocation, agent and flow invocation, Knowledge Base
   retrieval, guardrail application, Textract analysis, Lambda invocation, assuming another role).
 - `read-sandbox-data-policy.json` lets the read role decrypt tenant data through S3 and DynamoDB
-  (`kms:Decrypt` with `kms:ViaService`) and read Textract results (`textract:Get*`, `List*`),
-  neither of which `ReadOnlyAccess` grants. See the warning below.
+  and read Textract results (`textract:Get*`, `List*`), neither of which `ReadOnlyAccess` grants.
+  The decrypt is limited three ways: to keys in the sandbox account (the key ARN pattern and
+  `aws:ResourceAccount`), to keys with a tenant alias `alias/<product>-tenant-*`
+  (`kms:ResourceAliases`), and to calls S3 or DynamoDB make on the role's behalf
+  (`kms:ViaService`). See the warning below.
 - `deploy-policy.json` allows everything in the account except IAM, Organizations, account,
   billing, budget, cost and identity-center actions and assuming another role. Of IAM it allows:
   creating, changing and deleting roles under the path `/app/` **only when the role carries the
-  permission boundary** `app-permissions-boundary`; passing `/app/` roles to the product's
+  permission boundary** `app-permissions-boundary` (for `CreateRole` and
+  `PutRolePermissionsBoundary` the condition key `iam:PermissionsBoundary` is the boundary in the
+  request; for `PutRolePolicy`, `AttachRolePolicy`, `DetachRolePolicy` and `DeleteRolePolicy` it is
+  the boundary already attached to the role, per the IAM page of the AWS Service Authorization
+  Reference); passing `/app/` roles to the product's
   services only (`iam:PassedToService`: Step Functions, Lambda, Bedrock, Textract, Cognito,
   CloudTrail, VPC flow logs, Amplify, EventBridge); reading `/app/` roles; listing roles; and
   reading the boundary and AWS managed policies. Explicit Denies, which no Allow can override,
@@ -66,9 +73,9 @@ warnings.
   the boundary; removing a boundary; passing or reading any role outside `/app/`; the
   Organizations, account, billing and identity actions; stopping, deleting or updating the
   account's **baseline** CloudTrail trail; turning off Config or GuardDuty; bypassing S3 Object
-  Lock governance retention; reading secret values; Bedrock global inference profiles; and any
-  regional action outside the sandbox region, except the cross-region model routing of an
-  inference profile.
+  Lock governance retention; reading secret values; invoking a model through any inference
+  profile other than a US geographic one (`us.*`); and any regional action outside the sandbox
+  region, except the cross-region model routing of a US inference profile.
 - `app-permissions-boundary.json` caps every `/app/` role at what the deploy role itself may do,
   minus secret reads, key policy changes and key deletion, Object Lock changes, turning off the
   audit trail, and assuming roles. A role the deploy role creates therefore never has more power
@@ -156,7 +163,10 @@ us-east-2 and us-west-2:
 | Claude Sonnet 5 | `anthropic.claude-sonnet-5` | `us.anthropic.claude-sonnet-5` |
 | Claude Opus 5.5 | `anthropic.claude-opus-5-5` | `us.anthropic.claude-opus-5-5` |
 
-Global profiles (`global.*`) are denied by both the deploy policy and the boundary. Quotas for the
+Only US profiles are allowed, by both the deploy policy and the boundary: the statement
+`DenyInferenceProfilesOutsideTheUS` denies a model invocation whose `bedrock:InferenceProfileArn`
+is not `arn:aws:bedrock:*:*:inference-profile/us.*`. It is an allow-list, so `global.`, `eu.`,
+`apac.` and any profile prefix AWS adds later are denied without being named. Quotas for the
 profiles are the "Cross-region model inference ... for <model>" service quotas, requested in the
 sandbox region, one pair per model.
 
@@ -191,8 +201,10 @@ grant; AWS can add regions to a profile.
 **Why the region deny lets this through.** AWS evaluates the foundation model once per candidate
 destination region, with `aws:RequestedRegion` set to that region and the condition key
 `bedrock:InferenceProfileArn` set to the profile. The region deny in the deploy policy and in the
-boundary carries `"Null": {"bedrock:InferenceProfileArn": "true"}`, so it skips exactly those
-evaluations. The originating call is still locked to the sandbox region: AWS evaluates the
+boundary carries `"ArnNotLike": {"bedrock:InferenceProfileArn":
+"arn:aws:bedrock:*:*:inference-profile/us.*"}`, so it skips exactly the evaluations routed by a US
+profile; a call without the key, or through any other profile, is still refused outside the
+sandbox region. The originating call is still locked to the sandbox region: AWS evaluates the
 inference profile resource with the source region and without that key (AWS Bedrock user guide,
 "Geographic cross-Region inference", Service Control Policy requirements).
 
@@ -224,7 +236,9 @@ stack instead.
 ### Tenant keys and tables
 
 The stack creates each tenant's KMS key and DynamoDB table set at deploy time (owner ruling,
-2026-10-14). The deploy role keeps `kms:PutKeyPolicy` and `kms:ScheduleKeyDeletion`. Each key
+2026-10-14). Each tenant key gets the alias `alias/<product>-tenant-<tenant>`, where `<product>` is
+the value that replaces `REPLACE_WITH_PRODUCT_NAME`; the read role decrypts only through keys with
+such an alias, so a key without one is unreadable to it. The deploy role keeps `kms:PutKeyPolicy` and `kms:ScheduleKeyDeletion`. Each key
 policy keeps the statement that delegates to IAM in the account, or the roles' IAM policies
 (including the read role's decrypt) have no effect. Scheduling a key's deletion, or changing a key
 policy, through `tools/aws-sandbox write` prompts a person (`.claude/settings.json`); the same
@@ -259,7 +273,9 @@ in CI; commit `cdk.context.json`.
 
 1. In local copies of the policy files (never commit the values), replace
    `REPLACE_WITH_SANDBOX_REGION` (a US region where the US profiles are offered),
-   `REPLACE_WITH_SANDBOX_ACCOUNT_ID` and `REPLACE_WITH_BASELINE_TRAIL_NAME`.
+   `REPLACE_WITH_SANDBOX_ACCOUNT_ID`, `REPLACE_WITH_BASELINE_TRAIL_NAME` and (in
+   `read-sandbox-data-policy.json`) `REPLACE_WITH_PRODUCT_NAME`, the prefix of the tenant key
+   aliases.
 2. Create the customer managed policy `app-permissions-boundary` at the path `/` from
    `iam/app-permissions-boundary.json`. The name must match the ARN in `deploy-policy.json`.
 3. Create the read role: attach `ReadOnlyAccess` and customer managed policies from
@@ -334,6 +350,17 @@ in CI; commit `cdk.context.json`.
   the boundary nor any condition key limits a role's **trust policy**, though: a stack could create
   an `/app/` role that another account may assume. `aws-infra-reviewer` checks that every trust
   policy names only AWS service principals.
+- **`aws-sandbox exec` runs whatever it is given** (owner ruling, accepted). The guard hook does not
+  stop `tools/aws-sandbox exec bash -c '...'` from running arbitrary commands with the deploy
+  role's credentials; it checks who calls `exec`, not what `exec` runs. This is accepted because the
+  IAM roles are the boundary: anything run that way can do no more than the deploy role allows.
+- **The hook does not block the instance metadata service** (owner ruling, accepted under the machine
+  rule). A command can reach `169.254.169.254` directly; the hook does not look for it. The machine
+  rule is what makes this safe: there are no instance credentials to find.
+- **Agents must not run on an EC2 instance, or on any host that has an instance role or
+  instance-metadata credentials** (container task roles included). On such a host the two risks
+  above are no longer covered by the machine rule. `tools/check_aws_machine.py --probe` reports a
+  reachable metadata service.
 - **Read reaches data.** `ReadOnlyAccess` reads object contents and table items, and with
   `read-sandbox-data-policy.json` that includes data encrypted with the tenant keys, and Textract
   results. Keep production or personal data out of the sandbox, and see the warning under "The

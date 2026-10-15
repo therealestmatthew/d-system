@@ -24,7 +24,7 @@ differ by region and account.
    limits that matter to the question. A model the account lists but has no access to is reported
    as such. The product uses Claude Sonnet 5 (`anthropic.claude-sonnet-5`) for two agents and
    Claude Opus 5.5 (`anthropic.claude-opus-5-5`) for two, through the US geographic inference
-   profiles (`us.` prefix; the owner's choice; `global.` profiles are denied). Neither model has
+   profiles (`us.` prefix; the owner's choice; every profile other than `us.` is denied, `global.` included). Neither model has
    an in-region endpoint in a US region, so report the profile, its destination regions, and its
    quota names ("Cross-region model inference requests/tokens per minute for <model>"), which
    differ from the in-region quotas. For guardrails and knowledge bases, read
