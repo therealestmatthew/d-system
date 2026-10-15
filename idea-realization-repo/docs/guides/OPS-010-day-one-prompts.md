@@ -26,13 +26,13 @@ one-page command list per mode is in the mode cheat sheets (`OPS-009`).
 - Text in `<angle brackets>` is yours to fill in before you paste. Each prompt fits one session.
 - Where a prompt runs the product's tests, it runs them in the product worktree, as the
   `session-start` skill §5 and the implementing guide (`OPS-003`, step 3.6) state.
-- The plugin's skills may be listed as `/idea-realization:<skill>` (for example
-  `/idea-realization:start`). Each prompt names the skill, and the agent picks the form this
-  machine uses.
+- The plugin's skills are invoked as `/idea-realization:<skill>`, for example
+  `/idea-realization:start`; some setups also list the short name (`ONBOARDING.md` §1, "Skill
+  names"). Each prompt names the skill, and the agent invokes it.
 
 ---
 
-## 1. First session: set up the machine, then `/start`
+## 1. First session: set up the machine, then `/idea-realization:start`
 
 Paste this once per machine, on your first day. It does not claim any work.
 
@@ -48,10 +48,11 @@ will be <handle>.
 3. Never read or write anything under .private/ or ~/.aws/ unless I tell you to. I will save the
    deny-list myself.
 4. The only commit you may make today is my `owners` entry in docs/systems.yaml (ONBOARDING
-   section 3, step 3), and later my workstream claim in docs/workstreams.yaml (section 4). Each
+   section 3, step 5), and later my workstream claim in docs/workstreams.yaml (section 4). Each
    goes directly on control `dev`, is pushed at once, and contains nothing else. Show me the diff
    and ask before you commit.
-5. Repeat `uv run python tools/onboard_check.py` until it exits 0, and show me the final output.
+5. Repeat `uv run python tools/onboard_check.py` until it exits 0, or until only the AWS lines of
+   step 8 remain while my sandbox access is pending. Show me the final output.
 6. Then run the `start` skill and stop at its mode question.
 
 When something I asked for conflicts with CLAUDE.md, say so and follow CLAUDE.md. If a document is
@@ -73,7 +74,8 @@ Planning session. I am <handle>; the owner is <owner handle>.
    `uv run plugins/idea-realization/scripts/brain.py load --kind decision`.
 3. Today's work: <record these ideas: ... | triage the open ideas | partition the triaged ideas |
    plan accepted track <track> | split approved plan <PLAN-code>>.
-4. Run scripts from the control root with IDEA_REALIZATION_ROOT set to it. Dispatch every agent
+4. Run scripts from the control root; they find it from git. Never export IDEA_REALIZATION_ROOT:
+   if a script resolves the wrong root, set it on that one command only. Dispatch every agent
    by its own name (idea-triage, idea-planner, plan-adversary, phase-splitter, batch-validator).
    Never dispatch a general-purpose agent in place of one.
 5. Reserve every document code with the `next-code` skill. Never pick a code by reading a
@@ -116,12 +118,13 @@ Implementing session. I am <handle>. <Optional: the owner assigned me <phase-id>
    `product:` is in the product worktree. If the work needs a file outside them, stop and tell me.
    Commit small diffs on agent/<phase-id>. Rebase onto origin/dev; never merge dev in.
 8. Choose a free port yourself for any dev server.
-9. Every AWS command goes through tools/aws-sandbox. Only the aws-deploy agent deploys. Ask
-   bedrock-claude-advisor before writing a Bedrock call.
+9. Every AWS command goes through tools/aws-sandbox. Ask bedrock-claude-advisor before writing a
+   Bedrock call. Have aws-infra-reviewer review any infrastructure diff before it is deployed.
+   Only the aws-deploy agent deploys.
 10. Record any new ask as an idea with the `idea` skill. Do not fold it into this phase.
-11. When I stop, run the `checkpoint` skill from the control worktree. Paste the product
-    verification output into the record yourself: the skill does not cover the product
-    repository yet.
+11. When I stop, run the `checkpoint` skill from the control worktree. It records the control
+    repository only: add the product branch's tip and the product verification output to the
+    record yourself.
 ```
 
 ### 3b. Resume a claimed phase
@@ -129,7 +132,8 @@ Implementing session. I am <handle>. <Optional: the owner assigned me <phase-id>
 ```text
 Resume <phase-id>. I claimed it earlier; it is active with my agent id.
 
-1. Run the `start` skill and choose Implementing. I pull `dev` in both primary checkouts first.
+1. Run the `start` skill and choose Implementing. I run `git pull --rebase origin dev` in both
+   primary checkouts first.
 2. Do not claim again. Read the phase in backlog/backlog.yaml on control `dev`, then its latest
    session record in the control worktree <worktree dir>/<phase-id>, and its next_action.
 3. Check that both agent/<phase-id> worktrees exist and say where each branch tip is
@@ -156,17 +160,18 @@ Close <phase-id>.
    failing check is a result; report it, do not retry it until it passes.
 2. If any acceptance condition does not hold, stop. Run the `checkpoint` skill and tell me what
    remains.
-3. If every condition holds, run the `session-close` skill. Its gating review uses a fresh
-   phase-adversary agent (or validator-code for a narrow change against one requirement), never a
-   general-purpose agent and never a fork of this session. Give the reviewer the brief the skill
-   specifies and none of my explanations.
+3. If every condition holds, record what the next session should know with the `brain` skill,
+   in the control worktree, so the entry reaches `dev` in the control pull request. Then run the
+   `session-close` skill. Its gating review uses a fresh phase-adversary agent (or validator-code
+   for a narrow change against one requirement), never a general-purpose agent and never a fork
+   of this session. Give the reviewer the brief the skill specifies and none of my explanations.
 4. Show me the verdict's first line and every finding. Fix each finding or ask me to accept it.
    After a fix, the new HEAD gets a fresh review. Two rejects on the same finding: stop and tell me.
 5. Merge only on a pass, with merge commits, control first and then product once `verify` passes.
    Confirm that the product merge commit's second parent is the reviewed commit. Then write the
-   completion commit on control `dev` and push it.
-6. Record what the next session should know with the `brain` skill.
-7. Never commit with --no-verify. A failing hook is a finding to fix or report.
+   completion commit on control `dev` and push it. If session-close stops because `gh` cannot
+   reach a repository, tell me; never merge or push to `dev` by hand to get past it.
+6. Never commit with --no-verify. A failing hook is a finding to fix or report.
 ```
 
 ### 4b. Review a peer's pushed branch
