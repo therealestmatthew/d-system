@@ -95,7 +95,7 @@ def file_at(root: Path, commit: str, relative_path: str) -> bool:
     (a directory or a symlink there is not a file, as in the working tree check)."""
     found = subprocess.run(["git", "--literal-pathspecs", "-C", str(root), "ls-tree", "-z",
                             "--end-of-options", commit, "--", relative_path],
-                           capture_output=True, text=True, check=False)
+                           env=paths.git_env(), capture_output=True, text=True, check=False)
     if found.returncode != 0:
         return False
     for entry in found.stdout.split("\0"):

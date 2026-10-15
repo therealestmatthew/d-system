@@ -236,8 +236,8 @@ If either test fails, stop and report it; do not record completion.
 
 ### Local merge: a repository whose route is `local`
 
-Only for a repository `merge-route` printed `local` for, in place of 6a to 6d for that repository: confirm its
-primary checkout is clean (`git -C <checkout> status --short` shows nothing; never stash a peer's
+Only for a repository `merge-route` printed `local` for, in place of 6a to 6d for that repository:
+confirm its primary checkout is clean (`git -C <checkout> status --short` shows nothing; never stash a peer's
 uncommitted work and never force an integration around it) and is on its integration branch, then:
 
 ```bash

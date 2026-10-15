@@ -83,7 +83,8 @@ a bookkeeping commit as soon as it is made, so peers see it.
 | The completion record | control | one commit directly on the control integration branch, after the product merge, pushed at once |
 
 The `session-start` and `session-close` skills carry out these steps in order. A repository with no
-GitHub remote makes the same merges locally with `git merge --no-ff`.
+`origin`, or whose `origin` is a path on this machine, makes the same merges locally with
+`git merge --no-ff` (`product.py merge-route` decides); a hosted one whose `gh` fails stops instead.
 
 ## Paths in a phase
 

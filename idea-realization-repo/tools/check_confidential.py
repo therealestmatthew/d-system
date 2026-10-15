@@ -223,7 +223,7 @@ def pushed_commits(root: Path, remote: str,
         if git_out(root, "cat-file", "-t", local).strip() == "tag":
             tags.append(local)
         known = subprocess.run(["git", "cat-file", "-e", f"{remote_sha}^{{commit}}"], cwd=root,
-                               capture_output=True).returncode == 0
+                               capture_output=True, check=False).returncode == 0
         if set(remote_sha) == {"0"} or not known:
             # A new ref, or a remote tip this clone has not fetched (someone pushed first, so
             # the push will be refused as a non-fast-forward): send-able commits are those on no
@@ -332,9 +332,10 @@ def main(root: Path = ROOT, argv: list[str] | None = None) -> int:
             commits, tags = pushed_commits(root, args.pre_push, sys.stdin.read().splitlines())
         except subprocess.CalledProcessError as error:
             reason = error.stderr.decode("utf-8", errors="replace").strip().splitlines()
-            return report_failure([f"cannot list the commits this push sends ({' '.join(error.cmd)}"
-                                   f"{': ' + reason[-1] if reason else ''}); nothing was checked, "
-                                   "so the push is refused"])
+            detail = f"{' '.join(error.cmd)}{': ' + reason[-1] if reason else ''}"
+            message = (f"cannot list the commits this push sends ({detail}); nothing was "
+                       "checked, so the push is refused")
+            return report_failure([message])
         for tag in tags:
             violations += check_message(git_out(root, "cat-file", "tag", tag), identifiers or set(),
                                         f"tag {tag[:12]}")
