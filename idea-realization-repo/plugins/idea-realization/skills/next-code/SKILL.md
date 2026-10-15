@@ -21,11 +21,18 @@ CLAUDE_PLUGIN_OPTION_BACKLOG_PATH='${user_config.backlog_path}' \
 uv run "${CLAUDE_PLUGIN_ROOT}/scripts/cli.py" next-code <kind> [--parent <plan document id>]
 ```
 
-`--parent` allocates a sub-code under that plan's code, for a child plan. A dated kind (session,
-walkthrough) takes today's date and no parent.
+Every kind except `governance` is scoped: the code carries your developer handle after the
+prefix and counts your codes only, so a developer on another machine cannot take the same one. The
+handle is resolved from `git config user.email` against the developers in `systems.yaml`
+(`identity.py` prints it). When it does not resolve, the command refuses, says why, and reserves
+nothing; add your entry to `systems.yaml` owners or fix the git email, never choose a code by hand.
+
+`--parent` allocates a sub-code under that plan's code, for a child plan; it keeps the parent's
+handle. A dated kind (session, walkthrough) takes today's date and no parent.
 
 Report the printed code, or the output as printed when the command fails. Exit 1 means the
-document tree fails its check or no code could be allocated; nothing was reserved.
+document tree fails its check, no handle resolved for a scoped kind, or no code could be
+allocated; nothing was reserved.
 
 If the document will not be written after all, release the reservation with the same script:
 

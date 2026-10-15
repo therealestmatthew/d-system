@@ -233,8 +233,15 @@ Document code series, allocation, register consistency and the catalog.
 
 Two numbering modes exist. Counter series take the next free three-digit number in the series,
 with an optional ``.NN`` sub-code under a parent plan; dated series derive their code from the
-document's own date plus a same-day sequence, so kinds written by several sessions at once never
-contend on one counter.
+document's own date plus a same-day sequence.
+
+A scoped series (every series unless its register entry says ``scoped: false``) puts the
+allocating developer's handle after the prefix, ``<SERIES>-<handle>-NNN`` or
+``<SERIES>-<handle>-YYYY-MM-DD-NN``, and numbers per handle, so two developers allocating on
+separate machines, which share no reservation, never take the same code. The handle is the one
+``identity.py`` resolves; allocation in a scoped series refuses without one. Codes without a
+handle, written before a series was scoped, stay valid. In an unscoped series a code carries no
+handle. A sub-code follows its parent's stem, handle included, whoever allocates it.
 
 Run directly, this script is the ``next-code`` command: it scans the document root, then
 allocates the next free code for a kind and holds it with a pre-merge reservation (see
@@ -242,7 +249,7 @@ allocates the next free code for a kind and holds it with a pre-merge reservatio
 merges receive different codes. Never choose a code by hand.
 
 Exit codes: 0 with the code printed; 1 when the document tree fails its check or no code can be
-allocated; 2 on a usage error.
+allocated, including a scoped series when no developer handle resolves; 2 on a usage error.
 
 | Flag | Help | Choices | Default | Required |
 |---|---|---|---|---|

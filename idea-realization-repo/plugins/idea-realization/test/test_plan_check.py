@@ -122,3 +122,8 @@ def test_the_check_runs_from_a_copy_of_the_scripts(tmp_path: Path) -> None:
 def test_the_templates_carry_no_real_code(name: str) -> None:
     text = (PLUGIN_ROOT / "templates" / name).read_text()
     assert "-NNN" in text
+
+
+def test_two_handle_scoped_phase_ids_need_an_execution_order() -> None:
+    two = template() + "\nDelivered by phase-demo" + "-ana-01, then phase-demo" + "-ben-01.\n"
+    assert plan_check.missing_sections(two, {}) == ["Concurrency"]

@@ -47,7 +47,8 @@ REQUIREMENT_COVERAGE = ("Requirement coverage", ("Requirement coverage",))
 CONCURRENCY = ("Concurrency", ("Execution order and real concurrency", "Execution order"))
 
 HEADING = re.compile(r"^#{2,3} (.+)$")
-PHASE_ID = re.compile(r"phase-[a-z]+-[0-9]+")
+#: A phase id, ``phase-<track>-NN`` or ``phase-<track>-<handle>-NN``.
+PHASE_ID = re.compile(r"phase-[a-z]+-(?:[a-z][a-z0-9]{0,15}-)?[0-9]+")
 
 
 def unfenced(text: str) -> list[str]:

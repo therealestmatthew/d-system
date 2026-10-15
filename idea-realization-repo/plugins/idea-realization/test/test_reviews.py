@@ -388,3 +388,74 @@ def test_the_stranded_recovery_stops_when_the_forge_cannot_tell() -> None:
     assert "no pull request number is recorded" in confirm
     assert "do not reopen the phase" in confirm
     assert reopen.startswith("Only when the forge shows the pull request did not merge")
+
+
+REQUIRE = "IDEA_REALIZATION_REQUIRE_PRODUCT"
+
+
+def test_a_required_product_check_without_a_checkout_is_an_error(
+        two_repos: tuple[Path, Path, str, str], monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str]) -> None:
+    """Control CI sets the requirement: a missing product checkout fails instead of a note, even
+    for a fast-forward completion whose control records agree."""
+    control, _, _, tip = two_repos
+    complete_phase(control, product_merge=tip)
+    check(control, stamped(phase="build-api", reviewed_commit=tip))
+    monkeypatch.setenv(REQUIRE, "1")
+    errors = run(control)
+    assert any("product checkout is required" in e and REQUIRE in e for e in errors), errors
+    complete_phase(control, product_merge="f" * 40)
+    capsys.readouterr()
+    errors = run(control)
+    assert any("product checkout is required" in e for e in errors), errors
+    assert "not checked" not in capsys.readouterr().err
+
+
+def test_a_required_product_check_without_a_product_record_is_an_error(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv(REQUIRE, "1")
+    errors = run(tmp_path)
+    assert any(REQUIRE in e and "product.yaml" in e for e in errors), errors
+
+
+def test_a_required_product_check_with_a_checkout_fails_a_made_up_merge(
+        two_repos: tuple[Path, Path, str, str], monkeypatch: pytest.MonkeyPatch) -> None:
+    """The workflow-sim M3 reproduction with the product checkout CI now has."""
+    control, checkout, _, _ = two_repos
+    complete_phase(control, product_merge="f" * 40)
+    check(control, stamped(phase="build-api", reviewed_commit="a" * 40))
+    monkeypatch.setenv(REQUIRE, "1")
+    assert any("stranded" in e for e in run(control, checkout))
+
+
+def test_a_required_product_check_cannot_pass_when_origin_cannot_be_read(
+        two_repos: tuple[Path, Path, str, str], monkeypatch: pytest.MonkeyPatch) -> None:
+    """Under the requirement, ``cannot tell`` (here: origin unreadable, as with a token that
+    cannot read it) is an error, not a note."""
+    control, checkout, _, _ = two_repos
+    complete_phase(control, product_merge="f" * 40)
+    check(control, stamped(phase="build-api", reviewed_commit="a" * 40))
+    origin = Path(git(checkout, "remote", "get-url", "origin"))
+    for path in sorted(origin.rglob("*"), reverse=True):
+        path.unlink() if path.is_file() else path.rmdir()
+    origin.rmdir()
+    assert run(control, checkout) == []  # a note only, without the requirement
+    monkeypatch.setenv(REQUIRE, "1")
+    errors = run(control, checkout)
+    assert any("cannot tell" in e for e in errors), errors
+
+
+def test_a_required_product_check_passes_a_genuine_merge_commit(
+        two_repos: tuple[Path, Path, str, str], monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str]) -> None:
+    control, checkout, _, tip = two_repos
+    merge = merge_commit(checkout)
+    git(checkout, "push", "-q", "origin", "main")
+    git(checkout, "fetch", "-q", "origin")
+    complete_phase(control, product_merge=merge)
+    check(control, stamped(phase="build-api", reviewed_commit=tip))
+    monkeypatch.setenv(REQUIRE, "1")
+    capsys.readouterr()
+    assert run(control, checkout) == []
+    printed = capsys.readouterr().err
+    assert "not checked" not in printed and "cannot tell" not in printed

@@ -163,8 +163,14 @@ fetched, it prints `cannot tell whether product_merge … landed` instead, which
    merge, and remove its `product_merge`, in one commit directly on the control integration branch. Then rebase the product branch, run the verification, review
    the new `HEAD`, and close the session again.
 
-Without any product checkout on this machine (control CI is one such place) the check cannot test
-landing at all. It still fails a complete phase whose control records do not agree: no passing
+Control CI checks for real: it checks the product repository out with a read-only token and runs
+the check with `IDEA_REALIZATION_REQUIRE_PRODUCT=1`, under which a missing product checkout is an
+error and a `cannot tell` about landing is an error instead of a note. So in CI a `product_merge`
+that does not exist, is not on the integration branch, or is a merge commit whose second parent was
+not reviewed fails the run (the branching and CI guide, section 7).
+
+Without any product checkout on a developer's machine (`product_root` unset) and without that
+requirement, the check cannot test landing at all. It still fails a complete phase whose control records do not agree: no passing
 gating verdict for that phase on the product repository, or a `product_merge` or `reviewed_commit`
 that is not a full commit id. A `product_merge` equal to the reviewed commit (a fast-forward)
 passes. Any other `product_merge` can only be a merge commit whose second parent was reviewed,

@@ -5,17 +5,24 @@
 # Usage:
 #   tools/github/apply_rulesets.sh <owner/repo> <control|product> <main-merger>
 #
-#   control  applies control-dev.json, control-main.json, demo-tags.json
-#   product  applies product-dev.json, product-main.json, demo-tags.json
+#   control  applies control-dev.json, control-main.json, demo-tags-create.json, demo-tags-protect.json
+#   product  applies product-dev.json, product-main.json, demo-tags-create.json, demo-tags-protect.json
 #
-#   <main-merger> is the only actor allowed to merge into main:
+#   <main-merger> is the only actor allowed to merge into main and to create demo-* tags:
 #     user:<login>             one GitHub account (the repository owner)
 #     team:<org>/<team-slug>   a team whose only member is the repository owner
 #   The *-main.json rulesets contain an `update` rule (restrict updates) and an empty bypass list,
 #   so as committed nobody can update main. This script looks up the actor's numeric id and adds
 #   it as the ruleset's single bypass actor with bypass_mode `pull_request`: that actor can merge a
-#   pull request into main and cannot push to it directly; everyone else is refused. The id is
-#   read from GitHub at run time and never written into a tracked file.
+#   pull request into main and cannot push to it directly; everyone else is refused.
+#   demo-tags-create.json contains a `creation` rule (restrict creations) on refs/tags/demo-* and an
+#   empty bypass list. The script adds the same actor as its single bypass actor with bypass_mode
+#   `always`, because GitHub accepts `pull_request` mode only on branch rulesets: that actor can
+#   push a new demo-* tag; everyone else is refused. demo-tags-protect.json (deletion, update,
+#   non_fast_forward) is applied unchanged with no bypass actor, so nobody, the main merger
+#   included, can move or delete a demo-* tag. These are two rulesets because a bypass actor
+#   bypasses every rule in its ruleset; GitHub has no per-rule bypass. The id is read from GitHub
+#   at run time and never written into a tracked file.
 #
 # Before anything reaches GitHub the script checks the target: <owner/repo> must be the repository
 # this machine's configuration names for <kind>, so control rulesets cannot land on the product
@@ -50,8 +57,8 @@ case "$repo" in
 esac
 
 case "$kind" in
-  control) files=(control-dev.json control-main.json demo-tags.json) ;;
-  product) files=(product-dev.json product-main.json demo-tags.json) ;;
+  control) files=(control-dev.json control-main.json demo-tags-create.json demo-tags-protect.json) ;;
+  product) files=(product-dev.json product-main.json demo-tags-create.json demo-tags-protect.json) ;;
   *) echo "error: second argument must be control or product, got '$kind'" >&2; usage ;;
 esac
 
@@ -106,7 +113,7 @@ else
   actor_id="$(gh api "orgs/${actor_ref%%/*}/teams/${actor_ref#*/}" --jq .id)" \
     || { echo "error: team '$actor_ref' not found (it must belong to the organization)" >&2; exit 1; }
 fi
-echo "main merger: $actor_type $actor_ref (id $actor_id), bypass mode pull_request"
+echo "main merger: $actor_type $actor_ref (id $actor_id), bypass mode pull_request on main, always on demo-* tag creation"
 
 # The default branch can only point at a branch that exists.
 for branch in dev main; do
@@ -128,24 +135,31 @@ for file in "${files[@]}"; do
   path="$ruleset_dir/$file"
   [ -f "$path" ] || { echo "error: missing $path" >&2; exit 1; }
   name="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["name"])' "$path")"
+  # The main merger is the only bypass actor on main (pull requests only) and on demo-* tag
+  # creation (`always`: the only mode GitHub accepts on a tag ruleset). Every other ruleset is
+  # sent as committed, with no bypass actor.
   case "$file" in
-    *-main.json)
-      # Add the main merger as the only bypass actor, in a temporary copy of the ruleset.
-      body="$(mktemp)"
-      python3 - "$path" "$actor_type" "$actor_id" > "$body" <<'PY'
+    *-main.json) bypass_mode=pull_request ;;
+    demo-tags-create.json) bypass_mode=always ;;
+    *) bypass_mode="" ;;
+  esac
+  body=""
+  if [ -n "$bypass_mode" ]; then
+    # Add the main merger as the only bypass actor, in a temporary copy of the ruleset.
+    body="$(mktemp)"
+    python3 - "$path" "$actor_type" "$actor_id" "$bypass_mode" > "$body" <<'PY'
 import json
 import sys
 
-path, actor_type, actor_id = sys.argv[1], sys.argv[2], int(sys.argv[3])
+path, actor_type, actor_id, mode = sys.argv[1], sys.argv[2], int(sys.argv[3]), sys.argv[4]
 ruleset = json.load(open(path))
 ruleset["bypass_actors"] = [
-    {"actor_id": actor_id, "actor_type": actor_type, "bypass_mode": "pull_request"}
+    {"actor_id": actor_id, "actor_type": actor_type, "bypass_mode": mode}
 ]
 json.dump(ruleset, sys.stdout, indent=2)
 PY
-      path="$body"
-      ;;
-  esac
+    path="$body"
+  fi
   id="$(gh api "repos/$repo/rulesets?includes_parents=false" --paginate \
         --jq ".[] | select(.name == \"$name\") | .id" | awk 'NR == 1')"
   if [ -n "$id" ]; then
@@ -155,7 +169,7 @@ PY
     id="$(gh api -X POST "repos/$repo/rulesets" --input "$path" --jq .id)"
     echo "created ruleset '$name' (id $id) from $file"
   fi
-  case "$file" in *-main.json) rm -f "$body" ;; esac
+  [ -z "$body" ] || rm -f "$body"
 done
 
 echo "done. Review: gh api repos/$repo/rulesets --jq '.[] | \"\\(.id) \\(.name) \\(.enforcement)\"'"

@@ -3,7 +3,7 @@
   "plugin": "idea-realization",
   "plugin_version": "0.1.0",
   "installed_at": "2026-10-14T23:06:45Z",
-  "updated_at": "2026-10-15T14:31:15Z",
+  "updated_at": "2026-10-15T14:36:09Z",
   "features": [
     "backlog",
     "brain",
@@ -78,7 +78,7 @@
     },
     {
       "path": ".idea-realization/schemas/backlog.schema.json",
-      "sha256": "5b04ebfb508a0658df4423e65b6ad7b43e4f027ba631d04fc258cc6ffdfd2b3d",
+      "sha256": "92fee4d2f8f423a9b8c9311402214768575d82080c7e99d35efdf5e0e986a707",
       "feature": "backlog",
       "owner": "plugin"
     },
@@ -102,13 +102,13 @@
     },
     {
       "path": ".idea-realization/schemas/document.schema.json",
-      "sha256": "7feebf7815a18f4d565c597e26b482c565a9868342af47d292f35294b0a04d69",
+      "sha256": "72817d01e7a1c39133e1f6216f27908922eac94d7adf227f819452fb4663ecae",
       "feature": "documents",
       "owner": "plugin"
     },
     {
       "path": ".idea-realization/schemas/codes.schema.json",
-      "sha256": "565d9592e20d4b71884f0ab6e3a2704189503d1dc59decebfb1002b469f7cd52",
+      "sha256": "a1fea00ca5ae11201a19d4062d07e85723c35917ea84b10c00f62ca36e5f80e0",
       "feature": "documents",
       "owner": "plugin"
     },

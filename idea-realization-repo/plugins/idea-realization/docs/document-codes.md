@@ -18,34 +18,53 @@ allocates from them.
 
 The default register (`templates/codes.yaml`), with locations relative to the document root:
 
-| Series | Kind | Location | Numbering |
-|---|---|---|---|
-| `PLAN` | `plan` | `plans/` | counter, with sub-codes |
-| `REQ` | `requirement` | `requirements/` | counter |
-| `ADR` | `adr` | `decisions/` | counter |
-| `ARCH` | `architecture` | `architecture/` | counter |
-| `PROMPT` | `prompt` | `prompts/` | counter |
-| `OPS` | `operation` | `governance/` (a repository's `codes.yaml` may add more, such as `guides/`) | counter |
-| `GOV` | `governance` | `governance/` | counter |
-| `SESS` | `session` | `sessions/` | dated |
-| `WALK` | `walkthrough` | `sessions/` | dated |
+| Series | Kind | Location | Numbering | Scoped |
+|---|---|---|---|---|
+| `PLAN` | `plan` | `plans/` | counter, with sub-codes | yes |
+| `REQ` | `requirement` | `requirements/` | counter | yes |
+| `ADR` | `adr` | `decisions/` | counter | yes |
+| `ARCH` | `architecture` | `architecture/` | counter | yes |
+| `PROMPT` | `prompt` | `prompts/` | counter | yes |
+| `OPS` | `operation` | `governance/` (a repository's `codes.yaml` may add more, such as `guides/`) | counter | yes |
+| `GOV` | `governance` | `governance/` | counter | no |
+| `SESS` | `session` | `sessions/` | dated | yes |
+| `WALK` | `walkthrough` | `sessions/` | dated | yes |
 
-- A counter code reads `<SERIES>-NNN`, optionally with a sub-code `.NN`.
-- A dated code reads `<SERIES>-YYYY-MM-DD-NN`, and its date equals the document's `created`.
+- A series is scoped unless its register entry says `scoped: false`. A new code in a scoped series
+  carries the allocating developer's handle (`workstreams.md`, "Developers and handles") after the
+  prefix, and its number counts that developer's codes only.
+- A counter code reads `<SERIES>-<handle>-NNN` in a scoped series and `<SERIES>-NNN` in an
+  unscoped one, optionally with a sub-code `.NN`.
+- A dated code reads `<SERIES>-<handle>-YYYY-MM-DD-NN` in a scoped series and
+  `<SERIES>-YYYY-MM-DD-NN` in an unscoped one, and its date equals the document's `created`.
+- A code without a handle in a scoped series was allocated before the series was scoped. It stays
+  valid and permanent (section 5). A code with a handle in an unscoped series fails.
+- A code's handle must be a developer: an `owners` key with `emails` in `systems.yaml`. A
+  developer who leaves the team keeps that entry, or every code carrying their handle fails the
+  check.
+- `GOV` is unscoped because a governance document states a rule for the whole team, written by
+  the repository owner, so its code names no individual. Two `GOV` allocations on separate
+  machines can still collide; the duplicate check finds it and the second to integrate renumbers.
 
 ## 2. Allocation
 
 - A code is allocated with the `next-code` skill (`next-code <kind> [--parent <plan id>]`), which
   prints one code. A code is never chosen by hand or from a directory listing, and the register is
   never edited to take one.
+- In a scoped series, allocation resolves the developer handle with `identity.py` (from
+  `git config user.email`) and refuses, reserving nothing, when none resolves. An unscoped series
+  needs no handle.
 - The next counter code is the highest number among documents, register reservations, retirements
-  and pre-merge reservations, plus one.
+  and pre-merge reservations that carry the same handle (or, in an unscoped series, no handle),
+  plus one.
 - The next sub-code is the parent's highest sub-code plus one. The parent holds a top-level code in
-  a series that allows sub-codes.
-- A dated code takes today's date and the highest same-day sequence plus one, and takes no parent.
-  Dating does not separate developers: two machines that allocate in one series on the same day,
-  from the same integration branch, take the same code, and the second to integrate renumbers
-  (section 5).
+  a series that allows sub-codes, and the sub-code keeps the parent's stem, handle included,
+  whoever allocates it.
+- A dated code takes today's date and the highest same-day sequence for the same handle plus one,
+  and takes no parent.
+- Two developers on separate machines therefore never allocate the same top-level code in a scoped
+  series. Two sub-codes under one parent, or two codes in an unscoped series, allocated on separate
+  machines can still be the same; the second to integrate renumbers (section 5).
 - Allocation takes the code: computing it and holding it are one operation from a peer's point of
   view.
 - Allocation runs only on a clean document tree. On failure nothing is reserved.
@@ -78,7 +97,9 @@ The default register (`templates/codes.yaml`), with locations relative to the do
 - A code is free before merge and permanent after. When two branches carry the same code, whoever
   integrates second allocates again, renames the file and updates every reference.
 - A duplicate code arises only between allocations on different machines, which share no git
-  directory, or from a pre-merge reservation that expired before its document was written.
+  directory, in an unscoped series or under one parent's sub-codes; or from one developer
+  allocating on two machines; or from a pre-merge reservation that expired before its document was
+  written. The duplicate check applies to codes with and without a handle alike.
 - The register is the ledger and the check is the check.
 
 ## 6. Pre-merge reservations
@@ -90,6 +111,9 @@ The default register (`templates/codes.yaml`), with locations relative to the do
 | Made by | A deliberate edit | Every allocation, automatically |
 | Lasts | Until its document is written | Until it expires |
 | Visible | Everywhere the repository is cloned | Every worktree on the machine |
+
+- Pre-merge reservations separate one developer's concurrent worktrees on one machine. The handle
+  in a scoped code separates developers.
 
 - Each allocation creates one file named for the code with an exclusive create
   (`O_CREAT | O_EXCL`). Exactly one racer wins, and the loser tries the next candidate, up to 50

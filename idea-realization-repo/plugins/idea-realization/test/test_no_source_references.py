@@ -33,8 +33,9 @@ SKIP_PARTS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".ve
 PATTERNS: dict[str, re.Pattern[str]] = {
     "confidential directory": re.compile(r"_priv[a]te"),
     "idea id": re.compile(r"(?<![\w.])\d{6}(?![\w.])"),
-    "phase id": re.compile(r"\bphase-[a-z]+-\d+\b"),
-    "document code": re.compile(r"\b(?:PLAN|REQ|ADR|GOV|OPS|PROMPT|SESS|ARCH)-\d"),
+    "phase id": re.compile(r"\bphase-[a-z]+-(?:[a-z][a-z0-9]*-)?\d+\b"),
+    "document code": re.compile(
+        r"\b(?:PLAN|REQ|ADR|GOV|OPS|PROMPT|SESS|ARCH)-(?:[a-z][a-z0-9]*-)?\d"),
     "session record": re.compile(r"\bSESS-"),
     "commit hash": re.compile(r"\b(?=[0-9a-f]*\d)(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b"),
     "calendar date": re.compile(r"\b(?:19|20)\d\d-[01]\d-[0-3]\d\b"),
@@ -204,3 +205,12 @@ def test_plugin_concepts_are_allowed(tmp_path: Path) -> None:
             "Version 0.1.0 of idea-realization.")
     (tmp_path / "sample.md").write_text(text)
     assert scan(tmp_path, {"sample-repo"}) == []
+
+
+@pytest.mark.parametrize(("label", "text"), [
+    ("phase id", "from " + "-".join(["phase", "demo", "ana", "01"])),
+    ("document code", "per " + "-".join(["PLAN", "ana", "004"])),
+])
+def test_scan_catches_a_handle_scoped_instance(tmp_path: Path, label: str, text: str) -> None:
+    (tmp_path / "sample.md").write_text(text)
+    assert label in "\n".join(scan(tmp_path, set())), label

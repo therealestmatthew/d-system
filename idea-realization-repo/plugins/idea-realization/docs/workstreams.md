@@ -51,7 +51,13 @@ most sixteen characters. `uv run plugins/idea-realization/scripts/identity.py` p
 developers working offline never allocate the same one:
 
 - an idea id is `<handle>-NNNNNN`, counting that developer's own ideas;
+- a document code in a scoped series is `<SERIES>-<handle>-NNN` or
+  `<SERIES>-<handle>-YYYY-MM-DD-NN` (`document-codes.md`);
+- a phase id is `phase-<track>-<handle>-<NN>` (`backlog-protocol.md`);
 - a phase claim's agent is `<handle>/agent-<name>`.
+
+Codes and phase ids carry the handle permanently, so a developer who leaves keeps their `owners`
+entry; removing it fails the check on every code and phase id that names them.
 
 ## Claiming and releasing
 

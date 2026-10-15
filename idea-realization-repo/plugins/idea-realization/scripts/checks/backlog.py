@@ -173,6 +173,9 @@ def audit(config: paths.Config, today: date | None = None,
     errors = inspect(root, catalog, scanned.documents, set(scanned.systems),
                      set(scanned.owners), today or date.today(), product_root, note)
     items = {item["id"]: item for item in catalog["items"]}
+    registry = (docs_root / identity.REGISTRY).is_file()
+    errors += backlog.phase_id_errors(items,
+                                      set(identity.developers(docs_root)) if registry else None)
     for warning in backlog.owner_claim_warnings(items, set(identity.developers(docs_root))):
         note(warning)
     record = catalog.get("decision_record")

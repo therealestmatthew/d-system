@@ -208,6 +208,29 @@ Two rules apply to every entry:
 
   Source: `docs/guides/OPS-001-branching-and-ci.md`, section 7.
 
+### Control CI cannot read the product repository
+
+- **Symptom.** In control CI, the `Product repository settings` step fails with "The repository
+  secret PRODUCT_READ_TOKEN is not set" or "The product repository is not named", or the
+  `Check out the product repository (read-only)` step fails with an authentication error, `Bad
+  credentials`, `Repository not found` or `could not read Username`.
+- **Cause.**
+  - The secret `PRODUCT_READ_TOKEN` is not set on the control repository, or the run is a pull
+    request from a fork, which never receives secrets.
+  - Neither the repository variable `PRODUCT_GITHUB` nor `github:` in
+    `.idea-realization/product.yaml` names the product repository.
+  - The token has expired or been revoked, is still pending an organization's approval, or does not
+    include the product repository with Contents read-only. GitHub answers a token that cannot see
+    a private repository with `Repository not found`, not with a permissions error.
+- **Fix.** The owner creates a new token with the settings in `docs/guides/OPS-001-branching-and-ci.md`
+  (section 7), sets it with `gh secret set PRODUCT_READ_TOKEN --repo <org>/<control-repo>`, deletes
+  the old token, and re-runs the job (`gh run rerun <run id>`). For an unnamed product the owner sets
+  `gh variable set PRODUCT_GITHUB --repo <org>/<control-repo> --body <org>/<repo>`. Do not remove
+  the step, unset `IDEA_REALIZATION_REQUIRE_PRODUCT`, or widen the token's permissions. A fork pull
+  request is recreated as a branch in the repository instead.
+
+  Source: `docs/guides/OPS-001-branching-and-ci.md`, section 7.
+
 ### A merge into `main` is refused
 
 - **Symptom.** A pull request from `dev` to `main` cannot be merged, or a push to `main` is
@@ -220,6 +243,27 @@ Two rules apply to every entry:
   `tools/github/apply_rulesets.sh` with the right third argument.
 
   Source: `docs/guides/OPS-001-branching-and-ci.md`, section 9.
+
+### A push of a `demo-*` tag is refused
+
+- **Symptom.** `git push origin demo-rc-<n>` (or `demo-final`) is rejected with a message that the
+  ref is protected by a ruleset (for example "Cannot create ref due to creations being
+  restricted" or "Cannot update this protected ref").
+- **Cause.** Two rulesets cover `refs/tags/demo-*`. `demo-tags-create` restricts creation to the
+  owner, the only bypass actor. `demo-tags-protect` refuses moving or deleting an existing tag for
+  everyone, the owner included.
+- **Fix.**
+  - **You are not the owner:** do not retry and do not push the tag under another name. Ask the
+    owner to create and push it (`OPS-006`, "Release candidate", step 3). Delete your local tag
+    with `git tag -d <tag>` so it does not differ from the one the owner pushes.
+  - **The owner's push of a new tag is refused:** the rulesets were applied without the main
+    merger or with the wrong one. Re-run `tools/github/apply_rulesets.sh` with the right third
+    argument; the bypass list of `demo-tags-create` must show one actor with `bypass_mode`
+    `always`.
+  - **The tag already exists on the remote:** it cannot be moved or deleted. Make the next
+    release candidate, `demo-rc-<n+1>`, instead.
+
+  Source: `docs/guides/OPS-001-branching-and-ci.md`, section 9, "Who creates `demo-*` tags".
 
 ## AWS
 

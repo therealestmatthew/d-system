@@ -149,6 +149,23 @@ def concurrency_errors(items: dict[str, Any], active: list[str], max_active: int
     return errors
 
 
+def phase_id_errors(items: dict[str, Any], developers: set[str] | None) -> list[str]:
+    """A handle-scoped phase id (``phase-<track>-<handle>-NN``) must name a developer.
+
+    ``developers`` is the set of owners with emails in ``systems.yaml``, or None when there is no
+    registry to check against. A phase id without a handle, ``phase-<track>-NN``, names nobody and
+    is not checked here. The schema has already fixed the id's shape, so the handle is the third
+    hyphen-separated part whenever there are four.
+    """
+    errors = []
+    for key in sorted(items):
+        parts = key.split("-")
+        if developers is not None and len(parts) == 4 and parts[2] not in developers:
+            errors.append(f"{key}: handle {parts[2]} is not a developer (an owner with emails) "
+                          "in systems.yaml")
+    return errors
+
+
 def owner_claim_warnings(items: dict[str, Any], developers: set[str]) -> list[str]:
     """Active phases assigned to one developer and claimed by another; warnings, never errors.
 

@@ -57,9 +57,10 @@ RESERVATION_DIR = "code-reservations"
 #: only ever collects reservations whose session ended without writing one.
 TTL_SECONDS = 14 * 24 * 60 * 60
 
-#: Codes are ``[A-Z]+`` plus digits, dots and hyphens, so they are already safe as filenames.
+#: Codes are ``[A-Z]+``, an optional lower-case developer handle, digits, dots and hyphens, so
+#: they are already safe as filenames.
 #: This is asserted rather than assumed: a code that fails it would escape the directory.
-_SAFE = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.")
+_SAFE = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.")
 
 
 def _common_dir(root: Path) -> Path:

@@ -55,7 +55,8 @@ concurrent sessions read before claiming. The queue at its front (`next_up`) ove
 **The document root** — Governed documents carry YAML front matter with a code. Each document
 kind has a series in `codes.yaml`, which fixes its code prefix, its numbering (a counter, or the
 document's date plus a same-day sequence) and the folders it may live in. A code is allocated
-with `next-code`, never chosen by hand, and a counter code's file name starts with it. A plan
+with `next-code`, never chosen by hand, and a code's file name starts with it. Most series put
+the allocating developer's handle in the code (`document-codes.md`). A plan
 that spans several files lives in a folder named for its code, with child plans taking dotted
 sub-codes. `systems.yaml` names the independently changeable parts of the repository and the
 owners accountable for them; documents and phases refer to both. `catalog.md` is generated and
@@ -82,7 +83,10 @@ document receive different codes before either merges.
 
 ## Phase ids
 
-A phase id is `phase-<track>-<NN>`: a short lowercase track prefix naming the stream of work, and
-a two-digit sequence within that track, allocated by hand as the next unused number. Keep a table
+A phase id is `phase-<track>-<handle>-<NN>`: a short lowercase track prefix naming the stream of
+work, the handle of the developer who adds the phase, and a two-digit sequence counting that
+developer's phases in the track, allocated by hand as the next unused number. The handle keeps two
+developers adding phases to one track offline from choosing the same id. Ids without a handle,
+written before handles, stay valid. Keep a table
 of tracks, each with a one-line description, in a README beside the backlog, so a reader can tell
 what a track prefix means without opening a plan.

@@ -120,7 +120,9 @@ For each demo release:
    owner merges it with a merge commit. In the
    product repository the `verify` check must pass first. Only the owner can merge into `main`;
    GitHub refuses the merge for anyone else (section 9, "Who merges to `main`").
-2. Tag the merge on `main` with an annotated tag: `demo-rc-<n>`, counting up from 1.
+2. The owner tags the merge on `main` with an annotated tag: `demo-rc-<n>`, counting up from 1.
+   Only the owner can create `demo-*` tags; GitHub refuses the push for anyone else (section 9,
+   "Who creates `demo-*` tags").
 
    ```bash
    git fetch origin
@@ -133,8 +135,8 @@ For each demo release:
 Tag the control repository's `main` with the same name at the same time, so the two repositories
 can be matched to each other.
 
-`demo-*` tags cannot be moved or deleted once pushed (the `demo-tags` ruleset). If a tag is wrong,
-make a new release candidate with the next number.
+`demo-*` tags cannot be moved or deleted once pushed, by anyone, the owner included (the
+`demo-tags-protect` ruleset). If a tag is wrong, make a new release candidate with the next number.
 
 **Rollback:** redeploy the previous `demo-rc-<n>` tag with the `aws-deploy` agent. Do not move or
 delete tags and do not rewrite `main`.
@@ -162,15 +164,29 @@ Steps, in order:
 | Install | `astral-sh/setup-uv` with Python 3.12, cache keyed on `uv.lock`; `uv sync --locked --extra dev` |
 | Lint | `uv run ruff check tools/ test/` |
 | Doctor | `uv run plugins/idea-realization/scripts/doctor.py` |
-| Repository check | `uv run plugins/idea-realization/scripts/check.py` |
+| Product repository settings | fails without `PRODUCT_READ_TOKEN` or a product slug; reads the product integration branch from `.idea-realization/product.yaml` |
+| Product checkout | `actions/checkout` of the product repository with `PRODUCT_READ_TOKEN`, `fetch-depth: 0`, moved to `$RUNNER_TEMP/product` |
+| Repository check | `product.py verify`, then `check.py`, with `IDEA_REALIZATION_REQUIRE_PRODUCT=1` |
 | Folder tests | `uv run pytest -q test` |
 | Plugin tests | `uv run pytest -q`, from `plugins/idea-realization/` |
 | Private-content check | `uv run python tools/check_confidential.py` with the deny-list |
 
 Doctor and check run with `IDEA_REALIZATION_ROOT=$GITHUB_WORKSPACE`, so the scripts resolve this
 checkout. The test steps run without it: the plugin tests build temporary repositories and fail
-when that variable points them at the checkout. No product root is configured in CI, so the product
-checks are skipped by design.
+when that variable points them at the checkout.
+
+The repository check verifies product merges against the product repository itself. CI checks the
+product repository out read-only (full history, all branches, credentials not kept in its git
+config), moves it to `$RUNNER_TEMP/product` because `product_root` must be outside the control
+checkout, and runs the check with `IDEA_REALIZATION_PRODUCT_ROOT` and
+`IDEA_REALIZATION_PRODUCT_REMOTE` (`https://github.com/<org>/<repo>`, the origin `actions/checkout`
+sets) pointing at it. `product.py verify` runs first, so a checkout whose origin does not match fails
+the step. `IDEA_REALIZATION_REQUIRE_PRODUCT=1` makes the reviews check fail when no product checkout
+is configured, and makes a `cannot tell` about whether a `product_merge` landed an error instead of
+a note, so CI never passes a completion it did not check: a made-up `product_merge` fails as
+stranded, and a merge commit whose second parent was not reviewed fails. In that one step the token
+is also given to git as an HTTP header for the reviews check's `git ls-remote` of the product's
+origin.
 
 There is no scaffold step. A fresh checkout has no `.idea-realization/staging/` directory, because
 it is gitignored; doctor reports it as `absent` and does not fail on it. Running the scaffold in CI
@@ -187,6 +203,39 @@ The owner sets the secret once in each repository:
 gh secret set DENY_LIST --repo <org>/<control-repo> < .private/deny-list.txt
 gh secret set DENY_LIST --repo <org>/<product-repo> < .private/deny-list.txt
 ```
+
+The product checkout needs the repository secret `PRODUCT_READ_TOKEN` and the product's name on
+GitHub. **A missing token fails the run**, as a missing `DENY_LIST` does: a run that could not read
+the product repository has not shown that the recorded merges are real. A pull request from a fork
+gets no secrets, so its run fails at this step too.
+
+- **The token.** A fine-grained personal access token, or a GitHub App installation token, that can
+  read the product repository and nothing else:
+  - resource owner: the organization (or user) that owns the product repository; an organization
+    that requires approval of fine-grained tokens holds it as pending until an administrator
+    approves it;
+  - repository access: **Only select repositories**, with the product repository as the only one;
+  - repository permissions: **Contents: Read-only**. GitHub adds **Metadata: Read-only** itself as
+    mandatory. Grant nothing else: no write permission, no other repository, no account or
+    organization permission;
+  - expiration: a date, at most 366 days ahead (an organization policy can set a shorter maximum).
+  For a GitHub App the same holds: installed on the product repository only, with Contents
+  read-only and Metadata read-only.
+- **Who creates and rotates it.** The repository owner. Before the token expires, the owner creates
+  a new one with the same settings, replaces the secret, and deletes the old token. An expired
+  token fails the `Check out the product repository` step (`docs/guides/OPS-008-troubleshooting.md`).
+- **Where it is set.** As a GitHub Actions secret on the control repository, never in a file:
+
+  ```bash
+  gh secret set PRODUCT_READ_TOKEN --repo <org>/<control-repo>
+  ```
+
+  `gh` prompts for the value, so it is not left in the shell history.
+- **The product's name.** The repository variable `PRODUCT_GITHUB` on the control repository, as
+  `<org>/<repo>`: `gh variable set PRODUCT_GITHUB --repo <org>/<control-repo> --body <org>/<repo>`.
+  When it is unset the workflow uses `product_github` as `paths.py` resolves it, which in CI is the
+  `github:` field of `.idea-realization/product.yaml`. A team whose organization name must not be
+  tracked uses the variable. Neither set fails the run.
 
 The control job is not a required check: bookkeeping commits go to `dev` directly and must not wait
 for CI. A red run on `dev` or `main` is an alarm; fix it forward with a new commit.
@@ -208,11 +257,12 @@ Branch and tag protection is defined as GitHub repository rulesets in `.github/r
 | `control-main.json` | control | `main` | block force-push and deletion; restrict updates (only the main merger); pull request required, 0 approvals, merge commit only |
 | `product-dev.json` | product | `dev` | block force-push and deletion; pull request required, 0 approvals, merge commit only; required check `verify` |
 | `product-main.json` | product | `main` | same as `product-dev.json`, plus restrict updates (only the main merger) |
-| `demo-tags.json` | both | tags `demo-*` | block deletion, update and force-push |
+| `demo-tags-create.json` | both | tags `demo-*` | restrict creations (only the main merger) |
+| `demo-tags-protect.json` | both | tags `demo-*` | block deletion, update and force-push; no bypass actor |
 
 No ruleset requires linear history, because merges are merge commits. The bypass list is empty in
-every ruleset file; the apply script adds the main merger to the two `*-main.json` rulesets when it
-applies them, and nothing else has a bypass actor. The required check does not require the branch to be up to date with `dev`
+every ruleset file; the apply script adds the main merger to the two `*-main.json` rulesets and to
+`demo-tags-create.json` when it applies them, and nothing else has a bypass actor. The required check does not require the branch to be up to date with `dev`
 (`strict_required_status_checks_policy: false`): updating the branch would change its head and
 break `--match-head-commit <reviewed_commit>`. Session-close rebases onto `origin/dev` before the
 review instead.
@@ -282,3 +332,33 @@ the script runs. No account or team name is written into this repository.
 
 What this does not stop: an organization owner or repository administrator can edit or delete the
 ruleset itself. That is a GitHub limit; keep the administrator role to the owner.
+
+### Who creates `demo-*` tags
+
+Only the main merger (the owner) creates `demo-*` tags, in both repositories, and nobody can move or
+delete one:
+
+- `demo-tags-create.json` carries the `creation` rule ("Restrict creations") on `refs/tags/demo-*`.
+  The apply script puts the main merger on its bypass list with bypass mode `always`. GitHub accepts
+  bypass mode `pull_request` only on branch rulesets, and a tag is pushed, not merged, so `always`
+  is the mode that lets the owner push a new tag. Everyone else's tag push is refused.
+- `demo-tags-protect.json` carries the `deletion`, `update` and `non_fast_forward` rules on the same
+  tags and has no bypass actor, so the owner cannot move or delete a tag either.
+- They are two rulesets because a bypass actor bypasses every rule in its ruleset; GitHub has no
+  per-rule bypass. One ruleset with the owner on its bypass list would let the owner move and delete
+  `demo-*` tags.
+- As committed, the bypass list of `demo-tags-create.json` is empty, so applying it by hand
+  (without the script) leaves `demo-*` tag creation closed to everyone until the script is run.
+
+To confirm, after the script has run: the bypass list of `demo-tags-create` prints one actor with
+`bypass_mode` `always`, and that of `demo-tags-protect` prints `[]`:
+
+```bash
+gh api repos/<org>/<control-repo>/rulesets/<id of demo-tags-create> --jq '.bypass_actors'
+gh api repos/<org>/<control-repo>/rulesets/<id of demo-tags-protect> --jq '.bypass_actors'
+```
+
+A repository the earlier version of the script was applied to also has a ruleset named `demo-tags`
+(deletion, update and force-push protection, no bypass actor). The script matches rulesets by name,
+so it does not update or remove it. It protects the same tags the same way as `demo-tags-protect`
+and does no harm; the owner may delete it in the repository's ruleset settings.

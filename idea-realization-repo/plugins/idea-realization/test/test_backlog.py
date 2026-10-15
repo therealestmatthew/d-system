@@ -720,3 +720,50 @@ def test_without_the_documents_feature_phases_resolve_against_nothing(tmp_path: 
     errors = feature.audit(only, today=TODAY, note=notes.append)
     assert any("unknown owner repository-owner" in error for error in errors), errors
     assert any("primary plan must reference a plan document" in error for error in errors)
+
+
+# --- Handle-scoped phase ids ----------------------------------------------------------------
+#
+# A phase id is chosen by hand as the next unused number in its track, so two developers adding
+# to one track offline pick the same id. ``phase-<track>-<handle>-NN`` counts per developer;
+# ``phase-<track>-NN`` ids written before the change stay valid.
+
+
+def scoped_phase(track: str, handle: str, number: int) -> str:
+    return f"{PH}-{track}-{handle}-{number:02d}"
+
+
+def test_a_handle_scoped_phase_id_is_accepted_beside_a_legacy_one(backlog_repo: Any) -> None:
+    catalog = backlog_repo[1]
+    ana = scoped_phase("demo", "ana", 1)
+    catalog["items"].append(phase(id=ana, depends_on=[f"{PH}-demo-01"]))
+    catalog["items"].append(phase(id=scoped_phase("demo", "ben", 1), depends_on=[ana]))
+    catalog["next_up"] = [ana]
+    assert check(backlog_repo) == []
+
+
+@pytest.mark.parametrize("value", [
+    f"{PH}-demo-Ana-01", f"{PH}-demo-ana-1", f"{PH}-demo-1ana-01", f"{PH}-demo-ana-ben-01",
+    f"{PH}-demo-{'a' * 17}-01",
+])
+def test_a_malformed_handle_scoped_phase_id_is_refused(backlog_repo: Any, value: str) -> None:
+    backlog_repo[1]["items"][0]["id"] = value
+    assert any("does not match" in error for error in check(backlog_repo)), check(backlog_repo)
+
+
+def test_a_duplicate_handle_scoped_phase_id_is_refused(backlog_repo: Any) -> None:
+    catalog = backlog_repo[1]
+    catalog["items"] += [phase(id=scoped_phase("demo", "ana", 1)),
+                         phase(id=scoped_phase("demo", "ana", 1))]
+    assert any("duplicate phase ID" in error for error in check(backlog_repo))
+
+
+def test_a_phase_id_handle_must_be_a_developer() -> None:
+    from backlog import phase_id_errors
+
+    items = {key: {"id": key} for key in
+             (f"{PH}-demo-01", scoped_phase("demo", "ana", 1), scoped_phase("demo", "zed", 1))}
+    assert phase_id_errors(items, {"ana"}) == [
+        f"{scoped_phase('demo', 'zed', 1)}: handle zed is not a developer (an owner with "
+        "emails) in systems.yaml"]
+    assert phase_id_errors(items, None) == []

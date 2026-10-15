@@ -341,7 +341,9 @@ def scan(config: paths.Config, today: date | None = None) -> Scan:
             **meta, "path": location, "location": _relative(docs_root, path),
         }
     _check_references(result)
-    result.errors.extend(codes.inspect_codes(result.register, result.documents))
+    developers = {key for key, value in result.owners.items()
+                  if isinstance(value, dict) and value.get("emails")}
+    result.errors.extend(codes.inspect_codes(result.register, result.documents, developers))
     result.errors = sorted(result.errors)
     return result
 

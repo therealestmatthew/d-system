@@ -2,6 +2,10 @@ schema_version: 1
 # The code register. Series definitions are the only source of truth for prefix, numbering and
 # location; locations are relative to the document root. Never edit a code into a document by
 # hand: allocate it with the next-code command.
+# Every series is scoped unless it says scoped: false: a new code carries the allocating
+# developer's handle after the prefix and numbers per handle, so developers on separate
+# machines never take the same code. Codes without a handle stay valid. Governance is
+# unscoped because its rules are the team's, written by the repository owner.
 series:
 - code: PLAN
   kind: plan
@@ -46,6 +50,7 @@ series:
   - governance/
   numbering: counter
   sub_codes: false
+  scoped: false
 - code: SESS
   kind: session
   locations:

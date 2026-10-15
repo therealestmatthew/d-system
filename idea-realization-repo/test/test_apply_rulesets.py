@@ -3,6 +3,7 @@ machine's configuration names for that kind, with a fake `gh` on PATH and a temp
 
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
@@ -17,8 +18,17 @@ CONTROL = "team-org/control-repo"
 PRODUCT = "team-org/product-repo"
 
 FAKE_GH = """#!/usr/bin/env bash
-# Records every call, one line each, and answers the calls apply_rulesets.sh makes.
+# Records every call, one line each, and answers the calls apply_rulesets.sh makes. The body of
+# every ruleset sent with --input is appended, one JSON document per line, to $GH_BODIES.
 printf '%s\\n' "$*" >> "$GH_LOG"
+prev=""
+for arg in "$@"; do
+  if [ "$prev" = "--input" ]; then
+    python3 -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1]))))' "$arg" \\
+      >> "$GH_BODIES"
+  fi
+  prev="$arg"
+done
 case "$*" in
   "auth status") exit 0 ;;
   "api users/"*) echo 4242 ;;
@@ -50,6 +60,7 @@ def machine(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     gh.chmod(0o755)
     monkeypatch.setenv("PATH", f"{bin_dir}{os.pathsep}{os.environ['PATH']}")
     monkeypatch.setenv("GH_LOG", str(tmp_path / "gh.log"))
+    monkeypatch.setenv("GH_BODIES", str(tmp_path / "gh-bodies.jsonl"))
     monkeypatch.setenv("IDEA_REALIZATION_ROOT", str(root))
     return root
 
@@ -69,6 +80,14 @@ def run(*args: str) -> subprocess.CompletedProcess[str]:
 def gh_calls() -> list[str]:
     log = Path(os.environ["GH_LOG"])
     return log.read_text(encoding="utf-8").splitlines() if log.exists() else []
+
+
+def sent_rulesets() -> dict[str, dict]:
+    """Every ruleset body sent to gh, by ruleset name."""
+    log = Path(os.environ["GH_BODIES"])
+    lines = log.read_text(encoding="utf-8").splitlines() if log.exists() else []
+    bodies = [json.loads(line) for line in lines]
+    return {body["name"]: body for body in bodies}
 
 
 def test_the_matching_repository_and_kind_are_applied(machine: Path) -> None:
@@ -141,3 +160,56 @@ def test_shellcheck_is_clean() -> None:
         pytest.skip("shellcheck is not installed")
     result = subprocess.run(["shellcheck", str(SCRIPT)], capture_output=True, text=True)
     assert result.returncode == 0, result.stdout
+
+
+@pytest.mark.parametrize(("kind", "repo"), [("control", CONTROL), ("product", PRODUCT)])
+def test_each_kind_sends_its_branch_rulesets_and_both_demo_tag_rulesets(
+        machine: Path, kind: str, repo: str) -> None:
+    both_named(machine)
+    result = run(repo, kind, "user:owner")
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert sorted(sent_rulesets()) == sorted(
+        [f"{kind}-dev", f"{kind}-main", "demo-tags-create", "demo-tags-protect"])
+
+
+@pytest.mark.parametrize(("merger", "actor"), [
+    ("user:owner", {"actor_id": 4242, "actor_type": "User", "bypass_mode": "always"}),
+    ("team:team-org/owners", {"actor_id": 4343, "actor_type": "Team", "bypass_mode": "always"}),
+])
+def test_only_the_main_merger_may_create_demo_tags(
+        machine: Path, merger: str, actor: dict) -> None:
+    both_named(machine)
+    result = run(CONTROL, "control", merger)
+    assert result.returncode == 0, result.stdout + result.stderr
+    create = sent_rulesets()["demo-tags-create"]
+    assert create["target"] == "tag"
+    assert create["conditions"]["ref_name"]["include"] == ["refs/tags/demo-*"]
+    assert [rule["type"] for rule in create["rules"]] == ["creation"]
+    assert create["bypass_actors"] == [actor]
+
+
+def test_nobody_may_move_or_delete_demo_tags(machine: Path) -> None:
+    both_named(machine)
+    result = run(CONTROL, "control", "user:owner")
+    assert result.returncode == 0, result.stdout + result.stderr
+    protect = sent_rulesets()["demo-tags-protect"]
+    assert protect["target"] == "tag"
+    assert protect["conditions"]["ref_name"]["include"] == ["refs/tags/demo-*"]
+    assert sorted(rule["type"] for rule in protect["rules"]) == [
+        "deletion", "non_fast_forward", "update"]
+    assert protect["bypass_actors"] == []
+
+
+def test_the_main_merger_bypasses_main_through_pull_requests_only(machine: Path) -> None:
+    both_named(machine)
+    result = run(CONTROL, "control", "user:owner")
+    assert result.returncode == 0, result.stdout + result.stderr
+    sent = sent_rulesets()
+    assert sent["control-main"]["bypass_actors"] == [
+        {"actor_id": 4242, "actor_type": "User", "bypass_mode": "pull_request"}]
+    assert sent["control-dev"]["bypass_actors"] == []
+
+
+def test_no_committed_ruleset_names_a_bypass_actor() -> None:
+    for path in sorted((IRR / ".github" / "rulesets").glob("*.json")):
+        assert json.loads(path.read_text(encoding="utf-8"))["bypass_actors"] == [], path.name

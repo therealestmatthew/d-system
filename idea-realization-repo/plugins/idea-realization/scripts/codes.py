@@ -6,8 +6,15 @@
 
 Two numbering modes exist. Counter series take the next free three-digit number in the series,
 with an optional ``.NN`` sub-code under a parent plan; dated series derive their code from the
-document's own date plus a same-day sequence, so kinds written by several sessions at once never
-contend on one counter.
+document's own date plus a same-day sequence.
+
+A scoped series (every series unless its register entry says ``scoped: false``) puts the
+allocating developer's handle after the prefix, ``<SERIES>-<handle>-NNN`` or
+``<SERIES>-<handle>-YYYY-MM-DD-NN``, and numbers per handle, so two developers allocating on
+separate machines, which share no reservation, never take the same code. The handle is the one
+``identity.py`` resolves; allocation in a scoped series refuses without one. Codes without a
+handle, written before a series was scoped, stay valid. In an unscoped series a code carries no
+handle. A sub-code follows its parent's stem, handle included, whoever allocates it.
 
 Run directly, this script is the ``next-code`` command: it scans the document root, then
 allocates the next free code for a kind and holds it with a pre-merge reservation (see
@@ -15,7 +22,7 @@ allocates the next free code for a kind and holds it with a pre-merge reservatio
 merges receive different codes. Never choose a code by hand.
 
 Exit codes: 0 with the code printed; 1 when the document tree fails its check or no code can be
-allocated; 2 on a usage error.
+allocated, including a scoped series when no developer handle resolves; 2 on a usage error.
 """
 
 from __future__ import annotations
@@ -32,9 +39,14 @@ from typing import Any
 import paths
 import reservations
 
-COUNTER = re.compile(r"^(?P<series>[A-Z]+)-(?P<number>[0-9]{3})(?:\.(?P<sub>[0-9]{2}))?$")
+#: The optional developer handle after the series prefix. Same grammar as ``identity.py``'s.
+_HANDLE = r"(?:(?P<handle>[a-z][a-z0-9]{0,15})-)?"
+COUNTER = re.compile(
+    rf"^(?P<series>[A-Z]+)-{_HANDLE}(?P<number>[0-9]{{3}})(?:\.(?P<sub>[0-9]{{2}}))?$"
+)
 DATED = re.compile(
-    r"^(?P<series>[A-Z]+)-(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})-(?P<sequence>[0-9]{2})$"
+    rf"^(?P<series>[A-Z]+)-{_HANDLE}(?P<date>[0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})"
+    r"-(?P<sequence>[0-9]{2})$"
 )
 
 #: How many candidates an allocation tries before giving up. Each failed pass means a peer took
@@ -46,18 +58,21 @@ def parse_code(value: str) -> dict[str, Any] | None:
     """Split a code into its parts, or return None when it matches no grammar."""
     match = COUNTER.match(value)
     if match:
+        scope = f"{match['handle']}-" if match["handle"] else ""
         return {
             "series": match["series"],
             "numbering": "counter",
+            "handle": match["handle"],
             "number": int(match["number"]),
             "sub": int(match["sub"]) if match["sub"] else None,
-            "stem": f"{match['series']}-{match['number']}",
+            "stem": f"{match['series']}-{scope}{match['number']}",
         }
     match = DATED.match(value)
     if match:
         return {
             "series": match["series"],
             "numbering": "dated",
+            "handle": match["handle"],
             "date": match["date"],
             "sequence": int(match["sequence"]),
             "stem": value,
@@ -67,6 +82,11 @@ def parse_code(value: str) -> dict[str, Any] | None:
 
 def series_by_kind(register: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {entry["kind"]: entry for entry in register["series"]}
+
+
+def is_scoped(series: dict[str, Any]) -> bool:
+    """Whether new codes in this series carry the allocating developer's handle (default yes)."""
+    return bool(series.get("scoped", True))
 
 
 def held_codes(register: dict[str, Any]) -> dict[str, str]:
@@ -95,11 +115,14 @@ def next_code(
     parent: str | None = None,
     today: date | None = None,
     reserved: set[str] | None = None,
+    handle: str | None = None,
 ) -> str:
     """The next free code for a kind, treating pre-merge reservations as already spent.
 
     Pure in its arguments; the caller reads the reservation store and passes ``reserved`` in.
-    Without it, two worktrees calling this before either merges get the same answer.
+    Without it, two worktrees calling this before either merges get the same answer. ``handle``
+    is the allocating developer's; a scoped series refuses a top-level code without one and
+    counts only that handle's codes. An unscoped series ignores it.
     """
     series = series_by_kind(register).get(kind)
     if not series:
@@ -108,18 +131,24 @@ def next_code(
         parsed for value in allocated(register, documents, reserved)
         if (parsed := parse_code(value))
     ]
-    mine = [parsed for parsed in spent if parsed["series"] == series["code"]]
+    in_series = [parsed for parsed in spent if parsed["series"] == series["code"]]
+    owner = handle if is_scoped(series) else None
+    if is_scoped(series) and not parent and not owner:
+        raise ValueError(f"{series['code']} codes carry the allocating developer's handle, and "
+                         "none was resolved")
+    prefix = f"{series['code']}-{owner}-" if owner else f"{series['code']}-"
+    mine = [parsed for parsed in in_series if parsed["handle"] == owner]
 
     if series["numbering"] == "dated":
         if parent:
             raise ValueError(f"{series['code']} is a dated series and takes no parent")
         stamp = (today or date.today()).isoformat()
         used = {parsed["sequence"] for parsed in mine if parsed["date"] == stamp}
-        return f"{series['code']}-{stamp}-{max(used, default=0) + 1:02d}"
+        return f"{prefix}{stamp}-{max(used, default=0) + 1:02d}"
 
     if not parent:
         used = {parsed["number"] for parsed in mine}
-        return f"{series['code']}-{max(used, default=0) + 1:03d}"
+        return f"{prefix}{max(used, default=0) + 1:03d}"
 
     if not series["sub_codes"]:
         raise ValueError(f"{series['code']} does not allow sub-codes")
@@ -130,7 +159,7 @@ def next_code(
     if not stem or stem["numbering"] != "counter" or stem["sub"] is not None:
         raise ValueError(f"{parent} does not hold a top-level {series['code']} code")
     used = {
-        parsed["sub"] for parsed in mine
+        parsed["sub"] for parsed in in_series
         if parsed["stem"] == stem["stem"] and parsed["sub"] is not None
     }
     return f"{stem['stem']}.{max(used, default=0) + 1:02d}"
@@ -195,8 +224,14 @@ def naming_errors(
     return errors
 
 
-def inspect_codes(register: dict[str, Any], documents: dict[str, Any]) -> list[str]:
-    """Check every document's code against the register, its kind, its path and its parent."""
+def inspect_codes(
+    register: dict[str, Any], documents: dict[str, Any], developers: set[str] | None = None
+) -> list[str]:
+    """Check every document's code against the register, its kind, its path and its parent.
+
+    ``developers`` is the set of developer handles (owners with emails in ``systems.yaml``); a
+    code's handle must be one of them. None skips that check, for a tree with no registry.
+    """
     errors: list[str] = []
     series_index = series_by_kind(register)
     held = held_codes(register)
@@ -224,6 +259,11 @@ def inspect_codes(register: dict[str, Any], documents: dict[str, Any]) -> list[s
         if parsed["numbering"] != series["numbering"]:
             errors.append(f"{path}: {series['code']} uses {series['numbering']} numbering")
             continue
+        if parsed["handle"] and not is_scoped(series):
+            errors.append(f"{path}: {series['code']} codes carry no handle, not {code}")
+        elif parsed["handle"] and developers is not None and parsed["handle"] not in developers:
+            errors.append(f"{path}: handle {parsed['handle']} is not a developer (an owner with "
+                          "emails) in systems.yaml")
         if code in seen:
             errors.append(f"{path}: duplicate code {code}, already held by {seen[code]}")
         seen[code] = path
@@ -266,14 +306,17 @@ def parent_errors(
     return [] if key != meta.get("parent") else [f"{path}: document is its own parent"]
 
 
-def catalog_key(meta: dict[str, Any]) -> tuple[int, str, str, int, str]:
-    """Order documents by series, then number or date, then sub-code."""
+def catalog_key(meta: dict[str, Any]) -> tuple[int, str, str, str, int, str]:
+    """Order documents by series, then handle (codes without one first), then number or date,
+    then sub-code."""
     parsed = parse_code(meta["code"]) if meta.get("code") else None
     if not parsed:
-        return (1, "", "", 0, meta["path"])
+        return (1, "", "", "", 0, meta["path"])
+    scope = parsed["handle"] or ""
     if parsed["numbering"] == "counter":
-        return (0, parsed["series"], f"{parsed['number']:03d}", parsed["sub"] or 0, meta["path"])
-    return (0, parsed["series"], parsed["date"], parsed["sequence"], meta["path"])
+        return (0, parsed["series"], scope, f"{parsed['number']:03d}", parsed["sub"] or 0,
+                meta["path"])
+    return (0, parsed["series"], scope, parsed["date"], parsed["sequence"], meta["path"])
 
 
 def render_catalog(
@@ -360,6 +403,7 @@ def allocate(
     documents: dict[str, Any],
     parent: str | None = None,
     today: date | None = None,
+    handle: str | None = None,
 ) -> str:
     """Allocate a code and hold it against peers before returning it.
 
@@ -371,7 +415,7 @@ def allocate(
     reservations.prune(root)
     for _ in range(RESERVATION_ATTEMPTS):
         code = next_code(kind, register, documents, parent, today,
-                         reserved=reservations.active(root))
+                         reserved=reservations.active(root), handle=handle)
         if reservations.reserve(root, code):
             return code
     raise ValueError(
@@ -393,6 +437,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     paths.add_arguments(parser, ["docs_root", "exempt_files", "backlog_path"])
     args = parser.parse_args(argv)
     import documents  # the document scan imports this module, so it is loaded on use
+    import identity
 
     config = paths.resolve(args)
     scan = documents.scan(config)
@@ -402,9 +447,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         print("fix the document tree before allocating a code", file=sys.stderr)
         return 1
     try:
-        print(allocate(config.root, args.kind, scan.register, scan.documents, args.parent))
+        developer, unresolved = identity.handle(config), None
+    except identity.IdentityError as exc:
+        developer, unresolved = None, exc
+    try:
+        print(allocate(config.root, args.kind, scan.register, scan.documents, args.parent,
+                       handle=developer))
     except ValueError as exc:
         print(exc, file=sys.stderr)
+        if unresolved:
+            print(f"the handle did not resolve: {unresolved}", file=sys.stderr)
         return 1
     except subprocess.CalledProcessError:
         print(f"{config.root} is not inside a git repository", file=sys.stderr)

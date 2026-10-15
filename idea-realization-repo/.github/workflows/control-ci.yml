@@ -46,13 +46,73 @@ jobs:
           IDEA_REALIZATION_ROOT: ${{ github.workspace }}
         run: uv run plugins/idea-realization/scripts/doctor.py
 
-      # No product root is configured in CI, so the product checks cannot run here: the reviews
-      # check prints "product_merge ... not checked" for each complete phase, and those lines
-      # do not fail the run.
+      # The repository check verifies each complete phase's product_merge against the product
+      # repository itself, so CI checks the product out read-only. Two settings, both on this
+      # control repository (docs/guides/OPS-001-branching-and-ci.md, "Secrets"):
+      #   - secret PRODUCT_READ_TOKEN: a token that can only read the product repository;
+      #   - variable PRODUCT_GITHUB: the product repository as <org>/<repo>. When unset, the
+      #     product_github configured in .idea-realization/product.yaml (github:) is used.
+      # Without either the run fails, as with DENY_LIST: a run that could not read the product
+      # repository has not shown that the recorded merges are real. A pull request from a fork
+      # gets no secrets, so it fails here too.
+      - name: Product repository settings
+        id: product
+        env:
+          IDEA_REALIZATION_ROOT: ${{ github.workspace }}
+          IDEA_REALIZATION_PRODUCT_GITHUB: ${{ vars.PRODUCT_GITHUB }}
+          PRODUCT_READ_TOKEN: ${{ secrets.PRODUCT_READ_TOKEN }}
+        run: |
+          if [ -z "$PRODUCT_READ_TOKEN" ]; then
+            echo "::error::The repository secret PRODUCT_READ_TOKEN is not set (a pull request from a fork never receives it). The repository owner creates a read-only token for the product repository and sets it: gh secret set PRODUCT_READ_TOKEN. See docs/guides/OPS-001-branching-and-ci.md."
+            exit 1
+          fi
+          github=$(uv run plugins/idea-realization/scripts/paths.py | sed -n 's/^product_github: //p')
+          if [ -z "$github" ]; then
+            echo "::error::The product repository is not named. Set the repository variable PRODUCT_GITHUB to <org>/<repo> (gh variable set PRODUCT_GITHUB --body <org>/<repo>), or github: in .idea-realization/product.yaml."
+            exit 1
+          fi
+          branch=$(uv run python -c 'import yaml; print(yaml.safe_load(open(".idea-realization/product.yaml", encoding="utf-8"))["integration_branch"])')
+          echo "github=$github" >> "$GITHUB_OUTPUT"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
+      # Full history of every branch, so the reviews check can read a merge commit's parents and
+      # whether it is on the integration branch. persist-credentials is off: the token is not
+      # left in the checkout's git config for the steps that follow.
+      - name: Check out the product repository (read-only)
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ steps.product.outputs.github }}
+          ref: ${{ steps.product.outputs.branch }}
+          token: ${{ secrets.PRODUCT_READ_TOKEN }}
+          fetch-depth: 0
+          persist-credentials: false
+          path: .product-checkout
+
+      # actions/checkout only writes under the workspace, and product_root must be outside the
+      # control checkout (paths.py), so the checkout moves to the runner's temporary directory.
+      - name: Move the product checkout out of the control checkout
+        run: mv "$GITHUB_WORKSPACE/.product-checkout" "$RUNNER_TEMP/product"
+
+      # IDEA_REALIZATION_REQUIRE_PRODUCT makes a missing product checkout, or a merge whose
+      # landing cannot be told, an error rather than a note (scripts/checks/reviews.py). The
+      # token reaches git only in this step, as an HTTP header for github.com, for the reviews
+      # check's git ls-remote of the product's origin.
       - name: Repository check
         env:
           IDEA_REALIZATION_ROOT: ${{ github.workspace }}
-        run: uv run plugins/idea-realization/scripts/check.py
+          IDEA_REALIZATION_REQUIRE_PRODUCT: "1"
+          IDEA_REALIZATION_PRODUCT_ROOT: ${{ runner.temp }}/product
+          IDEA_REALIZATION_PRODUCT_GITHUB: ${{ steps.product.outputs.github }}
+          IDEA_REALIZATION_PRODUCT_REMOTE: ${{ github.server_url }}/${{ steps.product.outputs.github }}
+          PRODUCT_READ_TOKEN: ${{ secrets.PRODUCT_READ_TOKEN }}
+        run: |
+          header=$(printf 'x-access-token:%s' "$PRODUCT_READ_TOKEN" | base64 -w0)
+          echo "::add-mask::$header"
+          export GIT_CONFIG_COUNT=1
+          export GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader"
+          export GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $header"
+          uv run plugins/idea-realization/scripts/product.py verify
+          uv run plugins/idea-realization/scripts/check.py
 
       - name: Folder tests
         run: uv run pytest -q test

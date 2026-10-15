@@ -21,15 +21,21 @@ only when this checkout holds that tip and the commit is not in its history. Whe
 read, or its tip is a commit this checkout has not fetched, it prints a ``cannot tell`` note that
 says to fetch and run the check again.
 
-Without a product checkout on this machine (control CI is always in this state) every check that
-reads only the control records still runs and still fails: a passing gating verdict for this phase
-on the product repository, and full commit ids in ``product_merge`` and ``reviewed_commit``. When
+Without a product checkout on this machine (a developer who has not set ``product_root``) every
+check that reads only the control records still runs and still fails: a passing gating verdict for
+this phase on the product repository, and full commit ids in ``product_merge`` and
+``reviewed_commit``. When
 ``product_merge`` is the reviewed commit, a fast-forward, the records agree and nothing more is
 said. Any other ``product_merge`` can only be a merge commit whose second parent was reviewed, and
 its parents are in the product repository, so the check prints a ``not checked`` note for that
 phase naming the reviewed commit, rather than passing it silently.
 
-Notes go to standard error and never change the exit code.
+Notes go to standard error and never change the exit code, except under the requirement below.
+
+``IDEA_REALIZATION_REQUIRE_PRODUCT`` set to anything but empty or ``0`` (control CI sets it, with a
+read-only product checkout) makes the product check mandatory: a missing ``product.yaml`` or an
+unset ``product_root`` is an error, so the ``not checked`` path is never taken, and a ``cannot
+tell`` about landing is an error instead of a note.
 """
 
 from __future__ import annotations
@@ -51,6 +57,13 @@ from jsonschema import Draft7Validator, FormatChecker
 SCHEMA = paths.PLUGIN_ROOT / "schemas" / "review-verdict.schema.json"
 DIRECTORY = "reviews"
 COMMIT = re.compile(r"[0-9a-f]{40}")
+REQUIRE_ENV = "IDEA_REALIZATION_REQUIRE_PRODUCT"
+
+
+def product_required(env: dict[str, str] | None = None) -> bool:
+    """Whether ``IDEA_REALIZATION_REQUIRE_PRODUCT`` asks for the product check to be mandatory."""
+    value = (os.environ if env is None else env).get(REQUIRE_ENV, "").strip()
+    return value not in ("", "0")
 
 
 def record_errors(path: Path, schema: dict[str, object]) -> tuple[list[str], dict[str, Any]]:
@@ -158,13 +171,23 @@ def landing_errors(root: Path, key: str, merge: str, branch: str,
 
 
 def completion_errors(config: paths.Config, records: list[dict[str, Any]],
-                      note: Callable[[str], None]) -> list[str]:
-    """Every complete phase that no passing gating review supports."""
+                      note: Callable[[str], None], required: bool = False) -> list[str]:
+    """Every complete phase that no passing gating review supports. ``required``: a product
+    checkout must be configured, and a ``cannot tell`` about landing is an error."""
     two_repositories = product.read_record(config.root) is not None
     product_root, refused = product.verified_root(config) if two_repositories else (None, None)
     errors = []
     if refused:
         errors.append(f"product checkout refused, so product merges cannot be checked: {refused}")
+    if required and not two_repositories:
+        errors.append(f"{REQUIRE_ENV} is set, but {product.RECORD.as_posix()} does not exist: "
+                      "there is no product repository to check")
+    elif required and product_root is None and not refused:
+        errors.append(f"a product checkout is required ({REQUIRE_ENV} is set), but product_root "
+                      "is not set (IDEA_REALIZATION_PRODUCT_ROOT or local.yaml), so product "
+                      "merges cannot be checked")
+    # Under the requirement a cannot-tell note means the check did not run, so it is an error.
+    landing_note = errors.append if required else note
     for phase in completed_phases(config):
         key = phase.get("id", "?")
         passing = [record for record in records if record["phase"] == key
@@ -190,8 +213,8 @@ def completion_errors(config: paths.Config, records: list[dict[str, Any]],
             # Everything that reads only the control records has run above. A product_merge
             # equal to a reviewed commit is a fast-forward and the records agree; any other
             # value can only be a merge commit, and its second parent is in the product
-            # repository.
-            if merge not in reviewed and not refused:
+            # repository. Under the requirement the missing checkout is already an error.
+            if merge not in reviewed and not refused and not required:
                 judged = ", ".join(sorted(reviewed))
                 note(f"{key}: product_merge {merge} not checked: no product checkout is "
                      f"configured on this machine (product_root). It is not the reviewed commit "
@@ -204,7 +227,7 @@ def completion_errors(config: paths.Config, records: list[dict[str, Any]],
             errors.append(f"{key}: no passing gating verdict judged its product_merge {merge} "
                           "(fast-forward) or that merge commit's second parent")
             continue
-        errors.extend(landing_errors(product_root, key, merge, branch, note))
+        errors.extend(landing_errors(product_root, key, merge, branch, landing_note))
     return errors
 
 
@@ -222,7 +245,7 @@ def audit(config: paths.Config, note: Callable[[str], None] | None = None) -> li
             errors.extend(f"{DIRECTORY}/{line}" for line in found)
             if record:
                 records.append(record)
-    return errors + completion_errors(config, records, note)
+    return errors + completion_errors(config, records, note, product_required())
 
 
 def check(config: paths.Config) -> list[str]:

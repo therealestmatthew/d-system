@@ -153,9 +153,11 @@ progress.
 - **`backlog/backlog.yaml` conflicts are normal**: two developers edited different phases in one
   file. Keep both sides: the peer's phases verbatim and your own phase's edits, with `updated` set to
   today. Never resolve it with `--ours` or `--theirs`; either one deletes a peer's work.
-- **A duplicate document code** means a developer on another machine took the same number before
-  either merged. Whoever integrates second renumbers: allocate a new code, rename the file and
-  update every reference (`backlog-protocol.md`, section 12).
+- **A duplicate document code** means two allocations on separate machines took the same code
+  before either merged. Codes carry the allocating developer's handle (`PLAN-<handle>-NNN`), so
+  this happens only for a governance code, for two sub-codes under one plan, or for one developer
+  allocating on two machines. Whoever integrates second renumbers: allocate a new code, rename the
+  file and update every reference (`backlog-protocol.md`, section 12).
 - **A source conflict between two phases declared disjoint** means a declaration is wrong. Stop,
   do not force the merge, and fix the declarations before either phase completes; record the choice
   in the decision record.

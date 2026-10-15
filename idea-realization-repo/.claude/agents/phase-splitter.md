@@ -45,8 +45,10 @@ governs. Everything you produce is a proposal waiting for the owner's gate.
    `depends_on`, `scope` (at least one step), `acceptance` (at least two observable conditions, at
    least one naming an input that must be rejected), `verification` (commands that exist and run
    as written), `deliverables` and `next_action`. No `agent`: nothing is claimed.
-   - Ids follow `phase-<track>-<NN>`, taking the next unused number in the track. They are
-     proposed ids; the owner may renumber.
+   - Ids follow `phase-<track>-<handle>-<NN>`, with the handle that
+     `uv run plugins/idea-realization/scripts/identity.py` prints, taking the next unused number
+     for that handle in the track. They are proposed ids; the owner may renumber. If no handle
+     resolves, stop and say so.
    - `owner` is the plan's owner. Assigning a developer (`owner: <handle>`) is the owner's
      decision at the daily sync; do not make it.
    - Product-repository paths take the `product:` prefix

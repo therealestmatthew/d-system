@@ -24,7 +24,7 @@ governance or adr document), `max_active` (1 to 15, default 1), `next_up` and `i
 
 | Field | Rule |
 |---|---|
-| `id` | `phase-<track>-<NN>`. Permanent and never renumbered. A new phase takes the next unused number in its track, chosen by hand. |
+| `id` | `phase-<track>-<handle>-<NN>`, with the handle of the developer who adds the phase (`workstreams.md`). Permanent and never renumbered. A new phase takes the next unused number for that handle in its track, chosen by hand. A handle must be a developer in `systems.yaml`. Ids written before handles, `phase-<track>-<NN>`, stay valid. |
 | `title` | One observable outcome. |
 | `plan` | One primary plan document. |
 | `sources` | Every other governed source the phase covers. |

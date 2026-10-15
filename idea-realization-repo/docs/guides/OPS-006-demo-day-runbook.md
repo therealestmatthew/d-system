@@ -37,7 +37,7 @@ The owner records the handles here, or names the place the team uses instead.
 
 | Role | Does |
 |---|---|
-| Owner | Approves each release pull request into `main`, creates the tags, chooses `demo-final`, decides on rollback. Only the owner merges into `main`. |
+| Owner | Approves each release pull request into `main`, creates the tags, chooses `demo-final`, decides on rollback. Only the owner merges into `main` and only the owner can push a `demo-*` tag; GitHub refuses both for anyone else. |
 | Release developer | Opens the release pull requests, runs the `aws-deploy` agent on their machine, keeps the deployment log. |
 | Validator | Runs the smoke test against each deployed release candidate and records the result. |
 | Sandbox administrator | The person with administrator access to the sandbox account. Creates the permission boundary policy and service-linked roles, enables Bedrock model access, raises quotas. The deploy role cannot do any of these. |
@@ -96,7 +96,9 @@ Do this in **both** repositories (control and product), in the same order.
    gh pr merge <number> --merge
    ```
 
-3. **Tag.** On the merge commit on `main`, an annotated tag, pushed:
+3. **Tag.** The owner tags the merge commit on `main` with an annotated tag and pushes it. Only
+   the owner can create a `demo-*` tag (the `demo-tags-create` ruleset, `OPS-001` section 9); a
+   tag pushed by anyone else is refused (`OPS-008`, "A push of a `demo-*` tag is refused").
 
    ```bash
    git fetch origin
@@ -106,7 +108,8 @@ Do this in **both** repositories (control and product), in the same order.
 
    `<n>` starts at 1 and increases by one per candidate. The two repositories carry the same
    `demo-rc-<n>` for the same release. Tags matching `demo-*` cannot be deleted or moved once the
-   rulesets are applied, so check the commit before pushing the tag.
+   rulesets are applied, by anyone, the owner included, so check the commit before pushing the
+   tag.
 
 ## Local deployment
 
@@ -146,7 +149,7 @@ git push origin demo-final
 ```
 
 `demo-final` is created once. If a later candidate replaces it before the demo, ask the owner: the
-tag rule blocks moving it.
+`demo-tags-protect` ruleset blocks moving it, for the owner as well.
 
 ## Rollback
 
