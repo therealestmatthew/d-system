@@ -401,23 +401,29 @@ def test_this_repository_integrates_on_dev_from_project_yaml() -> None:
 CONTROL_URL = "git@forge.example.com:team/hack-control.git"
 PRODUCT_URL = "git@forge.example.com:team/hack-product.git"
 REPOSITORY_KEYS = ("control_remote", "control_github", "product_remote", "product_github")
+# owner/repo values, built from parts so that no origin can match them in the plugin's text
+# (test_no_source_references.py).
+TRACKED_CONTROL = "/".join(["tracked", "control"])
+TRACKED_PRODUCT = "/".join(["tracked", "product"])
+LOCAL_CONTROL, LOCAL_PRODUCT = "/".join(["team", "c"]), "/".join(["team", "p"])
 
 
 def test_repository_keys_resolve_env_then_local_yaml_then_the_tracked_files(
         tmp_path: Path) -> None:
     _write(tmp_path, "project.yaml", "schema_version: 1\ncontrol:\n  integration_branch: dev\n"
-           "  remote: https://forge.example.com/tracked/control\n  github: tracked/control\n")
+           f"  remote: https://forge.example.com/{TRACKED_CONTROL}\n  github: {TRACKED_CONTROL}\n")
     _write(tmp_path, "product.yaml", "schema_version: 1\nname: hack\nintegration_branch: dev\n"
-           "remote: https://forge.example.com/tracked/product\ngithub: tracked/product\n")
+           f"remote: https://forge.example.com/{TRACKED_PRODUCT}\ngithub: {TRACKED_PRODUCT}\n")
     tracked = paths.resolve({"root": str(tmp_path)}, env={})
     assert [tracked.sources[key] for key in REPOSITORY_KEYS] == [
         "project.yaml", "project.yaml", "product.yaml", "product.yaml"]
-    assert tracked.text("product_github") == "tracked/product"
-    _write(tmp_path, "local.yaml", f"control_remote: {CONTROL_URL}\ncontrol_github: team/c\n"
-           f"product_remote: {PRODUCT_URL}\nproduct_github: team/p\n")
+    assert tracked.text("product_github") == TRACKED_PRODUCT
+    _write(tmp_path, "local.yaml",
+           f"control_remote: {CONTROL_URL}\ncontrol_github: {LOCAL_CONTROL}\n"
+           f"product_remote: {PRODUCT_URL}\nproduct_github: {LOCAL_PRODUCT}\n")
     local = paths.resolve({"root": str(tmp_path)}, env={})
-    assert [local.text(key) for key in REPOSITORY_KEYS] == [CONTROL_URL, "team/c",
-                                                            PRODUCT_URL, "team/p"]
+    assert [local.text(key) for key in REPOSITORY_KEYS] == [CONTROL_URL, LOCAL_CONTROL,
+                                                            PRODUCT_URL, LOCAL_PRODUCT]
     assert {local.sources[key] for key in REPOSITORY_KEYS} == {"local.yaml"}
     env = {"IDEA_REALIZATION_PRODUCT_REMOTE": "https://forge.example.com/env/product"}
     from_env = paths.resolve({"root": str(tmp_path)}, env=env)
@@ -438,7 +444,7 @@ def test_placeholder_repository_values_count_as_unset(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize(("name", "value"), [
-    ("control_github", "team"), ("product_github", "a/b/c"),
+    ("control_github", "team"), ("product_github", "/".join("abc")),
     ("product_github", "https://forge.example.com/team/x"),
     ("control_remote", "git@forge.example.com:team/a b.git"),
 ])

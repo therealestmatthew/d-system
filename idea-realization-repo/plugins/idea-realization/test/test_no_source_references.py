@@ -13,10 +13,14 @@ the organization's names are the deny-list's job: ``tools/check_confidential.py`
 identifier on it against every tracked file, the plugin included, in the pre-commit hook and in
 CI.
 
-Residual risk, accepted: a slug written directly after a different host
-(``git@forge.example.com:<owner>/<repo>``) is read as another repository and not reported, so the
-plugin's own test fixtures can use placeholder URLs. The real repository named that way, on a host
-it does not live on, would be missed here; the deny-list check would still catch its names.
+A slug written directly after a host reserved for documentation (RFC 2606 and 6761: example.com,
+``*.example``, ``*.invalid``, ``*.test``, ``*.localhost``) is never the origin, since no real remote
+lives there; that is where the tests' fixture URLs point. A slug that is bare, or after a real host,
+is caught whatever the origin's host, a local path included.
+
+Residual risk, accepted: a slug written directly after a different real host is read as another
+repository and not reported. The real repository named that way, on a host it does not live on,
+would be missed here; the deny-list check would still catch its names.
 """
 
 from __future__ import annotations
@@ -96,11 +100,22 @@ def text_files(root: Path) -> list[Path]:
 HOST_BEFORE = re.compile(r"(?<![A-Za-z0-9.-])([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)[:/]$")
 
 
+# Names reserved for documentation and testing (RFC 2606, RFC 6761): no real remote lives there.
+RESERVED_HOST = re.compile(r"(?:^|\.)(?:example\.(?:com|net|org)|[^.]+\.(?:example|invalid|test|"
+                           r"localhost))$|^(?:example|invalid|test|localhost)$", re.IGNORECASE)
+
+
 def names_the_origin(line: str, match: re.Match[str], host: str | None) -> bool:
-    """Whether a slug match names the origin repository: it does unless a different host sits
-    directly before it, as in a test fixture's ``git@forge.example.com:team/control.git``."""
+    """Whether a slug match names the origin repository. It does not when a host sits directly
+    before it that is reserved for documentation (``git@forge.example.com:<owner>/<repo>``, the
+    tests' fixtures), whatever the origin's host, or when that host differs from the origin's."""
     before = HOST_BEFORE.search(line[:match.start()])
-    return before is None or host is None or before.group(1).lower() == host
+    if before is None:
+        return True
+    named = before.group(1).lower()
+    if RESERVED_HOST.search(named):
+        return False
+    return host is None or named == host
 
 
 def scan(root: Path, names: set[str], host: str | None = None) -> list[str]:
@@ -167,6 +182,13 @@ def test_identity_is_the_slug_not_the_developer_or_the_directory(
     # The same owner/repo on another host is another repository, such as a test fixture's.
     (prose / "sample.md").write_text(f"origin git@forge.example.com:{slug}.git")
     assert scan(prose, names, "github.com") == []
+    # With a local-path origin (no host) a reserved host's fixture is still not the origin, but
+    # the slug bare, or after a real host, is still a leak.
+    assert scan(prose, names, None) == []
+    for leak in (f"Cloned from {slug}.", f"see https://github.com/{slug}",
+                 f"git@gitlab.company.net:{slug}.git"):
+        (prose / "sample.md").write_text(leak)
+        assert scan(prose, names, None), leak
 
 
 @pytest.mark.parametrize(("url", "host"), [
@@ -223,11 +245,36 @@ def test_scan_catches_a_handle_scoped_instance(tmp_path: Path, label: str, text:
 # sample here, so this list never spells them out either.
 TODAYS_FIXTURE_SLUGS = [("team", "product"), ("work", "ideas"), ("example-owner", "control"),
                         ("team", "control"), ("team", "hack-product"), ("team", "other-product")]
+# Any owner/repo written directly after a host name, anywhere in the plugin's text.
+HOSTED_SLUG = re.compile(r"[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+[:/]([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)")
 
 
-@pytest.mark.parametrize("host", ["github.com", "github-work"])
+def hosted_slugs() -> set[str]:
+    """The fixture URLs' owner/repo slugs: those in the plugin's tests, where fixtures live. Links
+    elsewhere (a schema's ``$schema``, an installer's URL) name documents, not repositories."""
+    found = set()
+    for path in text_files(PLUGIN_ROOT / "test"):
+        for match in HOSTED_SLUG.finditer(path.read_text(encoding="utf-8", errors="replace")):
+            found.add(match.group(1).removesuffix("/").removesuffix(".git"))
+    return found
+
+
+ORIGIN_HOSTS = ["github.com", "github-work", None]  # None: an origin that is a local path
+
+
+@pytest.mark.parametrize("host", ORIGIN_HOSTS)
 @pytest.mark.parametrize("parts", TODAYS_FIXTURE_SLUGS)
-def test_no_fixture_collides_with_a_real_origin(parts: tuple[str, str], host: str) -> None:
-    """A team whose origin happens to equal a fixture slug must not fail the suite: no test
-    spells a slug out where the origin's host, or no host, would come before it."""
+def test_no_fixture_collides_with_a_real_origin(parts: tuple[str, str], host: str | None) -> None:
+    """A team whose origin happens to equal a fixture slug must not fail the suite, whatever
+    host its origin is on, or none (a local path)."""
     assert scan(PLUGIN_ROOT, {"/".join(parts)}, host) == []
+
+
+@pytest.mark.parametrize("host", ORIGIN_HOSTS)
+def test_no_slug_the_plugin_writes_after_a_host_collides_with_a_real_origin(
+        host: str | None) -> None:
+    """The same for every owner/repo the plugin's text writes after a host, found by scanning, so
+    a fixture added later is covered without being listed."""
+    slugs = hosted_slugs()
+    assert len(slugs) >= 5  # the harvest finds the fixtures; an empty set would pass vacuously
+    assert scan(PLUGIN_ROOT, slugs, host) == []

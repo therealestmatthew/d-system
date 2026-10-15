@@ -93,7 +93,7 @@ def test_a_config_edit_without_consent_is_edited_too(
     """product.yaml is repository-owned; the consent only adds a note to the line."""
     scaffold.scaffold(paths.resolve({"root": str(tmp_path)}, env={}), ["product"])
     product = tmp_path / ".idea-realization" / "product.yaml"
-    product.write_text(product.read_text() + "github: team/x\n")
+    product.write_text(product.read_text() + "github: " + "/".join(["team", "x"]) + "\n")
     assert doctor.main(["--root", str(tmp_path)]) == 0
     assert "edited    .idea-realization/product.yaml  (product)\n" in capsys.readouterr().out
 
