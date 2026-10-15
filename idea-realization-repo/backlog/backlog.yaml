@@ -765,7 +765,7 @@ items:
   - ui-kit/test/
   next_action: Ask the owner for the shape of the product's model stream before writing the mock iterator.
 - id: phase-ux-11
-  title: AI citations, provenance stamp, confidence and approval card
+  title: AI source drawer, provenance stamp, confidence indicator and sanitizer
   plan: doc-ux-kit-plan
   sources:
   - doc-ux-kit-requirements
@@ -780,13 +780,14 @@ items:
   depends_on:
   - phase-ux-10
   scope:
-  - Build the citation chip and source drawer, the provenance stamp, the confidence indicator and the
-    approval card, following Cloudscape's user-authorized actions pattern.
-  - Add static catalogue variants of the stamp, citation list and approval record for generated reports.
+  - Build the source drawer that opens from Kit v0's citation chip, the provenance stamp and the
+    confidence indicator. The citation chip and the approval card moved into Kit v0 by the owner's
+    ruling of 2026-10-14; extend them here only where this scope needs it.
+  - Add static catalogue variants of the stamp and the citation list for generated reports.
   - Add a sanitizer for model-written HTML shown inline.
   acceptance:
-  - The approval card records who decided and when, and Approve is not the default Enter action when the
-    impact is destructive.
+  - The source drawer opens from a citation chip, shows the source's title, location and excerpt, and
+    returns focus to the chip on close.
   - The sanitizer test removes script elements and event-handler attributes from a fixture.
   - The confidence indicator shows a category with its basis and never a percentage.
   verification:
@@ -799,7 +800,7 @@ items:
   - ui-kit/components.yaml
   - ui-kit/gallery/
   - ui-kit/test/
-  next_action: Build the approval card first; it is the component the demo's human checkpoints depend on.
+  next_action: Read Kit v0's citation chip and approval card, then build the source drawer on the chip.
 - id: phase-ux-12
   title: Page generation with render.py and lint_html.py
   plan: doc-ux-kit-plan
@@ -867,7 +868,7 @@ items:
   next_action: Read the skills under plugins/idea-realization/skills/ for the front matter and length this
     repository uses.
 - id: phase-ux-14
-  title: Two exemplars built only from kit parts
+  title: Examiner workbench exemplars built only from kit parts
   plan: doc-ux-kit-plan
   sources:
   - doc-ux-kit-requirements
@@ -884,9 +885,12 @@ items:
   - phase-ux-11
   - phase-ux-13
   scope:
-  - Generate an agent run report page with render.py from sample data.
-  - Build an app screen with nav, explorer, viewer, inspector, agent panel and dock from the React
-    components and a layout file.
+  - Generate a case review report page (case summary, citation-traceable findings, the examiner's
+    decision record) with render.py from synthetic case data.
+  - Build the examiner workbench screens from ARCH-002 in React on the examiner layout - prioritized
+    queue with flag status per case in both error directions, case summary beside findings, accept /
+    edit / reject with the drafted notice alongside, supervisor review queue, accuracy view - replacing
+    Kit v0's static mock (ui-kit/gallery/examiner-workbench.html).
   acceptance:
   - Both exemplars pass lint_html.py where it applies, axe with zero serious or critical issues, and the
     shell-fit test at the four sizes.

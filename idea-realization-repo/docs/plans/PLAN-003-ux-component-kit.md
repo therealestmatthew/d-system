@@ -31,6 +31,10 @@ with no claimed phase. It covers:
 - the shell and the panel frame;
 - buttons, cards, table, pills, empty / loading / error states, dialog, tabs and toast
   (`ui-kit/src/css/components/*.css`, `ui-kit/src/react/`);
+- the citation chip and the approval card, moved into Kit v0 from `phase-ux-11` by the owner's
+  ruling of 2026-10-14 so the examiner workbench mock uses the real components;
+- a static examiner workbench mock (`ui-kit/gallery/examiner-workbench.html`, `ui-kit/layouts/examiner.json`)
+  matching the screens in the product architecture (`ARCH-002`);
 - the theme sheet (`ui-kit/gallery/theme-sheet.html`) for the owner to choose an accent from;
 - the gallery and tests for these (`ui-kit/gallery/`, `ui-kit/test/`).
 
@@ -86,10 +90,10 @@ not a backlog phase, so it is not in any `depends_on`.
 | `phase-ux-08` | React DataTable: toolbar, filter chips with count, three-state sort, row selection, empty and loading states, virtualization above 500 rows, 1,000-row filter within 50ms | `phase-ux-03`, `phase-ux-07` |
 | `phase-ux-09` | React command palette and tree view | `phase-ux-06` |
 | `phase-ux-10` | AI streaming and run components: stream output, run timeline, AI output label, model and usage badge | `phase-ux-05`, `phase-ux-06` |
-| `phase-ux-11` | AI provenance and approval components: citation chip and source drawer, provenance stamp, confidence indicator, approval card, with static variants for reports and a sanitizer test | `phase-ux-10` |
+| `phase-ux-11` | AI provenance components: source drawer on Kit v0's citation chip, provenance stamp, confidence indicator, with static variants for reports and a sanitizer test (the citation chip and approval card moved into Kit v0) | `phase-ux-10` |
 | `phase-ux-12` | Page generation: report and fragment templates, the template library, `render.py` and `lint_html.py` | `phase-ux-04` |
 | `phase-ux-13` | The `ui-page` skill that tells agents to compose pages from the kit and gate them with the lint | `phase-ux-12` |
-| `phase-ux-14` | Two exemplars built only from kit parts: a generated agent run report and an app screen with nav, explorer, viewer, inspector, agent panel and dock | `phase-ux-08`, `phase-ux-09`, `phase-ux-11`, `phase-ux-13` |
+| `phase-ux-14` | Examiner workbench exemplars built only from kit parts: a generated case review report and the five examiner workbench screens from `ARCH-002` in React | `phase-ux-08`, `phase-ux-09`, `phase-ux-11`, `phase-ux-13` |
 | `phase-ux-15` | A one-page cheat sheet and a guidelines page in the gallery, rendered from the design guide | `phase-ux-14` |
 
 The source plan's units mapped onto these phases as follows: the static interactive unit became
