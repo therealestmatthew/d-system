@@ -311,13 +311,17 @@ def test_parse_code_reads_a_handle() -> None:
         "series": "PLAN", "numbering": "counter", "handle": ANA, "number": 4, "sub": None,
         "stem": value,
     }
-    assert codes.parse_code(value + ".02")["stem"] == value  # type: ignore[index]
+    sub = codes.parse_code(value + ".02")
+    assert sub is not None
+    assert sub["stem"] == value
     dated = scoped("SESS", ANA, f"{STAMP}-03")
     assert codes.parse_code(dated) == {
         "series": "SESS", "numbering": "dated", "handle": ANA, "date": STAMP, "sequence": 3,
         "stem": dated,
     }
-    assert codes.parse_code(PLAN_3)["handle"] is None  # type: ignore[index]
+    legacy = codes.parse_code(PLAN_3)
+    assert legacy is not None
+    assert legacy["handle"] is None
 
 
 @pytest.mark.parametrize("value", [
