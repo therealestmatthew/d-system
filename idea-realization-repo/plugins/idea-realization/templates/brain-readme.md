@@ -49,7 +49,8 @@ left out unless `--include-superseded` is given.
   a new entry that links to it and setting the old one's `status` to `superseded`.
 - No confidential content: no customer names, credentials, account ids or keys. The
   confidentiality check runs on every commit.
-- Anyone else with a procedure in mind records it as a `lesson` and proposes it.
+- Until a developer is marked `approves: [procedures]` in `docs/systems.yaml`, no procedure can be
+  recorded at all. Anyone else with a procedure in mind records it as a `lesson` and proposes it.
 - `brain.py check` (also part of `check.py`) fails on bad front matter, an entry in the wrong
   folder, an author who is not a developer, a procedure without an approver's approval, a broken
   link or a stale index.
