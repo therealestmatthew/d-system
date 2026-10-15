@@ -37,6 +37,7 @@ series:
   kind: operation
   locations:
   - governance/
+  - guides/
   numbering: counter
   sub_codes: false
 - code: GOV
