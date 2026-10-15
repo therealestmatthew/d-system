@@ -6,6 +6,7 @@ max_active: 15
 next_up: []
 # Phase ids written before ids carried a developer handle. Only these stay valid without one;
 # nothing new joins the list. A new phase takes phase-<track>-<handle>-NN (backlog-protocol.md).
+# Seed backlog, frozen at transfer; new phases use phase-<track>-<handle>-NN.
 legacy_phase_ids:
 - phase-boot-01
 - phase-boot-02
