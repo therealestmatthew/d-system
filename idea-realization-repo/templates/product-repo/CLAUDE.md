@@ -24,7 +24,8 @@ the product repository and does not govern the session reading it.)
 
 ## Checks
 
-- `tools/install-hooks.sh` installs the pre-commit hook that runs `tools/check_confidential.py`.
-  Never bypass it with `--no-verify`.
+- `tools/install-hooks.sh` installs three hooks that run `tools/check_confidential.py`: pre-commit
+  (the staged files), commit-msg (the message) and pre-push (every commit a push sends). Never
+  bypass them with `--no-verify`.
 - CI (`.github/workflows/product-ci.yml`, job `verify`) never calls AWS or Bedrock. Deploying is
   done from a developer machine by the control repository's `aws-deploy` agent.

@@ -27,7 +27,7 @@ one-page command list per mode is in the mode cheat sheets (`OPS-009`).
 - Where a prompt runs the product's tests, it runs them in the product worktree, as the
   `session-start` skill §5 and the implementing guide (`OPS-003`, step 3.6) state.
 - The plugin's skills run by their short name, such as `/start`; the long form
-  `/start` always works (`ONBOARDING.md` §1, "Skill names"). Each prompt names the
+  `/idea-realization:start` always works (`ONBOARDING.md` §1, "Skill names"). Each prompt names the
   skill, and the agent invokes it.
 
 ---

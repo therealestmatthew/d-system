@@ -24,7 +24,7 @@ under `docs/guides/`; where this page and those differ, they win.
 
 **Skill names.** Each of the plugin's skills runs by its short name, such as `/start`, unless
 another command already uses that name. The long form `/idea-realization:<skill>`, such as
-`/start`, always works.
+`/idea-realization:start`, always works.
 
 **Terms used on this page.**
 
@@ -161,8 +161,9 @@ that one command only (`OPS-008`, "check.py reports files from the wrong reposit
    ```
 
    If your sandbox access is not ready yet, skip this step and come back to it before your first
-   phase that touches AWS. Until then `onboard_check` keeps reporting `FIX` for the AWS lines; that
-   is expected, and the rest of the checklist does not depend on it.
+   phase that touches AWS. Until you name an AWS profile in `local.yaml`, `onboard_check` shows the
+   AWS lines as `NOTE` (pending the owner's AWS setup) and they do not fail it; once you name one,
+   they are checked and a problem is a `FIX`. The rest of the checklist does not depend on them.
 9. **Clone the product repository** beside the control repository, set `product_root` in
    `local.yaml` to it, and check that it is the right repository:
 
@@ -171,6 +172,20 @@ that one command only (`OPS-008`, "check.py reports files from the wrong reposit
    git -C ../<product> checkout dev
    uv run plugins/idea-realization/scripts/product.py verify   # prints "origin: matches"
    ```
+
+   Then install the product repository's own hooks and give it the deny-list. Its hooks run its own
+   copy of `check_confidential.py`, which reads only `PRIVATE_DENY_LIST` or the product checkout's
+   `.private/deny-list.txt` (worktrees read the product's primary checkout's copy); it never finds
+   the control repository's file. Copy the file; exporting `PRIVATE_DENY_LIST` also works, but only
+   in a shell where it is set.
+
+   ```bash
+   (cd ../<product> && tools/install-hooks.sh)                 # core.hooksPath -> tools/git-hooks
+   mkdir -p ../<product>/.private
+   cp .private/deny-list.txt ../<product>/.private/deny-list.txt   # gitignored there too
+   ```
+
+   `onboard_check` checks both (the `product hooks` and `product deny-list` lines).
 
 10. **Start Claude Code** in the control repository's primary checkout:
 
@@ -282,6 +297,10 @@ phase, record learnings in the brain, push every branch). The table is in `OPS-0
   folded into the phase in progress.
 - **The control repository's CI fails when the `DENY_LIST` secret is missing.** The owner sets it;
   tell the owner if CI reports it absent.
+- **The guidebook is generated.** `docs/guidebook.html` is built from the documents
+  `tools/guidebook.yaml` lists (this page among them). When you change one of them, run
+  `uv run python tools/build_guidebook.py` and commit the regenerated page with it: CI runs it with
+  `--check` and fails on a stale guidebook.
 
 ## 9. Help
 

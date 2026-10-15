@@ -3333,7 +3333,7 @@ Phase branches reach <code>dev</code> through a pull request merged with a merge
 </ul>
 <p><strong>Skill names.</strong> Each of the plugin&#x27;s skills runs by its short name, such as <code>/start</code>, unless
 another command already uses that name. The long form <code>/idea-realization:&lt;skill&gt;</code>, such as
-<code>/start</code>, always works.</p>
+<code>/idea-realization:start</code>, always works.</p>
 <p><strong>Terms used on this page.</strong></p>
 <ul>
 <li><strong>Bookkeeping</strong>: the small commits that go directly on control <code>dev</code> with no pull request: claims,
@@ -3455,6 +3455,10 @@ or <code>--theirs</code>.</li>
 folded into the phase in progress.</li>
 <li><strong>The control repository&#x27;s CI fails when the <code>DENY_LIST</code> secret is missing.</strong> The owner sets it;
 tell the owner if CI reports it absent.</li>
+<li><strong>The guidebook is generated.</strong> <code>docs/guidebook.html</code> is built from the documents
+<code>tools/guidebook.yaml</code> lists (this page among them). When you change one of them, run
+<code>uv run python tools/build_guidebook.py</code> and commit the regenerated page with it: CI runs it with
+<code>--check</code> and fails on a stale guidebook.</li>
 </ul>
 <h4 id="onboarding-9-help">9. Help</h4>
 <ul>
@@ -4222,7 +4226,9 @@ backlog protocol reserves, such as accepting plans and ranking the queue.</p>
 <h4 id="branching-7-ci-the-control-repository">7. CI: the control repository</h4>
 <p>Workflow: <code>.github/workflows/control-ci.yml</code>. One job, <code>verify</code>.</p>
 <p>Triggers: every pull request to <code>dev</code> or <code>main</code>, and every push to <code>dev</code>, <code>main</code> or <code>agent/**</code>.
-Runs are grouped per ref; a new push cancels the run still in progress for the same ref.</p>
+Runs are grouped per ref. A new push to a pull request cancels that pull request&#x27;s run still in
+progress; runs for pushes to <code>dev</code>, <code>main</code> and <code>agent/**</code> always finish, so every bookkeeping
+commit on <code>dev</code> gets its own result (as in product CI).</p>
 <p>Steps, in order:</p>
 <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th scope="col">Step</th><th scope="col">Command</th></tr></thead>
 <tbody>
@@ -6032,13 +6038,23 @@ differs from the team&#x27;s, in <code>local.yaml</code>. Then:</p>
 <pre data-lang="bash"><code>uv run python tools/check_aws_machine.py --probe   # must print OK
 tools/aws-sandbox whoami                           # both profile names and the read identity</code></pre>
 <p>If your sandbox access is not ready yet, skip this step and come back to it before your first
-phase that touches AWS. Until then <code>onboard_check</code> keeps reporting <code>FIX</code> for the AWS lines; that
-is expected, and the rest of the checklist does not depend on it.</p></li>
+phase that touches AWS. Until you name an AWS profile in <code>local.yaml</code>, <code>onboard_check</code> shows the
+AWS lines as <code>NOTE</code> (pending the owner&#x27;s AWS setup) and they do not fail it; once you name one,
+they are checked and a problem is a <code>FIX</code>. The rest of the checklist does not depend on them.</p></li>
 <li><p><strong>Clone the product repository</strong> beside the control repository, set <code>product_root</code> in
 <code>local.yaml</code> to it, and check that it is the right repository:</p>
 <pre data-lang="bash"><code>git clone &lt;product repository URL&gt; ../&lt;product&gt;
 git -C ../&lt;product&gt; checkout dev
-uv run plugins/idea-realization/scripts/product.py verify   # prints &quot;origin: matches&quot;</code></pre></li>
+uv run plugins/idea-realization/scripts/product.py verify   # prints &quot;origin: matches&quot;</code></pre>
+<p>Then install the product repository&#x27;s own hooks and give it the deny-list. Its hooks run its own
+copy of <code>check_confidential.py</code>, which reads only <code>PRIVATE_DENY_LIST</code> or the product checkout&#x27;s
+<code>.private/deny-list.txt</code> (worktrees read the product&#x27;s primary checkout&#x27;s copy); it never finds
+the control repository&#x27;s file. Copy the file; exporting <code>PRIVATE_DENY_LIST</code> also works, but only
+in a shell where it is set.</p>
+<pre data-lang="bash"><code>(cd ../&lt;product&gt; &amp;&amp; tools/install-hooks.sh)                 # core.hooksPath -&gt; tools/git-hooks
+mkdir -p ../&lt;product&gt;/.private
+cp .private/deny-list.txt ../&lt;product&gt;/.private/deny-list.txt   # gitignored there too</code></pre>
+<p><code>onboard_check</code> checks both (the <code>product hooks</code> and <code>product deny-list</code> lines).</p></li>
 <li><p><strong>Start Claude Code</strong> in the control repository&#x27;s primary checkout:</p>
 <pre data-lang="bash"><code>claude</code></pre>
 <p>The first time, Claude Code asks whether you trust the folder. Accept: the project settings
@@ -6070,7 +6086,7 @@ folder so the project settings load the plugin (ONBOARDING §3 step 10). Then pa
 <li>Where a prompt runs the product&#x27;s tests, it runs them in the product worktree, as the
 <code>session-start</code> skill §5 and the implementing guide (<a href="#modes-implementing-mode"><code>OPS-003</code></a>, step 3.6) state.</li>
 <li>The plugin&#x27;s skills run by their short name, such as <code>/start</code>; the long form
-<code>/start</code> always works (<a href="#onboarding-onboarding"><code>ONBOARDING.md</code></a> §1, &quot;Skill names&quot;). Each prompt names the
+<code>/idea-realization:start</code> always works (<a href="#onboarding-onboarding"><code>ONBOARDING.md</code></a> §1, &quot;Skill names&quot;). Each prompt names the
 skill, and the agent invokes it.</li>
 </ul>
 <hr>
@@ -6250,21 +6266,21 @@ the person who deployed it.
 <p class="gb-intro">Each file this page was built from, with the SHA-256 of its content at the time the page was generated. If a file's hash no longer matches, the page is stale: regenerate it with <code>uv run python tools/build_guidebook.py</code>.</p>
 <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th scope="col">File</th><th scope="col">Used in</th><th scope="col">SHA-256</th></tr></thead>
 <tbody>
-<tr><td><code>ONBOARDING.md</code></td><td>Onboarding, Day-one checklist</td><td class="ui-table__id gb-hash">a8ed58dd2ef2bf7f7b29978097cc65077e029460a949249841fa8eaaa639a0ab</td></tr>
+<tr><td><code>ONBOARDING.md</code></td><td>Onboarding, Day-one checklist</td><td class="ui-table__id gb-hash">cee617af55ee3a8751771fe58dffe8888dfa3589001fe5ac14f9c539e1a607f1</td></tr>
 <tr><td><code>docs/guides/OPS-005-team-workflow.md</code></td><td>Onboarding, The review gate, Bookkeeping, Release and demo day</td><td class="ui-table__id gb-hash">308d7516fb39152e7ecb3c2626533376e21a6150014f8700a4b17455cb69eb5e</td></tr>
 <tr><td><code>CLAUDE.md</code></td><td>Working modes, Bookkeeping, AWS safety and cost guardrails</td><td class="ui-table__id gb-hash">c3bd09d9060acae7470b2a3b820f8846196a4450a05f9e6b2f8fc4827ef9e2ff</td></tr>
 <tr><td><code>docs/guides/OPS-002-planning-mode.md</code></td><td>Working modes</td><td class="ui-table__id gb-hash">2c30e46bcfbf20da720a99877cf1d12f5c94e730dbcc79136d56db4aa2f8c84b</td></tr>
 <tr><td><code>docs/guides/OPS-003-implementing-mode.md</code></td><td>Working modes</td><td class="ui-table__id gb-hash">657169fead7069ff60751a0e04378a1977c4057125bb3d8b2eac30c3a89e05a1</td></tr>
 <tr><td><code>docs/guides/OPS-004-validating-mode.md</code></td><td>Working modes, The review gate</td><td class="ui-table__id gb-hash">212d55980f0b176659088d9aa3e3db158e37b1d73b09e23ac23448f01a1c0e10</td></tr>
 <tr><td><code>docs/guides/OPS-009-mode-cheat-sheets.md</code></td><td>Working modes</td><td class="ui-table__id gb-hash">ae262eea5be239d90bed3a781411a96734a2713fd078c3d201a4324c2b8201d5</td></tr>
-<tr><td><code>docs/guides/OPS-001-branching-and-ci.md</code></td><td>Branching and pull-request flow, Bookkeeping, Release and demo day</td><td class="ui-table__id gb-hash">68a895758ffa875634a7e110fb45a2a17637294e1116d4bd0ba0947c1dd6a2ff</td></tr>
+<tr><td><code>docs/guides/OPS-001-branching-and-ci.md</code></td><td>Branching and pull-request flow, Bookkeeping, Release and demo day</td><td class="ui-table__id gb-hash">fd40b3c5a643b42cae5fc25b0f376627f2308fb187f81428d1b6fc3cea0625ca</td></tr>
 <tr><td><code>plugins/idea-realization/docs/two-repositories.md</code></td><td>Branching and pull-request flow, Bookkeeping</td><td class="ui-table__id gb-hash">20864d65c56224237eafe50552e8f5bddd965241b79db10d5e3b342dee31bd0a</td></tr>
 <tr><td><code>plugins/idea-realization/docs/workstreams.md</code></td><td>Bookkeeping</td><td class="ui-table__id gb-hash">732dac8aaad45339e5ebc5a0ce3f880d851d16bce9fc57a110ee21542afabe77</td></tr>
 <tr><td><code>docs/guides/OPS-006-demo-day-runbook.md</code></td><td>Release and demo day</td><td class="ui-table__id gb-hash">b6e3874804a7b0c0f912542f772dc6209253abb9367b14ead6fe732fc77bfc57</td></tr>
 <tr><td><code>aws/README.md</code></td><td>AWS safety and cost guardrails</td><td class="ui-table__id gb-hash">b210fc67f698f2d28d2393f65d132c2de10716ea3db95c7e48e26a9d580c18e3</td></tr>
 <tr><td><code>docs/guides/OPS-007-cost-guardrails.md</code></td><td>AWS safety and cost guardrails</td><td class="ui-table__id gb-hash">c89c83e1e110c2ca7cc5b4099b4f6770b702d0cddcb1de3f58f05165264e09c7</td></tr>
 <tr><td><code>docs/guides/OPS-008-troubleshooting.md</code></td><td>Troubleshooting</td><td class="ui-table__id gb-hash">d73754432a47f5377175089c21697677f66982f0c89674dbbf6b752cec0a2c03</td></tr>
-<tr><td><code>docs/guides/OPS-010-day-one-prompts.md</code></td><td>Day-one checklist</td><td class="ui-table__id gb-hash">ff1becaa534b47377958684ee4904a34ea2ff696562f81dc4248e1fa9ff0b527</td></tr>
+<tr><td><code>docs/guides/OPS-010-day-one-prompts.md</code></td><td>Day-one checklist</td><td class="ui-table__id gb-hash">f803be52bd69f23b2784a49012fc4c4e7089e8b6845d7ee62a15a49ceb95a508</td></tr>
 <tr><td><code>tools/guidebook.yaml</code></td><td>The chapter list</td><td class="ui-table__id gb-hash">81806cc5fb4729eb0d140734e90c27ed55562adb6c0a4a79270153c5f91b5777</td></tr>
 <tr><td><code>ui-kit/dist/ui.css</code></td><td>The page styles</td><td class="ui-table__id gb-hash">c2293689359aab54de311b1141dfaea166dcd2ba42858a4c1ce8f24199d3e8a3</td></tr>
 </tbody></table></div>

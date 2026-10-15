@@ -155,7 +155,9 @@ It then goes to `main` in a new release pull request and gets the next `demo-rc-
 Workflow: `.github/workflows/control-ci.yml`. One job, `verify`.
 
 Triggers: every pull request to `dev` or `main`, and every push to `dev`, `main` or `agent/**`.
-Runs are grouped per ref; a new push cancels the run still in progress for the same ref.
+Runs are grouped per ref. A new push to a pull request cancels that pull request's run still in
+progress; runs for pushes to `dev`, `main` and `agent/**` always finish, so every bookkeeping
+commit on `dev` gets its own result (as in product CI).
 
 Steps, in order:
 

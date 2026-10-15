@@ -45,6 +45,8 @@ def machine(tmp_path: Path) -> tuple[Path, dict[str, str]]:
     git("-C", str(control), "remote", "add", "origin", CONTROL_REMOTE)
     git("init", "-q", str(product))
     git("-C", str(product), "remote", "add", "origin", REMOTE)
+    git("-C", str(product), "config", "core.hooksPath", "tools/git-hooks")
+    write(product / ".private" / "deny-list.txt", DENIED + "\n")
     write(control / "docs" / "systems.yaml",
           "schema_version: 1\nowners:\n  repository-owner: Owner.\n"
           "  ana:\n    description: Ana.\n    emails: [ana@example.com]\n")
@@ -282,3 +284,28 @@ def test_the_machine_rule_fails_even_before_the_aws_setup(tmp_path: Path) -> Non
     write(Path(env["HOME"]) / ".aws" / "config", "[default]\nregion = eu-west-1\n")
     assert "default profile" in fixes(onboard.run_checks(root, env, every_tool,
                                                          authenticated))["AWS machine rule"]
+
+
+
+def test_the_product_checkouts_hooks_and_deny_list_are_checked(tmp_path: Path) -> None:
+    """The product repository's hooks run its own check_confidential.py, which reads only
+    PRIVATE_DENY_LIST or the product checkout's .private/deny-list.txt: the control repository's
+    copy is never found from there."""
+    root, env = machine(tmp_path)
+    product = tmp_path / "product"
+    git("-C", str(product), "config", "--unset", "core.hooksPath")
+    (product / ".private" / "deny-list.txt").unlink()
+    found = fixes(onboard.run_checks(root, env, every_tool, authenticated))
+    assert set(found) == {"product hooks", "product deny-list"}
+    assert "tools/install-hooks.sh" in found["product hooks"]
+    assert str(product / ".private" / "deny-list.txt") in found["product deny-list"]
+
+
+def test_private_deny_list_satisfies_the_product_deny_list(tmp_path: Path) -> None:
+    root, env = machine(tmp_path)
+    (tmp_path / "product" / ".private" / "deny-list.txt").unlink()
+    shared = root / ".private" / "deny-list.txt"
+    lines = onboard.run_checks(root, {**env, "PRIVATE_DENY_LIST": str(shared)}, every_tool,
+                               authenticated)
+    assert fixes(lines) == {}
+    assert next(line for line in lines if line.item == "product deny-list").ok

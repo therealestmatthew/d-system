@@ -38,9 +38,12 @@ jobs:
       # Stops the AWS SDKs and the CDK CLI from asking an instance metadata service for credentials.
       AWS_EC2_METADATA_DISABLED: "true"
     steps:
+      # persist-credentials is off: no step pushes or fetches after the checkout, so the token is
+      # not left in the checkout's git config for a later step (or a dependency's script) to read.
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # gitleaks scans the whole history
+          persist-credentials: false
 
       - name: No AWS credentials in this job
         run: |
@@ -111,7 +114,7 @@ jobs:
       # [tool.ruff] section of the product's own, ruff applies its default rules.
       - name: Set up uv
         if: hashFiles('pyproject.toml') != ''
-        uses: astral-sh/setup-uv@v10
+        uses: astral-sh/setup-uv@v10.3.0 # the version control CI pins
         with:
           enable-cache: true
           cache-dependency-glob: "**/uv.lock"

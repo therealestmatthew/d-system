@@ -12,7 +12,9 @@ on:
 
 concurrency:
   group: control-ci-${{ github.ref }}
-  cancel-in-progress: true
+  # A newer push to a pull request makes the older run useless; runs on dev (bookkeeping commits
+  # land there back to back), main and agent branches all finish, as in product CI.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read

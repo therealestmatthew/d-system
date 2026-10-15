@@ -219,6 +219,31 @@ def check_product(config: paths.Config) -> Line:
     return Line(True, "product checkout", f"{found.root} (product.py verify passes)")
 
 
+def check_product_hooks(config: paths.Config, env: Mapping[str, str]) -> list[Line]:
+    """The product checkout's own hooks and deny-list. Its hooks run its copy of
+    check_confidential.py, which reads PRIVATE_DENY_LIST or the product checkout's
+    .private/deny-list.txt and never the control repository's file. Only for a verified product
+    checkout; the product checkout line already reports any other state."""
+    try:
+        root = product.verify(config).root
+    except ValueError:
+        return []
+    hooks = git_config(root, "core.hooksPath")
+    configured = env.get("PRIVATE_DENY_LIST")
+    deny_list = Path(configured) if configured else root / DENY_LIST
+    present = deny_list.is_file() and deny_list.stat().st_size > 0
+    return [
+        Line(hooks == HOOKS_PATH, "product hooks",
+             HOOKS_PATH if hooks == HOOKS_PATH else
+             f"core.hooksPath is {hooks or 'unset'} in {root}; run tools/install-hooks.sh there"),
+        Line(present, "product deny-list",
+             f"{deny_list} present" if present else
+             f"{deny_list} is missing or empty; copy the team's deny-list there (the product "
+             "repository's hooks never read the control repository's copy), or export "
+             "PRIVATE_DENY_LIST=<path to it> in every shell you commit from"),
+    ]
+
+
 def aws_profile_names(env: Mapping[str, str]) -> set[str]:
     """The profile names in the AWS config and credentials files. Reads section headers only."""
     names: set[str] = set()
@@ -290,6 +315,7 @@ def run_checks(root: Path, env: Mapping[str, str], which: Which = shutil.which,
     lines.append(check_doctor(config))
     lines.append(check_control(config))
     lines.append(check_product(config))
+    lines += check_product_hooks(config, env)
     lines += check_aws(config, env, which)
     return lines
 
