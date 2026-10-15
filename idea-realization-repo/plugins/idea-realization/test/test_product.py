@@ -99,7 +99,7 @@ def test_missing_record_means_no_product_repository(tmp_path: Path) -> None:
 def test_invalid_record_is_refused(repos: tuple[Path, Path]) -> None:
     control, checkout = repos
     (control / product.RECORD).write_text("schema_version: 1\nname: hack-product\n")
-    with pytest.raises(product.ProductError, match="remote"):
+    with pytest.raises(product.ProductError, match="integration_branch"):
         product.load(config(control, checkout))
 
 
@@ -163,7 +163,8 @@ def test_this_repositorys_product_record_integrates_on_dev() -> None:
     assert record is not None
     assert record["integration_branch"] == "dev"
     assert record["ci_workflow"] == "product-ci.yml"
-    assert record["remote"].startswith("REPLACE-WITH-")
+    # The URL and GitHub name can name a confidential organization: local.yaml holds them.
+    assert "remote" not in record and "github" not in record
 
 
 def evidence_errors(root: Path, product_root: Path | None, evidence: str) -> list[str]:
@@ -217,3 +218,52 @@ def test_resolve_never_returns_a_path_in_a_refused_checkout(repos: tuple[Path, P
     ) / "src/a.py"
     git(checkout, "remote", "set-url", "origin", "git@forge.example.com:team/other.git")
     assert product.resolve(config(control, checkout), "product:src/a.py") == ("product", None)
+
+
+def untracked(control: Path) -> None:
+    """Drop the URL from the tracked record, as a team with a confidential URL does."""
+    (control / product.RECORD).write_text(
+        "schema_version: 1\nname: hack-product\nintegration_branch: main\n")
+
+
+def test_verify_reads_the_remote_from_local_yaml(repos: tuple[Path, Path], capsys: Any) -> None:
+    control, checkout = repos
+    untracked(control)
+    (control / ".idea-realization" / "local.yaml").write_text(
+        f"product_root: {checkout}\nproduct_remote: {REMOTE}\nproduct_github: team/hack-product\n")
+    found = product.verify(config(control))
+    assert (found.remote, found.github) == (REMOTE, "team/hack-product")
+    assert product.main(["verify", "--root", str(control)]) == 0
+    out = capsys.readouterr().out
+    assert f"remote: {REMOTE}  (from local.yaml)" in out and "origin: matches" in out
+
+
+def test_local_yaml_overrides_the_tracked_remote(repos: tuple[Path, Path]) -> None:
+    control, checkout = repos
+    (control / ".idea-realization" / "local.yaml").write_text(
+        "product_remote: git@forge.example.com:team/other.git\n")
+    with pytest.raises(product.ProductError, match=r"product_remote \(from local.yaml\)"):
+        product.verify(config(control, checkout))
+
+
+def test_verify_refuses_without_a_product_remote_and_names_local_yaml(
+        repos: tuple[Path, Path], capsys: Any) -> None:
+    control, checkout = repos
+    untracked(control)
+    with pytest.raises(product.ProductError, match="local.yaml"):
+        product.verify(config(control, checkout))
+    assert product.main(["verify", "--root", str(control), "--product-root", str(checkout)]) == 1
+    assert "product_remote is not set" in capsys.readouterr().err
+    assert product.main(["show", "--root", str(control), "--product-root", str(checkout)]) == 0
+    assert "remote: (not set: product_remote in .idea-realization/local.yaml)" in (
+        capsys.readouterr().out)
+    assert product.verified_root(config(control, checkout))[1] is not None
+
+
+def test_a_placeholder_product_remote_is_refused_like_an_unset_one(
+        repos: tuple[Path, Path]) -> None:
+    control, checkout = repos
+    record = control / product.RECORD
+    record.write_text(record.read_text().replace(REMOTE, "REPLACE-WITH-THE-PRODUCT-GIT-URL"))
+    with pytest.raises(product.ProductError, match="product_remote is not set"):
+        product.verify(config(control, checkout))

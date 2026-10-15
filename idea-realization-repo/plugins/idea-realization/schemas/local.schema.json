@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Local machine configuration",
-  "description": "What differs per machine: the product checkout, worktree directories, AWS profiles and region, the asserted developer handle and the developer server ports. Untracked (gitignored); read from the primary checkout. Each value sits below a flag and an IDEA_REALIZATION_<KEY> variable and above the plugin option. A value that starts with REPLACE-WITH- counts as unset.",
+  "description": "What differs per machine: the product checkout, worktree directories, AWS profiles and region, the asserted developer handle, the developer server ports, and the control and product repository URLs and GitHub names (which may name a confidential organization, so they need not be tracked). Untracked (gitignored); read from the primary checkout. Each value sits below a flag and an IDEA_REALIZATION_<KEY> variable and above the plugin option. A value that starts with REPLACE-WITH- counts as unset.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -12,6 +12,10 @@
     "aws_deploy_profile": {"type": "string", "description": "AWS CLI profile for the sandbox's deploy role."},
     "aws_region": {"type": "string", "description": "AWS region on this machine; overrides project.yaml aws.region."},
     "handle": {"type": "string", "description": "The developer handle this machine asserts; the git email must belong to it."},
-    "dev_port_range": {"type": "string", "pattern": "^\\d+-\\d+$", "description": "Local ports a development server may use, as <first>-<last>."}
+    "dev_port_range": {"type": "string", "pattern": "^\\d+-\\d+$", "description": "Local ports a development server may use, as <first>-<last>."},
+    "control_remote": {"type": "string", "pattern": "^\\S+$", "description": "Git URL of the control repository; overrides project.yaml control.remote. check.py and doctor.py compare it with the control checkout's origin."},
+    "control_github": {"type": "string", "pattern": "^([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+|REPLACE-WITH-[A-Z0-9-]+)$", "description": "The control repository on GitHub, as <org>/<repo>; overrides project.yaml control.github."},
+    "product_remote": {"type": "string", "pattern": "^\\S+$", "description": "Git URL of the product repository; overrides product.yaml remote. product.py verify refuses a product checkout whose origin differs."},
+    "product_github": {"type": "string", "pattern": "^([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+|REPLACE-WITH-[A-Z0-9-]+)$", "description": "The product repository on GitHub, as <org>/<repo>; overrides product.yaml github."}
   }
 }

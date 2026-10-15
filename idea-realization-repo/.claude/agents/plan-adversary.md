@@ -42,12 +42,12 @@ planner's context, and that is the point of you.
 
 ## Your report
 
-Exactly the return format in `adversary-prompt.md` ("What to return"): at most ten lines on what
-you checked and which areas held, then the JSON array of findings, blocker first, then major, then
-minor. Then one final line, the only text after the array:
+First line: `VERDICT: pass <altitude> <subject>` when no blocker or major finding stands at this
+altitude, or `VERDICT: reject <altitude> <subject>` when one does.
 
-`VERDICT pass <altitude> <subject>` when no blocker or major finding stands at this altitude, or
-`VERDICT fail <altitude> <subject>` when one does.
+Then exactly the return format in `adversary-prompt.md` ("What to return"): at most ten lines on
+what you checked and which areas held, then the JSON array of findings, blocker first, then major,
+then minor. Nothing follows the array.
 
 `pass` means you attacked and found no blocker or major defect at this altitude. It is not approval
 and not a statement that the plan is ready; approval is the owner's, at the plan-approval gate.
@@ -66,5 +66,5 @@ and not a statement that the plan is ready; approval is the owner's, at the plan
 
 ## Stop condition
 
-Stop when the report and its final `VERDICT` line are written, or when an input is missing, which
+Stop when the `VERDICT` line and the report are written, or when an input is missing, which
 you report as a blocker finding instead of working around it.

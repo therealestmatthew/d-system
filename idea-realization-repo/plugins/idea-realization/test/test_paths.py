@@ -15,7 +15,8 @@ EXPECTED_KEYS = {
     "ideas_path", "ideas_view_path", "priority_path", "backlog_path", "docs_root",
     "integration_branch", "worktree_dir", "triage_search", "exempt_files", "staging_dir",
     "partitions_dir", "brain_root", "product_root", "product_worktree_dir", "aws_read_profile",
-    "aws_deploy_profile", "aws_region", "handle", "dev_port_range",
+    "aws_deploy_profile", "aws_region", "handle", "dev_port_range", "control_remote",
+    "control_github", "product_remote", "product_github",
 }
 
 
@@ -336,3 +337,73 @@ def test_this_repository_integrates_on_dev_from_project_yaml() -> None:
     config = paths.resolve({"root": str(repository)}, env={})
     assert config.text("integration_branch") == "dev"
     assert config.sources["integration_branch"] == "project.yaml"
+
+
+CONTROL_URL = "git@forge.example.com:team/hack-control.git"
+PRODUCT_URL = "git@forge.example.com:team/hack-product.git"
+REPOSITORY_KEYS = ("control_remote", "control_github", "product_remote", "product_github")
+
+
+def test_repository_keys_resolve_env_then_local_yaml_then_the_tracked_files(
+        tmp_path: Path) -> None:
+    _write(tmp_path, "project.yaml", "schema_version: 1\ncontrol:\n  integration_branch: dev\n"
+           "  remote: https://forge.example.com/tracked/control\n  github: tracked/control\n")
+    _write(tmp_path, "product.yaml", "schema_version: 1\nname: hack\nintegration_branch: dev\n"
+           "remote: https://forge.example.com/tracked/product\ngithub: tracked/product\n")
+    tracked = paths.resolve({"root": str(tmp_path)}, env={})
+    assert [tracked.sources[key] for key in REPOSITORY_KEYS] == [
+        "project.yaml", "project.yaml", "product.yaml", "product.yaml"]
+    assert tracked.text("product_github") == "tracked/product"
+    _write(tmp_path, "local.yaml", f"control_remote: {CONTROL_URL}\ncontrol_github: team/c\n"
+           f"product_remote: {PRODUCT_URL}\nproduct_github: team/p\n")
+    local = paths.resolve({"root": str(tmp_path)}, env={})
+    assert [local.text(key) for key in REPOSITORY_KEYS] == [CONTROL_URL, "team/c",
+                                                            PRODUCT_URL, "team/p"]
+    assert {local.sources[key] for key in REPOSITORY_KEYS} == {"local.yaml"}
+    env = {"IDEA_REALIZATION_PRODUCT_REMOTE": "https://forge.example.com/env/product"}
+    from_env = paths.resolve({"root": str(tmp_path)}, env=env)
+    assert (from_env.text("product_remote"), from_env.sources["product_remote"]) == (
+        "https://forge.example.com/env/product", "IDEA_REALIZATION_PRODUCT_REMOTE")
+    assert from_env.sources["control_remote"] == "local.yaml"
+
+
+def test_placeholder_repository_values_count_as_unset(tmp_path: Path) -> None:
+    _write(tmp_path, "project.yaml", PROJECT)
+    _write(tmp_path, "product.yaml", "schema_version: 1\nname: hack\nintegration_branch: dev\n"
+           "remote: REPLACE-WITH-THE-PRODUCT-REPOSITORY-GIT-URL\n")
+    _write(tmp_path, "local.yaml", "control_github: REPLACE-WITH-THE-CONTROL-ORG-AND-NAME\n")
+    config = paths.resolve({"root": str(tmp_path)}, env={})
+    assert [config.text(key) for key in REPOSITORY_KEYS] == ["", "", "", ""]
+    assert {config.sources[key] for key in REPOSITORY_KEYS} == {"default"}
+    assert config.invalid() == []
+
+
+@pytest.mark.parametrize(("name", "value"), [
+    ("control_github", "team"), ("product_github", "a/b/c"),
+    ("product_github", "https://forge.example.com/team/x"),
+    ("control_remote", "git@forge.example.com:team/a b.git"),
+])
+def test_a_malformed_repository_value_is_refused(tmp_path: Path, name: str, value: str) -> None:
+    with pytest.raises(ValueError, match=name):
+        _config(tmp_path, **{name: value}).text(name)
+
+
+def test_show_names_where_a_repository_url_came_from(
+        tmp_path: Path, capsys: pytest.CaptureFixture[str],
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    for name in [*paths.KEYS, "root"]:
+        monkeypatch.delenv("IDEA_REALIZATION_" + name.upper(), raising=False)
+        monkeypatch.delenv("CLAUDE_PLUGIN_OPTION_" + name.upper(), raising=False)
+    _write(tmp_path, "local.yaml", f"product_remote: {PRODUCT_URL}\n")
+    assert paths.main(["show", "--root", str(tmp_path)]) == 0
+    rows = {line.split()[0]: line.split() for line in capsys.readouterr().out.splitlines()}
+    assert rows["product_remote"][1:] == [PRODUCT_URL, "local.yaml"]
+    assert rows["control_remote"][1:] == ["default"]
+
+
+def test_this_repository_tracks_no_repository_url() -> None:
+    repository = PLUGIN_ROOT.parent.parent
+    config = paths.resolve({"root": str(repository)}, env={})
+    tracked = paths.project_values(repository)
+    assert not set(REPOSITORY_KEYS) & set(tracked)
+    assert all(config.sources[key] != "project.yaml" for key in REPOSITORY_KEYS)

@@ -2,9 +2,11 @@ schema_version: 1
 # What the whole team shares about this control repository (schemas/project.schema.json).
 # What differs per machine goes in the untracked .idea-realization/local.yaml instead.
 # A value that starts with REPLACE-WITH- is a placeholder: scripts treat it as unset.
+# The control repository's URL and GitHub name are not tracked here: they can name a confidential
+# organization. Each machine sets control_remote and control_github in its untracked
+# .idea-realization/local.yaml (template: local.example.yaml). A team whose URL may be tracked can
+# add control.remote and control.github below instead; local.yaml still overrides them.
 control:
-  remote: REPLACE-WITH-THE-CONTROL-REPOSITORY-GIT-URL
-  github: REPLACE-WITH-THE-CONTROL-REPOSITORY-ORG-AND-NAME
   integration_branch: dev
 demo:
   date: '2026-11-05'

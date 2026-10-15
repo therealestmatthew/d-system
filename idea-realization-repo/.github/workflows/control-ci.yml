@@ -36,15 +36,11 @@ jobs:
       - name: Lint (ruff)
         run: uv run ruff check tools/ test/
 
-      # The scaffold recreates the gitignored .idea-realization/staging/ directory that doctor
-      # otherwise reports missing. It never overwrites an existing file. IDEA_REALIZATION_ROOT is
-      # set on these three steps only: the plugin tests create their own temporary repositories
-      # and fail if it points them at this checkout.
-      - name: Scaffold
-        env:
-          IDEA_REALIZATION_ROOT: ${{ github.workspace }}
-        run: uv run plugins/idea-realization/scripts/scaffold.py --feature all
-
+      # No scaffold step: doctor reports the gitignored .idea-realization/staging/ directory, which a
+      # fresh checkout lacks, as absent and does not fail on it, and running the scaffold here would
+      # rewrite the tracked install-state.json. IDEA_REALIZATION_ROOT is set on the doctor and check
+      # steps only: the plugin tests create their own temporary repositories and fail if it points
+      # them at this checkout.
       - name: Doctor
         env:
           IDEA_REALIZATION_ROOT: ${{ github.workspace }}
@@ -66,25 +62,27 @@ jobs:
       # The deny-list is the repository secret DENY_LIST, one identifier per line. It is written
       # to the runner's temporary directory, never to the workspace, and removed afterwards.
       # check_confidential.py reads its path from PRIVATE_DENY_LIST (tools/check_confidential.py).
-      # Without the secret (for example on a pull request from a fork) only the path check runs,
-      # and the run carries a warning.
+      # Without the secret the step fails, as product CI does: a run that could not look for the
+      # identifiers has not shown that none are present. A pull request from a fork gets no
+      # secrets, so it fails here too.
       - name: Private-content check
         env:
           DENY_LIST: ${{ secrets.DENY_LIST }}
         run: |
-          if [ -n "$DENY_LIST" ]; then
-            deny_file="$RUNNER_TEMP/deny-list.txt"
-            printf '%s\n' "$DENY_LIST" > "$deny_file"
-            # A violation line names the identifier it matched; mask every entry so the log
-            # never shows one.
-            while IFS= read -r entry; do
-              case "$entry" in ''|'#'*) ;; *) echo "::add-mask::$entry" ;; esac
-            done < "$deny_file"
-            export PRIVATE_DENY_LIST="$deny_file"
-          else
-            echo "::warning::secret DENY_LIST is not available; only the path check runs"
-            export PRIVATE_DENY_LIST="$RUNNER_TEMP/no-deny-list.txt"
+          if [ -z "$DENY_LIST" ]; then
+            echo "::error::The repository secret DENY_LIST is not set. The repository owner sets it: gh secret set DENY_LIST < .private/deny-list.txt"
+            exit 1
           fi
+          deny_file="$RUNNER_TEMP/deny-list.txt"
+          printf '%s\n' "$DENY_LIST" | tr -d '\r' > "$deny_file"
+          # A violation line names the identifier it matched; mask every entry so the log
+          # never shows one.
+          while IFS= read -r line; do
+            entry=$(printf '%s' "$line" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            case "$entry" in ''|'#'*) continue ;; esac
+            echo "::add-mask::$entry"
+          done < "$deny_file"
+          export PRIVATE_DENY_LIST="$deny_file"
           status=0
           uv run python tools/check_confidential.py || status=$?
           rm -f "$RUNNER_TEMP/deny-list.txt"

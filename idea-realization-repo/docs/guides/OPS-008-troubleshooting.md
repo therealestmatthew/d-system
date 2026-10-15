@@ -21,7 +21,8 @@ from the control repository's root unless the entry says otherwise.
 Two rules apply to every entry:
 
 - A failing check or hook is a result to fix or report, never a step to retry until it goes quiet.
-- Never commit with `--no-verify`, never force-push a shared branch, and never route around a hook.
+- Never commit with `--no-verify` and never route around a hook. Never force-push `dev` or `main`;
+  a feature branch may be force-pushed only with `--force-with-lease`, after a rebase.
 
 ## Git and the backlog
 
@@ -64,24 +65,39 @@ Two rules apply to every entry:
 
   Source: the `session-start` skill, "If a rebase conflicts"; `plugins/idea-realization/docs/backlog-protocol.md`.
 
-### The doctor reports drift
+### The doctor fails
 
-- **Symptom.** `uv run plugins/idea-realization/scripts/doctor.py` exits 1 and lists files as
-  `drifted` or `missing`.
-- **Cause.** The doctor compares each file the scaffold wrote with the hash it recorded then.
-  - `drifted` on a data file (`backlog/backlog.yaml`, `docs/codes.yaml`, `docs/systems.yaml`, the
-    idea files, `brain/index.md`) is expected once work has started.
-  - `drifted` on a copied schema under `.idea-realization/schemas/` means the local copy differs
-    from the plugin's.
-  - `missing` means the file or directory was removed (for example `.idea-realization/staging/`,
-    which is not tracked by git).
+- **Symptom.** `IDEA_REALIZATION_ROOT=$PWD uv run plugins/idea-realization/scripts/doctor.py`
+  exits 1. Each recorded file is listed with a state.
+- **Cause.** The doctor compares each file in `.idea-realization/install-state.json` with the disk.
+  Only some states fail the run:
+  - `unchanged`: matches the record. Does not fail.
+  - `edited`: a data or configuration file people and agents edit by design (`backlog/backlog.yaml`,
+    `docs/codes.yaml`, `docs/systems.yaml`, the idea files, `brain/index.md`, `product.yaml`,
+    `project.yaml`) changed since the scaffold wrote it. This is normal use and does not fail;
+    `check.py` validates the content.
+  - `absent`: a recorded directory that git ignores, such as `.idea-realization/staging/`, is not
+    there. A fresh clone never has it. Does not fail.
+  - `stale`: a schema copy under `.idea-realization/schemas/` differs from the plugin's own copy.
+    Fails.
+  - `unrecorded`: a schema copy matches the plugin's, but the record still holds an older hash
+    (the copy was updated by hand). Fails.
+  - `drifted`: a schema copy that this plugin version no longer ships differs from the record, or
+    `.gitignore` changed since the scaffold changed it with consent. Fails.
+  - `missing`: a recorded file, or a recorded directory git does not ignore, was removed. Fails.
 - **Fix.**
+  - `stale` or `unrecorded`: run the command the doctor's line names, for example
+    `IDEA_REALIZATION_ROOT=$PWD uv run plugins/idea-realization/scripts/scaffold.py --feature backlog --refresh-schemas`.
+    It replaces the copy with the plugin's file (or only records the current hash when the content
+    already matches) and never touches data files. Add `--dry-run` first to see what it would do.
+    Commit the refreshed schema and `install-state.json` together.
   - `missing`: run the scaffold again for that feature, for example
-    `uv run plugins/idea-realization/scripts/scaffold.py --feature partition`. It writes only what is
-    missing and never overwrites.
-  - `drifted` on a data file: no action.
-  - `drifted` on a schema: do not edit it back by hand. Ask the owner; the scaffold never
-    overwrites an existing file, and there is no command that resets a record.
+    `IDEA_REALIZATION_ROOT=$PWD uv run plugins/idea-realization/scripts/scaffold.py --feature partition`.
+    It writes only what is missing and never overwrites.
+  - `drifted`: ask the owner.
+  - `edited` and `absent`: no action.
+
+  Source: the `doctor` and `scaffold` skills (`plugins/idea-realization/skills/`).
 
 ### A hook refuses a commit or a command
 
@@ -155,6 +171,31 @@ Two rules apply to every entry:
     `.idea-realization/product.yaml`, normally `product-ci.yml`) is not on the branch, or its job is
     not named `verify`, or GitHub Actions is not enabled for the repository. Check the first two in
     the repository. Enabling Actions and changing the ruleset are the owner's: ask the owner.
+
+### CI fails with "The repository secret DENY_LIST is not set"
+
+- **Symptom.** The `Private-content check` step (control) or `Confidential check` step (product)
+  fails with that message.
+- **Cause.** The workflow has no deny-list to check against. A missing secret fails the run in both
+  repositories by design. A pull request from a fork never receives secrets, so it always fails here.
+- **Fix.** The owner sets the secret: `gh secret set DENY_LIST --repo <org>/<repo> <
+  .private/deny-list.txt`, then re-runs the job. Do not remove or weaken the step. A fork pull
+  request is recreated as a branch in the repository instead.
+
+  Source: `docs/guides/OPS-001-branching-and-ci.md`, section 7.
+
+### A merge into `main` is refused
+
+- **Symptom.** A pull request from `dev` to `main` cannot be merged, or a push to `main` is
+  rejected, with a message that the ref is protected by a ruleset (for example "Cannot update
+  this protected ref").
+- **Cause.** Only the owner can update `main` (the `update` rule in `control-main.json` and
+  `product-main.json`, with the owner as the only bypass actor), and only through a pull request.
+- **Fix.** Ask the owner to merge the release pull request. If the owner's own merge is refused,
+  the rulesets were applied without the main merger or with the wrong one: the owner re-runs
+  `tools/github/apply_rulesets.sh` with the right third argument.
+
+  Source: `docs/guides/OPS-001-branching-and-ci.md`, section 9.
 
 ## AWS
 

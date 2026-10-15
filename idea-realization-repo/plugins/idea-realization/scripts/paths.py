@@ -10,7 +10,8 @@ Every key is resolved with one precedence:
 2. the environment variable ``IDEA_REALIZATION_<KEY>``,
 3. this machine's ``.idea-realization/local.yaml`` (untracked),
 4. the plugin option ``CLAUDE_PLUGIN_OPTION_<KEY>``,
-5. the team's ``.idea-realization/project.yaml`` (tracked), for the keys it carries,
+5. the tracked ``.idea-realization/project.yaml`` or ``.idea-realization/product.yaml``, for the
+   keys they carry,
 6. the default declared in ``.claude-plugin/plugin.json``.
 
 ``local.yaml`` is gitignored and holds what differs per machine: a flat map of key to value for
@@ -19,10 +20,18 @@ entry of ``git worktree list``, at the same place relative to the git top level 
 every session worktree sees the one file. ``local.example.yaml`` is its tracked template.
 
 ``project.yaml`` is tracked and holds what the whole team shares (``schemas/project.schema.json``):
-``control.integration_branch`` supplies ``integration_branch`` and ``aws.region`` supplies
-``aws_region``. Its other values (the control remote, the demo dates, the team URLs) are read by
-``project.py``. A value in either file that starts with ``REPLACE-WITH-`` is a placeholder and
-counts as unset. A file that fails its schema raises ``PathError`` naming the file.
+``control.integration_branch`` supplies ``integration_branch``, ``aws.region`` supplies
+``aws_region``, and the optional ``control.remote`` and ``control.github`` supply
+``control_remote`` and ``control_github``. Its other values (the demo dates, the team URLs) are
+read by ``project.py``. A value in either file that starts with ``REPLACE-WITH-`` is a placeholder
+and counts as unset. A file that fails its schema raises ``PathError`` naming the file.
+
+The repository URLs are keys like any other, because a team may not be allowed to track them (a
+URL can name a confidential organization). ``control_remote`` and ``control_github`` name the
+control repository; ``product_remote`` and ``product_github`` name the product repository, and
+fall back to the optional ``remote`` and ``github`` of the tracked ``product.yaml``. Each machine
+sets the real values in its ``local.yaml`` (or ``IDEA_REALIZATION_<KEY>``). A ``*_github`` value
+must be ``<org>/<repo>``; a ``*_remote`` value must contain no whitespace.
 
 Claude Code exports ``CLAUDE_PLUGIN_OPTION_<KEY>`` to hooks only. A skill passes the saved option
 to a script by prefixing the command with ``CLAUDE_PLUGIN_OPTION_<KEY>='${user_config.<key>}'``,
@@ -85,10 +94,20 @@ ROOT_ENV = "IDEA_REALIZATION_ROOT"
 PLACEHOLDER = "REPLACE-WITH-"
 LOCAL_RECORD = Path(".idea-realization") / "local.yaml"
 PROJECT_RECORD = Path(".idea-realization") / "project.yaml"
+PRODUCT_RECORD = Path(".idea-realization") / "product.yaml"
 
 #: Keys ``project.yaml`` supplies, and where in it each one sits.
 PROJECT_KEYS = {"integration_branch": ("control", "integration_branch"),
-                "aws_region": ("aws", "region")}
+                "aws_region": ("aws", "region"),
+                "control_remote": ("control", "remote"),
+                "control_github": ("control", "github")}
+
+#: Keys ``product.yaml`` supplies, and the field of it each one is.
+PRODUCT_RECORD_KEYS = {"product_remote": "remote", "product_github": "github"}
+
+#: Keys naming a repository on its forge, as ``<org>/<repo>``.
+GITHUB_KEYS = {"control_github", "product_github"}
+GITHUB_SLUG = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 
 
 @dataclass(frozen=True)
@@ -113,7 +132,8 @@ class Key:
 
 #: Keys that hold plain text rather than a path. A ``multiple`` key is a list of paths.
 TEXT_KEYS = {"integration_branch", "aws_read_profile", "aws_deploy_profile", "aws_region",
-             "handle", "dev_port_range"}
+             "handle", "dev_port_range", "control_remote", "control_github", "product_remote",
+             "product_github"}
 
 #: Keys that resolve against the primary checkout rather than the current one.
 PRIMARY_KEYS = {"worktree_dir"}
@@ -159,13 +179,15 @@ def raw_source(name: str, flags: Mapping[str, str | None] | None = None,
                env: Mapping[str, str] | None = None, local: Mapping[str, str] | None = None,
                project: Mapping[str, str] | None = None) -> tuple[str | list[str], str]:
     """Return a key's value before path resolution and the source it came from, following the
-    six-level precedence. ``local`` and ``project`` are the keys read from the two files."""
+    six-level precedence. ``local`` is the keys read from ``local.yaml``; ``project`` is the keys
+    read from the tracked files (``project.yaml`` and ``product.yaml``)."""
     key = KEYS[name]
     env = os.environ if env is None else env
+    tracked = PRODUCT_RECORD.name if name in PRODUCT_RECORD_KEYS else PROJECT_RECORD.name
     candidates = (((flags or {}).get(name), key.flag), (env.get(key.env), key.env),
                   ((local or {}).get(name), LOCAL_RECORD.name),
                   (env.get(key.option_env), key.option_env),
-                  ((project or {}).get(name), PROJECT_RECORD.name))
+                  ((project or {}).get(name), tracked))
     for candidate, source in candidates:
         if _set(candidate):
             assert candidate is not None
@@ -249,13 +271,27 @@ def local_values(root: Path) -> dict[str, str]:
 
 
 def project_values(root: Path) -> dict[str, str]:
-    """The keys the tracked ``project.yaml`` supplies (``PROJECT_KEYS``)."""
+    """The keys the tracked files supply: ``project.yaml`` (``PROJECT_KEYS``) and
+    ``product.yaml`` (``PRODUCT_RECORD_KEYS``).
+
+    ``product.yaml`` is read without its schema: ``product.py`` validates it and reports a bad
+    one, so a broken product record does not stop scripts that never touch the product."""
     record = read_yaml_record(root / PROJECT_RECORD, "project.schema.json") or {}
     found = {}
     for name, (section, field) in PROJECT_KEYS.items():
         value = (record.get(section) or {}).get(field)
         if value is not None:
             found[name] = str(value)
+    location = root / PRODUCT_RECORD
+    if location.is_file():
+        try:
+            product = yaml.safe_load(location.read_text(encoding="utf-8"))
+        except yaml.YAMLError:
+            product = None
+        if isinstance(product, dict):
+            for name, field in PRODUCT_RECORD_KEYS.items():
+                if isinstance(product.get(field), str):
+                    found[name] = product[field]
     return found
 
 
@@ -372,6 +408,10 @@ class Config:
             raise PathError(name, value, f"a handle must match {HANDLE.pattern}")
         if name == "dev_port_range" and value:
             return _port_range(name, value)
+        if name in GITHUB_KEYS and value and not GITHUB_SLUG.match(value):
+            raise PathError(name, value, "must be <org>/<repo>")
+        if name in {"control_remote", "product_remote"} and re.search(r"\s", value):
+            raise PathError(name, value, "a repository URL must contain no whitespace")
         return value
 
     def invalid(self) -> list[PathError]:

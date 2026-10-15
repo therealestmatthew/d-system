@@ -116,6 +116,7 @@ Severity:
 
 Order the array blocker first, then major, then minor. Omit optional fields you have nothing for.
 Before the array, write at most ten lines: what you checked, and for each area that held, one line
-saying so. An empty array must mean you attacked and found nothing, not that you skimmed.
+saying so. If the agent you run as asks for a `VERDICT:` line, it is the first line of your reply,
+before those ten lines, and does not count toward them; nothing follows the array. An empty array must mean you attacked and found nothing, not that you skimmed.
 
 If an input named above is missing, report that as a blocker finding and stop.

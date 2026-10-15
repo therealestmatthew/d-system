@@ -3,7 +3,7 @@
   "plugin": "idea-realization",
   "plugin_version": "0.1.0",
   "installed_at": "2026-10-14T23:06:45Z",
-  "updated_at": "2026-10-15T02:15:58Z",
+  "updated_at": "2026-10-15T02:38:13Z",
   "features": [
     "backlog",
     "brain",
@@ -131,26 +131,26 @@
       "owner": "plugin"
     },
     {
-      "path": ".idea-realization/schemas/product.schema.json",
-      "sha256": "b28de79d0cbf9fdd15b7c06bec5af308fe787680e3605dced105dcb454f92fd1",
-      "feature": "product",
-      "owner": "plugin"
-    },
-    {
       "path": ".idea-realization/schemas/brain-entry.schema.json",
       "sha256": "79a993dca9ff25c212d018e87a10f9bef57ebb15449347371be8a279dcd9b686",
       "feature": "brain",
       "owner": "plugin"
     },
     {
+      "path": ".idea-realization/schemas/product.schema.json",
+      "sha256": "cdf5d5f3ea7a58d6988f654fd803d94834e8706ef5b2edf399a027fa94757a0f",
+      "feature": "product",
+      "owner": "plugin"
+    },
+    {
       "path": ".idea-realization/schemas/project.schema.json",
-      "sha256": "d6641e450ce86fcad8fb52d7f949e16bf275c107a7297850fed5de5523ab5bc7",
+      "sha256": "3b0aa85517b5c543074103f34c42dbf99ee1df48e4cdc493320a88aae758c73e",
       "feature": "project",
       "owner": "plugin"
     },
     {
       "path": ".idea-realization/schemas/local.schema.json",
-      "sha256": "21fc400f16e23b076b35fe4a2d690680f56cbfb51b552b05cad695f72b5377b5",
+      "sha256": "b78bbf6e56d784477238bcfe5344a15061a711cdb45d01778cd55c84fb04c893",
       "feature": "project",
       "owner": "plugin"
     }

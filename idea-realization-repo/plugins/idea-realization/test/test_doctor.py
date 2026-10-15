@@ -98,23 +98,29 @@ def test_a_config_edit_without_consent_is_edited_too(
     assert "edited    .idea-realization/product.yaml  (product)\n" in capsys.readouterr().out
 
 
-def test_doctor_reports_a_control_origin_that_is_not_project_yaml_remote(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+def test_doctor_reports_a_control_origin_that_is_not_the_control_remote(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    monkeypatch.delenv("IDEA_REALIZATION_CONTROL_REMOTE", raising=False)
+    monkeypatch.delenv("CLAUDE_PLUGIN_OPTION_CONTROL_REMOTE", raising=False)
     git(tmp_path, "init", "-q")
     git(tmp_path, "remote", "add", "origin", "git@forge.example.com:team/control.git")
     scaffold.scaffold(paths.resolve({"root": str(tmp_path)}, env={}), ["project"],
                       consent=["edit"])
-    project = tmp_path / ".idea-realization" / "project.yaml"
-    text = project.read_text()
-    project.write_text(text.replace("REPLACE-WITH-THE-CONTROL-REPOSITORY-GIT-URL",
-                                    "https://forge.example.com/team/control"))
     assert doctor.main(["--root", str(tmp_path)]) == 0
-    assert "origin    matches" in capsys.readouterr().out
-    project.write_text(text.replace("REPLACE-WITH-THE-CONTROL-REPOSITORY-GIT-URL",
-                                    "git@forge.example.com:team/other.git"))
+    out = capsys.readouterr().out
+    assert "origin    not compared: control_remote is not set" in out
+    assert ".idea-realization/local.yaml" in out
+    local = tmp_path / ".idea-realization" / "local.yaml"
+    local.write_text("control_remote: https://forge.example.com/team/control\n")
+    assert doctor.main(["--root", str(tmp_path)]) == 0
+    assert "origin    matches control_remote (from local.yaml)" in capsys.readouterr().out
+    local.write_text("control_remote: git@forge.example.com:team/other.git\n")
     assert doctor.main(["--root", str(tmp_path)]) == 1
     assert "not the control repository" in capsys.readouterr().out
+    monkeypatch.setenv("IDEA_REALIZATION_CONTROL_REMOTE", "git@forge.example.com:team/control.git")
+    assert doctor.main(["--root", str(tmp_path)]) == 0
+    assert "(from IDEA_REALIZATION_CONTROL_REMOTE)" in capsys.readouterr().out
 
 
 def test_an_invalid_project_yaml_exits_two_without_a_traceback(

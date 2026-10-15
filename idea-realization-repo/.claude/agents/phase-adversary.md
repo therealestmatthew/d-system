@@ -41,8 +41,9 @@ judged against.
 
 ## Your report
 
-- First line: `VERDICT pass` or `VERDICT fail`, the phase id and the reviewed commit. `pass` means
-  every acceptance condition holds and no blocker or major finding stands.
+- First line: `VERDICT: pass` or `VERDICT: reject`, then the phase id and the reviewed commit.
+  `pass` means every acceptance condition holds and no blocker or major finding stands; these are
+  the two values of the review schema's `verdict` field.
 - Then each acceptance condition: met or not met, with the evidence (a command and its output, or
   a diff hunk).
 - Then the ranked findings, then the verbatim output of the commands that support them.

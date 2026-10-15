@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Project configuration",
-  "description": "What the whole team shares about this control repository: its remote and integration branch, the demo dates and tag prefix, the team's links and the default AWS region. Tracked; what differs per machine goes in local.yaml. A value that starts with REPLACE-WITH- is a placeholder and counts as unset.",
+  "description": "What the whole team shares about this control repository: its integration branch (and its remote, when the URL may be tracked), the demo dates and tag prefix, the team's links and the default AWS region. Tracked; what differs per machine goes in local.yaml. A value that starts with REPLACE-WITH- is a placeholder and counts as unset.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "control"],
@@ -29,19 +29,19 @@
     "control": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["remote", "integration_branch"],
+      "required": ["integration_branch"],
       "properties": {
         "remote": {
           "type": "string",
           "minLength": 1,
-          "description": "Git URL of this control repository. Once set, check.py and doctor.py report a checkout whose origin differs."
+          "description": "Git URL of this control repository. Optional: a team whose URL must not be tracked sets control_remote in local.yaml instead, which overrides this. Once set, check.py and doctor.py report a checkout whose origin differs."
         },
         "github": {
           "anyOf": [
             {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
             {"$ref": "#/definitions/placeholder"}
           ],
-          "description": "The control repository on GitHub, as <org>/<repo>, for gh commands."
+          "description": "The control repository on GitHub, as <org>/<repo>, for gh commands. Optional; control_github in local.yaml overrides it."
         },
         "integration_branch": {
           "type": "string",

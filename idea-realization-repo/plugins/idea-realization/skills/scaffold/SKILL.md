@@ -22,7 +22,8 @@ Ask with the AskUserQuestion tool which features to set up, as a multi-select: `
 log, rendered view and priority file), `partition` (the staging directory), `backlog` (the phase
 catalog), `documents` (the document root, code register and systems registry), `workstreams` (the
 workstream ownership registry), `reviews` (the directory for review verdict records) and `product`
-(the record naming the product repository, whose `remote` must then be filled in) and `brain` (the
+(the record naming the product repository; each machine then sets `product_remote` in its
+untracked `.idea-realization/local.yaml`) and `brain` (the
 team's shared memory: its folders, README and index). Recommend `all`
 for a repository adopting the whole pipeline.
 

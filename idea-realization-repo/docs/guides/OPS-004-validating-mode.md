@@ -62,7 +62,7 @@ verification. Its brief to the reviewer contains:
 - the paths of the phase's requirement and plan;
 - the verification output, as evidence it may re-run but must not take on trust.
 
-`phase-adversary` replies with `VERDICT pass` or `VERDICT fail`, the phase id and the reviewed
+`phase-adversary` replies with a first line `VERDICT: pass` or `VERDICT: reject`, the phase id and the reviewed
 commit, then a judgement per acceptance condition, then ranked findings. The session records it with
 `gating: true` (the schema's `verdict` values are `pass` and `reject`). A passing gating verdict is
 the approval for merging both the product and the control pull requests. Two rejects in a row on the
@@ -126,8 +126,8 @@ reason or asks `aws-deploy` to remove it.
   (`plan-review.md`, section 4, and `plugins/idea-realization/docs/prompt-packs.md`).
 - **Batches:** `batch-validator`, which runs `plugins/idea-realization/scripts/batch_check.py
   <batch-id>` and the repository check, then judges the rules in
-  `plugins/idea-realization/docs/batches.md`. It ends with `VERDICT pass <batch-id>` or
-  `VERDICT fail <batch-id>`.
+  `plugins/idea-realization/docs/batches.md`. Its first line is `VERDICT: pass <batch-id>` or
+  `VERDICT: reject <batch-id>`.
 
 ## Reviewing a peer's ready branch
 

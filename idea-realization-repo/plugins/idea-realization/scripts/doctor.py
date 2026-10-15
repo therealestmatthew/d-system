@@ -26,9 +26,10 @@ fresh clone never has it, and the scaffold (or the first partition sweep) create
 A file changed under recorded ``gitignore`` consent (``.gitignore``) is reported unchanged or
 drifted against the hash recorded with the consent, marked as consented; people edit it.
 
-When ``project.yaml`` names a real ``control.remote``, the control checkout's ``origin`` must be
-that repository (``project.py``); while the value is a ``REPLACE-WITH-`` placeholder the comparison
-is skipped with a note.
+When ``control_remote`` is set (this machine's ``local.yaml``, ``IDEA_REALIZATION_CONTROL_REMOTE``,
+or a real ``control.remote`` in ``project.yaml``), the control checkout's ``origin`` must be that
+repository (``project.py``); while it is unset the comparison is skipped with a note naming
+``local.yaml``.
 
 It first checks every configured key the way the scripts do (``paths``) and names each one it
 would refuse, with the reason, rather than stopping at the first.
@@ -157,7 +158,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"{state:<9} {path}" + (f"  ({note})" if note else ""))
     bad = [result for result in results if result[0] not in OK_STATES]
     print(f"{len(results)} recorded, {len(bad)} drifted, stale, unrecorded or missing")
-    origin_problem, origin_note = project.control_origin(root)
+    origin_problem, origin_note = project.control_origin(config)
     if origin_problem:
         print(f"origin    {origin_problem}")
     elif origin_note:

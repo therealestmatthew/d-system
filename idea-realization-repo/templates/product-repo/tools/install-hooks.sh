@@ -6,8 +6,8 @@
 #   tools/install-hooks.sh
 #
 # The pre-commit hook runs tools/check_confidential.py. Put the deny-list at
-# .private/deny-list.txt (never committed), or export PRIVATE_DENY_LIST=<path>; without one, only
-# the private-directory path check runs.
+# .private/deny-list.txt in the main checkout (never committed; worktrees read it from there), or
+# export PRIVATE_DENY_LIST=<path>; without one, only the private-directory path check runs.
 #
 # If the project adds a hook manager that also sets core.hooksPath (for example husky), call
 # tools/git-hooks/pre-commit from that manager's pre-commit hook instead of running this script.
@@ -24,6 +24,9 @@ if [ -n "$PRIVATE_DENY_LIST" ]; then
     echo "deny-list: $PRIVATE_DENY_LIST (from PRIVATE_DENY_LIST)"
 elif [ -f .private/deny-list.txt ]; then
     echo "deny-list: .private/deny-list.txt"
+elif main_checkout=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)") &&
+        [ -f "$main_checkout/.private/deny-list.txt" ]; then
+    echo "deny-list: $main_checkout/.private/deny-list.txt (main checkout)"
 else
     echo "WARNING: no deny-list found; the hook will only run the private-directory path check."
     echo "         Get the deny-list from the repository owner and save it as .private/deny-list.txt."

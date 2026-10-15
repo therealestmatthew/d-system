@@ -12,7 +12,17 @@ the `check` command regenerates it in memory and fails on any difference.
 | ARCH-002 | architecture | draft | repository-owner | docs/architecture/ARCH-002-bidirectional-integrity-architecture.md |
 | GOV-001 | governance | draft | repository-owner | docs/governance/GOV-001-standing-rules.md |
 | GOV-002 | governance | draft | repository-owner | docs/governance/GOV-002-anti-pattern-procedures.md |
+| OPS-001 | operation | draft | repository-owner | docs/guides/OPS-001-branching-and-ci.md |
+| OPS-002 | operation | draft | repository-owner | docs/guides/OPS-002-planning-mode.md |
+| OPS-003 | operation | draft | repository-owner | docs/guides/OPS-003-implementing-mode.md |
+| OPS-004 | operation | draft | repository-owner | docs/guides/OPS-004-validating-mode.md |
+| OPS-005 | operation | draft | repository-owner | docs/guides/OPS-005-team-workflow.md |
+| OPS-006 | operation | draft | repository-owner | docs/guides/OPS-006-demo-day-runbook.md |
+| OPS-007 | operation | draft | repository-owner | docs/guides/OPS-007-cost-guardrails.md |
+| OPS-008 | operation | draft | repository-owner | docs/guides/OPS-008-troubleshooting.md |
+| OPS-009 | operation | draft | repository-owner | docs/guides/OPS-009-mode-cheat-sheets.md |
 | PLAN-001 | plan | approved | repository-owner | docs/plans/PLAN-001-bootstrap-follow-ons.md |
+| PLAN-002 | plan | draft | repository-owner | docs/plans/PLAN-002-ci-deploy-to-aws.md |
 | PLAN-003 | plan | draft | repository-owner | docs/plans/PLAN-003-ux-component-kit.md |
 | REQ-001 | requirement | draft | repository-owner | docs/requirements/REQ-001-ux-kit-requirements.md |
 
@@ -21,6 +31,7 @@ the `check` command regenerates it in memory and fails on any difference.
 | Code | Plan | Status | Queued | Active | Complete | Agents |
 |---|---|---|---|---|---|---|
 | PLAN-001 | doc-bootstrap-follow-ons | approved | 17 | 0 | 0 | — |
+| PLAN-002 | doc-ci-deploy-to-aws | draft | 1 | 0 | 0 | — |
 | PLAN-003 | doc-ux-kit-plan | draft | 15 | 0 | 0 | — |
 
 ## Held codes
@@ -29,4 +40,4 @@ the `check` command regenerates it in memory and fails on any difference.
 |---|---|---|
 | — | — | — |
 
-8 documents — adr: 1, architecture: 2, governance: 2, plan: 2, requirement: 1.
+18 documents — adr: 1, architecture: 2, governance: 2, operation: 9, plan: 3, requirement: 1.

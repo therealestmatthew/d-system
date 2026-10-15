@@ -9,7 +9,8 @@ the product repository and does not govern the session reading it.)
 - Sessions start in the **control repository** and reach this repository with `--add-dir` (or
   `/add-dir` inside a session). Do not start an agent session here.
 - The control repository's `AGENTS.md` governs all work in this repository. Read it there. Its
-  `docs/` and `.idea-realization/product.yaml` say which phase you are working on and where this
+  `docs/` say which phase you are working on; its `.idea-realization/product.yaml` and each
+  machine's untracked `.idea-realization/local.yaml` say which repository this is and where this
   checkout and its worktrees are.
 
 ## Branches

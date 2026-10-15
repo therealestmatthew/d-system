@@ -182,7 +182,9 @@ exits 0 before any hand-off.
   it would still be correct if a different person adopted the system.
 - A fresh clone, with nothing from the confidential directory, passes the check and the tests.
 - Pushing your own branch needs no approval. Backing up your own work is not publishing.
-- Pushed history is not rewritten. If it seems to need rewriting, the agent says so and stops.
+- A feature branch (`agent/...`) may be force-pushed with `git push --force-with-lease` after it
+  is rebased onto the integration branch. The integration branch and `main` are never
+  force-pushed. Any other rewrite of pushed history is not done: the agent says so and stops.
 
 ## 11. Worktrees
 

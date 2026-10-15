@@ -29,8 +29,8 @@ intent.
 
 ## What you produce
 
-A verdict — **pass** or **fail** — then the findings (empty on pass), then the verbatim output of
-every verification command. A summary of a failure is not a result; the failure is the result.
+First line: `VERDICT: pass` or `VERDICT: reject` (the two values of the review schema's `verdict`
+field), then the findings (empty on pass), then the verbatim output of every verification command. A summary of a failure is not a result; the failure is the result.
 
 ## What you must never do
 

@@ -15,7 +15,8 @@ Every key is resolved with one precedence:
 2. the environment variable ``IDEA_REALIZATION_<KEY>``,
 3. this machine's ``.idea-realization/local.yaml`` (untracked),
 4. the plugin option ``CLAUDE_PLUGIN_OPTION_<KEY>``,
-5. the team's ``.idea-realization/project.yaml`` (tracked), for the keys it carries,
+5. the tracked ``.idea-realization/project.yaml`` or ``.idea-realization/product.yaml``, for the
+   keys they carry,
 6. the default declared in ``.claude-plugin/plugin.json``.
 
 ``local.yaml`` is gitignored and holds what differs per machine: a flat map of key to value for
@@ -24,10 +25,18 @@ entry of ``git worktree list``, at the same place relative to the git top level 
 every session worktree sees the one file. ``local.example.yaml`` is its tracked template.
 
 ``project.yaml`` is tracked and holds what the whole team shares (``schemas/project.schema.json``):
-``control.integration_branch`` supplies ``integration_branch`` and ``aws.region`` supplies
-``aws_region``. Its other values (the control remote, the demo dates, the team URLs) are read by
-``project.py``. A value in either file that starts with ``REPLACE-WITH-`` is a placeholder and
-counts as unset. A file that fails its schema raises ``PathError`` naming the file.
+``control.integration_branch`` supplies ``integration_branch``, ``aws.region`` supplies
+``aws_region``, and the optional ``control.remote`` and ``control.github`` supply
+``control_remote`` and ``control_github``. Its other values (the demo dates, the team URLs) are
+read by ``project.py``. A value in either file that starts with ``REPLACE-WITH-`` is a placeholder
+and counts as unset. A file that fails its schema raises ``PathError`` naming the file.
+
+The repository URLs are keys like any other, because a team may not be allowed to track them (a
+URL can name a confidential organization). ``control_remote`` and ``control_github`` name the
+control repository; ``product_remote`` and ``product_github`` name the product repository, and
+fall back to the optional ``remote`` and ``github`` of the tracked ``product.yaml``. Each machine
+sets the real values in its ``local.yaml`` (or ``IDEA_REALIZATION_<KEY>``). A ``*_github`` value
+must be ``<org>/<repo>``; a ``*_remote`` value must contain no whitespace.
 
 Claude Code exports ``CLAUDE_PLUGIN_OPTION_<KEY>`` to hooks only. A skill passes the saved option
 to a script by prefixing the command with ``CLAUDE_PLUGIN_OPTION_<KEY>='${user_config.<key>}'``,
@@ -264,9 +273,10 @@ fresh clone never has it, and the scaffold (or the first partition sweep) create
 A file changed under recorded ``gitignore`` consent (``.gitignore``) is reported unchanged or
 drifted against the hash recorded with the consent, marked as consented; people edit it.
 
-When ``project.yaml`` names a real ``control.remote``, the control checkout's ``origin`` must be
-that repository (``project.py``); while the value is a ``REPLACE-WITH-`` placeholder the comparison
-is skipped with a note.
+When ``control_remote`` is set (this machine's ``local.yaml``, ``IDEA_REALIZATION_CONTROL_REMOTE``,
+or a real ``control.remote`` in ``project.yaml``), the control checkout's ``origin`` must be that
+repository (``project.py``); while it is unset the comparison is skipped with a note naming
+``local.yaml``.
 
 It first checks every configured key the way the scripts do (``paths``) and names each one it
 would refuse, with the reason, rather than stopping at the first.
@@ -725,27 +735,35 @@ tracked in ``.idea-realization/product.yaml``::
 
     schema_version: 1
     name: <product name>
-    remote: <git URL of the product repository>
     integration_branch: main
     ci_workflow: none
-    github: <org>/<repo>        # optional
+    remote: <git URL of the product repository>   # optional
+    github: <org>/<repo>                          # optional
+
+The repository's URL and GitHub name are the ``product_remote`` and ``product_github`` keys
+(``paths.py``): ``--product-remote``, then ``IDEA_REALIZATION_PRODUCT_REMOTE``, then this machine's
+untracked ``.idea-realization/local.yaml``, then the plugin option, then the tracked ``remote`` and
+``github`` above. A team whose URL names a confidential organization leaves them out of
+``product.yaml`` and sets them in ``local.yaml`` on every machine.
 
 Where the product checkout sits differs per machine, so it is configured, never tracked: the
-``product_root`` key (``--product-root``, ``IDEA_REALIZATION_PRODUCT_ROOT``, then the plugin
-option). ``product_worktree_dir`` names where product worktrees go, beside the product checkout.
+``product_root`` key (``--product-root``, ``IDEA_REALIZATION_PRODUCT_ROOT``, ``local.yaml``, then
+the plugin option). ``product_worktree_dir`` names where product worktrees go, beside the product
+checkout.
 
 A declared path names its repository with a prefix: ``product:src/api/`` is a path in the product
 repository, and a path with no prefix is a path in the control repository.
 
 Before any script acts on the product checkout it calls ``verify``, which refuses unless the
-checkout's ``origin`` is the tracked ``remote``, so a wrong path cannot send work into the wrong
-repository.
+checkout's ``origin`` is the resolved ``product_remote``, so a wrong path cannot send work into the
+wrong repository. While ``product_remote`` is unset (or a ``REPLACE-WITH-`` placeholder) ``verify``
+refuses and names ``local.yaml``; ``show`` prints it as not set.
 
 | Flag | Help | Choices | Default | Required |
 |---|---|---|---|---|
 | `command` |  |  |  |  |
 
-Shared configuration flags: `--root`, `--product-root`, `--product-worktree-dir`, resolved by the shared configuration precedence rule.
+Shared configuration flags: `--root`, `--product-root`, `--product-worktree-dir`, `--product-remote`, `--product-github`, resolved by the shared configuration precedence rule.
 
 Exit codes found in source: 0, 1.
 
@@ -761,9 +779,9 @@ What the whole team shares about this control repository, and the check that the
 
     schema_version: 1
     control:
-      remote: <git URL of this control repository>
-      github: <org>/<repo>
       integration_branch: dev
+      remote: <git URL of this control repository>   # optional
+      github: <org>/<repo>                           # optional
     demo:
       date: 'YYYY-MM-DD'
       freeze: 'YYYY-MM-DD'
@@ -775,20 +793,26 @@ What the whole team shares about this control repository, and the check that the
     aws:
       region: <region>
 
-``control.integration_branch`` and ``aws.region`` feed the ``integration_branch`` and
-``aws_region`` keys through ``paths.py``; ``show`` prints every value here. A value that starts
-with ``REPLACE-WITH-`` is a placeholder and counts as unset.
+``control.integration_branch``, ``aws.region``, ``control.remote`` and ``control.github`` feed the
+``integration_branch``, ``aws_region``, ``control_remote`` and ``control_github`` keys through
+``paths.py``; ``show`` prints every value here, then the resolved repository keys and where each
+came from. A value that starts with ``REPLACE-WITH-`` is a placeholder and counts as unset.
 
-``show`` and ``verify`` both compare the control checkout's ``origin`` with ``control.remote`` and
-exit 1 when they differ, so a session cannot record work in the wrong repository. While
-``control.remote`` is a placeholder the comparison is skipped with a note. ``check.py`` and
-``doctor.py`` run the same comparison.
+The repository URL may name a confidential organization, so a team can leave ``control.remote``
+and ``control.github`` out of this file and set ``control_remote`` and ``control_github`` in each
+machine's untracked ``.idea-realization/local.yaml`` (or ``IDEA_REALIZATION_CONTROL_REMOTE``),
+which take precedence over this file.
+
+``show`` and ``verify`` both compare the control checkout's ``origin`` with the resolved
+``control_remote`` and exit 1 when they differ, so a session cannot record work in the wrong
+repository. While ``control_remote`` is unset the comparison is skipped with a note naming
+``local.yaml``. ``check.py`` and ``doctor.py`` run the same comparison.
 
 | Flag | Help | Choices | Default | Required |
 |---|---|---|---|---|
 | `command` |  |  |  |  |
 
-Shared configuration flags: `--root`, resolved by the shared configuration precedence rule.
+Shared configuration flags: `--root`, `--control-remote`, `--control-github`, resolved by the shared configuration precedence rule.
 
 Exit codes found in source: 0, 1.
 

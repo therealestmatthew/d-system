@@ -10,5 +10,11 @@ product_root: REPLACE-WITH-THE-ABSOLUTE-PATH-OF-YOUR-PRODUCT-CHECKOUT
 aws_read_profile: REPLACE-WITH-YOUR-READ-ONLY-AWS-PROFILE
 aws_deploy_profile: REPLACE-WITH-YOUR-DEPLOY-AWS-PROFILE
 # aws_region: overrides aws.region in project.yaml on this machine only.
+# The repository URLs and GitHub names (<org>/<repo>). They are set here, not in the tracked
+# project.yaml and product.yaml, because they can name a confidential organization.
+control_remote: REPLACE-WITH-THE-CONTROL-REPOSITORY-GIT-URL
+control_github: REPLACE-WITH-THE-CONTROL-REPOSITORY-ORG-AND-NAME
+product_remote: REPLACE-WITH-THE-PRODUCT-REPOSITORY-GIT-URL
+product_github: REPLACE-WITH-THE-PRODUCT-REPOSITORY-ORG-AND-NAME
 handle: REPLACE-WITH-YOUR-DEVELOPER-HANDLE
 dev_port_range: 3000-3099

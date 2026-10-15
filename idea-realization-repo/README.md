@@ -5,6 +5,9 @@ decision, backlog phase, session record and review record, and the agents, skill
 that move work through them. The product itself is built in a separate **product repository**; work
 in it is planned, claimed, reviewed and recorded here.
 
+New to the team? Start with [ONBOARDING.md](ONBOARDING.md): the first-day checklist, how to claim
+work, and where to get help. `uv run python tools/onboard_check.py` checks your machine against it.
+
 ## The pipeline
 
 An idea moves through nine stages. Each gate marked *owner* is a decision only the owner makes.

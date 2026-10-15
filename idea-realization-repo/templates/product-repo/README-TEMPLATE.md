@@ -76,17 +76,22 @@ GitHub name.
    `.github/CODEOWNERS.example` as its comment says and rename it to `.github/CODEOWNERS`. This
    goes through a pull request to `dev` like any other change.
 
-9. **Point the control repository at the product repository** in
-   `.idea-realization/product.yaml`: set `remote` to the product repository's git URL and `github`
-   to `<org>/<product>`; keep `integration_branch: dev` and `ci_workflow: product-ci.yml`. Commit
-   that directly to control `dev` and push. The confidential check runs on that commit: a value
-   that contains a deny-listed identifier is refused, and must not be forced past the hook.
+9. **Check the control repository's product record**, `.idea-realization/product.yaml`: it keeps
+   `integration_branch: dev` and `ci_workflow: product-ci.yml`, and carries no URL. The product
+   repository's URL and `<org>/<product>` name can contain the organization's name, so they are
+   never committed: each developer sets them in step 10. If `product.yaml` needed a change,
+   commit it directly to control `dev` and push. The confidential check runs on that commit: a
+   value that contains a deny-listed identifier is refused, and must not be forced past the hook.
 
 10. **Each developer**, once per machine: clone the product repository, run
     `tools/install-hooks.sh`, put the deny-list at `.private/deny-list.txt` (or export
-    `PRIVATE_DENY_LIST`), and set `IDEA_REALIZATION_PRODUCT_ROOT` in the control repository to the
-    clone's path. `uv run plugins/idea-realization/scripts/product.py verify` in the control
-    repository must then succeed.
+    `PRIVATE_DENY_LIST`), and copy the control repository's `.idea-realization/local.example.yaml`
+    to `.idea-realization/local.yaml` (untracked) in its primary checkout. Set `product_root` to the
+    clone's path, `product_remote` to the product repository's git URL, `product_github` to
+    `<org>/<product>`, and `control_remote` and `control_github` to the control repository's.
+    `uv run plugins/idea-realization/scripts/product.py verify` in the control repository must
+    then succeed, and `uv run plugins/idea-realization/scripts/paths.py show` names `local.yaml`
+    as the source of each URL.
 
 ## What CI checks
 

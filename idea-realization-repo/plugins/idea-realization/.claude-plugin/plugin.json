@@ -129,6 +129,30 @@
       "title": "Developer server ports",
       "description": "The local ports a development server on this machine may use, as <first>-<last>, so two developers' servers on a shared host do not collide. Empty means no range is set.",
       "default": ""
+    },
+    "control_remote": {
+      "type": "string",
+      "title": "Control repository URL",
+      "description": "Git URL of the control repository. check.py and doctor.py report a control checkout whose origin differs; while it is empty the comparison is skipped. Set it in local.yaml when the URL must not be tracked; project.yaml control.remote is read below the plugin option.",
+      "default": ""
+    },
+    "control_github": {
+      "type": "string",
+      "title": "Control repository on GitHub",
+      "description": "The control repository on GitHub, as <org>/<repo>, for gh commands. Set it in local.yaml when it must not be tracked; project.yaml control.github is read below the plugin option.",
+      "default": ""
+    },
+    "product_remote": {
+      "type": "string",
+      "title": "Product repository URL",
+      "description": "Git URL of the product repository. product.py verify refuses a product checkout whose origin differs, and refuses while it is empty. Set it in local.yaml when the URL must not be tracked; product.yaml remote is read below the plugin option.",
+      "default": ""
+    },
+    "product_github": {
+      "type": "string",
+      "title": "Product repository on GitHub",
+      "description": "The product repository on GitHub, as <org>/<repo>, for gh commands. Set it in local.yaml when it must not be tracked; product.yaml github is read below the plugin option.",
+      "default": ""
     }
   }
 }

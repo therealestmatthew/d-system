@@ -89,9 +89,10 @@ Governed documents live under `docs_root`, in the folder `codes.yaml` names for 
 
 `uv run scripts/check.py` runs every installed feature's check; `--feature <name>` runs one.
 `/idea-realization:doctor` compares the install record with the disk. It reports a data file you
-have edited since the scaffold, such as the idea log or the backlog, as drifted. The `tools`
-skill answers which script does what from `docs/tools.md`, and `docs/` holds the protocol,
-backlog, reporting and review documents the skills follow.
+have edited since the scaffold, such as the idea log or the backlog, as edited, which does not
+fail; a schema copy that differs from the plugin's is stale, and `scaffold.py --refresh-schemas`
+fixes it. The `tools` skill answers which script does what from `docs/tools.md`, and `docs/`
+holds the protocol, backlog, reporting and review documents the skills follow.
 
 ## Skills
 
@@ -99,7 +100,7 @@ backlog, reporting and review documents the skills follow.
 |---|---|
 | `prerequisites` | Checks Python 3.12+, `uv`, `git` and, for triage and partition, the `claude` CLI; installs what is missing only after a yes |
 | `scaffold` | Creates each chosen feature's directories and seed files, never overwriting, and records every file written |
-| `doctor` | Reports every recorded file as unchanged, drifted or missing; changes nothing |
+| `doctor` | Reports every recorded file as unchanged, edited, stale, unrecorded, drifted, missing or absent; changes nothing |
 | `idea` | Records an idea, or amends, annotates, links, classifies or moves one, through the idea writer |
 | `idea-triage` | Triages one open idea with the triage agent and moves it to `triaged` |
 | `partition-ideas` | Runs a partition sweep over the triaged ideas, stopping at each gate |
@@ -113,6 +114,25 @@ backlog, reporting and review documents the skills follow.
 | `tools` | Answers which script does what from the generated tools reference |
 | `brain` | Loads the team's shared memory before work, or records a decision, research note, concept, entity, lesson, procedure or note in one step |
 
+## Agents
+
+The plugin ships three agents, in `agents/`:
+
+| Agent | Role (`docs/role-contracts.md`) |
+|---|---|
+| `idea-triage` | Triage: scouts one open idea and writes one finding |
+| `partition-analyst` | Partition: one analyst section of the partition pack |
+| `partition-adversary` | Partition: audits a proposed partition |
+
+The planning roles name three more agents that the plugin does not ship. A repository that wants
+them writes them in its own agent directory (`.claude/agents/`), against the contracts:
+
+| Agent | Role (`docs/role-contracts.md`) |
+|---|---|
+| `plan-adversary` | Adversary: reviews a plan at one altitude with `docs/adversary-prompt.md`; first line `VERDICT: pass` or `VERDICT: reject` |
+| `phase-splitter` | Phase-fit and Mapper: turns an approved plan into proposed one-session phases, batch stages and a `next_up` order, written only under `staging_dir` |
+| `batch-validator` | Batch validator: checks one batch composition with `scripts/batch_check.py` and the check; first line `VERDICT: pass` or `VERDICT: reject` |
+
 ## Configuration
 
 Every path a script reads is resolved by `scripts/paths.py`, in this order:
@@ -123,9 +143,11 @@ Every path a script reads is resolved by `scripts/paths.py`, in this order:
    (`schemas/local.schema.json`; the tracked `local.example.yaml` is its template);
 4. the plugin option `CLAUDE_PLUGIN_OPTION_<KEY>`, which the skills set from your saved options;
 5. the team's tracked `.idea-realization/project.yaml`, which supplies `integration_branch`
-   (`control.integration_branch`) and `aws_region` (`aws.region`); `scripts/project.py show`
-   prints the rest of it, and `check.py` and `doctor.py` report a control checkout whose `origin`
-   is not its `control.remote`;
+   (`control.integration_branch`), `aws_region` (`aws.region`) and, when the team tracks them,
+   `control_remote` (`control.remote`) and `control_github` (`control.github`); and the tracked
+   `.idea-realization/product.yaml`, which supplies `product_remote` (`remote`) and
+   `product_github` (`github`) when the team tracks them. `scripts/project.py show` prints the
+   rest of `project.yaml`;
 6. the default in `.claude-plugin/plugin.json`.
 
 A value that starts with `REPLACE-WITH-` is a placeholder and counts as unset.
@@ -147,6 +169,17 @@ Relative paths resolve against the repository root: `--root`, then `IDEA_REALIZA
 | `exempt_files` | none |
 | `staging_dir` | `.idea-realization/staging`, which must be gitignored |
 | `partitions_dir` | `ideas/partitions` |
+| `control_remote` | none. Git URL of the control repository; `check.py` and `doctor.py` report a control checkout whose `origin` differs, and skip the comparison with a note while it is unset |
+| `control_github` | none. The control repository on GitHub, as `<org>/<repo>` |
+| `product_remote` | none. Git URL of the product repository; `product.py verify` refuses a product checkout whose `origin` differs, and refuses while it is unset |
+| `product_github` | none. The product repository on GitHub, as `<org>/<repo>` |
+
+**Repository URLs.** A repository URL can name an organization that must not appear in a tracked
+file. Set the four repository keys in each machine's untracked `.idea-realization/local.yaml`
+(copy `local.example.yaml`), or with `IDEA_REALIZATION_CONTROL_REMOTE` and the like; leave them out
+of `project.yaml` and `product.yaml`. A team whose URLs may be tracked can put them in those files
+instead (`control.remote`, `control.github`, `remote`, `github`), and `local.yaml` still overrides
+them. `paths.py show` names the file each value came from.
 
 `uv run scripts/paths.py` prints every resolved value; `uv run scripts/paths.py show` adds the
 source of each one.

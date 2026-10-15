@@ -7,7 +7,9 @@ what it never does. The never-do list is the binding half.
 - Capturing an idea is the owner's work, done in conversation through the `idea` skill. It is not
   an agent role and has no contract.
 - Where a role has an agent definition, the contract is the authority and the definition is
-  changed to match it.
+  changed to match it. Some definitions ship in the plugin's `agents/` directory; others
+  (`plan-adversary`, `phase-splitter`, `batch-validator`) are written by the adopting repository
+  in its own agent directory and named below where they carry a role.
 
 ## 1. Owner-reserved decisions
 
@@ -82,17 +84,22 @@ templates, and the `plan-check` and `next-code` skills.
 
 ### Adversary
 
-Runs the review in `plan-review.md` with the dispatch prompt in `adversary-prompt.md`.
+Runs the review in `plan-review.md` with the dispatch prompt in `adversary-prompt.md`. Where the
+repository defines a `plan-adversary` agent, it carries this role at one altitude per dispatch.
 
 - **Receives:** a requirement and plan pair, and the review procedure.
-- **Produces:** findings in its reply. Every finding reaches the review record and receives a
-  disposition, including `accepted-no-change`. None is silently dropped.
+- **Produces:** findings in its reply, after a first line `VERDICT: pass` or `VERDICT: reject`
+  for the altitude. Every finding reaches the review record and receives a disposition, including
+  `accepted-no-change`. None is silently dropped. A `pass` is not plan approval.
 - **Never:** approves the plan; authors the fix beyond naming the smallest change; skips the
   later-added altitude because the first two came back clean; writes a disposition.
 
 ### Phase-fit
 
-Splits phases that do not fit one session (`backlog-protocol.md`, section 14).
+Splits phases that do not fit one session (`backlog-protocol.md`, section 14). Where the
+repository defines a `phase-splitter` agent, it carries this role and the Mapper role together,
+and writes its proposal (candidate backlog, candidate batch, a summary) only under the staging
+directory.
 
 - **Receives:** the plan and its dispositioned review record; the phase-splitting rule. Splitting a
   phase is a different act on a different object from decomposing an idea.
@@ -102,7 +109,8 @@ Splits phases that do not fit one session (`backlog-protocol.md`, section 14).
 
 ### Mapper
 
-Validated by the check (`check.py`).
+Validated by the check (`check.py`). Carried by the `phase-splitter` agent where the repository
+defines one (see Phase-fit).
 
 - **Receives:** the final phase set.
 - **Produces:** phases carrying `depends_on` and `systems` that pass the check, and a proposed
@@ -110,7 +118,21 @@ Validated by the check (`check.py`).
   plan-approval gate.
 - **Never:** ranks `next_up` or sets cross-track priority; registers a phase the check rejects
   without revising first; proceeds after a second rejection without escalating to the owner with
-  the check output attached.
+  the check output attached; assigns a phase to a developer.
+
+### Batch validator
+
+Checks one proposed batch composition before it runs (`batches.md`). Carried by the
+`batch-validator` agent where the repository defines one, with `scripts/batch_check.py`.
+
+- **Receives:** one batch id, and the batches and backlog files to read (the real ones, or a
+  proposal's candidate copies).
+- **Produces:** a first line `VERDICT: pass <batch-id>` or `VERDICT: reject <batch-id>`, then the
+  output of `batch_check.py` and `check.py`, then ranked findings on what the script does not
+  decide. The composing session records the result in the batch's `checks` list, where a `reject`
+  is recorded as `fail`.
+- **Never:** composes, re-orders or edits a batch; writes the backlog, the batches file or a
+  candidate copy; records its own check result; treats a `pass` as the owner's approval.
 
 ### Developer
 
@@ -127,8 +149,9 @@ Carried by the `session-start`, `checkpoint` and `session-close` skills.
 The independent review in the `session-close` skill, and any validator a repository adds.
 
 - **Receives:** the requirement or the phase's acceptance, and the diff.
-- **Produces:** a pass or fail verdict under the evidence rule, with findings and the verbatim
-  output of every verification command it ran.
+- **Produces:** a verdict under the evidence rule, first line `VERDICT: pass` or `VERDICT: reject`
+  (the review schema's `verdict` values), with findings and the verbatim output of every
+  verification command it ran.
 - **Never:** accepts the developer's rationale as evidence; edits the diff or fixes a finding;
   marks a phase complete; merges; substitutes "this looks correct" for a check it ran.
 

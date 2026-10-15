@@ -213,6 +213,8 @@ worktree must be copied out by hand before the worktree is removed.
 - **Rebase onto each integration branch, never merge it in**, whenever a peer integrates, not only
   at the end: `git fetch origin`, then `git rebase origin/<integration branch>` in each worktree.
 - Pushing either `agent/<phase-id>` needs no approval; backing up your own work is not publishing.
+  After a rebase, push it with `git push --force-with-lease`; never force-push the integration
+  branch or the release branch (`protocol.md`, section 10).
 - Record progress with the `checkpoint` skill as often as useful. It writes in the control worktree
   and never marks a phase complete.
 

@@ -23,7 +23,8 @@ workflow (`OPS-005`); the one-page command list is in the mode cheat sheets (`OP
 ## The two repositories
 
 The **control repository** (this one) holds the backlog, plans, session and review records. The
-**product repository** that `.idea-realization/product.yaml` names holds the code. A session has a
+**product repository** holds the code; its remote is set per machine as `product_remote` in the
+untracked `.idea-realization/local.yaml`. A session has a
 worktree in each, both on a branch named `agent/<phase-id>`
 (`plugins/idea-realization/docs/two-repositories.md`).
 

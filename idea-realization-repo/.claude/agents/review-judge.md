@@ -54,8 +54,9 @@ an acceptance condition names.
 Your final message is your verdict, because you cannot write a file. The dispatching session
 records it without changing a finding.
 
-- First line: `VERDICT pass` or `VERDICT fail`, then the phase id and the reviewed commit. `pass`
-  means every acceptance condition is met and no blocker or major finding stands.
+- First line: `VERDICT: pass` or `VERDICT: reject`, then the phase id and the reviewed commit.
+  `pass` means every acceptance condition is met and no blocker or major finding stands; these are
+  the two values of the review schema's `verdict` field.
 - Then each acceptance condition with its judgement and evidence.
 - Then findings ranked blocker, major, minor, each with file and line, the concrete failure and the
   smallest fix where it is obvious. An empty list must mean you attacked the diff and found
@@ -72,5 +73,5 @@ records it without changing a finding.
 ## Stop condition
 
 Stop when your final message contains the complete verdict. If an input is missing or unreadable
-(no diff, no evidence files, an evidence file that is absent), say so as the first line, return
-`VERDICT fail` with that as a blocker, and do not work around it.
+(no diff, no evidence files, an evidence file that is absent), return `VERDICT: reject` as the
+first line with the missing input as a blocker finding, and do not work around it.

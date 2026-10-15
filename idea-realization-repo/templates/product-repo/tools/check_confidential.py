@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Fail when a tracked file leaks a confidential identifier or lives under the private directory.
 
-This is a copy of the control repository's tools/check_confidential.py, so that this repository's
-pre-commit hook and CI can run it without the control repository. It uses only the Python
-standard library. Change both copies together.
+Two identical copies exist: tools/check_confidential.py in the control repository, and the same
+path in the product-repository template (templates/product-repo/), so a product repository's hook
+and CI can run it without the control repository. It uses only the Python standard library.
+Change both copies together; test/test_confidential.py fails when they differ.
 
-Run before committing, or let the pre-commit hook (tools/install-hooks.sh) run it:
+Run before committing, or let the pre-commit hook run it:
 
     python3 tools/check_confidential.py
 
@@ -25,9 +26,18 @@ Two checks:
    tracked file's path and text. The file is per machine and is never committed, because a tracked
    list of the identifiers would be the leak it exists to prevent.
 
-   The deny-list is `.private/deny-list.txt` under the repository root, or the path in the
-   `PRIVATE_DENY_LIST` environment variable. When it is missing the content check is skipped with
-   a note; the path check still runs.
+   Where the deny-list is read from, first match wins:
+
+   - the path in the `PRIVATE_DENY_LIST` environment variable (CI writes its secret there). If
+     the variable is set and the file does not exist, the check fails;
+   - `.private/deny-list.txt` in the checkout being committed;
+   - `.private/deny-list.txt` in the main checkout, found through `git rev-parse
+     --git-common-dir`. A linked worktree has no `.private/` of its own, because the directory is
+     untracked, so without this step the content check would be skipped in every worktree.
+
+   When none exists the content check is skipped with a warning on standard error and the check
+   still passes, so a developer who does not have the file yet can commit; the path check still
+   runs. CI does not reach this case: its workflow fails before the check when the secret is unset.
 
 Exit codes: 0 when nothing leaks; 1 when anything does, one line per violation.
 """
@@ -82,9 +92,53 @@ def read_blobs(root: Path, object_ids: list[str]) -> dict[str, bytes]:
     return contents
 
 
-def deny_list_path(root: Path) -> Path:
+def main_checkout(root: Path) -> Path | None:
+    """The main checkout of the repository `root` belongs to: the parent of the common git
+    directory. For a linked worktree this is the checkout it was added from; for the main checkout
+    it is `root` itself. None when git cannot say."""
+    result = subprocess.run(["git", "rev-parse", "--git-common-dir"], cwd=root,
+                            capture_output=True, text=True)
+    if result.returncode != 0 or not result.stdout.strip():
+        return None
+    common = Path(result.stdout.strip())
+    if not common.is_absolute():
+        common = root / common
+    return common.resolve().parent
+
+
+def deny_list_candidates(root: Path) -> list[Path]:
+    """Where to look for the deny-list when PRIVATE_DENY_LIST is not set, in order."""
+    candidates = [root / DEFAULT_DENY_LIST]
+    main = main_checkout(root)
+    if main is not None and (main / DEFAULT_DENY_LIST).resolve() != candidates[0].resolve():
+        candidates.append(main / DEFAULT_DENY_LIST)
+    return candidates
+
+
+def find_deny_list(root: Path) -> tuple[Path | None, list[Path]]:
+    """The deny-list to use, or None, and every path that was looked at."""
     configured = os.environ.get("PRIVATE_DENY_LIST")
-    return Path(configured) if configured else root / DEFAULT_DENY_LIST
+    if configured:
+        return Path(configured), [Path(configured)]
+    candidates = deny_list_candidates(root)
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate, candidates
+    return None, candidates
+
+
+def warn_no_deny_list(searched: list[Path]) -> None:
+    bar = "!" * 78
+    lines = [bar,
+             "WARNING: check_confidential found NO deny-list.",
+             "Confidential identifiers were NOT checked.",
+             "Only the private-directory path check ran.",
+             "Looked in:"]
+    lines += [f"  {path}" for path in searched]
+    lines += ["Get the deny-list from the repository owner and save it as .private/deny-list.txt",
+              "in the main checkout (worktrees read it from there), or set PRIVATE_DENY_LIST.",
+              bar]
+    print("\n".join(lines), file=sys.stderr)
 
 
 def read_deny_list(path: Path) -> set[str] | None:
@@ -136,13 +190,13 @@ def main(root: Path = ROOT) -> int:
     files = list(blobs)
     violations = check_paths(files)
 
-    deny_list = deny_list_path(root)
-    identifiers = read_deny_list(deny_list)
-    if identifiers is None:
-        print(f"note: deny-list {deny_list} not found — content check skipped "
-              "(path check still ran)")
-        identifiers = set()
-    violations += check_content(root, blobs, identifiers)
+    deny_list, searched = find_deny_list(root)
+    identifiers = read_deny_list(deny_list) if deny_list is not None else None
+    if identifiers is None and os.environ.get("PRIVATE_DENY_LIST"):
+        violations.append(f"PRIVATE_DENY_LIST is set but {deny_list} does not exist")
+    elif identifiers is None:
+        warn_no_deny_list(searched)
+    violations += check_content(root, blobs, identifiers or set())
 
     if violations:
         print("check_confidential: FAILED")
@@ -150,8 +204,12 @@ def main(root: Path = ROOT) -> int:
             print(f"  - {violation}")
         return 1
 
-    print(f"check_confidential: OK ({len(files)} tracked files, "
-          f"{len(identifiers)} identifiers checked)")
+    if identifiers is None:
+        print(f"check_confidential: OK ({len(files)} tracked files, path check only; "
+              "content check SKIPPED, no deny-list)")
+    else:
+        print(f"check_confidential: OK ({len(files)} tracked files, "
+              f"{len(identifiers)} identifiers checked)")
     return 0
 
 

@@ -4,7 +4,7 @@
   "description": "The product repository a control repository drives. Only what is the same on every machine; the local checkout path is configured per machine, never tracked.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "name", "remote", "integration_branch"],
+  "required": ["schema_version", "name", "integration_branch"],
   "properties": {
     "schema_version": {
       "const": 1,
@@ -18,7 +18,7 @@
     "remote": {
       "type": "string",
       "minLength": 1,
-      "description": "Git URL of the product repository. A product checkout whose origin differs is refused."
+      "description": "Git URL of the product repository. Optional: a team whose URL must not be tracked sets product_remote in local.yaml instead, which overrides this. A product checkout whose origin differs from the resolved URL is refused."
     },
     "integration_branch": {
       "type": "string",
@@ -34,7 +34,7 @@
     "github": {
       "type": "string",
       "pattern": "^([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+|REPLACE-WITH-[A-Z0-9-]+)$",
-      "description": "The product repository on GitHub, as <org>/<repo>, for gh commands. Optional."
+      "description": "The product repository on GitHub, as <org>/<repo>, for gh commands. Optional; product_github in local.yaml overrides it."
     }
   }
 }

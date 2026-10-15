@@ -58,9 +58,9 @@ agent type, never as a general-purpose agent. Scripts run from the control repos
 | 4 | Code reservation | `next-code` skill (`plan`, and `requirement` for a new plan) | An accepted track the owner sends to planning | Reserved codes | Whoever decided the track becomes a plan reserves the codes before the planner runs. Never choose a code by hand. |
 | 5 | Planner | `idea-planner` agent (runs on Opus) | One accepted track, its disposition (new plan or amendment), the reserved codes | `status: draft` requirement and plan, with the phase table already split into one-session phases | No decision. The planner never approves its own draft. |
 | 6 | Plan check | `plan-check` skill (`scripts/plan_check.py`) | The plan draft | Pass (exit 0) or returned (exit 1) with the missing sections | Mechanical. A plan returned twice goes to the owner. |
-| 7 | Plan review | `plan-adversary` agent, once per altitude | The plan, its requirement, and the filled prompt from `plugins/idea-realization/docs/adversary-prompt.md` | Findings and a `VERDICT pass` or `VERDICT fail` line per altitude, recorded in the review record | The planner dispositions each finding. The owner rules on escalated findings and **approves the plan** (`status: approved`) at the plan-approval gate. |
+| 7 | Plan review | `plan-adversary` agent, once per altitude | The plan, its requirement, and the filled prompt from `plugins/idea-realization/docs/adversary-prompt.md` | A first line `VERDICT: pass` or `VERDICT: reject` per altitude, then the findings, recorded in the review record | The planner dispositions each finding. The owner rules on escalated findings and **approves the plan** (`status: approved`) at the plan-approval gate. |
 | 8 | Phase split | `phase-splitter` agent | The approved plan and its dispositioned review record | A proposal under `<staging_dir>/phase-split/<plan-code>/`: candidate `backlog.yaml` and `batches.yaml`, and `proposal.md` with phases, stages and a proposed `next_up` | No decision. A phase it splits goes back to `plan-adversary` at the phase altitude. After a second check rejection it stops and goes to the owner. |
-| 9 | Batch validation | `batch-validator` agent and `scripts/batch_check.py` | The batch id and the backlog and batches files (the candidates from step 8, or the real files) | Command output, ranked findings, `VERDICT pass <batch-id>` or `VERDICT fail <batch-id>` | No decision. A `pass` is evidence for the owner, not approval. |
+| 9 | Batch validation | `batch-validator` agent and `scripts/batch_check.py` | The batch id and the backlog and batches files (the candidates from step 8, or the real files) | A first line `VERDICT: pass <batch-id>` or `VERDICT: reject <batch-id>`, then command output and ranked findings | No decision. A `pass` is evidence for the owner, not approval. |
 | 10 | Assignment | The owner edits `backlog/backlog.yaml` and `backlog/batches.yaml` | The validated proposal | Phases registered; `next_up` ranked; `owner: <handle>` on each phase; batch `status: approved` with its check recorded | The owner. Composing a batch, ranking `next_up` and assigning developers are the owner's decisions. |
 
 ### 1. Ideation
@@ -152,7 +152,7 @@ uv run plugins/idea-realization/scripts/check.py --feature backlog --feature bat
 could not be read or the batch does not exist. The agent then judges what the script does not: that
 the batch record restates no phase content, that each stage boundary rests on a real edge or
 collision, that a stage wider than the free active slots will run serially, and that each phase
-fits one session. It ends with `VERDICT pass <batch-id>` or `VERDICT fail <batch-id>`.
+fits one session. Its first line is `VERDICT: pass <batch-id>` or `VERDICT: reject <batch-id>`.
 
 ### 10. Assignment
 

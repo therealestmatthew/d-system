@@ -96,7 +96,9 @@ prompt:
 - the paths of the requirement and plan documents the phase names, in the control worktree;
 - the step 2 output, as evidence it may re-run but must not take on trust;
 - its job: decide independently, from the diffs and its own run of the verification, whether each
-  acceptance condition holds, and end its reply with `VERDICT: pass` or `VERDICT: reject`.
+  acceptance condition holds, and begin its reply with the line `VERDICT: pass` or
+  `VERDICT: reject` (the schema's `verdict` values), followed by the phase id and the reviewed
+  commit.
   "No findings" is a valid result.
 
 Wait for its reply. Never paraphrase away an uncomfortable finding, and never proceed as if the
@@ -152,7 +154,8 @@ git -C <product worktree> push --force-with-lease -u origin agent/<phase-id>
 ```
 
 `--force-with-lease` is needed only because step 2 rebased a branch you may have pushed before; it
-applies to your own `agent/<phase-id>` branch and never to an integration branch.
+applies to your own `agent/<phase-id>` branch and never to the integration branch or the release branch, which
+are never force-pushed (`protocol.md`, section 10).
 
 In each worktree, reuse the open pull request for `agent/<phase-id>` if there is one
 (`gh pr view agent/<phase-id> --json number,state,headRefOid`), and otherwise open one against

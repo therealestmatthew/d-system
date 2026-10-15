@@ -2,10 +2,11 @@ schema_version: 1
 # The product repository this control repository drives. Only what is the same on every machine:
 # each developer sets the local checkout path in .idea-realization/local.yaml (or with
 # IDEA_REALIZATION_PRODUCT_ROOT), never here.
-# product.py verify refuses to act until remote names the real product repository.
+# The product repository's URL and GitHub name are not tracked here: they can name a confidential
+# organization. Each machine sets product_remote and product_github in its untracked
+# .idea-realization/local.yaml (template: local.example.yaml); product.py verify refuses to act
+# until product_remote is set. A team whose URL may be tracked can add remote: and github: here
+# instead; local.yaml still overrides them.
 name: product
-remote: REPLACE-WITH-THE-PRODUCT-REPOSITORY-GIT-URL
 integration_branch: dev
 ci_workflow: product-ci.yml
-# Optional: the product repository on GitHub, for gh commands.
-# github: <org>/<repo>

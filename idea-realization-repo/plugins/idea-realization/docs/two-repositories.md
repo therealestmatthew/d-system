@@ -20,21 +20,34 @@ every machine:
 ```yaml
 schema_version: 1
 name: <product name>
-remote: <git URL of the product repository>
 integration_branch: dev
 ci_workflow: none
 ```
 
-Where the product checkout sits differs per machine, so it is configured and never tracked:
+What differs per machine, or must not be tracked, is configured in each machine's untracked
+`.idea-realization/local.yaml` (copy `local.example.yaml`; it is read from the primary checkout),
+or with the environment variable, which takes precedence:
 
 | Key | Environment variable | Meaning |
 |---|---|---|
 | `product_root` | `IDEA_REALIZATION_PRODUCT_ROOT` | This machine's product checkout; outside the control repository |
 | `product_worktree_dir` | `IDEA_REALIZATION_PRODUCT_WORKTREE_DIR` | Where product worktrees go; default `../<product>-worktrees`, beside the product checkout |
+| `product_remote` | `IDEA_REALIZATION_PRODUCT_REMOTE` | Git URL of the product repository |
+| `product_github` | `IDEA_REALIZATION_PRODUCT_GITHUB` | The product repository on GitHub, as `<org>/<repo>` |
+| `control_remote` | `IDEA_REALIZATION_CONTROL_REMOTE` | Git URL of the control repository |
+| `control_github` | `IDEA_REALIZATION_CONTROL_GITHUB` | The control repository on GitHub, as `<org>/<repo>` |
+
+The repository URLs live in `local.yaml` because a URL can name an organization that must not
+appear in a tracked file. A team whose URLs may be tracked can set `remote` and `github` in
+`product.yaml`, and `control.remote` and `control.github` in `project.yaml`, instead; a value in
+`local.yaml` or the environment still overrides them.
+`uv run plugins/idea-realization/scripts/paths.py show`
+prints each value and the file or variable it came from.
 
 `uv run plugins/idea-realization/scripts/product.py verify` prints the product checkout, its
 integration branch and its worktree directory, and **refuses unless the checkout's `origin` is the
-tracked `remote`**. Every procedure that acts on the product repository runs it first, so a wrong
+resolved `product_remote`**. While `product_remote` is not set it refuses and says to set it in
+`local.yaml`. Every procedure that acts on the product repository runs it first, so a wrong
 path cannot send work into the wrong repository.
 
 Without `product_root`, everything that only reads or writes the control repository still works:

@@ -42,6 +42,11 @@ Short-lived branches:
 Cut every feature branch from `origin/dev` in both repositories. A hotfix is a phase, not a branch
 type (section 6).
 
+**Force-pushing.** A feature branch may be force-pushed with `git push --force-with-lease` after it
+has been rebased onto `origin/dev`; session-close does this before it opens the pull request.
+`dev` and `main` are never force-pushed, and the rulesets refuse it (section 9). Plain
+`--force` is not used on any branch.
+
 ## 2. Before any work, and after any bookkeeping
 
 - Always `git pull` origin `dev` before starting any work, in both repositories.
@@ -107,8 +112,9 @@ A repository with no GitHub remote (tests, local-only use) uses a local fallback
 
 For each demo release:
 
-1. Open a pull request from `dev` to `main` and merge it with a merge commit. In the product
-   repository the `verify` check must pass first.
+1. The owner opens a pull request from `dev` to `main` and merges it with a merge commit. In the
+   product repository the `verify` check must pass first. Only the owner can merge into `main`;
+   GitHub refuses the merge for anyone else (section 9, "Who merges to `main`").
 2. Tag the merge on `main` with an annotated tag: `demo-rc-<n>`, counting up from 1.
 
    ```bash
@@ -150,27 +156,31 @@ Steps, in order:
 |---|---|
 | Install | `astral-sh/setup-uv` with Python 3.12, cache keyed on `uv.lock`; `uv sync --locked --extra dev` |
 | Lint | `uv run ruff check tools/ test/` |
-| Scaffold | `uv run plugins/idea-realization/scripts/scaffold.py --feature all` |
 | Doctor | `uv run plugins/idea-realization/scripts/doctor.py` |
 | Repository check | `uv run plugins/idea-realization/scripts/check.py` |
 | Folder tests | `uv run pytest -q test` |
 | Plugin tests | `uv run pytest -q`, from `plugins/idea-realization/` |
 | Private-content check | `uv run python tools/check_confidential.py` with the deny-list |
 
-Scaffold, doctor and check run with `IDEA_REALIZATION_ROOT=$GITHUB_WORKSPACE`, so the scripts
-resolve this checkout. The test steps run without it: the plugin tests build temporary repositories
-and fail when that variable points them at the checkout. No product root is configured in CI, so
-the product checks are skipped by design. The scaffold runs first because it recreates the
-gitignored `.idea-realization/staging/` directory, which doctor otherwise reports missing.
+Doctor and check run with `IDEA_REALIZATION_ROOT=$GITHUB_WORKSPACE`, so the scripts resolve this
+checkout. The test steps run without it: the plugin tests build temporary repositories and fail
+when that variable points them at the checkout. No product root is configured in CI, so the product
+checks are skipped by design.
+
+There is no scaffold step. A fresh checkout has no `.idea-realization/staging/` directory, because
+it is gitignored; doctor reports it as `absent` and does not fail on it. Running the scaffold in CI
+would also rewrite the tracked `.idea-realization/install-state.json`.
 
 The deny-list comes from the repository secret `DENY_LIST`, one identifier per line. The workflow
 masks each entry in the log, writes the list to `$RUNNER_TEMP`, passes its path in
-`PRIVATE_DENY_LIST`, and deletes it after the check. Without the secret (for example on a pull
-request from a fork), only the path check runs and the run shows a warning. The owner sets the
-secret once:
+`PRIVATE_DENY_LIST`, and deletes it after the check. **A missing secret fails the run**, in this
+repository and in the product repository alike: a run that could not look for the identifiers has
+not shown that none are present. A pull request from a fork gets no secrets, so its run fails too.
+The owner sets the secret once in each repository:
 
 ```bash
 gh secret set DENY_LIST --repo <org>/<control-repo> < .private/deny-list.txt
+gh secret set DENY_LIST --repo <org>/<product-repo> < .private/deny-list.txt
 ```
 
 The control job is not a required check: bookkeeping commits go to `dev` directly and must not wait
@@ -190,13 +200,14 @@ Branch and tag protection is defined as GitHub repository rulesets in `.github/r
 | File | Repository | Protects | Rules |
 |---|---|---|---|
 | `control-dev.json` | control | `dev` | block force-push and deletion; no pull request requirement (bookkeeping is direct) |
-| `control-main.json` | control | `main` | block force-push and deletion; pull request required, 0 approvals, merge commit only |
+| `control-main.json` | control | `main` | block force-push and deletion; restrict updates (only the main merger); pull request required, 0 approvals, merge commit only |
 | `product-dev.json` | product | `dev` | block force-push and deletion; pull request required, 0 approvals, merge commit only; required check `verify` |
-| `product-main.json` | product | `main` | same as `product-dev.json` |
+| `product-main.json` | product | `main` | same as `product-dev.json`, plus restrict updates (only the main merger) |
 | `demo-tags.json` | both | tags `demo-*` | block deletion, update and force-push |
 
 No ruleset requires linear history, because merges are merge commits. The bypass list is empty in
-every ruleset. The required check does not require the branch to be up to date with `dev`
+every ruleset file; the apply script adds the main merger to the two `*-main.json` rulesets when it
+applies them, and nothing else has a bypass actor. The required check does not require the branch to be up to date with `dev`
 (`strict_required_status_checks_policy: false`): updating the branch would change its head and
 break `--match-head-commit <reviewed_commit>`. Session-close rebases onto `origin/dev` before the
 review instead.
@@ -208,9 +219,12 @@ and rebase merges switched off.
 repository first, then:
 
 ```bash
-tools/github/apply_rulesets.sh <org>/<control-repo> control
-tools/github/apply_rulesets.sh <org>/<product-repo> product
+tools/github/apply_rulesets.sh <org>/<control-repo> control user:<owner-login>
+tools/github/apply_rulesets.sh <org>/<product-repo> product user:<owner-login>
 ```
+
+The third argument names who may merge into `main` (below). Use the same value for both
+repositories.
 
 The script needs `gh` signed in as an administrator of the repository. It is safe to run again: a
 ruleset whose name already exists on the repository is updated in place, otherwise it is created.
@@ -219,7 +233,41 @@ It prints each action it took.
 **Plan requirement:** rulesets on a private repository need a paid GitHub plan for the
 organization. Both repositories live in the owner's work organization, and its plan applies.
 
-**Who merges to `main`:** `control-main.json` requires a pull request with an empty bypass list,
-but a ruleset cannot by itself limit *who* merges a pull request. Releasing to `main` is the owner's
-job by agreement. Enforcing it would need a ruleset `update` rule with the owner as a bypass actor,
-which this kit does not do.
+### Who merges to `main`
+
+Only the owner merges `dev` into `main`, in both repositories, and GitHub enforces it:
+
+- Both `*-main.json` rulesets carry the `update` rule (shown as "Restrict updates" in GitHub's
+  settings): only an actor on the ruleset's bypass list may change `main` at all, and merging a pull
+  request into `main` is such a change.
+- The apply script puts exactly one actor on that bypass list, the main merger, with bypass mode
+  `pull_request`. The main merger can merge a pull request into `main` but cannot push to it
+  directly; the pull request rule still applies to them. Everyone else, including other
+  administrators acting through a pull request, is refused.
+- As committed, the bypass list is empty, so applying a `*-main.json` file by hand (without the
+  script) leaves `main` closed to everyone until the script is run.
+
+The actor is given as the script's third argument and its numeric id is looked up on GitHub when
+the script runs. No account or team name is written into this repository.
+
+**What the owner sets up**, once:
+
+1. Choose the main merger. The direct form is your own account: `user:<owner-login>`. GitHub has
+   accepted individual users as bypass actors on repository rulesets since May 2026 (actor type
+   `User`). If the organization's policy does not allow a user bypass, create a team in the
+   organization whose only member is you, give it at least write access to both repositories, and
+   pass `team:<org>/<team-slug>` instead. Keep that team to one member: everyone in it can merge to
+   `main`.
+2. Push `dev` and `main` to both repositories, then run the two commands above with that argument.
+3. Confirm the result:
+
+   ```bash
+   gh api repos/<org>/<control-repo>/rulesets --jq '.[] | "\(.id) \(.name)"'
+   gh api repos/<org>/<control-repo>/rulesets/<id of control-main> --jq '.bypass_actors'
+   ```
+
+   The second command must print one actor, with `bypass_mode` `pull_request`.
+4. If the main merger changes, re-run the script with the new argument. It replaces the bypass list.
+
+What this does not stop: an organization owner or repository administrator can edit or delete the
+ruleset itself. That is a GitHub limit; keep the administrator role to the owner.
