@@ -210,3 +210,4 @@ Source data (`_data/`) → templates (`templates/html/`, `templates/styles/`) �
 | `_tmpagent/` | Files agents in sibling worktrees must read. Tracked, ungoverned, read-only once active; claimed and released through `_tmpagent/claims.jsonl` ([contract](_tmpagent/AGENTS.md)) |
 | `_public/` | Shareable outputs |
 | `_private/` | Gitignored — credentials, raw dumps, personal notes, and `portfolio/`: the owner's real projects/people/commitments/tasks (ADR-009) |
+| `idea-realization-repo/` | Blank-slate copy of the idea realization system for the hackathon work repository (idea `000698`): agents, governance and tooling, no d-system history or personal parts. Copied out, not run from here |
