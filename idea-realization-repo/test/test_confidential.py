@@ -479,3 +479,12 @@ def test_a_push_after_someone_else_pushed_first_is_checked_without_a_traceback(
     else:
         assert "check_confidential: OK (push: 1 commits" in output
         assert "rejected" in output or "fetch first" in output
+
+
+def test_the_product_template_documents_every_hook_it_ships() -> None:
+    hooks = sorted(path.name for path in (TEMPLATE_TOOLS / "git-hooks").iterdir())
+    for readme in ("README.md", "README-TEMPLATE.md"):
+        text = (TEMPLATE_TOOLS.parent / readme).read_text(encoding="utf-8")
+        assert "tools/install-hooks.sh" in text, readme
+        assert [hook for hook in hooks if f"`{hook}`" not in text
+                and f"git-hooks/{hook}" not in text] == [], readme

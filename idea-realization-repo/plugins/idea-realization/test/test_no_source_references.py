@@ -42,6 +42,10 @@ PATTERNS: dict[str, re.Pattern[str]] = {
 }
 
 
+# A fixture slug, built from parts so that no origin can ever match it in this file's text.
+FIXTURE = "/".join(["example-owner", "control"])
+
+
 def git(*args: str, cwd: Path = PLUGIN_ROOT) -> str:
     try:
         return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True,
@@ -127,18 +131,17 @@ def test_identities_are_found_when_the_repository_has_an_origin() -> None:
         assert identities()
 
 
-@pytest.mark.parametrize("url", ["git@github.com:example-owner/control.git",
-                                 "https://github.com/example-owner/control",
-                                 "ssh://git@github.com/example-owner/control.git",
-                                 "https://github.com/example-owner/control.git/"])
+@pytest.mark.parametrize("url", [f"git@github.com:{FIXTURE}.git", f"https://github.com/{FIXTURE}",
+                                 f"ssh://git@github.com/{FIXTURE}.git",
+                                 f"https://github.com/{FIXTURE}.git/"])
 def test_remote_slug_reads_every_url_form(url: str) -> None:
-    assert remote_slug(url) == "example-owner/control"
+    assert remote_slug(url) == FIXTURE
 
 
 @pytest.mark.parametrize(("developer", "directory", "slug"), [
-    ("Ana Dev", "control", "example-owner/control"),
-    ("Work", "product", "team/product"),
-    ("Sam Team", "ideas", "work/ideas"),
+    ("Ana Dev", "control", FIXTURE),
+    ("Work", "product", "/".join(["team", "product"])),
+    ("Sam Team", "ideas", "/".join(["work", "ideas"])),
 ])
 def test_identity_is_the_slug_not_the_developer_or_the_directory(
         tmp_path: Path, developer: str, directory: str, slug: str) -> None:
@@ -167,10 +170,10 @@ def test_identity_is_the_slug_not_the_developer_or_the_directory(
 
 
 @pytest.mark.parametrize(("url", "host"), [
-    ("git@github.com:example-owner/control.git", "github.com"),
-    ("https://someone@GitHub.com/example-owner/control", "github.com"),
-    ("ssh://git@github.com:22/example-owner/control.git", "github.com"),
-    ("git@github-work:example-owner/control.git", "github-work"),
+    (f"git@github.com:{FIXTURE}.git", "github.com"),
+    (f"https://someone@GitHub.com/{FIXTURE}", "github.com"),
+    (f"ssh://git@github.com:22/{FIXTURE}.git", "github.com"),
+    (f"git@github-work:{FIXTURE}.git", "github-work"),
     ("/srv/git/control.git", None), ("file:///srv/control.git", None),
 ])
 def test_remote_host_reads_every_url_form(url: str, host: str | None) -> None:
@@ -214,3 +217,17 @@ def test_plugin_concepts_are_allowed(tmp_path: Path) -> None:
 def test_scan_catches_a_handle_scoped_instance(tmp_path: Path, label: str, text: str) -> None:
     (tmp_path / "sample.md").write_text(text)
     assert label in "\n".join(scan(tmp_path, set())), label
+
+
+# The owner/repo slugs the plugin's own tests used as fixtures. Built from parts, like every other
+# sample here, so this list never spells them out either.
+TODAYS_FIXTURE_SLUGS = [("team", "product"), ("work", "ideas"), ("example-owner", "control"),
+                        ("team", "control"), ("team", "hack-product"), ("team", "other-product")]
+
+
+@pytest.mark.parametrize("host", ["github.com", "github-work"])
+@pytest.mark.parametrize("parts", TODAYS_FIXTURE_SLUGS)
+def test_no_fixture_collides_with_a_real_origin(parts: tuple[str, str], host: str) -> None:
+    """A team whose origin happens to equal a fixture slug must not fail the suite: no test
+    spells a slug out where the origin's host, or no host, would come before it."""
+    assert scan(PLUGIN_ROOT, {"/".join(parts)}, host) == []

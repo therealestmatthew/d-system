@@ -14,7 +14,7 @@ these steps once. Delete this file from the product repository once step 9 is do
 | `.github/ISSUE_TEMPLATE/blocker.md`, `question.md` | Issue forms for a blocked phase and an open question |
 | `.github/CODEOWNERS.example` | Filled from the control repository's `docs/workstreams.yaml`, then renamed |
 | `tools/check_confidential.py` | Copy of the control repository's confidential check (standard library only) |
-| `tools/git-hooks/pre-commit`, `tools/install-hooks.sh` | Pre-commit hook running that check, and its installer |
+| `tools/git-hooks/pre-commit`, `commit-msg`, `pre-push`, `tools/install-hooks.sh` | The three hooks running that check (on the staged files, the commit message, and every commit a push sends), and their installer |
 | `.gitignore` | Node, Python, CDK output, `.private/`, `.env` files |
 
 There is no deploy workflow. Deploying is done from a developer machine by the control
@@ -28,7 +28,7 @@ GitHub name.
 1. **Create the empty repository** on GitHub, private, in the team's organization, with no README,
    licence or `.gitignore` (the template provides them).
 
-2. **Copy the template** into a new directory, keeping file modes (the hook and scripts are
+2. **Copy the template** into a new directory, keeping file modes (the hooks and scripts are
    executable), and make the first commit on `main`:
 
    ```bash
@@ -93,7 +93,7 @@ GitHub name.
    repository's URL and `<org>/<product>` name can contain the organization's name, so they are
    never committed: each developer sets them in step 10. If `product.yaml` needed a change,
    commit it directly to control `dev` and push. The confidential check runs on that commit: a
-   value that contains a deny-listed identifier is refused, and must not be forced past the hook.
+   value that contains a deny-listed identifier is refused, and must not be forced past the hooks.
 
 10. **Each developer**, once per machine: clone the product repository, run
     `tools/install-hooks.sh`, put the deny-list at `.private/deny-list.txt` (or export

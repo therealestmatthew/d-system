@@ -28,6 +28,17 @@ git switch dev
 tools/install-hooks.sh          # hooks: the confidential check on commit, message and push
 ```
 
+`tools/install-hooks.sh` points `core.hooksPath` at `tools/git-hooks/`, which holds three hooks.
+Each runs `tools/check_confidential.py`:
+
+- `pre-commit`: the staged files, by path and content.
+- `commit-msg`: the commit message.
+- `pre-push`: every commit the push sends (its message, and the paths and lines it adds), on every
+  ref, tags included. It catches what a rebase, a cherry-pick or `--no-verify` let past the other
+  two.
+
+Never bypass a refusal with `--no-verify`.
+
 Put the deny-list (from the repository owner, never committed) at `.private/deny-list.txt`, or
 export `PRIVATE_DENY_LIST=<path>` to point at the control repository's copy.
 

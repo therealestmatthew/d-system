@@ -15,6 +15,10 @@ from checks import backlog as feature
 from test_backlog import TODAY, phase
 
 REMOTE = "git@forge.example.com:team/hack-product.git"
+# owner/repo fixtures written without a host (or after a real host's name) are built from parts, so
+# no team's real origin can match them in the plugin's text (test_no_source_references.py).
+GITHUB = "/".join(["team", "hack-product"])
+HOSTED = "/".join(["example-owner", "control"])
 
 
 def git(cwd: Path, *args: str) -> None:
@@ -142,10 +146,10 @@ def test_github_is_optional_and_printed(repos: tuple[Path, Path], capsys: Any) -
     control, checkout = repos
     assert product.load(config(control, checkout)).github == ""
     record = control / product.RECORD
-    record.write_text(record.read_text() + "github: team/hack-product\n")
-    assert product.load(config(control, checkout)).github == "team/hack-product"
+    record.write_text(record.read_text() + f"github: {GITHUB}\n")
+    assert product.load(config(control, checkout)).github == GITHUB
     assert product.main(["show", "--root", str(control), "--product-root", str(checkout)]) == 0
-    assert "github: team/hack-product" in capsys.readouterr().out
+    assert f"github: {GITHUB}" in capsys.readouterr().out
 
 
 @pytest.mark.parametrize("value", ["team", "a/b/c", "https://forge.example.com/team/x"])
@@ -287,9 +291,9 @@ def test_verify_reads_the_remote_from_local_yaml(repos: tuple[Path, Path], capsy
     control, checkout = repos
     untracked(control)
     (control / ".idea-realization" / "local.yaml").write_text(
-        f"product_root: {checkout}\nproduct_remote: {REMOTE}\nproduct_github: team/hack-product\n")
+        f"product_root: {checkout}\nproduct_remote: {REMOTE}\nproduct_github: {GITHUB}\n")
     found = product.verify(config(control))
-    assert (found.remote, found.github) == (REMOTE, "team/hack-product")
+    assert (found.remote, found.github) == (REMOTE, GITHUB)
     assert product.main(["verify", "--root", str(control)]) == 0
     out = capsys.readouterr().out
     assert f"remote: {REMOTE}  (from local.yaml)" in out and "origin: matches" in out
@@ -337,9 +341,9 @@ class FakeGh:
         return subprocess.CompletedProcess(command, self.code, "", self.stderr)
 
 
-@pytest.mark.parametrize("url", [REMOTE, "https://github.com/example-owner/control.git",
-                                 "ssh://git@github.com/example-owner/control.git",
-                                 "git@github-work:example-owner/control.git"])
+@pytest.mark.parametrize("url", [REMOTE, f"https://github.com/{HOSTED}.git",
+                                 f"ssh://git@github.com/{HOSTED}.git",
+                                 f"git@github-work:{HOSTED}.git"])
 def test_a_hosted_origin_is_never_routed_to_a_local_merge_when_gh_fails(
         tmp_path: Path, url: str) -> None:
     """The fallback a failing gh used to select: session-close merged onto the integration branch
