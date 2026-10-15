@@ -18,7 +18,7 @@ One page per mode: the skills, agents and commands in the order they are used, o
 full procedure for each mode is in its guide: planning (`OPS-002`), implementing (`OPS-003`),
 validating (`OPS-004`). Where this page and a guide differ, the guide wins. Prompts to paste for each mode are in `OPS-010`.
 
-**Entry point for every mode: `/start`** (long form `/start`). It asks which mode you are in and points to that mode's
+**Entry point for every mode: `/start`** (long form `/idea-realization:start`). It asks which mode you are in and points to that mode's
 first step.
 
 Plugin skills are invoked as `/idea-realization:<skill>`. Agents are dispatched by name, never as a

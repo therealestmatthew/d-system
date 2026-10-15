@@ -6,8 +6,10 @@ Every AWS command an agent runs goes through this wrapper. A PreToolUse hook
 `.claude/settings.json` denies the bare `aws` command as a second layer.
 
 **The IAM roles are the boundary.** The sandbox has two roles (`aws/README.md`): a read-only role
-and a deploy role whose only IAM permission is managing `/app/` roles that carry the permission
-boundary, and which has no Organizations, account or billing permissions. Each machine has one
+and a deploy role whose IAM rights are limited to `/app/` roles (create, change and delete them
+when they carry the permission boundary, pass them to the product's services, read them) plus
+listing roles and reading the boundary and AWS managed policies,
+and which has no Organizations, account or billing permissions. Each machine has one
 named profile for each. The wrapper picks the profile by mode, so a `read` command runs with the
 read-only role and cannot change anything, whatever it asks for:
 
