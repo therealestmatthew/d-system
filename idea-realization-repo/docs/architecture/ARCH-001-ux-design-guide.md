@@ -50,6 +50,7 @@ this guide differs from that source, this guide is the authority.
 | Layout | A fixed layout-as-data shell. No runtime panel reassignment and no layout persistence. |
 | Hosting | The app is hosted on AWS Amplify Hosting. The custom domain and AWS WAF are not yet decided. |
 | Table sort control | The column header cell itself is the pressable sort control, with `aria-sort` on it (the React Aria form), not a button inside the header (2026-10-14). |
+| Dialog element | The static HTML layer uses native `<dialog>` with `showModal()`; the React layer uses React Aria's `role="dialog"` with its focus containment and background hiding (2026-10-14). |
 | Toast announcements | React Aria's toast announces every toast assertively. Accepted for now as a known gap; revisit when React Aria's toast is stable (2026-10-14). |
 
 ## Principles
@@ -308,6 +309,8 @@ Each entry gives purpose, anatomy, variants, states, keyboard and ARIA, and what
      `terminal`, `ticker` or `chart`.
    - A panel never draws its own header. It places controls through typed bar elements; an
      element type the slot does not admit throws, and the panel's error boundary shows it.
+     Not built in Kit v0: the React `Panel` takes its controls as plain content in the toolbar, and
+     typed bar elements with this check are deferred to `phase-ux-05`.
    - Variants: `standard` (stacked header and body), `compact` (one inline row).
    - States: `empty` ("Nothing here yet" plus the next step), `loading`, `error` (error boundary
      plus Retry), `maximized` (transient, never saved), `collapsed` (header only).
@@ -400,9 +403,12 @@ Each entry gives purpose, anatomy, variants, states, keyboard and ARIA, and what
 11. **Dialog**
     - Variants: `info` (title, body, one "Got it" button), `confirm` (destructive: names the object
       and the consequence, with the danger button on the right), `form` (short), `full` (sheet).
-    - Keyboard and ARIA: native `<dialog>` with `showModal()`. Focus moves to the first field or the
-      safe button and is held by the top layer. Escape closes unless there is unsaved work.
-      `aria-labelledby` and `aria-describedby`. Focus returns to the trigger.
+    - Keyboard and ARIA, static HTML layer: native `<dialog>` with `showModal()`. Focus moves to the
+      first field or the safe button and is held by the top layer. Escape closes unless there is
+      unsaved work. `aria-labelledby` and `aria-describedby`. Focus returns to the trigger.
+    - Keyboard and ARIA, React layer: React Aria's dialog, an element with `role="dialog"` inside
+      React Aria's modal. React Aria contains focus in the dialog and hides the background from
+      assistive technology; the rest of the rules above apply unchanged (owner ruling, 2026-10-14).
     - Not for: confirming reversible actions, or anything a popover or an inline expansion can do.
 12. **Collapsible section (accordion)**
     - Anatomy: native `<details><summary>` with the heading inside the summary, a number, a chevron
