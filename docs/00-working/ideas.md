@@ -29467,3 +29467,13 @@ From Session 1 - Builder A, 2026-10-14.
 idea-realization plugin check.py resolves its root to the git top level, so run from idea-realization-repo/ inside d-system it checks d-system's tree and fails; it passes only with IDEA_REALIZATION_ROOT set. Detect the nearest .idea-realization/ marker before falling back to git top level.
 
 From Session 1 - Builder A, 2026-10-14.
+
+---
+
+## 000706 · Port the hackathon repo's idea-realization plugin changes back to d-system's copy, or decide the two copies diverge on purpose
+
+**Created 2026-10-14T23:17:27-04:00 · Status: `open`**
+
+port the plugin changes made in idea-realization-repo/plugins/idea-realization/ on agent/idea-realization-team-kit (PR merge-commit flow, local.yaml config, doctor edited/stale classes, batch check, start skill, templates) back to d-system's own plugins/idea-realization/ copy, or decide the two copies diverge on purpose.
+
+From Session 2 - Builder B, 2026-10-14.
