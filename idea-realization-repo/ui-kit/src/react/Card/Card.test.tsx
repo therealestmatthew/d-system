@@ -1,5 +1,6 @@
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { axeViolations } from '../test-utils/axe'
 import { Card, CardGrid, StatCard } from './Card'
 
 describe('Card', () => {
@@ -34,5 +35,22 @@ describe('Card', () => {
     expect(open!.querySelector('.ui-card__delta')).toHaveTextContent('+3')
     expect(cost!.querySelector('.ui-card__value')).toHaveTextContent('Not recorded')
     expect(cost!.querySelector('.ui-card__value')).toHaveAttribute('data-state', 'not-recorded')
+  })
+
+  it('exposes card titles as headings and has no axe violations', async () => {
+    const { container } = render(
+      <CardGrid>
+        <Card kicker="Run" title="Summary" meta="Source: runs" actions={<button>Open</button>} variant="ai">
+          Body
+        </Card>
+        <Card title="Plain" variant="accent">Body</Card>
+        <StatCard label="Open" value={12} delta="+3" />
+        <StatCard label="Cost" value={null} />
+      </CardGrid>,
+    )
+    expect(screen.getByRole('heading', { name: 'Summary' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Plain' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Open' })).toBeInTheDocument()
+    expect(await axeViolations(container)).toEqual([])
   })
 })

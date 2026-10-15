@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { axeViolations } from '../test-utils/axe'
-import { Citation, SourceList, type Source } from './Citation'
+import { Citation, SourceList, safeHref, type Source } from './Citation'
 
 const SOURCES: Source[] = [
   { id: 's1', kind: 'statute', title: 'SS UI Act § 4-210(b)', location: 'Synthetic State corpus' },
@@ -68,5 +68,31 @@ describe('SourceList', () => {
       </div>,
     )
     expect(await axeViolations(container)).toEqual([])
+  })
+
+  it('never links to an unsafe scheme: the chip falls back to the list and the title is plain text', () => {
+    const unsafe = ['javascript:alert(1)', ' JavaScript:alert(1)', 'java\tscript:alert(1)', 'data:text/html,x', 'vbscript:x']
+    for (const href of unsafe) {
+      const source: Source = { id: 'bad', kind: 'policy', title: 'Bad source', location: 'x', href }
+      const { container, unmount } = render(
+        <>
+          <Citation index={1} source={source} />
+          <SourceList sources={[source]} />
+        </>,
+      )
+      expect(screen.getByRole('link', { name: /^Source 1:/ })).toHaveAttribute('href', '#source-bad')
+      expect(container.querySelector('.ui-sources__title')!.tagName).toBe('SPAN')
+      unmount()
+    }
+  })
+
+  it('keeps http(s) and relative hrefs', () => {
+    expect(safeHref('https://example.invalid/a')).toBe('https://example.invalid/a')
+    expect(safeHref('HTTP://example.invalid/a')).toBe('HTTP://example.invalid/a')
+    expect(safeHref('/docs/a.pdf')).toBe('/docs/a.pdf')
+    expect(safeHref('#source-s1')).toBe('#source-s1')
+    expect(safeHref('mailto:x@example.invalid')).toBeUndefined()
+    expect(safeHref('')).toBeUndefined()
+    expect(safeHref(undefined)).toBeUndefined()
   })
 })

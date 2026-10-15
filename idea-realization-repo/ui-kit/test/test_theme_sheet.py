@@ -136,3 +136,11 @@ def test_samples_use_the_kit_classes(full_text: str) -> None:
         assert cls in full_text, cls
     for status in ("ok", "warn", "info", "err", "ai"):
         assert f'data-status="{status}"' in full_text
+
+
+def test_colour_strings_are_escaped_at_output() -> None:
+    """Values are validated upstream, but the sheet escapes them where it writes HTML anyway."""
+    hostile = '#fff" onmouseover="alert(1)'
+    out = sheet.swatch_dot(hostile)
+    assert 'onmouseover="' not in out
+    assert html.escape(hostile) in out

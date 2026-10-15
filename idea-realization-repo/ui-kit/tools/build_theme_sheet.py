@@ -33,6 +33,8 @@ from pathlib import Path
 
 import build_tokens as tk
 
+esc = html.escape
+
 KIT = Path(__file__).resolve().parent.parent
 CSS = KIT / "dist" / "ui.css"
 OUTPUT = KIT / "gallery" / "theme-sheet.html"
@@ -172,8 +174,9 @@ def sample_body(tokens: tk.Tokens, theme: str, accent: str) -> str:
     """The mini product view and swatches, written against the kit class contract."""
     palette = tokens.palette(theme, accent)
     swatches = "\n".join(
-        f'<li class="ts-swatch"><span class="ts-chip" style="background: var(--ui-color-{role})">'
-        f"</span><span><b>{role}</b><code>{palette[role]}</code></span></li>"
+        f'<li class="ts-swatch"><span class="ts-chip" '
+        f'style="background: var(--ui-color-{esc(role)})">'
+        f"</span><span><b>{esc(role)}</b><code>{esc(palette[role])}</code></span></li>"
         for role in tk.ACCENT_ROLES
     )
     return f"""<div class="ts-stack">
@@ -244,8 +247,9 @@ Two need a decision before the run can close.</p>
 def sample_document(tokens: tk.Tokens, css: str, theme: str, accent: str) -> str:
     label = tokens.accents[accent].label
     return (
-        f'<!doctype html><html lang="en" data-theme="{theme}" data-accent="{accent}">'
-        f'<head><meta charset="utf-8"><title>{html.escape(label)}, {theme}</title>'
+        f'<!doctype html><html lang="en" data-theme="{esc(theme)}" '
+        f'data-accent="{esc(accent)}">'
+        f'<head><meta charset="utf-8"><title>{esc(label)}, {esc(theme)}</title>'
         f"<style>\n{css}\n/* theme sheet sample layout */{SAMPLE_CSS}</style></head>"
         f"<body inert>\n{sample_body(tokens, theme, accent)}\n</body></html>"
     )
@@ -387,7 +391,10 @@ PAGE_SCRIPT = """
 
 
 def swatch_dot(hex_colour: str) -> str:
-    return f'<span class="ts-dot" style="background-color: {hex_colour}" aria-hidden="true"></span>'
+    return (
+        f'<span class="ts-dot" style="background-color: {esc(hex_colour)}" '
+        'aria-hidden="true"></span>'
+    )
 
 
 def comparison_table(tokens: tk.Tokens) -> str:
@@ -404,20 +411,20 @@ def comparison_table(tokens: tk.Tokens) -> str:
             if note.neutral:
                 text = "neutral (low chroma)"
             else:
-                text = f"{STATUS_NAMES[note.nearest]}, {note.gap:.1f}°"
+                text = esc(f"{STATUS_NAMES[note.nearest]}, {note.gap:.1f}°")
                 if note.near:
                     text = f'<span class="ts-flag">{text}, under threshold</span>'
             hue_cells.append(f"{THEME_LABEL[theme]}: {text}")
         default = " <em>(provisional default)</em>" if name == tokens.default_accent else ""
         rows.append(
             "<tr>"
-            f'<th scope="row"><a href="#accent-{name}">{html.escape(accent.label)}</a>'
+            f'<th scope="row"><a href="#accent-{esc(name)}">{esc(accent.label)}</a>'
             f"{default}</th>"
-            f"<td>{swatch_dot(light)}<code>{light}</code></td>"
-            f"<td>{swatch_dot(dark)}<code>{dark}</code></td>"
+            f"<td>{swatch_dot(light)}<code>{esc(light)}</code></td>"
+            f"<td>{swatch_dot(dark)}<code>{esc(dark)}</code></td>"
             f"<td>{fmt_ratio(low.ratio)} <span class=\"ts-muted\">"
             f"{THEME_LABEL[low_theme].lower()}, "
-            f"{low.fg} on {low.bg}</span></td>"
+            f"{esc(low.fg)} on {esc(low.bg)}</span></td>"
             f"<td>{'<br>'.join(hue_cells)}</td>"
             "</tr>"
         )
@@ -442,14 +449,15 @@ def accent_section(tokens: tk.Tokens, css: str, name: str) -> str:
         doc = sample_document(tokens, css, theme, name)
         title = f"{accent.label} accent, {theme} theme sample"
         tiles.append(
-            f'<figure class="ts-tile" data-theme-tile="{theme}">'
-            f'<iframe title="{html.escape(title)}" '
-            f'srcdoc="{html.escape(doc, quote=True)}"></iframe>'
+            f'<figure class="ts-tile" data-theme-tile="{esc(theme)}">'
+            f'<iframe title="{esc(title)}" '
+            f'srcdoc="{esc(doc, quote=True)}"></iframe>'
             f"<figcaption><ul class=\"ts-notes\">"
             f"<li><strong>{THEME_LABEL[theme]}.</strong> Lowest accent contrast "
-            f"{fmt_ratio(worst.ratio)}: {worst.fg} on {worst.bg} ({html.escape(worst.use)}; "
+            f"{fmt_ratio(worst.ratio)}: {esc(worst.fg)} on {esc(worst.bg)} "
+            f"({esc(worst.use)}; "
             f"minimum {worst.minimum:g}:1).</li>"
-            f"<li>{html.escape(hue_sentence(tokens, note, theme, name))}</li>"
+            f"<li>{esc(hue_sentence(tokens, note, theme, name))}</li>"
             "</ul></figcaption></figure>"
         )
     default = (
@@ -457,11 +465,12 @@ def accent_section(tokens: tk.Tokens, css: str, name: str) -> str:
         if name == tokens.default_accent
         else ""
     )
-    blurb = f"<p class=\"ts-muted\">{html.escape(accent.note)}</p>" if accent.note else ""
+    blurb = f"<p class=\"ts-muted\">{esc(accent.note)}</p>" if accent.note else ""
+    safe = esc(name)
     return (
-        f'<section class="ts-accent" id="accent-{name}" aria-labelledby="accent-{name}-title">'
-        f'<div class="ts-accent__head"><h2 id="accent-{name}-title">{html.escape(accent.label)}'
-        f'</h2><p class="ts-muted"><code>data-accent="{name}"</code></p>{default}{blurb}</div>'
+        f'<section class="ts-accent" id="accent-{safe}" aria-labelledby="accent-{safe}-title">'
+        f'<div class="ts-accent__head"><h2 id="accent-{safe}-title">{esc(accent.label)}'
+        f'</h2><p class="ts-muted"><code>data-accent="{safe}"</code></p>{default}{blurb}</div>'
         f'<div class="ts-pair">{"".join(tiles)}</div></section>'
     )
 
@@ -489,7 +498,7 @@ def render(tokens: tk.Tokens, css: str) -> str:
 <p class="ts-lede">This page shows each of the {count} candidate accent colours on the same small
 product view, in the light and the dark theme side by side. Under each view are its lowest contrast
 ratio and how close it sits to a status colour, so a choice can weigh appearance against those
-limits. The current default, {html.escape(default)}, is provisional; nothing here has
+limits. The current default, {esc(default)}, is provisional; nothing here has
 been decided.</p>
 <p class="ts-lede ts-muted">The page itself uses the neutral slate accent so its own links do not
 favour a candidate. Each sample is a separate document with its own theme, so it looks the same

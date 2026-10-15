@@ -34,7 +34,7 @@ export {
   useToast,
 } from './Toast/Toast'
 export type { ToastAction, ToastContent, ToastProviderProps, ToastQueue, ToastRegionProps, ToastStatus } from './Toast/Toast'
-export { Citation, SOURCE_ID_PREFIX, SOURCE_KIND_LABEL, SourceList, citationName } from './Citation/Citation'
+export { Citation, SOURCE_ID_PREFIX, SOURCE_KIND_LABEL, SourceList, citationName, safeHref } from './Citation/Citation'
 export type { CitationProps, Source, SourceKind, SourceListProps } from './Citation/Citation'
 export { ApprovalCard, DEFAULT_APPROVAL_LABELS, OUTCOME_LABEL } from './ApprovalCard/ApprovalCard'
 export type {

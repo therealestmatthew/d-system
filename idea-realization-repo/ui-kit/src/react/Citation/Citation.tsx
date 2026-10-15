@@ -21,6 +21,23 @@ export const SOURCE_KIND_LABEL: Record<SourceKind, string> = {
   'claim-document': 'Claim document',
 }
 
+const SCHEME = /^([a-z][a-z0-9+.-]*):/i
+
+/**
+ * The href if it is safe to put in a link: http(s), or relative (path, `?query`, `#anchor`).
+ * Any other scheme (javascript:, data:, vbscript:, file: ...) returns undefined. Whitespace and
+ * control characters are removed before the scheme is read, as browsers do when they parse a URL.
+ */
+export function safeHref(href: string | undefined): string | undefined {
+  if (href === undefined) return undefined
+  const normalized = href.replace(/[\u0000-\u0020\u007f]/g, '')
+  if (normalized === '') return undefined
+  const scheme = SCHEME.exec(normalized)
+  if (scheme === null) return href
+  const name = scheme[1]!.toLowerCase()
+  return name === 'http' || name === 'https' ? href : undefined
+}
+
 /** Default anchor prefix shared by Citation and SourceList, so a chip reaches its list item. */
 export const SOURCE_ID_PREFIX = 'source-'
 
@@ -41,11 +58,11 @@ export interface CitationProps {
 
 /**
  * Inline numbered citation chip (ARCH-001 item 30, static form). A real link: to the source's
- * href when given, otherwise to its item in the page's SourceList. No popover in Kit v0.
+ * href when given and safe (see safeHref), otherwise to its item in the page's SourceList. No popover in Kit v0.
  */
 export function Citation({ index, source, label, idPrefix = SOURCE_ID_PREFIX }: CitationProps) {
   return (
-    <a className="ui-citation" href={source.href ?? `#${idPrefix}${source.id}`} aria-label={citationName(index, source)}>
+    <a className="ui-citation" href={safeHref(source.href) ?? `#${idPrefix}${source.id}`} aria-label={citationName(index, source)}>
       <span className="ui-citation__index">{index}</span>
       {label !== undefined && <span className="ui-citation__label">{label}</span>}
     </a>
@@ -75,8 +92,8 @@ export function SourceList({ sources, label = 'Sources', idPrefix = SOURCE_ID_PR
           data-highlighted={s.id === highlightedId || undefined}
         >
           <span className="ui-sources__kind">{SOURCE_KIND_LABEL[s.kind]}</span>
-          {s.href !== undefined ? (
-            <a className="ui-sources__title" href={s.href}>
+          {safeHref(s.href) !== undefined ? (
+            <a className="ui-sources__title" href={safeHref(s.href)}>
               {s.title}
             </a>
           ) : (
