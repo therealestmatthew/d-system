@@ -62,6 +62,11 @@ repository check again, then push. Never force-push.
 
 Everything else, in both repositories, reaches `dev` through a pull request.
 
+On control `dev` this is a rule you follow, not a rule GitHub enforces. Control `dev` has no pull
+request requirement, because bookkeeping commits go there directly, so GitHub would accept a
+feature branch pushed or merged straight to it. Do not do that: a control feature branch goes
+through a pull request like a product one. Product `dev` does enforce it.
+
 ## 4. Merging a phase: pull request with a merge commit
 
 Feature branches reach `dev` only through a pull request merged with a **merge commit**. Squash and
