@@ -205,7 +205,8 @@ markdown entry per file, each naming its author. `brain/README.md` says what goe
 ## AWS
 
 - **The IAM roles and the machine rule are the boundary.** The sandbox has a read-only role and a
-  deploy role with no IAM, Organizations, account or billing permissions (`aws/README.md`). Each
+  deploy role with no Organizations, account or billing permissions, which may change IAM only for
+  the stack's own roles under /app/ that carry the permission boundary (`aws/README.md`). Each
   machine has one named profile for each, in untracked configuration.
 - **Machine rule: a machine that runs agents holds no default or ambient AWS credentials** — no
   `default` profile, no `AWS_` credential or profile variables, no instance or container role —
