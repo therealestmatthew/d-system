@@ -16,44 +16,6 @@ lede: >-
   page in reading order. Every section below is converted from the document named above it; where
   this page and a document differ, the document is the one to follow.
 
-# Dated list of known issues shown under the page header. Each item names a finding in the
-# workflow simulation report; remove it in the change that fixes it, then regenerate.
-known_issues:
-  as_of: '2026-10-15'
-  source: the two-developer workflow simulation of 2026-10-15
-  items:
-    - id: B1
-      severity: blocker
-      text: >-
-        A commit made inside a control-repository worktree fails the pre-commit hook with "product
-        checkout refused". Never commit with `--no-verify`; stop and tell the owner until the hook
-        fix merges.
-    - id: M3
-      severity: major
-      text: >-
-        With no product checkout configured, as in control CI, the check cannot read a merge
-        commit's parents. It prints a "not checked" note for a completion whose `product_merge` is
-        not the reviewed commit, and checks only the shape of `product:` evidence paths, not that
-        the files exist. Treat that note as
-        unchecked, and run the check with your product checkout configured before you record a
-        completion. Whether control CI gets a product checkout is an owner decision.
-    - id: M6
-      severity: major
-      text: >-
-        Document and session codes allocated on two machines can be the same. The check refuses
-        the duplicate at integration; whoever integrates second renumbers with `next-code` and
-        `release-code`.
-    - id: M7
-      severity: major
-      text: >-
-        `git rebase --continue` does not run the pre-commit hook. After resolving a rejected claim
-        push, run the repository check by hand before you push.
-    - id: M8
-      severity: major
-      text: >-
-        The confidentiality check scans tracked files but not commit messages. Before you commit,
-        read your own commit message and make sure it names no confidential identifier.
-
 chapters:
   - id: onboarding
     title: Onboarding
@@ -178,8 +140,10 @@ chapters:
   - id: day-one
     title: Day-one checklist
     intro: >-
-      The first-day setup from the onboarding page, once per machine, in order.
+      The first-day setup from the onboarding page, once per machine, in order, then the prompts
+      to paste into Claude Code for the first session and each working mode.
     sources:
       - path: ONBOARDING.md
         start_at: 3. First-day checklist
         stop_before: 4. Claim your workstream
+      - path: docs/guides/OPS-010-day-one-prompts.md

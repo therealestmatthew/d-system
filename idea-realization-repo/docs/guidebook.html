@@ -3292,7 +3292,7 @@ button.ui-table__sort {
 <li><a href="#troubleshooting">Troubleshooting</a>
 <ol class="gb-toc__sub"><li><a href="#troubleshooting-troubleshooting">Troubleshooting (OPS-008)</a></li></ol></li>
 <li><a href="#day-one">Day-one checklist</a>
-<ol class="gb-toc__sub"><li><a href="#day-one-onboarding">Onboarding</a></li></ol></li>
+<ol class="gb-toc__sub"><li><a href="#day-one-onboarding">Onboarding</a></li><li><a href="#day-one-day-one-prompts">Day-one prompts (OPS-010)</a></li></ol></li>
 <li><a href="#sources">Sources</a></li>
 </ol>
 </nav>
@@ -3300,20 +3300,10 @@ button.ui-table__sort {
 <header class="gb-header">
 <h1>Developer guidebook</h1>
 <p class="gb-lede">The control repository&#x27;s onboarding page, operating guides and AWS setup, collected into one page in reading order. Every section below is converted from the document named above it; where this page and a document differ, the document is the one to follow.</p>
-<p class="gb-intro">Built from 14 files by <code>tools/build_guidebook.py</code>. The
+<p class="gb-intro">Built from 15 files by <code>tools/build_guidebook.py</code>. The
 <a href="#sources">Sources</a> list gives each file's hash, so a stale page can be seen.</p>
 </header>
-<section class="ui-card ui-card--accent gb-issues" aria-labelledby="known-issues">
-<h2 class="ui-card__title" id="known-issues">Known issues as of 2026-10-15</h2>
-<p class="ui-card__meta">From the two-developer workflow simulation of 2026-10-15. Each item is removed when its fix merges and this page is regenerated.</p>
-<ul class="gb-issues__list">
-<li><span class="ui-pill" data-status="err"><span class="ui-pill__dot"></span>blocker B1</span> A commit made inside a control-repository worktree fails the pre-commit hook with &quot;product checkout refused&quot;. Never commit with <code>--no-verify</code>; stop and tell the owner until the hook fix merges.</li>
-<li><span class="ui-pill" data-status="warn"><span class="ui-pill__dot"></span>major M3</span> With no product checkout configured, as in control CI, the check cannot read a merge commit&#x27;s parents. It prints a &quot;not checked&quot; note for a completion whose <code>product_merge</code> is not the reviewed commit, and checks only the shape of <code>product:</code> evidence paths, not that the files exist. Treat that note as unchecked, and run the check with your product checkout configured before you record a completion. Whether control CI gets a product checkout is an owner decision.</li>
-<li><span class="ui-pill" data-status="warn"><span class="ui-pill__dot"></span>major M6</span> Document and session codes allocated on two machines can be the same. The check refuses the duplicate at integration; whoever integrates second renumbers with <code>next-code</code> and <code>release-code</code>.</li>
-<li><span class="ui-pill" data-status="warn"><span class="ui-pill__dot"></span>major M7</span> <code>git rebase --continue</code> does not run the pre-commit hook. After resolving a rejected claim push, run the repository check by hand before you push.</li>
-<li><span class="ui-pill" data-status="warn"><span class="ui-pill__dot"></span>major M8</span> The confidentiality check scans tracked files but not commit messages. Before you commit, read your own commit message and make sure it names no confidential identifier.</li>
-</ul>
-</section>
+
 <section class="gb-chapter" aria-labelledby="onboarding">
 <h2 id="onboarding">Onboarding</h2>
 <p class="gb-intro">What the two repositories are, how the team divides the work, and where to look when something fails. The first-day machine setup is its own chapter, the Day-one checklist.</p>
@@ -3341,9 +3331,9 @@ Phase branches reach <code>dev</code> through a pull request merged with a merge
 <strong>Implementing</strong> or <strong>Validating</strong>.</li>
 <li>Demo: 2026-11-05. Code freeze: 2026-11-03.</li>
 </ul>
-<p><strong>Skill names.</strong> The plugin&#x27;s skills are invoked as <code>/idea-realization:&lt;skill&gt;</code>, for example
-<code>/idea-realization:start</code>. Some setups also list them by the short name (<code>/start</code>); both run the
-same skill. The guides use the full form.</p>
+<p><strong>Skill names.</strong> Each of the plugin&#x27;s skills runs by its short name, such as <code>/start</code>, unless
+another command already uses that name. The long form <code>/idea-realization:&lt;skill&gt;</code>, such as
+<code>/start</code>, always works.</p>
 <p><strong>Terms used on this page.</strong></p>
 <ul>
 <li><strong>Bookkeeping</strong>: the small commits that go directly on control <code>dev</code> with no pull request: claims,
@@ -3406,22 +3396,22 @@ workstream keeps the lines its own claim wrote, whichever side they came from. N
 with <code>--ours</code> or <code>--theirs</code>.</p>
 <p>In the first two days each workstream writes the interface documents the others build against.
 The team workflow guide (<a href="#onboarding-team-workflow"><code>OPS-005</code></a>, sections 1 and 2) has the details.</p>
-<h4 id="onboarding-5-pick-a-mode-with-idea-realizationstart">5. Pick a mode with <code>/idea-realization:start</code></h4>
+<h4 id="onboarding-5-pick-a-mode-with-start">5. Pick a mode with <code>/start</code></h4>
 <p>Before every session, in the primary checkout of each repository: <code>git pull --rebase origin dev</code>.
 The <code>--rebase</code> keeps an unpushed bookkeeping commit on top instead of making a merge commit on
 <code>dev</code>.</p>
-<p>Then run <code>/idea-realization:start</code> and choose a mode:</p>
+<p>Then run <code>/start</code> and choose a mode:</p>
 <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th scope="col">Mode</th><th scope="col">What you do</th><th scope="col">Guide</th></tr></thead>
 <tbody>
 <tr><td>Planning</td><td>Turn captured ideas into approved plans and backlog phases</td><td><a href="#modes-planning-mode"><code>docs/guides/OPS-002-planning-mode.md</code></a></td></tr>
 <tr><td>Implementing</td><td>Claim one phase, build it, verify it, merge it</td><td><a href="#modes-implementing-mode"><code>docs/guides/OPS-003-implementing-mode.md</code></a></td></tr>
 <tr><td>Validating</td><td>Review a plan, a peer&#x27;s branch, infrastructure or spend; change nothing</td><td><a href="#modes-validating-mode"><code>docs/guides/OPS-004-validating-mode.md</code></a></td></tr>
 </tbody></table></div>
-<p>The one-page versions are in <a href="#modes-mode-cheat-sheets"><code>docs/guides/OPS-009-mode-cheat-sheets.md</code></a>.</p>
+<p>The one-page versions are in <a href="#modes-mode-cheat-sheets"><code>docs/guides/OPS-009-mode-cheat-sheets.md</code></a>; prompts to paste for each mode are in <a href="#day-one-day-one-prompts"><code>docs/guides/OPS-010-day-one-prompts.md</code></a>.</p>
 <h4 id="onboarding-6-your-first-phase-end-to-end">6. Your first phase, end to end</h4>
 <p>The implementing-mode guide (<a href="#modes-implementing-mode"><code>OPS-003</code></a>) is the full procedure. In short:</p>
 <ol>
-<li><code>/idea-realization:start</code>, choose Implementing. Pull <code>dev</code> first.</li>
+<li><code>/start</code>, choose Implementing. Pull <code>dev</code> first.</li>
 <li><code>/idea-realization:backlog</code>: see the ready queue. Take the first ready phase in <code>next_up</code> order,
 preferring one assigned to you (<code>owner: &lt;your handle&gt;</code>).</li>
 <li><code>/idea-realization:session-start</code>: it asks before claiming, then commits the claim directly on
@@ -3450,7 +3440,9 @@ phase, record learnings in the brain, push every branch). The table is in <a hre
 unpushed claim lets two people claim the same phase.</li>
 <li><strong>Every session works in its own worktree.</strong> The primary checkout&#x27;s branch is never switched.</li>
 <li><strong>Never write a confidential identifier into a tracked file</strong>: no organization or client name,
-account id, email or repository URL in code, documents or commit messages.</li>
+account id or repository URL in code, documents or commit messages. Your work email is not
+confidential: it belongs in your own <code>docs/systems.yaml</code> entry (section 3, step 5) and nowhere
+else.</li>
 <li><strong>Never commit with <code>--no-verify</code>, never force-push <code>dev</code> or <code>main</code>, never route around a hook.</strong>
 A failing check is a result to fix or report.</li>
 <li><strong>Every AWS command goes through <code>tools/aws-sandbox</code>.</strong> No <code>default</code> profile, no <code>AWS_</code>
@@ -3485,7 +3477,7 @@ AWS access errors and port clashes.</li>
 <tr><td><code>backlog/backlog.yaml</code></td><td>Phases, one session each; on <code>dev</code> it is also the lock table</td></tr>
 <tr><td><code>backlog/batches.yaml</code></td><td>Owner-approved, ordered batches of phases grouped into stages</td></tr>
 <tr><td><code>docs/</code></td><td>Governed documents: <code>plans/</code>, <code>requirements/</code>, <code>decisions/</code>, <code>architecture/</code>, <code>governance/</code>, <code>sessions/</code>, <code>prompts/</code>, plus <code>codes.yaml</code>, <code>systems.yaml</code>, <code>workstreams.yaml</code> and the generated <code>catalog.md</code></td></tr>
-<tr><td><code>docs/guides/</code></td><td>The operating guides (<a href="#branching-branching-and-ci"><code>OPS-001</code></a> to <a href="#modes-mode-cheat-sheets"><code>OPS-009</code></a>): branching and CI, the three modes, team workflow, demo day, cost, troubleshooting, cheat sheets</td></tr>
+<tr><td><code>docs/guides/</code></td><td>The operating guides (<a href="#branching-branching-and-ci"><code>OPS-001</code></a> to <a href="#day-one-day-one-prompts"><code>OPS-010</code></a>): branching and CI, the three modes, team workflow, demo day, cost, troubleshooting, cheat sheets, day-one prompts</td></tr>
 <tr><td><code>docs/reviews/</code></td><td>Review verdict records</td></tr>
 <tr><td><code>brain/</code></td><td>The team&#x27;s shared memory: decisions, research, concepts, entities, learnings</td></tr>
 <tr><td><code>.claude/agents/</code></td><td>The planner, the review-gate agents and the AWS agents</td></tr>
@@ -3571,10 +3563,11 @@ the code that depends on it.</li>
 <p class="gb-source__meta"><span class="ui-pill">Source</span> <code>CLAUDE.md</code><span>, from “Pick your mode” up to “Two repositories”</span></p>
 <div class="ui-prose gb-prose">
 <h4 id="modes-pick-your-mode">Pick your mode</h4>
-<p>Start every session with <strong><code>/start</code></strong> (under <code>--plugin-dir</code> it may be named
-<code>/idea-realization:start</code>). It asks which mode you are in and points you to that mode&#x27;s guide and
-first step. The one-page list of steps per mode is the mode cheat sheets (<a href="#modes-mode-cheat-sheets"><code>OPS-009</code></a>); where a cheat
-sheet and a guide differ, the guide wins.</p>
+<p>Start every session with <strong><code>/start</code></strong> (long form <code>/idea-realization:start</code>). The project settings
+load the plugin, so a plain <code>claude</code> started in this repository has it once you trust the folder.
+It asks which mode you are in and points you to that mode&#x27;s guide and first step. The one-page
+list of steps per mode is the mode cheat sheets (<a href="#modes-mode-cheat-sheets"><code>OPS-009</code></a>); where a cheat sheet and a guide
+differ, the guide wins.</p>
 <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th scope="col">Mode</th><th scope="col">Use it to</th><th scope="col">Main steps</th><th scope="col">Guide</th></tr></thead>
 <tbody>
 <tr><td>Planning</td><td>turn ideas into approved plans and assigned phases</td><td><code>idea</code>, <code>idea-triage</code>, <code>partition-ideas</code>, <code>idea-planner</code>, <code>plan-adversary</code>, <code>phase-splitter</code>, <code>batch-validator</code></td><td><a href="#modes-planning-mode"><code>OPS-002</code></a></td></tr>
@@ -3606,7 +3599,7 @@ does, and the decisions reserved to the owner (section 1);</li>
 <p>The one-page list of commands for this mode is in the mode cheat sheets (<a href="#modes-mode-cheat-sheets"><code>OPS-009</code></a>). How the team&#x27;s
 day is organised around it is in the team workflow (<a href="#onboarding-team-workflow"><code>OPS-005</code></a>).</p>
 <h4 id="modes-starting">Starting</h4>
-<p>Run <code>/idea-realization:start</code> and choose Planning. Then, in the control repository&#x27;s primary checkout on <code>dev</code>:</p>
+<p>Run <code>/start</code> and choose Planning. Then, in the control repository&#x27;s primary checkout on <code>dev</code>:</p>
 <ol>
 <li><code>git pull --rebase origin dev</code>, before any work (<a href="#branching-branching-and-ci"><code>OPS-001</code></a>, section 2).</li>
 <li>Load what is already decided: the <code>brain</code> skill, or
@@ -3628,7 +3621,7 @@ working directory that <code>paths.py</code> prints.</p>
 <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th scope="col">What</th><th scope="col">Where it goes</th></tr></thead>
 <tbody>
 <tr><td>Idea log entries (new ideas, status moves, findings)</td><td>Directly on control <code>dev</code> and pushed at once. Idea commits are bookkeeping (<a href="#branching-branching-and-ci"><code>OPS-001</code></a>, section 3).</td></tr>
-<tr><td>Accepted partition record, requirement, plan, new phases in <code>backlog/backlog.yaml</code>, batch record in <code>backlog/batches.yaml</code>, regenerated catalog</td><td>A control worktree on a branch <code>agent/&lt;handle&gt;-&lt;slug&gt;</code>, reaching control <code>dev</code> through a pull request merged with a merge commit (<a href="#branching-branching-and-ci"><code>OPS-001</code></a>, sections 1 and 4).</td></tr>
+<tr><td>Accepted partition record, requirement, plan, new phases in <code>backlog/backlog.yaml</code>, batch record in <code>backlog/batches.yaml</code>, regenerated catalog</td><td>A control worktree on a branch <code>agent/&lt;handle&gt;-&lt;slug&gt;</code>, reaching control <code>dev</code> through a pull request merged with a merge commit (<a href="#branching-branching-and-ci"><code>OPS-001</code></a>, sections 1 and 4). The owner merges planning pull requests.</td></tr>
 </tbody></table></div>
 <h4 id="modes-the-steps">The steps</h4>
 <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th scope="col">#</th><th scope="col">Step</th><th scope="col">Tool</th><th scope="col">Input</th><th scope="col">Output</th><th scope="col">Who decides</th></tr></thead>
@@ -3777,7 +3770,7 @@ worktree in each, both on a branch named <code>agent/&lt;phase-id&gt;</code>
 <p>Neither primary checkout ever leaves <code>dev</code>.</p>
 <h4 id="modes-the-steps-2">The steps</h4>
 <h5 id="modes-1-start">1. Start</h5>
-<p>Run <code>/idea-realization:start</code> and choose Implementing. In the control primary checkout,
+<p>Run <code>/start</code> and choose Implementing. In the control primary checkout,
 <code>git pull --rebase origin dev</code>
 before anything else, and load the context the phase needs with the <code>brain</code> skill.</p>
 <h5 id="modes-2-choose-a-phase-backlog-skill">2. Choose a phase: <code>backlog</code> skill</h5>
@@ -3879,8 +3872,9 @@ fails after the product merged, retry; never revert the product merge. The phase
 until this commit lands.</li>
 <li>Removes both worktrees and both local branches, copying out any ignored content first.</li>
 </ol>
-<p>A repository with no GitHub remote uses a local <code>git merge --no-ff</code> instead; the skill says which
-path applied. Commands for each step and the failure cases are in <a href="#branching-branching-and-ci"><code>OPS-001</code></a>, section 4, and
+<p>A repository with no <code>origin</code>, or a local-path one, uses a local <code>git merge --no-ff</code> instead; a
+hosted <code>origin</code> that <code>gh</code> cannot reach stops the close rather than merging locally. The skill says
+which path applied. Commands for each step and the failure cases are in <a href="#branching-branching-and-ci"><code>OPS-001</code></a>, section 4, and
 <a href="#troubleshooting-troubleshooting"><code>OPS-008</code></a>.</p>
 <p>Before you run <code>session-close</code>, record what the next session should know with the <code>brain</code> skill,
 as a <code>lesson</code> or a <code>decision</code>, in the control worktree. The entry and <code>brain/index.md</code> are committed
@@ -3906,7 +3900,7 @@ only on one machine. Closing honestly incomplete is a correct outcome.</li>
 <p>How plans, phase branches, infrastructure and spend are reviewed, which reviewer does each, and what
 a reviewer&#x27;s verdict decides. Reviewers change nothing: every reviewer agent below is read-and-run
 only and spawns no subagents. The one-page command list is in the mode cheat sheets (<a href="#modes-mode-cheat-sheets"><code>OPS-009</code></a>).</p>
-<p>Run <code>/idea-realization:start</code> and choose Validating. Then <code>git pull --rebase origin dev</code> in the control primary checkout
+<p>Run <code>/start</code> and choose Validating. Then <code>git pull --rebase origin dev</code> in the control primary checkout
 before any work.</p>
 <h4 id="modes-the-rules-every-review-follows">The rules every review follows</h4>
 <ul>
@@ -3975,8 +3969,8 @@ approved may edit the in-scope queued phases&#x27; backlog lines, never <code>ne
 <div class="ui-prose gb-prose">
 <p>One page per mode: the skills, agents and commands in the order they are used, one line each. The
 full procedure for each mode is in its guide: planning (<a href="#modes-planning-mode"><code>OPS-002</code></a>), implementing (<a href="#modes-implementing-mode"><code>OPS-003</code></a>),
-validating (<a href="#modes-validating-mode"><code>OPS-004</code></a>). Where this page and a guide differ, the guide wins.</p>
-<p><strong>Entry point for every mode: <code>/idea-realization:start</code>.</strong> It asks which mode you are in and points to that mode&#x27;s
+validating (<a href="#modes-validating-mode"><code>OPS-004</code></a>). Where this page and a guide differ, the guide wins. Prompts to paste for each mode are in <a href="#day-one-day-one-prompts"><code>OPS-010</code></a>.</p>
+<p><strong>Entry point for every mode: <code>/start</code></strong> (long form <code>/idea-realization:start</code>). It asks which mode you are in and points to that mode&#x27;s
 first step.</p>
 <p>Plugin skills are invoked as <code>/idea-realization:&lt;skill&gt;</code>. Agents are dispatched by name, never as a
 general-purpose agent. Run scripts from the control repository&#x27;s root; they find it from git and need no
@@ -3987,7 +3981,7 @@ repository&quot;).</p>
 <h4 id="modes-planning">Planning</h4>
 <p>From a captured idea to approved plans, registered phases and validated, assigned batches.</p>
 <ol>
-<li><code>/idea-realization:start</code>, choose Planning.</li>
+<li><code>/start</code>, choose Planning.</li>
 <li><code>uv run plugins/idea-realization/scripts/brain.py load --kind decision</code> — read what is already decided.</li>
 <li><code>/idea-realization:idea</code> — record each new idea as given.</li>
 <li><code>/idea-realization:idea-triage &lt;id&gt;</code> — scout one open idea for related material; moves it to triaged.</li>
@@ -4006,7 +4000,7 @@ validated and assigned.</p>
 <h4 id="modes-implementing">Implementing</h4>
 <p>From a claimed phase to merged code and a completion record.</p>
 <ol>
-<li><code>/idea-realization:start</code>, choose Implementing.</li>
+<li><code>/start</code>, choose Implementing.</li>
 <li><code>git pull --rebase origin dev</code> on control <code>dev</code> — always, before any work.</li>
 <li><code>/idea-realization:brain</code> — load the context the phase needs.</li>
 <li><code>/idea-realization:backlog</code> — run the check, see the ready queue and its Conflicts column, orient on one phase.</li>
@@ -4026,7 +4020,7 @@ validated and assigned.</p>
 <h4 id="modes-validating">Validating</h4>
 <p>Reviewing plans, branches, infrastructure and spend. Reviewers change nothing.</p>
 <ol>
-<li><code>/idea-realization:start</code>, choose Validating.</li>
+<li><code>/start</code>, choose Validating.</li>
 <li><code>phase-adversary</code> agent — the gating review of a phase&#x27;s product diff; <code>session-close</code> dispatches it with the phase&#x27;s acceptance.</li>
 <li><code>validator-code</code> agent — gating review instead, for a narrow code change judged against one requirement.</li>
 <li><code>review-judge</code> agent — shadow judge of the same diff, dispatched by a session other than the one that built the phase (<code>session-close</code> does not run it); its verdict is recorded and decides nothing.</li>
@@ -4113,7 +4107,10 @@ git rev-parse &lt;merge commit&gt;^2    # must equal reviewed_commit</code></pre
 <li><p>If step 6 fails after the product merged, retry the pull, rebase and push. Never revert the
 product merge. The phase stays <code>active</code> until the completion commit lands.</p></li>
 </ol>
-<p>A repository with no GitHub remote (tests, local-only use) uses a local fallback instead: <code>git merge --no-ff</code> into <code>dev</code>, then push if a remote exists.</p>
+<p>A repository with no <code>origin</code>, or whose <code>origin</code> is a path on this machine (tests, local-only use),
+is merged locally instead: <code>git merge --no-ff</code> into <code>dev</code>, then push if a remote exists.
+<code>product.py merge-route</code> decides from the <code>origin</code> URL. A hosted <code>origin</code> always takes the pull
+request: if <code>gh</code> cannot reach it, session-close stops and reports instead of merging locally.</p>
 </div>
 </div>
 <div class="gb-source">
@@ -4189,7 +4186,8 @@ a bookkeeping commit as soon as it is made, so peers see it.</p>
 <tr><td>The completion record</td><td>control</td><td>one commit directly on the control integration branch, after the product merge, pushed at once</td></tr>
 </tbody></table></div>
 <p>The <code>session-start</code> and <code>session-close</code> skills carry out these steps in order. A repository with no
-GitHub remote makes the same merges locally with <code>git merge --no-ff</code>.</p>
+<code>origin</code>, or whose <code>origin</code> is a path on this machine, makes the same merges locally with
+<code>git merge --no-ff</code> (<code>product.py merge-route</code> decides); a hosted one whose <code>gh</code> fails stops instead.</p>
 <h4 id="branching-paths-in-a-phase">Paths in a phase</h4>
 <p>A path with the prefix <code>product:</code> is a path in the product repository; a path without one is a path
 in the control repository. The prefix is used in a phase&#x27;s <code>deliverables</code> and
@@ -4231,15 +4229,28 @@ Runs are grouped per ref; a new push cancels the run still in progress for the s
 <tr><td>Install</td><td><code>astral-sh/setup-uv</code> with Python 3.12, cache keyed on <code>uv.lock</code>; <code>uv sync --locked --extra dev</code></td></tr>
 <tr><td>Lint</td><td><code>uv run ruff check tools/ test/</code></td></tr>
 <tr><td>Doctor</td><td><code>uv run plugins/idea-realization/scripts/doctor.py</code></td></tr>
-<tr><td>Repository check</td><td><code>uv run plugins/idea-realization/scripts/check.py</code></td></tr>
+<tr><td>Product repository settings</td><td>fails without <code>PRODUCT_READ_TOKEN</code> or a product slug; reads the product integration branch from <code>.idea-realization/product.yaml</code></td></tr>
+<tr><td>Product checkout</td><td><code>actions/checkout</code> of the product repository with <code>PRODUCT_READ_TOKEN</code>, <code>fetch-depth: 0</code>, moved to <code>$RUNNER_TEMP/product</code></td></tr>
+<tr><td>Repository check</td><td><code>product.py verify</code>, then <code>check.py</code>, with <code>IDEA_REALIZATION_REQUIRE_PRODUCT=1</code></td></tr>
 <tr><td>Folder tests</td><td><code>uv run pytest -q test</code></td></tr>
 <tr><td>Plugin tests</td><td><code>uv run pytest -q</code>, from <code>plugins/idea-realization/</code></td></tr>
 <tr><td>Private-content check</td><td><code>uv run python tools/check_confidential.py</code> with the deny-list</td></tr>
 </tbody></table></div>
 <p>Doctor and check run with <code>IDEA_REALIZATION_ROOT=$GITHUB_WORKSPACE</code>, so the scripts resolve this
 checkout. The test steps run without it: the plugin tests build temporary repositories and fail
-when that variable points them at the checkout. No product root is configured in CI, so the product
-checks are skipped by design.</p>
+when that variable points them at the checkout.</p>
+<p>The repository check verifies product merges against the product repository itself. CI checks the
+product repository out read-only (full history, all branches, credentials not kept in its git
+config), moves it to <code>$RUNNER_TEMP/product</code> because <code>product_root</code> must be outside the control
+checkout, and runs the check with <code>IDEA_REALIZATION_PRODUCT_ROOT</code> and
+<code>IDEA_REALIZATION_PRODUCT_REMOTE</code> (<code>https://github.com/&lt;org&gt;/&lt;repo&gt;</code>, the origin <code>actions/checkout</code>
+sets) pointing at it. <code>product.py verify</code> runs first, so a checkout whose origin does not match fails
+the step. <code>IDEA_REALIZATION_REQUIRE_PRODUCT=1</code> makes the reviews check fail when no product checkout
+is configured, and makes a <code>cannot tell</code> about whether a <code>product_merge</code> landed an error instead of
+a note, so CI never passes a completion it did not check: a made-up <code>product_merge</code> fails as
+stranded, and a merge commit whose second parent was not reviewed fails. In that one step the token
+is also given to git as an HTTP header for the reviews check&#x27;s <code>git ls-remote</code> of the product&#x27;s
+origin.</p>
 <p>There is no scaffold step. A fresh checkout has no <code>.idea-realization/staging/</code> directory, because
 it is gitignored; doctor reports it as <code>absent</code> and does not fail on it. Running the scaffold in CI
 would also rewrite the tracked <code>.idea-realization/install-state.json</code>.</p>
@@ -4251,6 +4262,37 @@ not shown that none are present. A pull request from a fork gets no secrets, so 
 The owner sets the secret once in each repository:</p>
 <pre data-lang="bash"><code>gh secret set DENY_LIST --repo &lt;org&gt;/&lt;control-repo&gt; &lt; .private/deny-list.txt
 gh secret set DENY_LIST --repo &lt;org&gt;/&lt;product-repo&gt; &lt; .private/deny-list.txt</code></pre>
+<p>The product checkout needs the repository secret <code>PRODUCT_READ_TOKEN</code> and the product&#x27;s name on
+GitHub. <strong>A missing token fails the run</strong>, as a missing <code>DENY_LIST</code> does: a run that could not read
+the product repository has not shown that the recorded merges are real. A pull request from a fork
+gets no secrets, so its run fails at this step too.</p>
+<ul>
+<li><p><strong>The token.</strong> A fine-grained personal access token, or a GitHub App installation token, that can
+read the product repository and nothing else:</p>
+<ul>
+<li>resource owner: the organization (or user) that owns the product repository; an organization
+that requires approval of fine-grained tokens holds it as pending until an administrator
+approves it;</li>
+<li>repository access: <strong>Only select repositories</strong>, with the product repository as the only one;</li>
+<li>repository permissions: <strong>Contents: Read-only</strong>. GitHub adds <strong>Metadata: Read-only</strong> itself as
+mandatory. Grant nothing else: no write permission, no other repository, no account or
+organization permission;</li>
+<li>expiration: a date, at most 366 days ahead (an organization policy can set a shorter maximum).
+For a GitHub App the same holds: installed on the product repository only, with Contents
+read-only and Metadata read-only.</li>
+</ul></li>
+<li><p><strong>Who creates and rotates it.</strong> The repository owner. Before the token expires, the owner creates
+a new one with the same settings, replaces the secret, and deletes the old token. An expired
+token fails the <code>Check out the product repository</code> step (<a href="#troubleshooting-troubleshooting"><code>docs/guides/OPS-008-troubleshooting.md</code></a>).</p></li>
+<li><p><strong>Where it is set.</strong> As a GitHub Actions secret on the control repository, never in a file:</p>
+<pre data-lang="bash"><code>gh secret set PRODUCT_READ_TOKEN --repo &lt;org&gt;/&lt;control-repo&gt;</code></pre>
+<p><code>gh</code> prompts for the value, so it is not left in the shell history.</p></li>
+<li><p><strong>The product&#x27;s name.</strong> The repository variable <code>PRODUCT_GITHUB</code> on the control repository, as
+<code>&lt;org&gt;/&lt;repo&gt;</code>: <code>gh variable set PRODUCT_GITHUB --repo &lt;org&gt;/&lt;control-repo&gt; --body &lt;org&gt;/&lt;repo&gt;</code>.
+When it is unset the workflow uses <code>product_github</code> as <code>paths.py</code> resolves it, which in CI is the
+<code>github:</code> field of <code>.idea-realization/product.yaml</code>. A team whose organization name must not be
+tracked uses the variable. Neither set fails the run.</p></li>
+</ul>
 <p>The control job is not a required check: bookkeeping commits go to <code>dev</code> directly and must not wait
 for CI. A red run on <code>dev</code> or <code>main</code> is an alarm; fix it forward with a new commit.</p>
 <h4 id="branching-8-ci-the-product-repository">8. CI: the product repository</h4>
@@ -4266,11 +4308,12 @@ must keep that id and must not set a different <code>name:</code>.</p>
 <tr><td><code>control-main.json</code></td><td>control</td><td><code>main</code></td><td>block force-push and deletion; restrict updates (only the main merger); pull request required, 0 approvals, merge commit only</td></tr>
 <tr><td><code>product-dev.json</code></td><td>product</td><td><code>dev</code></td><td>block force-push and deletion; pull request required, 0 approvals, merge commit only; required check <code>verify</code></td></tr>
 <tr><td><code>product-main.json</code></td><td>product</td><td><code>main</code></td><td>same as <code>product-dev.json</code>, plus restrict updates (only the main merger)</td></tr>
-<tr><td><code>demo-tags.json</code></td><td>both</td><td>tags <code>demo-*</code></td><td>block deletion, update and force-push</td></tr>
+<tr><td><code>demo-tags-create.json</code></td><td>both</td><td>tags <code>demo-*</code></td><td>restrict creations (only the main merger)</td></tr>
+<tr><td><code>demo-tags-protect.json</code></td><td>both</td><td>tags <code>demo-*</code></td><td>block deletion, update and force-push; no bypass actor</td></tr>
 </tbody></table></div>
 <p>No ruleset requires linear history, because merges are merge commits. The bypass list is empty in
-every ruleset file; the apply script adds the main merger to the two <code>*-main.json</code> rulesets when it
-applies them, and nothing else has a bypass actor. The required check does not require the branch to be up to date with <code>dev</code>
+every ruleset file; the apply script adds the main merger to the two <code>*-main.json</code> rulesets and to
+<code>demo-tags-create.json</code> when it applies them, and nothing else has a bypass actor. The required check does not require the branch to be up to date with <code>dev</code>
 (<code>strict_required_status_checks_policy: false</code>): updating the branch would change its head and
 break <code>--match-head-commit &lt;reviewed_commit&gt;</code>. Session-close rebases onto <code>origin/dev</code> before the
 review instead.</p>
@@ -4287,6 +4330,14 @@ repositories.</p>
 for <code>product</code> (or, when those are unset, the GitHub repository in <code>control_remote</code> or
 <code>product_remote</code>). It refuses when the value is unset or differs, so the control rulesets cannot be
 applied to the product repository or the reverse.</p>
+<p>It then checks that the main merger (the third argument) already has access to that repository,
+and refuses before it changes any setting or sends any ruleset when it does not. For
+<code>user:&lt;login&gt;</code> it calls <code>gh api repos/&lt;org&gt;/&lt;repo&gt;/collaborators/&lt;login&gt;</code>, which GitHub answers
+with 204 for a collaborator (outside collaborators, organization members with direct, team or
+base-permission access, and organization owners) and 404 otherwise. For <code>team:&lt;org&gt;/&lt;team-slug&gt;</code>
+it calls <code>gh api orgs/&lt;org&gt;/teams/&lt;team-slug&gt;/repos/&lt;org&gt;/&lt;repo&gt;</code>, which answers 204 when the team
+has access and 404 when it does not. This stops a mistyped login, or the wrong team, from being
+given the bypass on <code>main</code> and on <code>demo-*</code> tag creation.</p>
 <p>The script needs <code>gh</code> signed in as an administrator of the repository. It is safe to run again: a
 ruleset whose name already exists on the repository is updated in place, otherwise it is created.
 It prints each action it took.</p>
@@ -4324,6 +4375,30 @@ gh api repos/&lt;org&gt;/&lt;control-repo&gt;/rulesets/&lt;id of control-main&gt
 </ol>
 <p>What this does not stop: an organization owner or repository administrator can edit or delete the
 ruleset itself. That is a GitHub limit; keep the administrator role to the owner.</p>
+<h5 id="branching-who-creates-demo-tags">Who creates <code>demo-*</code> tags</h5>
+<p>Only the main merger (the owner) creates <code>demo-*</code> tags, in both repositories, and nobody can move or
+delete one:</p>
+<ul>
+<li><code>demo-tags-create.json</code> carries the <code>creation</code> rule (&quot;Restrict creations&quot;) on <code>refs/tags/demo-*</code>.
+The apply script puts the main merger on its bypass list with bypass mode <code>always</code>. GitHub accepts
+bypass mode <code>pull_request</code> only on branch rulesets, and a tag is pushed, not merged, so <code>always</code>
+is the mode that lets the owner push a new tag. Everyone else&#x27;s tag push is refused.</li>
+<li><code>demo-tags-protect.json</code> carries the <code>deletion</code>, <code>update</code> and <code>non_fast_forward</code> rules on the same
+tags and has no bypass actor, so the owner cannot move or delete a tag either.</li>
+<li>They are two rulesets because a bypass actor bypasses every rule in its ruleset; GitHub has no
+per-rule bypass. One ruleset with the owner on its bypass list would let the owner move and delete
+<code>demo-*</code> tags.</li>
+<li>As committed, the bypass list of <code>demo-tags-create.json</code> is empty, so applying it by hand
+(without the script) leaves <code>demo-*</code> tag creation closed to everyone until the script is run.</li>
+</ul>
+<p>To confirm, after the script has run: the bypass list of <code>demo-tags-create</code> prints one actor with
+<code>bypass_mode</code> <code>always</code>, and that of <code>demo-tags-protect</code> prints <code>[]</code>:</p>
+<pre data-lang="bash"><code>gh api repos/&lt;org&gt;/&lt;control-repo&gt;/rulesets/&lt;id of demo-tags-create&gt; --jq &#x27;.bypass_actors&#x27;
+gh api repos/&lt;org&gt;/&lt;control-repo&gt;/rulesets/&lt;id of demo-tags-protect&gt; --jq &#x27;.bypass_actors&#x27;</code></pre>
+<p>A repository the earlier version of the script was applied to also has a ruleset named <code>demo-tags</code>
+(deletion, update and force-push protection, no bypass actor). The script matches rulesets by name,
+so it does not update or remove it. It protects the same tags the same way as <code>demo-tags-protect</code>
+and does no harm; the owner may delete it in the repository&#x27;s ruleset settings.</p>
 </div>
 </div>
 </section>
@@ -4446,7 +4521,8 @@ settled; until the owner decides, the gating verdict is the one <code>session-cl
 <li>claim commits (session-start),</li>
 <li>completion commits (session-close: <code>status: complete</code>, <code>product_merge</code>, regenerated catalog),</li>
 <li>idea commits,</li>
-<li>workstream claims.</li>
+<li>workstream claims,</li>
+<li>a developer&#x27;s own entry in <code>docs/systems.yaml</code> (<a href="#onboarding-onboarding"><code>ONBOARDING.md</code></a>, section 3, step 5).</li>
 </ul>
 <p>If the push is rejected because someone else pushed first: <code>git pull --rebase origin dev</code>, run the
 repository check again, then push. Never force-push.</p>
@@ -4543,8 +4619,10 @@ branch.</li>
 <code>queued</code> with an exact <code>next_action</code>, releasing your claim.</li>
 <li>Rebase both branches onto <code>origin/&lt;integration branch&gt;</code> and re-run the verification, the
 repository check and the product&#x27;s tests. Never merge a red rebase.</li>
-<li>Run the gating review (<code>phase-adversary</code>, with <code>review-judge</code> in shadow); the verdicts are
-recorded under <code>docs/reviews/</code>. Fix or explicitly accept every finding, and re-review after a fix.</li>
+<li>Run the gating review (<code>phase-adversary</code>); the verdicts are recorded under <code>docs/reviews/</code>.
+<code>review-judge</code> is optional: it runs in shadow only when another session dispatches it
+(<a href="#modes-validating-mode"><code>OPS-004</code></a>); <code>session-close</code> does not. Fix or explicitly accept every finding, and re-review
+after a fix.</li>
 <li>Confirm both primary checkouts are clean. <strong>Never stash or overwrite a peer&#x27;s uncommitted work.</strong></li>
 <li><strong>Merge, on a passing verdict only</strong>: a pull request to <code>dev</code> in each repository, control first,
 then product after <code>verify</code> passes, each with a merge commit pinned to the reviewed head. The
@@ -4603,8 +4681,13 @@ in the control repository: set it back to <code>active</code> with a <code>next_
 merge, and remove its <code>product_merge</code>, in one commit directly on the control integration branch. Then rebase the product branch, run the verification, review
 the new <code>HEAD</code>, and close the session again.</li>
 </ol>
-<p>Without any product checkout on this machine (control CI is one such place) the check cannot test
-landing at all. It still fails a complete phase whose control records do not agree: no passing
+<p>Control CI checks for real: it checks the product repository out with a read-only token and runs
+the check with <code>IDEA_REALIZATION_REQUIRE_PRODUCT=1</code>, under which a missing product checkout is an
+error and a <code>cannot tell</code> about landing is an error instead of a note. So in CI a <code>product_merge</code>
+that does not exist, is not on the integration branch, or is a merge commit whose second parent was
+not reviewed fails the run (the branching and CI guide, section 7).</p>
+<p>Without any product checkout on a developer&#x27;s machine (<code>product_root</code> unset) and without that
+requirement, the check cannot test landing at all. It still fails a complete phase whose control records do not agree: no passing
 gating verdict for that phase on the product repository, or a <code>product_merge</code> or <code>reviewed_commit</code>
 that is not a full commit id. A <code>product_merge</code> equal to the reviewed commit (a fast-forward)
 passes. Any other <code>product_merge</code> can only be a merge commit whose second parent was reviewed,
@@ -4631,9 +4714,11 @@ progress.</p>
 <li><strong><code>backlog/backlog.yaml</code> conflicts are normal</strong>: two developers edited different phases in one
 file. Keep both sides: the peer&#x27;s phases verbatim and your own phase&#x27;s edits, with <code>updated</code> set to
 today. Never resolve it with <code>--ours</code> or <code>--theirs</code>; either one deletes a peer&#x27;s work.</li>
-<li><strong>A duplicate document code</strong> means a developer on another machine took the same number before
-either merged. Whoever integrates second renumbers: allocate a new code, rename the file and
-update every reference (<code>backlog-protocol.md</code>, section 12).</li>
+<li><strong>A duplicate document code</strong> means two allocations on separate machines took the same code
+before either merged. Codes carry the allocating developer&#x27;s handle (<code>PLAN-&lt;handle&gt;-NNN</code>), so
+this happens only for a governance code, for two sub-codes under one plan, or for one developer
+allocating on two machines. Whoever integrates second renumbers: allocate a new code, rename the
+file and update every reference (<code>backlog-protocol.md</code>, section 12).</li>
 <li><strong>A source conflict between two phases declared disjoint</strong> means a declaration is wrong. Stop,
 do not force the merge, and fix the declarations before either phase completes; record the choice
 in the decision record.</li>
@@ -4685,8 +4770,14 @@ most sixteen characters. <code>uv run plugins/idea-realization/scripts/identity.
 developers working offline never allocate the same one:</p>
 <ul>
 <li>an idea id is <code>&lt;handle&gt;-NNNNNN</code>, counting that developer&#x27;s own ideas;</li>
+<li>a document code in a scoped series is <code>&lt;SERIES&gt;-&lt;handle&gt;-NNN</code> or
+<code>&lt;SERIES&gt;-&lt;handle&gt;-YYYY-MM-DD-NN</code> (<code>document-codes.md</code>);</li>
+<li>a phase id is <code>phase-&lt;track&gt;-&lt;handle&gt;-&lt;NN&gt;</code>; an id without a handle passes only when the
+backlog&#x27;s <code>legacy_phase_ids</code> lists it (<code>backlog-protocol.md</code>);</li>
 <li>a phase claim&#x27;s agent is <code>&lt;handle&gt;/agent-&lt;name&gt;</code>.</li>
 </ul>
+<p>Codes and phase ids carry the handle permanently, so a developer who leaves keeps their <code>owners</code>
+entry; removing it fails the check on every code and phase id that names them.</p>
 <h4 id="bookkeeping-claiming-and-releasing">Claiming and releasing</h4>
 <pre data-lang="bash"><code>uv run plugins/idea-realization/scripts/workstreams.py show
 uv run plugins/idea-realization/scripts/workstreams.py claim &lt;id&gt;
@@ -4735,7 +4826,9 @@ developer, unless the phase records that developer&#x27;s approval:</li>
 owner merges it with a merge commit. In the
 product repository the <code>verify</code> check must pass first. Only the owner can merge into <code>main</code>;
 GitHub refuses the merge for anyone else (section 9, &quot;Who merges to <code>main</code>&quot;).</p></li>
-<li><p>Tag the merge on <code>main</code> with an annotated tag: <code>demo-rc-&lt;n&gt;</code>, counting up from 1.</p>
+<li><p>The owner tags the merge on <code>main</code> with an annotated tag: <code>demo-rc-&lt;n&gt;</code>, counting up from 1.
+Only the owner can create <code>demo-*</code> tags; GitHub refuses the push for anyone else (section 9,
+&quot;Who creates <code>demo-*</code> tags&quot;).</p>
 <pre data-lang="bash"><code>git fetch origin
 git tag -a demo-rc-3 origin/main -m &quot;Demo release candidate 3&quot;
 git push origin demo-rc-3</code></pre></li>
@@ -4743,8 +4836,8 @@ git push origin demo-rc-3</code></pre></li>
 </ol>
 <p>Tag the control repository&#x27;s <code>main</code> with the same name at the same time, so the two repositories
 can be matched to each other.</p>
-<p><code>demo-*</code> tags cannot be moved or deleted once pushed (the <code>demo-tags</code> ruleset). If a tag is wrong,
-make a new release candidate with the next number.</p>
+<p><code>demo-*</code> tags cannot be moved or deleted once pushed, by anyone, the owner included (the
+<code>demo-tags-protect</code> ruleset). If a tag is wrong, make a new release candidate with the next number.</p>
 <p><strong>Rollback:</strong> redeploy the previous <code>demo-rc-&lt;n&gt;</code> tag with the <code>aws-deploy</code> agent. Do not move or
 delete tags and do not rewrite <code>main</code>.</p>
 <h4 id="release-6-code-freeze-and-hotfixes">6. Code freeze and hotfixes</h4>
@@ -4793,7 +4886,7 @@ it in, the assignment is open:</p>
 <p>The owner records the handles here, or names the place the team uses instead.</p>
 <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th scope="col">Role</th><th scope="col">Does</th></tr></thead>
 <tbody>
-<tr><td>Owner</td><td>Approves each release pull request into <code>main</code>, creates the tags, chooses <code>demo-final</code>, decides on rollback. Only the owner merges into <code>main</code>.</td></tr>
+<tr><td>Owner</td><td>Approves each release pull request into <code>main</code>, creates the tags, chooses <code>demo-final</code>, decides on rollback. Only the owner merges into <code>main</code> and only the owner can push a <code>demo-*</code> tag; GitHub refuses both for anyone else.</td></tr>
 <tr><td>Release developer</td><td>Opens the release pull requests, runs the <code>aws-deploy</code> agent on their machine, keeps the deployment log.</td></tr>
 <tr><td>Validator</td><td>Runs the smoke test against each deployed release candidate and records the result.</td></tr>
 <tr><td>Sandbox administrator</td><td>The person with administrator access to the sandbox account. Creates the permission boundary policy and service-linked roles, enables Bedrock model access, raises quotas. The deploy role cannot do any of these.</td></tr>
@@ -4840,13 +4933,16 @@ claim but not the review). It is not a ruling yet: ask the owner before using it
 <code>gh pr checks &lt;number&gt; --watch</code>.</p></li>
 <li><p><strong>Merge.</strong> The owner merges with a merge commit:</p>
 <pre data-lang="bash"><code>gh pr merge &lt;number&gt; --merge</code></pre></li>
-<li><p><strong>Tag.</strong> On the merge commit on <code>main</code>, an annotated tag, pushed:</p>
+<li><p><strong>Tag.</strong> The owner tags the merge commit on <code>main</code> with an annotated tag and pushes it. Only
+the owner can create a <code>demo-*</code> tag (the <code>demo-tags-create</code> ruleset, <a href="#branching-branching-and-ci"><code>OPS-001</code></a> section 9); a
+tag pushed by anyone else is refused (<a href="#troubleshooting-troubleshooting"><code>OPS-008</code></a>, &quot;A push of a <code>demo-*</code> tag is refused&quot;).</p>
 <pre data-lang="bash"><code>git fetch origin
 git tag -a demo-rc-&lt;n&gt; origin/main -m &quot;Demo release candidate &lt;n&gt;&quot;
 git push origin demo-rc-&lt;n&gt;</code></pre>
 <p><code>&lt;n&gt;</code> starts at 1 and increases by one per candidate. The two repositories carry the same
 <code>demo-rc-&lt;n&gt;</code> for the same release. Tags matching <code>demo-*</code> cannot be deleted or moved once the
-rulesets are applied, so check the commit before pushing the tag.</p></li>
+rulesets are applied, by anyone, the owner included, so check the commit before pushing the
+tag.</p></li>
 </ol>
 <h4 id="release-local-deployment">Local deployment</h4>
 <p>Deployment runs on the release developer&#x27;s machine through the <code>aws-deploy</code> agent. There is no CI
@@ -4874,7 +4970,7 @@ repositories:</p>
 <pre data-lang="bash"><code>git tag -a demo-final demo-rc-&lt;n&gt;^{commit} -m &quot;Demo final: demo-rc-&lt;n&gt;&quot;
 git push origin demo-final</code></pre>
 <p><code>demo-final</code> is created once. If a later candidate replaces it before the demo, ask the owner: the
-tag rule blocks moving it.</p>
+<code>demo-tags-protect</code> ruleset blocks moving it, for the owner as well.</p>
 <h4 id="release-rollback">Rollback</h4>
 <p>Rollback is redeploying the previous candidate, never reverting commits on <code>main</code>:</p>
 <ol>
@@ -5512,8 +5608,8 @@ not authorized for it, or you have no access to the repository.</p></li>
 <li><p><strong>Cause.</strong> <code>session-close</code> merges a repository whose <code>origin</code> is on GitHub only through a pull
 request. When <code>gh</code> cannot reach it, the skill stops and reports; it never falls back to a local
 merge for a GitHub origin, because control <code>dev</code> has no pull-request rule and would accept a
-merge with no pull request. The local <code>git merge --no-ff</code> fallback is only for a repository
-whose <code>origin</code> is not on GitHub.</p></li>
+merge with no pull request. The local <code>git merge --no-ff</code> is only for a repository with no
+<code>origin</code>, or whose <code>origin</code> is a path on this machine: <code>product.py merge-route --checkout &lt;worktree&gt;</code> prints <code>local</code> for those, and treats every other <code>origin</code> as hosted.</p></li>
 <li><p><strong>Fix.</strong></p>
 <ol>
 <li>Fix the login: <code>gh auth login</code>, or authorize the token for the organization&#x27;s single sign-on.
@@ -5567,6 +5663,41 @@ repositories by design. A pull request from a fork never receives secrets, so it
 request is recreated as a branch in the repository instead.</p>
 <p>Source: <a href="#branching-branching-and-ci"><code>docs/guides/OPS-001-branching-and-ci.md</code></a>, section 7.</p></li>
 </ul>
+<h5 id="troubleshooting-control-ci-cannot-read-the-product-repository">Control CI cannot read the product repository</h5>
+<ul>
+<li><p><strong>Symptom.</strong> In control CI, the <code>Product repository settings</code> step fails with &quot;The repository
+secret PRODUCT_READ_TOKEN is not set&quot; or &quot;The product repository is not named&quot;, or the
+<code>Check out the product repository (read-only)</code> step fails with an authentication error, <code>Bad credentials</code>, <code>Repository not found</code> or <code>could not read Username</code>.</p></li>
+<li><p><strong>Cause.</strong></p>
+<ul>
+<li>The secret <code>PRODUCT_READ_TOKEN</code> is not set on the control repository, or the run is a pull
+request from a fork, which never receives secrets.</li>
+<li>Neither the repository variable <code>PRODUCT_GITHUB</code> nor <code>github:</code> in
+<code>.idea-realization/product.yaml</code> names the product repository.</li>
+<li>The token has expired or been revoked, is still pending an organization&#x27;s approval, or does not
+include the product repository with Contents read-only. GitHub answers a token that cannot see
+a private repository with <code>Repository not found</code>, not with a permissions error.</li>
+</ul></li>
+<li><p><strong>Fix.</strong> The owner creates a new token with the settings in <a href="#branching-branching-and-ci"><code>docs/guides/OPS-001-branching-and-ci.md</code></a>
+(section 7), sets it with <code>gh secret set PRODUCT_READ_TOKEN --repo &lt;org&gt;/&lt;control-repo&gt;</code>, deletes
+the old token, and re-runs the job (<code>gh run rerun &lt;run id&gt;</code>). For an unnamed product the owner sets
+<code>gh variable set PRODUCT_GITHUB --repo &lt;org&gt;/&lt;control-repo&gt; --body &lt;org&gt;/&lt;repo&gt;</code>. Do not remove
+the step, unset <code>IDEA_REALIZATION_REQUIRE_PRODUCT</code>, or widen the token&#x27;s permissions. A fork pull
+request is recreated as a branch in the repository instead.</p>
+<p>Source: <a href="#branching-branching-and-ci"><code>docs/guides/OPS-001-branching-and-ci.md</code></a>, section 7.</p></li>
+</ul>
+<h5 id="troubleshooting-apply_rulesetssh-says-the-main-merger-has-no-access"><code>apply_rulesets.sh</code> says the main merger has no access</h5>
+<ul>
+<li><p><strong>Symptom.</strong> <code>tools/github/apply_rulesets.sh</code> stops with
+<code>error: User &#x27;&lt;login&gt;&#x27; has no access to &lt;org&gt;/&lt;repo&gt;</code> (or <code>Team &#x27;&lt;org&gt;/&lt;team-slug&gt;&#x27;</code>), and says
+nothing was changed on GitHub.</p></li>
+<li><p><strong>Cause.</strong> The script gives the bypass on <code>main</code> and on <code>demo-*</code> tag creation only to an actor
+that already has access to the repository. GitHub answered 404 to the access check: the user is
+not a collaborator, the team does not have the repository, or the name is misspelled.</p></li>
+<li><p><strong>Fix.</strong> Check the third argument&#x27;s spelling. If it is right, grant the account or team access to
+the repository first (a team needs at least write access), then run the script again.</p>
+<p>Source: <a href="#branching-branching-and-ci"><code>docs/guides/OPS-001-branching-and-ci.md</code></a>, section 9.</p></li>
+</ul>
 <h5 id="troubleshooting-a-merge-into-main-is-refused">A merge into <code>main</code> is refused</h5>
 <ul>
 <li><p><strong>Symptom.</strong> A pull request from <code>dev</code> to <code>main</code> cannot be merged, or a push to <code>main</code> is
@@ -5578,6 +5709,28 @@ this protected ref&quot;).</p></li>
 the rulesets were applied without the main merger or with the wrong one: the owner re-runs
 <code>tools/github/apply_rulesets.sh</code> with the right third argument.</p>
 <p>Source: <a href="#branching-branching-and-ci"><code>docs/guides/OPS-001-branching-and-ci.md</code></a>, section 9.</p></li>
+</ul>
+<h5 id="troubleshooting-a-push-of-a-demo-tag-is-refused">A push of a <code>demo-*</code> tag is refused</h5>
+<ul>
+<li><p><strong>Symptom.</strong> <code>git push origin demo-rc-&lt;n&gt;</code> (or <code>demo-final</code>) is rejected with a message that the
+ref is protected by a ruleset (for example &quot;Cannot create ref due to creations being
+restricted&quot; or &quot;Cannot update this protected ref&quot;).</p></li>
+<li><p><strong>Cause.</strong> Two rulesets cover <code>refs/tags/demo-*</code>. <code>demo-tags-create</code> restricts creation to the
+owner, the only bypass actor. <code>demo-tags-protect</code> refuses moving or deleting an existing tag for
+everyone, the owner included.</p></li>
+<li><p><strong>Fix.</strong></p>
+<ul>
+<li><strong>You are not the owner:</strong> do not retry and do not push the tag under another name. Ask the
+owner to create and push it (<a href="#release-demo-day-runbook"><code>OPS-006</code></a>, &quot;Release candidate&quot;, step 3). Delete your local tag
+with <code>git tag -d &lt;tag&gt;</code> so it does not differ from the one the owner pushes.</li>
+<li><strong>The owner&#x27;s push of a new tag is refused:</strong> the rulesets were applied without the main
+merger or with the wrong one. Re-run <code>tools/github/apply_rulesets.sh</code> with the right third
+argument; the bypass list of <code>demo-tags-create</code> must show one actor with <code>bypass_mode</code>
+<code>always</code>.</li>
+<li><strong>The tag already exists on the remote:</strong> it cannot be moved or deleted. Make the next
+release candidate, <code>demo-rc-&lt;n+1&gt;</code>, instead.</li>
+</ul>
+<p>Source: <a href="#branching-branching-and-ci"><code>docs/guides/OPS-001-branching-and-ci.md</code></a>, section 9, &quot;Who creates <code>demo-*</code> tags&quot;.</p></li>
 </ul>
 <h4 id="troubleshooting-aws">AWS</h4>
 <h5 id="troubleshooting-accessdenied-on-iamcreaterole"><code>AccessDenied</code> on <code>iam:CreateRole</code></h5>
@@ -5670,7 +5823,7 @@ the next person finds it, and tell the owner if it should be added here.</p>
 </section>
 <section class="gb-chapter" aria-labelledby="day-one">
 <h2 id="day-one">Day-one checklist</h2>
-<p class="gb-intro">The first-day setup from the onboarding page, once per machine, in order.</p>
+<p class="gb-intro">The first-day setup from the onboarding page, once per machine, in order, then the prompts to paste into Claude Code for the first session and each working mode.</p>
 <div class="gb-source">
 <h3 id="day-one-onboarding">Onboarding</h3>
 <p class="gb-source__meta"><span class="ui-pill">Source</span> <code>ONBOARDING.md</code><span>, from “3. First-day checklist” up to “4. Claim your workstream”</span></p>
@@ -5710,7 +5863,8 @@ it into a tracked file.</p></li>
 <li><p><code>git config user.email &lt;your work email&gt;</code>.</p></li>
 <li><p>Add yourself to the <code>owners</code> map in <code>docs/systems.yaml</code>: the key is your handle (lower-case
 letters and digits, starting with a letter, at most 16 characters), the value lists your git
-email. The handle is how every claim, idea and brain entry names you.</p>
+email. The handle is how every claim, idea and brain entry names you. A work email here is
+expected; it is not a confidential identifier.</p>
 <pre data-lang="yaml"><code>owners:
   ana:
     description: Ana, user interface workstream.
@@ -5757,8 +5911,11 @@ is expected, and the rest of the checklist does not depend on it.</p></li>
 <pre data-lang="bash"><code>git clone &lt;product repository URL&gt; ../&lt;product&gt;
 git -C ../&lt;product&gt; checkout dev
 uv run plugins/idea-realization/scripts/product.py verify   # prints &quot;origin: matches&quot;</code></pre></li>
-<li><p><strong>Start Claude Code</strong> in the control repository with the plugin loaded:</p>
-<pre data-lang="bash"><code>claude --plugin-dir plugins/idea-realization</code></pre>
+<li><p><strong>Start Claude Code</strong> in the control repository&#x27;s primary checkout:</p>
+<pre data-lang="bash"><code>claude</code></pre>
+<p>The first time, Claude Code asks whether you trust the folder. Accept: the project settings
+(<code>.claude/settings.json</code>) load the plugin only in a trusted folder. <code>/start</code> then exists; if
+it does not, run <code>/plugin</code> and check that <code>idea-realization@idea-realization-team</code> is enabled.</p>
 <p>There is no product worktree yet, so nothing else is added at launch. <code>session-start</code> creates
 one when you claim a phase, and you add it then with <code>/add-dir</code> (section 6, step 4).</p>
 <p>The session banner prints your handle, the product checkout and the days to the demo. A line
@@ -5769,27 +5926,218 @@ done yet.</p></li>
 lines of step 8 remain while your sandbox access is pending.</p>
 </div>
 </div>
+<div class="gb-source">
+<h3 id="day-one-day-one-prompts">Day-one prompts (OPS-010)</h3>
+<p class="gb-source__meta"><span class="ui-pill">Source</span> <code>docs/guides/OPS-010-day-one-prompts.md</code><span>, whole document</span></p>
+<div class="ui-prose gb-prose">
+<p>Prompts a developer pastes into Claude Code for the common sessions: the first session on a new
+machine, planning, implementing a phase, asking for a review, and release day. Each prompt follows
+<code>CLAUDE.md</code> and the guides it names; where a prompt and a guide differ, the guide wins. The
+one-page command list per mode is in the mode cheat sheets (<a href="#modes-mode-cheat-sheets"><code>OPS-009</code></a>).</p>
+<h4 id="day-one-how-to-use-these-prompts">How to use these prompts</h4>
+<ul>
+<li>Start Claude Code in the <strong>control repository&#x27;s primary checkout</strong> with <code>claude</code>, and trust the
+folder so the project settings load the plugin (ONBOARDING §3 step 10). Then paste one prompt.</li>
+<li>Text in <code>&lt;angle brackets&gt;</code> is yours to fill in before you paste. Each prompt fits one session.</li>
+<li>Where a prompt runs the product&#x27;s tests, it runs them in the product worktree, as the
+<code>session-start</code> skill §5 and the implementing guide (<a href="#modes-implementing-mode"><code>OPS-003</code></a>, step 3.6) state.</li>
+<li>The plugin&#x27;s skills run by their short name, such as <code>/start</code>; the long form
+<code>/start</code> always works (<a href="#onboarding-onboarding"><code>ONBOARDING.md</code></a> §1, &quot;Skill names&quot;). Each prompt names the
+skill, and the agent invokes it.</li>
+</ul>
+<hr>
+<h4 id="day-one-1-first-session-set-up-the-machine-then-start">1. First session: set up the machine, then <code>/start</code></h4>
+<p>Paste this once per machine, on your first day. It does not claim any work.</p>
+<pre data-lang="text"><code>This is my first session in this team&#x27;s control repository. I am a new developer, and my handle
+will be &lt;handle&gt;.
+
+1. Read CLAUDE.md and ONBOARDING.md in full before doing anything else.
+2. Run `uv run python tools/onboard_check.py` and show me its output as printed. For each FIX
+   line, take me through the matching step in ONBOARDING.md section 3, one step at a time, in
+   order. I run anything that needs a credential or a URL myself. Do not make up a URL, an email,
+   an AWS profile name or a deny-list entry; ask me for each one with AskUserQuestion.
+3. Never read or write anything under .private/ or ~/.aws/ unless I tell you to. I will save the
+   deny-list myself.
+4. The only commit you may make today is my `owners` entry in docs/systems.yaml (ONBOARDING
+   section 3, step 5), and later my workstream claim in docs/workstreams.yaml (section 4). Each
+   goes directly on control `dev`, is pushed at once, and contains nothing else. Show me the diff
+   and ask before you commit.
+5. Repeat `uv run python tools/onboard_check.py` until it exits 0, or until only the AWS lines of
+   step 8 remain while my sandbox access is pending. Show me the final output.
+6. Then run the `start` skill and stop at its mode question.
+
+When something I asked for conflicts with CLAUDE.md, say so and follow CLAUDE.md. If a document is
+wrong, quote the passage and tell me. Do not edit CLAUDE.md.</code></pre>
+<h4 id="day-one-2-planning-mode">2. Planning mode</h4>
+<p>For the person who turns ideas into an approved plan and phases. The planning guide (<a href="#modes-planning-mode"><code>OPS-002</code></a>)
+reserves every gate to the owner. Someone who is not the owner stops at each gate.</p>
+<pre data-lang="text"><code>Planning session. I am &lt;handle&gt;; the owner is &lt;owner handle&gt;.
+
+1. Run the `start` skill and choose Planning. Read docs/guides/OPS-002-planning-mode.md in full.
+   Follow it step by step and ask me before each step.
+2. First, I pull: `git pull --rebase origin dev` in the control primary checkout. Do not run the
+   pull yourself. Then load what is already decided:
+   `uv run plugins/idea-realization/scripts/brain.py load --kind decision`.
+3. Today&#x27;s work: &lt;record these ideas: ... | triage the open ideas | partition the triaged ideas |
+   plan accepted track &lt;track&gt; | split approved plan &lt;PLAN-code&gt;&gt;.
+4. Run scripts from the control root; they find it from git. Never export IDEA_REALIZATION_ROOT:
+   if a script resolves the wrong root, set it on that one command only. Dispatch every agent
+   by its own name (idea-triage, idea-planner, plan-adversary, phase-splitter, batch-validator).
+   Never dispatch a general-purpose agent in place of one.
+5. Reserve every document code with the `next-code` skill. Never pick a code by reading a
+   directory.
+6. Idea commits go directly on control `dev` and are pushed at once. Everything else (partition
+   record, requirement, plan, backlog phases, batches, catalog) goes in a control worktree on
+   `agent/&lt;handle&gt;-&lt;slug&gt;` and reaches `dev` through a pull request.
+7. Stop at each owner gate and tell me what the owner has to decide: accepting the partition,
+   approving the plan, ranking next_up, composing a batch and assigning phases. No agent makes
+   those decisions, and you do not.
+8. Before any commit, `uv run plugins/idea-realization/scripts/check.py` must exit 0. Show me its
+   output.</code></pre>
+<h4 id="day-one-3-implementing-a-phase">3. Implementing a phase</h4>
+<p>For building one phase. The first form starts a new phase; the second resumes one this
+developer already claimed.</p>
+<h5 id="day-one-3a-start-a-phase">3a. Start a phase</h5>
+<pre data-lang="text"><code>Implementing session. I am &lt;handle&gt;. &lt;Optional: the owner assigned me &lt;phase-id&gt;.&gt;
+
+1. Run the `start` skill and choose Implementing. Read
+   docs/guides/OPS-003-implementing-mode.md in full and follow its steps in order.
+2. First, I pull: `git pull --rebase origin dev` in both primary checkouts (control and product).
+   Do not run the pull yourself.
+3. Load context with the `brain` skill for the phase&#x27;s subject.
+4. Run the `backlog` skill. Take the first ready phase in next_up order, preferring one with
+   `owner: &lt;handle&gt;`. If the check is red, stop: nothing is claimed on a red backlog.
+5. Run the `session-start` skill. It asks before claiming. When it asks, show me the phase&#x27;s
+   scope, acceptance, verification, systems and deliverables, its Conflicts column, and whether
+   its deliverables are in my workstream. The claim goes directly on control `dev` and is pushed
+   at once.
+6. After the claim, tell me the exact `/add-dir &lt;product worktree dir&gt;/&lt;phase-id&gt;` line to run.
+   Install the product worktree&#x27;s own environment and run the product&#x27;s tests there once,
+   before any change. Keep that output.
+7. Build only inside the phase&#x27;s declared systems and deliverables. A path that starts with
+   `product:` is in the product worktree. If the work needs a file outside them, stop and tell me.
+   Commit small diffs on agent/&lt;phase-id&gt;. Rebase onto origin/dev; never merge dev in.
+8. Choose a free port yourself for any dev server.
+9. Every AWS command goes through tools/aws-sandbox. Ask bedrock-claude-advisor before writing a
+   Bedrock call. Have aws-infra-reviewer review any infrastructure diff before it is deployed.
+   Only the aws-deploy agent deploys.
+10. Record any new ask as an idea with the `idea` skill. Do not fold it into this phase.
+11. When I stop, run the `checkpoint` skill from the control worktree. It records the control
+    repository only: add the product branch&#x27;s tip and the product verification output to the
+    record yourself.</code></pre>
+<h5 id="day-one-3b-resume-a-claimed-phase">3b. Resume a claimed phase</h5>
+<pre data-lang="text"><code>Resume &lt;phase-id&gt;. I claimed it earlier; it is active with my agent id.
+
+1. Run the `start` skill and choose Implementing. I run `git pull --rebase origin dev` in both
+   primary checkouts first.
+2. Do not claim again. Read the phase in backlog/backlog.yaml on control `dev`, then its latest
+   session record in the control worktree &lt;worktree dir&gt;/&lt;phase-id&gt;, and its next_action.
+3. Check that both agent/&lt;phase-id&gt; worktrees exist and say where each branch tip is
+   (`git -C &lt;path&gt; log -1 --oneline`). If one is missing, stop and tell me. Do not recreate it
+   from memory.
+4. Add the product worktree with /add-dir. Rebase both branches onto origin/dev and rerun the
+   product&#x27;s tests in the product worktree before changing anything.
+5. Then continue from step 7 of the start-a-phase prompt.</code></pre>
+<h4 id="day-one-4-asking-for-a-review">4. Asking for a review</h4>
+<p>There is no <code>review</code> skill (<a href="#modes-validating-mode"><code>OPS-004</code></a>, &quot;Reviewing a peer&#x27;s ready branch&quot;). Your own phase&#x27;s gating
+review runs inside <code>session-close</code>. A review of a peer&#x27;s branch is done by hand and does not
+replace their gating review.</p>
+<h5 id="day-one-4a-close-your-own-phase-the-gating-review">4a. Close your own phase (the gating review)</h5>
+<pre data-lang="text"><code>Close &lt;phase-id&gt;.
+
+1. Run the phase&#x27;s verification list first: each command in the product worktree, except those
+   that start with `control:`, which run in the control worktree. Show me the real output. A
+   failing check is a result; report it, do not retry it until it passes.
+2. If any acceptance condition does not hold, stop. Run the `checkpoint` skill and tell me what
+   remains.
+3. If every condition holds, record what the next session should know with the `brain` skill,
+   in the control worktree, so the entry reaches `dev` in the control pull request. Then run the
+   `session-close` skill. Its gating review uses a fresh phase-adversary agent (or validator-code
+   for a narrow change against one requirement), never a general-purpose agent and never a fork
+   of this session. Give the reviewer the brief the skill specifies and none of my explanations.
+4. Show me the verdict&#x27;s first line and every finding. Fix each finding or ask me to accept it.
+   After a fix, the new HEAD gets a fresh review. Two rejects on the same finding: stop and tell me.
+5. Merge only on a pass, with merge commits, control first and then product once `verify` passes.
+   Confirm that the product merge commit&#x27;s second parent is the reviewed commit. Then write the
+   completion commit on control `dev` and push it. If session-close stops because `gh` cannot
+   reach a repository, tell me; never merge or push to `dev` by hand to get past it.
+6. Never commit with --no-verify. A failing hook is a finding to fix or report.</code></pre>
+<h5 id="day-one-4b-review-a-peers-pushed-branch">4b. Review a peer&#x27;s pushed branch</h5>
+<pre data-lang="text"><code>Validating session. Review &lt;peer handle&gt;&#x27;s branch for &lt;phase-id&gt;. This review is advice for the
+peer and does not replace their gating review in session-close.
+
+1. Run the `start` skill and choose Validating. Read docs/guides/OPS-004-validating-mode.md,
+   section &quot;Reviewing a peer&#x27;s ready branch&quot;, and follow its six steps.
+2. `git fetch origin` in each primary checkout and confirm that origin/agent/&lt;phase-id&gt; exists. If
+   it does not, stop and tell me.
+3. Create detached review worktrees outside the repositories, at the pushed commit, so the peer&#x27;s
+   branch never moves. Install the product worktree&#x27;s own environment there.
+4. Dispatch a fresh phase-adversary agent with the phase&#x27;s scope, acceptance, verification and
+   deliverables from control `dev`, both review worktree paths with the range origin/dev...HEAD,
+   and the requirement and plan paths. Give it nothing the peer wrote to explain the work.
+5. Show me the full reply with the reviewed commit, so I can send it to the peer. Commit nothing
+   on the peer&#x27;s branch.
+6. Change nothing you review.
+7. When I confirm, remove both review worktrees with `git worktree remove`.</code></pre>
+<h4 id="day-one-5-release-day">5. Release day</h4>
+<p>Demo 2026-11-05, freeze 2026-11-03 (<a href="#release-demo-day-runbook"><code>OPS-006</code></a>). Only the owner merges into <code>main</code> and creates
+tags. Each prompt below states which role uses it. The release developer and the validator should
+be different people.</p>
+<h5 id="day-one-5a-release-developer-release-candidate-and-deploy">5a. Release developer: release candidate and deploy</h5>
+<pre data-lang="text"><code>Release session. I am the release developer for demo-rc-&lt;n&gt;. Read
+docs/guides/OPS-006-demo-day-runbook.md in full and follow it.
+
+1. In both repositories, in that order (control, then product), prepare the release pull request
+   from dev to main with the command in OPS-006, &quot;Release candidate&quot;, step 1. Show me the command
+   and the body before you run it. In the product repository, wait for `verify` with
+   `gh pr checks &lt;number&gt; --watch`.
+2. Stop there. The owner merges the release pull requests and creates the demo-rc-&lt;n&gt; tags. Do
+   not merge into main, and do not create, move or push a tag.
+3. After the owner tags, check the machine: `uv run python tools/check_aws_machine.py --probe`
+   must print OK, then run `tools/aws-sandbox whoami`.
+4. Check out the tag in a separate detached product worktree (OPS-006, &quot;Local deployment&quot;,
+   step 2). Do not use any working branch.
+5. Dispatch the aws-deploy agent with the worktree path, the tag, the product&#x27;s deploy command and
+   the smoke test&#x27;s first check as its verification. It shows a diff or change set before it
+   applies anything. Before any prompt to delete appears, tell me exactly what will be deleted. A
+   refused prompt means stop.
+6. Keep the deploy report, with what was created or updated and the verification output, where
+   the owner asks.</code></pre>
+<h5 id="day-one-5b-validator-smoke-test">5b. Validator: smoke test</h5>
+<pre data-lang="text"><code>Validating session. Smoke test demo-rc-&lt;n&gt; (or demo-final) as deployed. I am the validator, not
+the person who deployed it.
+
+1. Read docs/guides/OPS-006-demo-day-runbook.md, sections &quot;Smoke test&quot; and &quot;On the day&quot;.
+2. Run each check of the written smoke test in the product repository, in order. Record pass or
+   fail for each check with its real output or a screenshot.
+3. Dispatch the aws-ops-inspector agent to read the deployed resources&#x27; state and recent errors,
+   and add its output to the record.
+4. Change nothing on the deployed stack. A failed check becomes a fix: record it as an idea with
+   the `idea` skill, and the owner registers a phase for it.</code></pre>
+</div>
+</div>
 </section>
 <section class="gb-chapter" aria-labelledby="sources">
 <h2 id="sources">Sources</h2>
 <p class="gb-intro">Each file this page was built from, with the SHA-256 of its content at the time the page was generated. If a file's hash no longer matches, the page is stale: regenerate it with <code>uv run python tools/build_guidebook.py</code>.</p>
 <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th scope="col">File</th><th scope="col">Used in</th><th scope="col">SHA-256</th></tr></thead>
 <tbody>
-<tr><td><code>ONBOARDING.md</code></td><td>Onboarding, Day-one checklist</td><td class="ui-table__id gb-hash">eee7f6db13a28de03e43d4effb4f9997e434b8776f96a70a26fea3b517016032</td></tr>
-<tr><td><code>docs/guides/OPS-005-team-workflow.md</code></td><td>Onboarding, The review gate, Bookkeeping, Release and demo day</td><td class="ui-table__id gb-hash">9445ee51462f1feeaa247ced71aefa59159112ab6f96a06105cddb1443fef706</td></tr>
-<tr><td><code>CLAUDE.md</code></td><td>Working modes, Bookkeeping, AWS safety and cost guardrails</td><td class="ui-table__id gb-hash">74cdb35604a083dcd2e9838aaaa361a1c746060fa615ecf492d37f0e68df32ba</td></tr>
-<tr><td><code>docs/guides/OPS-002-planning-mode.md</code></td><td>Working modes</td><td class="ui-table__id gb-hash">44d2f78b69911d015c758950370c902fa51afb7cbc23e9f4beb71d12fcaf54a6</td></tr>
-<tr><td><code>docs/guides/OPS-003-implementing-mode.md</code></td><td>Working modes</td><td class="ui-table__id gb-hash">0db2adebd2fb8616ed6d7f49a75577056f72360c5d99fdf04db3e8570fd607f6</td></tr>
-<tr><td><code>docs/guides/OPS-004-validating-mode.md</code></td><td>Working modes, The review gate</td><td class="ui-table__id gb-hash">819f76b03045400f9f58ed6a3552e74918b6ae78a8e711cf1c10f84a1849a42b</td></tr>
-<tr><td><code>docs/guides/OPS-009-mode-cheat-sheets.md</code></td><td>Working modes</td><td class="ui-table__id gb-hash">35c5b5b857b6925c4b73701e1965a43bba88e64831d412d82289fd51cb8af7f9</td></tr>
-<tr><td><code>docs/guides/OPS-001-branching-and-ci.md</code></td><td>Branching and pull-request flow, Bookkeeping, Release and demo day</td><td class="ui-table__id gb-hash">ed3fdae1d943398dee1e7f8a4586e1664ebb6c1b97f7049f59e69d3795869746</td></tr>
-<tr><td><code>plugins/idea-realization/docs/two-repositories.md</code></td><td>Branching and pull-request flow, Bookkeeping</td><td class="ui-table__id gb-hash">10c36302a48f55c679ad293b039608a4a62bdbee2bf6da16044a9d8184295927</td></tr>
-<tr><td><code>plugins/idea-realization/docs/workstreams.md</code></td><td>Bookkeeping</td><td class="ui-table__id gb-hash">73f603701e0aeda13a6fa718183512931571c5d045980b0e0b85326b0196b568</td></tr>
-<tr><td><code>docs/guides/OPS-006-demo-day-runbook.md</code></td><td>Release and demo day</td><td class="ui-table__id gb-hash">bca1baf0f5f153014617f81db0be5093efe6d363408976d1d8c1d316b64695fa</td></tr>
+<tr><td><code>ONBOARDING.md</code></td><td>Onboarding, Day-one checklist</td><td class="ui-table__id gb-hash">a8ed58dd2ef2bf7f7b29978097cc65077e029460a949249841fa8eaaa639a0ab</td></tr>
+<tr><td><code>docs/guides/OPS-005-team-workflow.md</code></td><td>Onboarding, The review gate, Bookkeeping, Release and demo day</td><td class="ui-table__id gb-hash">308d7516fb39152e7ecb3c2626533376e21a6150014f8700a4b17455cb69eb5e</td></tr>
+<tr><td><code>CLAUDE.md</code></td><td>Working modes, Bookkeeping, AWS safety and cost guardrails</td><td class="ui-table__id gb-hash">c3bd09d9060acae7470b2a3b820f8846196a4450a05f9e6b2f8fc4827ef9e2ff</td></tr>
+<tr><td><code>docs/guides/OPS-002-planning-mode.md</code></td><td>Working modes</td><td class="ui-table__id gb-hash">2c30e46bcfbf20da720a99877cf1d12f5c94e730dbcc79136d56db4aa2f8c84b</td></tr>
+<tr><td><code>docs/guides/OPS-003-implementing-mode.md</code></td><td>Working modes</td><td class="ui-table__id gb-hash">657169fead7069ff60751a0e04378a1977c4057125bb3d8b2eac30c3a89e05a1</td></tr>
+<tr><td><code>docs/guides/OPS-004-validating-mode.md</code></td><td>Working modes, The review gate</td><td class="ui-table__id gb-hash">212d55980f0b176659088d9aa3e3db158e37b1d73b09e23ac23448f01a1c0e10</td></tr>
+<tr><td><code>docs/guides/OPS-009-mode-cheat-sheets.md</code></td><td>Working modes</td><td class="ui-table__id gb-hash">ae262eea5be239d90bed3a781411a96734a2713fd078c3d201a4324c2b8201d5</td></tr>
+<tr><td><code>docs/guides/OPS-001-branching-and-ci.md</code></td><td>Branching and pull-request flow, Bookkeeping, Release and demo day</td><td class="ui-table__id gb-hash">68a895758ffa875634a7e110fb45a2a17637294e1116d4bd0ba0947c1dd6a2ff</td></tr>
+<tr><td><code>plugins/idea-realization/docs/two-repositories.md</code></td><td>Branching and pull-request flow, Bookkeeping</td><td class="ui-table__id gb-hash">20864d65c56224237eafe50552e8f5bddd965241b79db10d5e3b342dee31bd0a</td></tr>
+<tr><td><code>plugins/idea-realization/docs/workstreams.md</code></td><td>Bookkeeping</td><td class="ui-table__id gb-hash">732dac8aaad45339e5ebc5a0ce3f880d851d16bce9fc57a110ee21542afabe77</td></tr>
+<tr><td><code>docs/guides/OPS-006-demo-day-runbook.md</code></td><td>Release and demo day</td><td class="ui-table__id gb-hash">b6e3874804a7b0c0f912542f772dc6209253abb9367b14ead6fe732fc77bfc57</td></tr>
 <tr><td><code>aws/README.md</code></td><td>AWS safety and cost guardrails</td><td class="ui-table__id gb-hash">280a2a3f3c203dc3c57cccc3c3d32cbaaa8cbc602ba30cb17df6432b0f64407a</td></tr>
 <tr><td><code>docs/guides/OPS-007-cost-guardrails.md</code></td><td>AWS safety and cost guardrails</td><td class="ui-table__id gb-hash">c89c83e1e110c2ca7cc5b4099b4f6770b702d0cddcb1de3f58f05165264e09c7</td></tr>
-<tr><td><code>docs/guides/OPS-008-troubleshooting.md</code></td><td>Troubleshooting</td><td class="ui-table__id gb-hash">e66d53e45a44e7ae77f540d7bb16f2f8decf72c1c4c5cc1d9d6627437060dd4a</td></tr>
-<tr><td><code>tools/guidebook.yaml</code></td><td>The chapter list</td><td class="ui-table__id gb-hash">af80c1976b63f3b15430b07b7dda57bda8780406dc8c1447a3a4247a90ada438</td></tr>
+<tr><td><code>docs/guides/OPS-008-troubleshooting.md</code></td><td>Troubleshooting</td><td class="ui-table__id gb-hash">d73754432a47f5377175089c21697677f66982f0c89674dbbf6b752cec0a2c03</td></tr>
+<tr><td><code>docs/guides/OPS-010-day-one-prompts.md</code></td><td>Day-one checklist</td><td class="ui-table__id gb-hash">ff1becaa534b47377958684ee4904a34ea2ff696562f81dc4248e1fa9ff0b527</td></tr>
+<tr><td><code>tools/guidebook.yaml</code></td><td>The chapter list</td><td class="ui-table__id gb-hash">81806cc5fb4729eb0d140734e90c27ed55562adb6c0a4a79270153c5f91b5777</td></tr>
 <tr><td><code>ui-kit/dist/ui.css</code></td><td>The page styles</td><td class="ui-table__id gb-hash">c2293689359aab54de311b1141dfaea166dcd2ba42858a4c1ce8f24199d3e8a3</td></tr>
 </tbody></table></div>
 </section>

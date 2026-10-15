@@ -119,6 +119,11 @@ jobs:
           uv run plugins/idea-realization/scripts/product.py verify
           uv run plugins/idea-realization/scripts/check.py
 
+      # docs/guidebook.html is generated from the documents tools/guidebook.yaml lists; a change
+      # to one of them without regenerating the page fails here (owner, 2026-10-15).
+      - name: Guidebook is up to date
+        run: uv run python tools/build_guidebook.py --check
+
       - name: Folder tests
         run: uv run pytest -q test
 

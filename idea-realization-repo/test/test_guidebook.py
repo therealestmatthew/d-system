@@ -407,11 +407,21 @@ def test_unsupported_constructs_are_warned_and_kept_visible(source: str, message
 def test_known_issues_render_and_validate(tmp_path: Path) -> None:
     """The dated known-issues list renders each item with its severity, and bad input is refused."""
     manifest = gb.load_manifest(MANIFEST)
-    assert manifest.known_issues is not None
     html_text = (ROOT / manifest.output).read_text(encoding="utf-8")
-    assert 'id="known-issues"' in html_text
-    for item in manifest.known_issues.items:
-        assert f"{item.severity} {item.id}</span>" in html_text
+    if manifest.known_issues is None:
+        assert 'id="known-issues"' not in html_text
+    else:
+        assert 'id="known-issues"' in html_text
+        for item in manifest.known_issues.items:
+            assert f"{item.severity} {item.id}</span>" in html_text
+    issues = gb.load_known_issues(
+        {"as_of": "2026-10-15", "source": "a test", "items": [
+            {"id": "B9", "severity": "blocker", "text": "Never use `--no-verify`."}]}
+    )
+    page = gb.Renderer(gb.build_page(ROOT, manifest))
+    card = page.known_issues(issues)
+    assert 'id="known-issues"' in card and "blocker B9</span>" in card
+    assert "<code>--no-verify</code>" in card
     with pytest.raises(gb.GuidebookError, match="severity"):
         gb.load_known_issues(
             {"as_of": "2026-10-15", "source": "s", "items": [{"id": "X", "severity": "odd",
