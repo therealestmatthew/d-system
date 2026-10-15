@@ -106,22 +106,29 @@ def test_remote_slug_reads_every_url_form(url: str) -> None:
     assert remote_slug(url) == "example-owner/control"
 
 
-def test_identity_is_the_slug_not_the_developer_or_the_directory(tmp_path: Path) -> None:
-    """A developer called Ana Dev, a checkout called control: neither name is an identity, and
-    prose that uses them as ordinary words passes. The whole slug is still caught."""
-    checkout = tmp_path / "control"
+@pytest.mark.parametrize(("developer", "directory", "slug"), [
+    ("Ana Dev", "control", "example-owner/control"),
+    ("Work", "product", "team/product"),
+    ("Sam Team", "ideas", "work/ideas"),
+])
+def test_identity_is_the_slug_not_the_developer_or_the_directory(
+        tmp_path: Path, developer: str, directory: str, slug: str) -> None:
+    """A developer, a checkout directory and an organization each named with an ordinary word
+    are not identities, and prose that uses those words passes. The whole slug is still caught."""
+    checkout = tmp_path / directory
     checkout.mkdir()
-    for args in (["init", "-q"], ["config", "user.name", "Ana Dev"],
-                 ["config", "user.email", "ana@example.invalid"],
-                 ["remote", "add", "origin", "git@github.com:example-owner/control.git"]):
+    for args in (["init", "-q"], ["config", "user.name", developer],
+                 ["config", "user.email", f"{developer.split()[0].lower()}@example.invalid"],
+                 ["remote", "add", "origin", f"git@github.com:{slug}.git"]):
         subprocess.run(["git", *args], cwd=checkout, check=True)
     names = identities(checkout)
-    assert names == {"example-owner/control"}
+    assert names == {slug}
     prose = tmp_path / "prose"
     prose.mkdir()
-    (prose / "sample.md").write_text("Ask the control dev, Ana, before a team release.")
+    (prose / "sample.md").write_text(
+        "Ask the control dev, Ana, about the team's work on product ideas before a release.")
     assert scan(prose, names) == []
-    (prose / "sample.md").write_text("Cloned from example-owner/control.")
+    (prose / "sample.md").write_text(f"Cloned from {slug}.")
     assert scan(prose, names)
 
 
