@@ -15,7 +15,7 @@ the `check` command regenerates it in memory and fails on any difference.
 
 | Code | Plan | Status | Queued | Active | Complete | Agents |
 |---|---|---|---|---|---|---|
-| PLAN-001 | doc-bootstrap-follow-ons | approved | 14 | 0 | 0 | — |
+| PLAN-001 | doc-bootstrap-follow-ons | approved | 17 | 0 | 0 | — |
 
 ## Held codes
 

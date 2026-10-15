@@ -341,3 +341,78 @@ items:
   deliverables:
   - plugins/idea-realization/skills/checkpoint/
   next_action: Read skills/checkpoint/SKILL.md and list each place it assumes one repository.
+- id: phase-boot-15
+  title: Glossary generated from the brain's concepts
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-pipeline
+  - sys-brain
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Generate a glossary page from the brain's concept entries.
+  - Fail the check while it is stale.
+  acceptance:
+  - Every active concept entry appears in the glossary with its title and first paragraph.
+  - Editing a concept without regenerating the glossary fails the check.
+  verification:
+  - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - plugins/idea-realization/scripts/brain.py
+  - plugins/idea-realization/test/
+  - brain/glossary.md
+  next_action: Read brain.py's index generation and reuse it for the glossary.
+- id: phase-boot-16
+  title: Agents that search the brain
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-pipeline
+  - sys-agents
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Have the triage, planner and review agents load relevant brain entries before they work.
+  acceptance:
+  - A triage finding can cite a brain entry.
+  - The planner's draft names the decisions it builds on.
+  verification:
+  - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - plugins/idea-realization/agents/
+  - plugins/idea-realization/skills/idea-triage/
+  - .claude/agents/
+  next_action: Add brain to the triage search list first, then brief the planner and reviewers to run
+    brain.py load.
+- id: phase-boot-17
+  title: Search over the brain beyond text matching
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-brain
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Add ranked or semantic search over the brain when text matching stops finding what agents need.
+  acceptance:
+  - An agent finds an entry by meaning, not only by a word it contains.
+  - Plain markdown stays the source of truth.
+  verification:
+  - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - plugins/idea-realization/scripts/
+  next_action: Wait until the brain holds enough entries that text matching misses; ask the owner which
+    search service is approved.

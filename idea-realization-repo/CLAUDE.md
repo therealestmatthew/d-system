@@ -53,6 +53,8 @@ the output that carries information, and do not block on a question that can wai
 - Every AWS command goes through `tools/aws-sandbox`, never the bare `aws` command. The two
   sandbox IAM roles and the machine rule (no default or ambient AWS credentials on a machine that
   runs agents) are the boundary (`aws/README.md`); the hook and permission rules are guardrails.
+- The team's shared memory is `brain/`. Load context from it at session start and record decisions
+  and learnings before close (AGENTS.md, "The brain").
 
 ## Project
 

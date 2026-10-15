@@ -3,9 +3,10 @@
   "plugin": "idea-realization",
   "plugin_version": "0.1.0",
   "installed_at": "2026-10-14T23:06:45Z",
-  "updated_at": "2026-10-14T23:06:45Z",
+  "updated_at": "2026-10-15T00:21:23Z",
   "features": [
     "backlog",
+    "brain",
     "documents",
     "ideas",
     "partition",
@@ -46,7 +47,7 @@
     },
     {
       "path": "backlog/backlog.yaml",
-      "sha256": "75f397e89bd1bd15e2821c1acc6a6008439fa9b9a9a8a41f6faf408d2b0e8bb5",
+      "sha256": "5356ecb416b6e1b7f82a268a47d2407c1da6a1e8c4f01355c78eddc1819e0956",
       "feature": "backlog"
     },
     {
@@ -61,7 +62,7 @@
     },
     {
       "path": "docs/systems.yaml",
-      "sha256": "05d614491b0d027afd10ae937d96dd8e0b05cf26cc23cb3ba8eb126c0017336a",
+      "sha256": "034a343eba879ab65b68cfe0332f5b18f02536aec6e1b5d5fd8d0a026767cfdd",
       "feature": "documents"
     },
     {
@@ -103,6 +104,21 @@
       "path": ".idea-realization/schemas/product.schema.json",
       "sha256": "585a0797e07472c7262986d9a843250c0e964d3858d0f37879f5077e73a1df15",
       "feature": "product"
+    },
+    {
+      "path": "brain/README.md",
+      "sha256": "99519fc4a1039b31190e0d7cdd3745573cce5756dc7c5bd461739c44b170ae87",
+      "feature": "brain"
+    },
+    {
+      "path": "brain/index.md",
+      "sha256": "fbe7144417b5cf775b0c8c4617264174f6e0aa5faacb2adb79ef1563d10bce80",
+      "feature": "brain"
+    },
+    {
+      "path": ".idea-realization/schemas/brain-entry.schema.json",
+      "sha256": "0e12e88a827b5751b0ce28f9305dbb15c534601beba0b0864d0d149afc9cc3fd",
+      "feature": "brain"
     }
   ],
   "directories": [
@@ -113,6 +129,26 @@
     {
       "path": "docs/reviews",
       "feature": "reviews"
+    },
+    {
+      "path": "brain/decisions",
+      "feature": "brain"
+    },
+    {
+      "path": "brain/research",
+      "feature": "brain"
+    },
+    {
+      "path": "brain/concepts",
+      "feature": "brain"
+    },
+    {
+      "path": "brain/entities",
+      "feature": "brain"
+    },
+    {
+      "path": "brain/learnings",
+      "feature": "brain"
     }
   ],
   "consent": []

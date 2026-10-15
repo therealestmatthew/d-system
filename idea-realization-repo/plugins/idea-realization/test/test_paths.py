@@ -13,7 +13,7 @@ from conftest import PLUGIN_ROOT
 EXPECTED_KEYS = {
     "ideas_path", "ideas_view_path", "priority_path", "backlog_path", "docs_root",
     "integration_branch", "worktree_dir", "triage_search", "exempt_files", "staging_dir",
-    "partitions_dir", "product_root", "product_worktree_dir", "aws_read_profile",
+    "partitions_dir", "brain_root", "product_root", "product_worktree_dir", "aws_read_profile",
     "aws_deploy_profile", "aws_region",
 }
 

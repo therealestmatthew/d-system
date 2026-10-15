@@ -58,6 +58,48 @@ Pure rules: every function takes dicts and returns errors or text, with no file 
 
 No command-line arguments.
 
+## `brain.py`
+
+```bash
+uv run "${CLAUDE_PLUGIN_ROOT}/scripts/brain.py"
+```
+
+The team's shared memory: decisions, research, concepts, entities and learnings.
+
+Each entry is one markdown file with YAML front matter (``schemas/brain-entry.schema.json``) under
+``brain_root``, in the folder for its kind. The front matter names its author's handle, so a team
+on separate machines writes to one shared memory and every entry says who wrote it. Everything is
+plain markdown: any model or person can read it, and git carries it.
+
+Commands:
+
+- ``new <kind> --title ...`` records an entry in one step, as the current developer, and
+  regenerates the index.
+- ``load`` prints the entries an agent should read, filtered by kind, tag, link or text, as one
+  markdown block to read at the start of a session.
+- ``index`` regenerates ``<brain_root>/index.md``. The check fails while it is stale.
+- ``check`` reports every problem: front matter, folders, duplicate ids, broken links, the index.
+
+| Flag | Help | Choices | Default | Required |
+|---|---|---|---|---|
+| `kind` |  |  |  |  |
+| `--title` |  |  |  | yes |
+| `--body` | markdown body; '-' reads standard input |  |  |  |
+| `--tags` | comma-separated |  |  |  |
+| `--links` | comma-separated entry ids |  |  |  |
+| `--sources` | comma-separated URLs, documents or ids |  |  |  |
+| `--status` |  |  | active |  |
+| `--kind` |  |  |  |  |
+| `--tag` |  |  |  |  |
+| `--link` | an entry id: it, what it links to, and what links to it |  |  |  |
+| `--query` | text to find in titles, tags and bodies |  |  |  |
+| `--limit` |  |  |  |  |
+| `--include-superseded` |  |  |  |  |
+
+Shared configuration flags: `--root`, `--brain-root`, `--docs-root`, resolved by the shared configuration precedence rule.
+
+Exit codes found in source: 0, 1.
+
 ## `check.py`
 
 ```bash

@@ -53,6 +53,9 @@ pipeline as the product.
 12. A browser validator agent, once the user interface is designed.
 13. The instance and history scanners run over the whole repository, skipping lockfiles.
 14. The `checkpoint` skill written for two repositories.
+15. A glossary generated from the brain's concept entries.
+16. Triage, planning and review agents that search the brain as well as the documents.
+17. Search over the brain beyond text matching, once the entries outgrow it.
 
 No step depends on another, except that step 3 waits for the product's stack and step 12 for the
 user interface design.

@@ -21,7 +21,7 @@ Then, once per repository:
 1. **Check the machine.** `/idea-realization:prerequisites` checks Python 3.12+, `uv`, `git` and,
    for triage and partition, the `claude` CLI. It installs nothing without a yes.
 2. **Scaffold.** `/idea-realization:scaffold` asks which features to set up (`ideas`,
-   `partition`, `backlog`, `documents`, `workstreams`, `reviews`, `product`, or all), shows a dry run, and asks separately before
+   `partition`, `backlog`, `documents`, `workstreams`, `reviews`, `product`, `brain`, or all), shows a dry run, and asks separately before
    adding the staging directory to `.gitignore`. It never overwrites a file; running it again
    reports every path as `skipped … (exists)` and creates nothing.
 3. **Confirm.** `/idea-realization:doctor` reports every recorded file as unchanged, drifted or
@@ -111,6 +111,7 @@ backlog, reporting and review documents the skills follow.
 | `checkpoint` | Records progress on the active phase without completing it |
 | `session-close` | Finalizes the session record, runs the independent review, and completes the phase when it holds |
 | `tools` | Answers which script does what from the generated tools reference |
+| `brain` | Loads the team's shared memory before work, or records a decision, research note, concept, entity, lesson, procedure or note in one step |
 
 ## Configuration
 

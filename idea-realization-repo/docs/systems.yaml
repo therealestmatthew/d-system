@@ -42,3 +42,11 @@ systems:
   paths: [docs/governance/]
   depends_on: []
   description: The repository's governing documents, including the placeholders for the standing rules and the anti-pattern procedures.
+- id: sys-brain
+  name: Shared memory
+  domain: memory
+  status: implemented
+  owner: repository-owner
+  paths: [brain/]
+  depends_on: []
+  description: The team's shared memory of decisions, research, concepts, entities and learnings, recorded and loaded with the plugin's brain command.

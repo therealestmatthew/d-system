@@ -58,6 +58,19 @@ deliverables inside your own workstream or in shared ground. Your agent id on a 
 `<handle>/<agent>`, where the handle is your key in `docs/systems.yaml`'s `owners`. The protocol is
 `plugins/idea-realization/docs/workstreams.md`.
 
+## The brain
+
+The team's shared memory is `brain/`: decisions, research, concepts, entities and learnings, one
+markdown entry per file, each naming its author. `brain/README.md` says what goes where.
+
+- At the start of a session, load what bears on the work with the `brain` skill
+  (`brain.py load --query <subject>`, `brain.py load --kind decision`), and read it before planning.
+- Before a session closes, record what it decided, found out or learned that the next session
+  should know, with the `brain` skill (`brain.py new <kind>`), and commit the entry together with
+  `brain/index.md`.
+- An anti-pattern procedure enters only after the owner approves it; propose one as a `lesson`
+  instead.
+
 ## Before you start
 
 1. **Open the session properly.** Any session that will write code or a document runs the

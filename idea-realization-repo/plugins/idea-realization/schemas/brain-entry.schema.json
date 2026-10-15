@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Brain entry front matter",
+  "description": "The YAML front matter of one entry in the team's shared memory. The body below it is free markdown.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "kind",
+    "title",
+    "author",
+    "created",
+    "updated",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Stable identifier; the file name without .md. Links name it."
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "decision",
+        "research",
+        "concept",
+        "entity",
+        "lesson",
+        "procedure",
+        "note"
+      ],
+      "description": "decision=why a choice was made | research=notes, sources and comparisons | concept=a term or how something works | entity=a person, stakeholder, service, resource or sponsor | lesson=what a session learned | procedure=how to do something; an anti-pattern procedure enters only with the owner's approval | note=meeting or demo notes."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "One line naming the entry."
+    },
+    "author": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "The handle of the developer who wrote it: a key in systems.yaml owners."
+    },
+    "created": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "The day the entry was written."
+    },
+    "updated": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "The day it last changed."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "draft",
+        "superseded"
+      ],
+      "description": "active=current | draft=not yet settled | superseded=kept for history; a newer entry links to it."
+    },
+    "tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "description": "Free lower-case labels used to filter."
+    },
+    "links": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "description": "Ids of related entries; every one must exist."
+    },
+    "sources": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Where the content comes from: URLs, documents, idea ids, file paths."
+    }
+  }
+}

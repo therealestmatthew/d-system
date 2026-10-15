@@ -82,6 +82,12 @@
       "description": "Directory the accepted idea partitions are copied into, relative to the repository root.",
       "default": "ideas/partitions"
     },
+    "brain_root": {
+      "type": "string",
+      "title": "Brain",
+      "description": "The team's shared memory: decisions, research, concepts, entities and learnings as markdown entries, relative to the repository root.",
+      "default": "brain"
+    },
     "product_root": {
       "type": "string",
       "title": "Product checkout",
