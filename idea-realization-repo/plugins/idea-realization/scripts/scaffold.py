@@ -45,6 +45,7 @@ import sys
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
 import paths
 
@@ -314,7 +315,7 @@ def scaffold(config: paths.Config, features: Sequence[str], dry_run: bool = Fals
             written = True
 
     if "edit" in consent:
-        edits: list[dict[str, object]] = record["consent"]  # type: ignore[assignment]
+        edits = cast("list[dict[str, object]]", record["consent"])
         granted = {entry["path"] for entry in edits if entry["target"] == "edit"}
         for feature, path in EDITABLE.items():
             name = path.as_posix()
