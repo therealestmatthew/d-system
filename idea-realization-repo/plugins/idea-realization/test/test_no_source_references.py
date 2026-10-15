@@ -53,11 +53,21 @@ def remote_slug(url: str) -> str | None:
     return "/".join(parts[-2:]) if len(parts) >= 2 else None
 
 
+def remote_host(url: str) -> str | None:
+    """The host an origin URL names, or None for a path on this machine."""
+    match = (re.match(r"^[A-Za-z][A-Za-z0-9+.-]*://(?:[^@/]*@)?([^/:]+)", url.strip())
+             or re.match(r"^(?:[^/:@]+@)?([^/:]+):(?!//)", url.strip()))
+    return match.group(1).lower() if match and not url.startswith("file:") else None
+
+
 def identities(cwd: Path = PLUGIN_ROOT) -> set[str]:
     """The enclosing repository's whole ``owner/repo`` slug, from its origin remote; empty when
     there is no origin or it names no owner."""
     slug = remote_slug(git("remote", "get-url", "origin", cwd=cwd))
     return {slug} if slug else set()
+
+
+IDENTITY = "source repository or person"
 
 
 def identity_pattern(names: set[str]) -> re.Pattern[str] | None:
@@ -72,17 +82,29 @@ def text_files(root: Path) -> list[Path]:
                   if p.is_file() and not SKIP_PARTS.intersection(p.relative_to(root).parts))
 
 
-def scan(root: Path, names: set[str]) -> list[str]:
+# A host name directly before a slug (``example.com/`` or ``example.com:``).
+HOST_BEFORE = re.compile(r"(?<![A-Za-z0-9.-])([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)[:/]$")
+
+
+def names_the_origin(line: str, match: re.Match[str], host: str | None) -> bool:
+    """Whether a slug match names the origin repository: it does unless a different host sits
+    directly before it, as in a test fixture's ``git@forge.example.com:team/control.git``."""
+    before = HOST_BEFORE.search(line[:match.start()])
+    return before is None or host is None or before.group(1).lower() == host
+
+
+def scan(root: Path, names: set[str], host: str | None = None) -> list[str]:
     patterns = dict(PATTERNS)
     identity = identity_pattern(names)
     if identity is not None:
-        patterns["source repository or person"] = identity
+        patterns[IDENTITY] = identity
     found = []
     for path in text_files(root):
         text = path.read_text(encoding="utf-8", errors="replace")
         for number, line in enumerate(text.splitlines(), start=1):
             for label, pattern in patterns.items():
-                match = pattern.search(line)
+                match = next((m for m in pattern.finditer(line) if label != IDENTITY
+                              or names_the_origin(line, m, host)), None)
                 if match:
                     where = path.relative_to(root).as_posix()
                     found.append(f"{where}:{number}: {label}: {match.group(0)!r}")
@@ -90,7 +112,8 @@ def scan(root: Path, names: set[str]) -> list[str]:
 
 
 def test_plugin_names_no_source_instance() -> None:
-    assert scan(PLUGIN_ROOT, identities()) == []
+    origin = git("remote", "get-url", "origin")
+    assert scan(PLUGIN_ROOT, identities(), remote_host(origin)) == []
 
 
 def test_identities_are_found_when_the_repository_has_an_origin() -> None:
@@ -129,7 +152,23 @@ def test_identity_is_the_slug_not_the_developer_or_the_directory(
         "Ask the control dev, Ana, about the team's work on product ideas before a release.")
     assert scan(prose, names) == []
     (prose / "sample.md").write_text(f"Cloned from {slug}.")
-    assert scan(prose, names)
+    assert scan(prose, names, "github.com")
+    (prose / "sample.md").write_text(f"Cloned from https://github.com/{slug}.")
+    assert scan(prose, names, "github.com")
+    # The same owner/repo on another host is another repository, such as a test fixture's.
+    (prose / "sample.md").write_text(f"origin git@forge.example.com:{slug}.git")
+    assert scan(prose, names, "github.com") == []
+
+
+@pytest.mark.parametrize(("url", "host"), [
+    ("git@github.com:example-owner/control.git", "github.com"),
+    ("https://someone@GitHub.com/example-owner/control", "github.com"),
+    ("ssh://git@github.com:22/example-owner/control.git", "github.com"),
+    ("git@github-work:example-owner/control.git", "github-work"),
+    ("/srv/git/control.git", None), ("file:///srv/control.git", None),
+])
+def test_remote_host_reads_every_url_form(url: str, host: str | None) -> None:
+    assert remote_host(url) == host
 
 
 def test_scan_catches_a_phase_id(tmp_path: Path) -> None:
