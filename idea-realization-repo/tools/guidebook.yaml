@@ -1,0 +1,187 @@
+# The developer guidebook: which documents it is built from, in which order.
+#
+# tools/build_guidebook.py reads this file and writes docs/guidebook.html. The guidebook holds no
+# text of its own beyond the title, the lede and each chapter's intro below; everything else is
+# converted from the sources listed here, so it is regenerated, never edited by hand.
+#
+# Each source is a repository-relative path. `start_at` takes the source from that heading
+# (inclusive) and `stop_before` ends it before that heading; both are the heading's text as written
+# after the `#` marks, and each must match exactly one heading in the file. A missing file or
+# heading stops the build with exit 1.
+schema_version: 1
+title: Developer guidebook
+output: docs/guidebook.html
+lede: >-
+  The control repository's onboarding page, operating guides and AWS setup, collected into one
+  page in reading order. Every section below is converted from the document named above it; where
+  this page and a document differ, the document is the one to follow.
+
+# Dated list of known issues shown under the page header. Each item names a finding in the
+# workflow simulation report; remove it in the change that fixes it, then regenerate.
+known_issues:
+  as_of: '2026-10-15'
+  source: the two-developer workflow simulation of 2026-10-15
+  items:
+    - id: B1
+      severity: blocker
+      text: >-
+        A commit made inside a control-repository worktree fails the pre-commit hook with "product
+        checkout refused". Never commit with `--no-verify`; stop and tell the owner until the hook
+        fix merges.
+    - id: M1
+      severity: major
+      text: >-
+        Product CI's lint step fails on the first pull request that adds a `pyproject.toml`, on the
+        template's own `tools/check_confidential.py`. Expect it until the template fix merges.
+    - id: M3
+      severity: major
+      text: >-
+        With no product checkout configured, as in control CI, the repository check does not check
+        a phase's product merge or `product:` evidence, and says nothing. Configure your product
+        checkout before you run the check for a completion.
+    - id: M4
+      severity: major
+      text: >-
+        If your product checkout is behind, the check can report a peer's completed phase as
+        "stranded". Pull the product checkout and run the check again before you reopen anything.
+    - id: M6
+      severity: major
+      text: >-
+        Document and session codes allocated on two machines can be the same. The check refuses
+        the duplicate at integration; whoever integrates second renumbers with `next-code` and
+        `release-code`.
+    - id: M7
+      severity: major
+      text: >-
+        `git rebase --continue` does not run the pre-commit hook. After resolving a rejected claim
+        push, run the repository check by hand before you push.
+
+chapters:
+  - id: onboarding
+    title: Onboarding
+    intro: >-
+      What the two repositories are, how the team divides the work, and where to look when
+      something fails. The first-day machine setup is its own chapter, the Day-one checklist.
+    sources:
+      - path: ONBOARDING.md
+        stop_before: 3. First-day checklist
+      - path: ONBOARDING.md
+        start_at: 4. Claim your workstream
+      - path: docs/guides/OPS-005-team-workflow.md
+        stop_before: 3. Claims
+
+  - id: modes
+    title: Working modes
+    intro: >-
+      Every session starts with `/start` and one of three modes. This chapter has the guide for
+      each mode and the one-page cheat sheets.
+    sources:
+      - path: CLAUDE.md
+        start_at: Pick your mode
+        stop_before: Two repositories
+      - path: docs/guides/OPS-002-planning-mode.md
+      - path: docs/guides/OPS-003-implementing-mode.md
+      - path: docs/guides/OPS-004-validating-mode.md
+        stop_before: Phase reviews
+      - path: docs/guides/OPS-004-validating-mode.md
+        start_at: Infrastructure and spend
+        stop_before: Reviewing a peer's ready branch
+      - path: docs/guides/OPS-009-mode-cheat-sheets.md
+
+  - id: branching
+    title: Branching and pull-request flow
+    intro: >-
+      Branch names, how a phase's branches reach `dev` in both repositories, and the CI jobs and
+      rulesets that guard them.
+    sources:
+      - path: docs/guides/OPS-001-branching-and-ci.md
+        stop_before: 3. What goes direct to control `dev`
+      - path: docs/guides/OPS-001-branching-and-ci.md
+        start_at: "4. Merging a phase: pull request with a merge commit"
+        stop_before: "5. Releases: `dev` to `main`, and demo tags"
+      - path: plugins/idea-realization/docs/two-repositories.md
+        stop_before: A merged phase without its completion record
+      - path: docs/guides/OPS-001-branching-and-ci.md
+        start_at: "7. CI: the control repository"
+
+  - id: review
+    title: The review gate
+    intro: >-
+      A passing gating review is the approval to merge a phase. This chapter covers who reviews,
+      what the reviewer is given, and how a verdict is recorded.
+    sources:
+      - path: docs/guides/OPS-004-validating-mode.md
+        start_at: Phase reviews
+        stop_before: Infrastructure and spend
+      - path: docs/guides/OPS-005-team-workflow.md
+        start_at: 4. Review and merge
+        stop_before: 5. Daily cadence
+      - path: docs/guides/OPS-004-validating-mode.md
+        start_at: Reviewing a peer's ready branch
+
+  - id: bookkeeping
+    title: Bookkeeping
+    intro: >-
+      The commits that go directly on control `dev` (ideas, claims, completion records and
+      workstream claims) and the rules for plans, phases and the catalog.
+    sources:
+      - path: docs/guides/OPS-001-branching-and-ci.md
+        start_at: 3. What goes direct to control `dev`
+        stop_before: "4. Merging a phase: pull request with a merge commit"
+      - path: CLAUDE.md
+        start_at: "Plans: governed and ephemeral"
+        stop_before: "Concurrent agents: claim a phase"
+      - path: docs/guides/OPS-005-team-workflow.md
+        start_at: 3. Claims
+        stop_before: 4. Review and merge
+      - path: CLAUDE.md
+        start_at: "Concurrent agents: complete and hand off"
+        stop_before: "Concurrent agents: resolve collisions"
+      - path: plugins/idea-realization/docs/two-repositories.md
+        start_at: A merged phase without its completion record
+      - path: docs/guides/OPS-005-team-workflow.md
+        start_at: 5. Daily cadence
+        stop_before: 7. Release
+      - path: plugins/idea-realization/docs/workstreams.md
+
+  - id: release
+    title: Release and demo day
+    intro: >-
+      From `dev` to `main`, the `demo-rc` tags, the code freeze, and the runbook for the demo
+      itself.
+    sources:
+      - path: docs/guides/OPS-001-branching-and-ci.md
+        start_at: "5. Releases: `dev` to `main`, and demo tags"
+        stop_before: "7. CI: the control repository"
+      - path: docs/guides/OPS-005-team-workflow.md
+        start_at: 7. Release
+      - path: docs/guides/OPS-006-demo-day-runbook.md
+
+  - id: aws
+    title: AWS safety and cost guardrails
+    intro: >-
+      The sandbox's two roles and the machine rule are the boundary; the wrapper, the hook and
+      the permission rules keep agents on the intended path. Spend is kept visible with a budget
+      alarm, a daily review and tags.
+    sources:
+      - path: CLAUDE.md
+        start_at: AWS
+        stop_before: Running the checks
+      - path: aws/README.md
+      - path: docs/guides/OPS-007-cost-guardrails.md
+
+  - id: troubleshooting
+    title: Troubleshooting
+    intro: >-
+      Common failures, each with its symptom, cause and fix.
+    sources:
+      - path: docs/guides/OPS-008-troubleshooting.md
+
+  - id: day-one
+    title: Day-one checklist
+    intro: >-
+      The first-day setup from the onboarding page, once per machine, in order.
+    sources:
+      - path: ONBOARDING.md
+        start_at: 3. First-day checklist
+        stop_before: 4. Claim your workstream
