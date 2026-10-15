@@ -155,7 +155,9 @@ Every path a script reads is resolved by `scripts/paths.py`, in this order:
 A value that starts with `REPLACE-WITH-` is a placeholder and counts as unset.
 
 Relative paths resolve against the repository root: `--root`, then `IDEA_REALIZATION_ROOT`, then
-`CLAUDE_PROJECT_DIR`, then the git top level of the working directory. List options, such as
+the git top level of the working directory, then `CLAUDE_PROJECT_DIR`, so a command run inside a
+worktree resolves that worktree. `CLAUDE_PROJECT_DIR` comes first only when it is a folder inside
+the working tree the command runs in and the command runs inside it. List options, such as
 `triage_search`, are comma-separated, so a path in one cannot contain a comma.
 
 | Option | Default |

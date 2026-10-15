@@ -234,9 +234,12 @@ def _read_registers(config: paths.Config, result: Scan) -> bool:
     for item in result.systems.values():
         if item["owner"] not in result.owners:
             result.errors.append(f"{item['id']}: unknown owner {item['owner']}")
-        if item["status"] in {"implemented", "scaffold"} and not item["paths"]:
+        built = item["status"] in {"implemented", "scaffold"}
+        if built and not item["paths"]:
             result.errors.append(f"{item['id']}: implemented or scaffold system requires paths")
-        for value in item["paths"]:
+        # Only a built system's paths must exist: a planned one names where its code will go,
+        # and a retired one's code may be gone.
+        for value in item["paths"] if built else []:
             if value.startswith(PRODUCT_PREFIX):
                 # A product path is checked only in a verified product checkout on this machine.
                 product_root, refused = product.verified_root(config)

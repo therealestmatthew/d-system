@@ -7,6 +7,7 @@ date for the plugin's source-reference check to flag.
 from __future__ import annotations
 
 import shutil
+import subprocess
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
@@ -293,7 +294,9 @@ def test_kinds_by_id_reads_front_matter_without_checking_it(repo: Repo) -> None:
     [
         ([system(owner="nobody")], "sys-core: unknown owner nobody"),
         ([system(status="implemented")], "implemented or scaffold system requires paths"),
-        ([system(paths=["src/missing"])], "sys-core: missing path src/missing"),
+        ([system(status="implemented", paths=["src/missing"])],
+         "sys-core: missing path src/missing"),
+        ([system(status="scaffold", paths=["src/missing"])], "sys-core: missing path src/missing"),
         ([system(depends_on=["sys-missing"])], "unknown system dependency sys-missing"),
         ([system(depends_on=["sys-other"]), system(id="sys-other", depends_on=["sys-core"])],
          "systems: dependency cycle"),
@@ -304,6 +307,50 @@ def test_the_systems_registry_is_checked(repo: Repo, entries: list[dict[str, Any
                                          expected: str) -> None:
     repo.systems(entries)
     assert any(expected in error for error in repo.errors()), repo.errors()
+
+
+@pytest.mark.parametrize("status", ["planned", "retired"])
+def test_a_planned_or_retired_system_may_list_paths_that_do_not_exist(repo: Repo,
+                                                                       status: str) -> None:
+    """Protocol section 8 requires existing paths only of implemented and scaffold systems."""
+    repo.systems([system(status=status, paths=["src/later/"])])
+    assert repo.errors() == []
+
+
+PRODUCT_REMOTE = "git@forge.example.com:team/sample-product.git"
+
+
+def product_repo(tmp_path: Path) -> tuple[Repo, Path]:
+    """A control fixture with a product record, and a verified product checkout beside it."""
+    control, checkout = Repo(tmp_path / "control"), tmp_path / "sample-product"
+    checkout.mkdir()
+    for args in (["init", "-q", "-b", "main"], ["remote", "add", "origin", PRODUCT_REMOTE]):
+        subprocess.run(["git", *args], cwd=checkout, check=True, capture_output=True)
+    (control.root / ".idea-realization").mkdir()
+    (control.root / ".idea-realization" / "product.yaml").write_text(
+        f"schema_version: 1\nname: sample-product\nremote: {PRODUCT_REMOTE}\n"
+        "integration_branch: main\n")
+    return control, checkout
+
+
+def product_errors(control: Repo, checkout: Path) -> list[str]:
+    config = paths.resolve({"root": str(control.root)},
+                           env={"IDEA_REALIZATION_PRODUCT_ROOT": str(checkout)})
+    return documents.scan(config).errors
+
+
+def test_a_planned_system_may_list_a_product_path_that_does_not_exist(tmp_path: Path) -> None:
+    control, checkout = product_repo(tmp_path)
+    control.systems([system(paths=["product:web/"])])
+    assert product_errors(control, checkout) == []
+
+
+def test_an_implemented_system_needs_its_product_path_in_the_checkout(tmp_path: Path) -> None:
+    control, checkout = product_repo(tmp_path)
+    control.systems([system(status="implemented", paths=["product:web/"])])
+    assert "sys-core: missing product path product:web/" in product_errors(control, checkout)
+    (checkout / "web").mkdir()
+    assert product_errors(control, checkout) == []
 
 
 def test_the_code_register_is_checked_against_the_document_kinds(repo: Repo) -> None:

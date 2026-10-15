@@ -5,9 +5,17 @@ in ``backlog.py`` against the documents, systems and owners the document scan
 (``documents.scan``) reports, then the status-regression check (``regression.py``) when the
 catalog names a ``decision_record``. A repository without a backlog file has nothing to check.
 
-Regression warnings, the note that the regression check did not run, and the warning that an
-active phase assigned to one developer (``owner: <handle>``) is claimed by another
-(``backlog.owner_claim_warnings``) go to standard error: they never change the exit code.
+A ``product:`` completion evidence path of a phase that names its ``product_merge`` is read at
+that commit (``git ls-tree``), not in the product checkout's working tree, so a checkout that has
+not pulled a peer's merge does not report the peer's evidence missing. When the checkout does not
+hold that commit at all, nothing can be read: the check prints a ``cannot tell`` note that says to
+fetch and run the check again, and reports no error. Other ``product:`` paths, and a phase without
+``product_merge``, are read in the working tree.
+
+Regression warnings, the note that the regression check did not run, the ``cannot tell`` evidence
+note, and the warning that an active phase assigned to one developer (``owner: <handle>``) is
+claimed by another (``backlog.owner_claim_warnings``) go to standard error: they never change the
+exit code.
 
 ``ready`` prints the phase queue — ``next_up`` first, then priority and id — with each phase's
 readiness, prerequisites and the active phases it would collide with, and a stale-claim signal
@@ -34,6 +42,7 @@ import yaml
 from jsonschema import Draft7Validator, FormatChecker
 
 import backlog
+from checks import reviews
 
 SCHEMA = paths.PLUGIN_ROOT / "schemas" / "backlog.schema.json"
 #: Path parts a phase may never declare: git's own directory and a virtual environment.
@@ -81,13 +90,33 @@ def load_catalog(config: paths.Config) -> tuple[list[str], dict[str, Any]]:
     return [], catalog
 
 
+def file_at(root: Path, commit: str, relative_path: str) -> bool:
+    """Whether ``commit`` in the checkout at ``root`` holds ``relative_path`` as a regular file
+    (a directory or a symlink there is not a file, as in the working tree check)."""
+    found = subprocess.run(["git", "--literal-pathspecs", "-C", str(root), "ls-tree", "-z",
+                            "--end-of-options", commit, "--", relative_path],
+                           capture_output=True, text=True, check=False)
+    if found.returncode != 0:
+        return False
+    for entry in found.stdout.split("\0"):
+        meta, _, name = entry.partition("\t")
+        mode, kind = (meta.split(" ") + ["", ""])[:2]
+        if name == relative_path and kind == "blob" and not mode.startswith("12"):  # 12: symlink
+            return True
+    return False
+
+
 def inspect(root: Path, catalog: dict[str, Any], documents: dict[str, Any], systems: set[str],
-            owners: set[str], today: date, product_root: Path | None = None) -> list[str]:
+            owners: set[str], today: date, product_root: Path | None = None,
+            note: Callable[[str], None] | None = None) -> list[str]:
     """Every rule in ``backlog.inspect_backlog``, with declared paths resolved under ``root``.
 
     A ``product:`` path resolves under ``product_root``. Without a product checkout on this machine
-    its shape is still validated, and its existence is taken as given.
+    its shape is still validated, and its existence is taken as given. Completion evidence of a
+    phase with a ``product_merge`` is read at that commit; when ``product_root`` does not hold the
+    commit, ``note`` (default: standard error) says so and the evidence is not reported missing.
     """
+    note = note or (lambda line: print(f"backlog: {line}", file=sys.stderr))
 
     def exists(value: str) -> bool:
         if value.startswith(PRODUCT_PREFIX):
@@ -98,7 +127,21 @@ def inspect(root: Path, catalog: dict[str, Any], documents: dict[str, Any], syst
             return repository_path(product_root, relative_path).is_file()
         return repository_path(root, value).is_file()
 
-    return backlog.inspect_backlog(catalog, documents, systems, owners, exists, today)
+    def evidence(item: dict[str, Any], value: str) -> bool:
+        merge = item.get("product_merge")
+        if product_root is None or not value.startswith(PRODUCT_PREFIX) or \
+                not isinstance(merge, str) or not reviews.COMMIT.fullmatch(merge):
+            return exists(value)
+        relative_path = value.removeprefix(PRODUCT_PREFIX)
+        repository_path(Path("."), relative_path)  # shape only: the file is read from git
+        if not reviews.known_commit(product_root, merge):
+            note(f"{item['id']}: cannot tell whether completion evidence {value} exists: the "
+                 f"product checkout does not hold product_merge {merge}; fetch the product "
+                 f"checkout (git -C {product_root} fetch origin) and run the check again")
+            return True
+        return file_at(product_root, merge, relative_path)
+
+    return backlog.inspect_backlog(catalog, documents, systems, owners, exists, today, evidence)
 
 
 def audit(config: paths.Config, today: date | None = None,
@@ -128,7 +171,7 @@ def audit(config: paths.Config, today: date | None = None,
                 "backlog resolves its plans, systems and owners through it"]
     root = config.root
     errors = inspect(root, catalog, scanned.documents, set(scanned.systems),
-                     set(scanned.owners), today or date.today(), product_root)
+                     set(scanned.owners), today or date.today(), product_root, note)
     items = {item["id"]: item for item in catalog["items"]}
     for warning in backlog.owner_claim_warnings(items, set(identity.developers(docs_root))):
         note(warning)

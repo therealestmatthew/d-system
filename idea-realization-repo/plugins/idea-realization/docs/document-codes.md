@@ -43,8 +43,9 @@ The default register (`templates/codes.yaml`), with locations relative to the do
 - The next sub-code is the parent's highest sub-code plus one. The parent holds a top-level code in
   a series that allows sub-codes.
 - A dated code takes today's date and the highest same-day sequence plus one, and takes no parent.
-  Dated series contend only within one date, which is why the kinds several sessions write at once
-  are dated.
+  Dating does not separate developers: two machines that allocate in one series on the same day,
+  from the same integration branch, take the same code, and the second to integrate renumbers
+  (section 5).
 - Allocation takes the code: computing it and holding it are one operation from a peer's point of
   view.
 - Allocation runs only on a clean document tree. On failure nothing is reserved.

@@ -46,8 +46,12 @@ When the option was never saved, Claude Code leaves that text unsubstituted, so 
 reads ``${user_config.`` counts as unset.
 
 Relative paths resolve against the repository root: ``--root``, then ``IDEA_REALIZATION_ROOT``,
-then ``CLAUDE_PROJECT_DIR``, then the git top level of the working directory, then the working
-directory. No path is ever derived from a script's own location except the plugin's own files.
+then the git top level of the working directory, then ``CLAUDE_PROJECT_DIR``, then the working
+directory. A command run inside a worktree therefore resolves that worktree even when
+``CLAUDE_PROJECT_DIR`` names the primary checkout. The one case where ``CLAUDE_PROJECT_DIR``
+comes before the git top level is a project directory inside that working tree (a repository kept
+in a subdirectory of another one) with the command run inside the project directory. No path is
+ever derived from a script's own location except the plugin's own files.
 
 ``worktree_dir`` is the exception: it names a directory beside the repository rather than a file
 in one checkout, so it resolves against the primary checkout, the first entry of
@@ -221,16 +225,26 @@ def repository_root(flag: str | None = None, env: Mapping[str, str] | None = Non
     """Resolve the repository root that relative paths are taken from."""
     env = os.environ if env is None else env
     cwd = Path.cwd() if cwd is None else cwd
-    for candidate in (flag, env.get(ROOT_ENV), env.get("CLAUDE_PROJECT_DIR")):
+    for candidate in (flag, env.get(ROOT_ENV)):
         if _set(candidate):
             assert candidate is not None
             return Path(candidate).expanduser().resolve()
+    project_dir = env.get("CLAUDE_PROJECT_DIR")
+    project = Path(project_dir).expanduser().resolve() if _set(project_dir) else None
+    here = cwd.resolve()
     try:
-        top = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd=cwd,
-                             capture_output=True, text=True, check=True).stdout.strip()
+        top_text = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd=cwd,
+                                  capture_output=True, text=True, check=True).stdout.strip()
     except (OSError, subprocess.CalledProcessError):
-        return cwd.resolve()
-    return Path(top).resolve()
+        return project or here
+    top = Path(top_text).resolve()
+    # The project directory wins only when it is a folder nested inside the working tree the
+    # command runs in and the command runs inside it: a control repository kept in a
+    # subdirectory of another repository. A worktree elsewhere is always its own root.
+    if project is not None and project != top and project.is_relative_to(top) \
+            and here.is_relative_to(project):
+        return project
+    return top
 
 
 def primary_checkout(root: Path) -> Path:

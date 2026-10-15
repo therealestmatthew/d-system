@@ -3,7 +3,7 @@
   "plugin": "idea-realization",
   "plugin_version": "0.1.0",
   "installed_at": "2026-10-14T23:06:45Z",
-  "updated_at": "2026-10-15T02:38:13Z",
+  "updated_at": "2026-10-15T05:55:01Z",
   "features": [
     "backlog",
     "brain",
@@ -113,12 +113,6 @@
       "owner": "plugin"
     },
     {
-      "path": ".idea-realization/schemas/systems.schema.json",
-      "sha256": "df509e41e8dcfd51d6ac01b14b44274e4e92e814e95f387f46121d907f8801cf",
-      "feature": "documents",
-      "owner": "plugin"
-    },
-    {
       "path": ".idea-realization/schemas/workstreams.schema.json",
       "sha256": "9a1ad72f845cc24dc56589a81b6fc9475bdf885968b8c2efc40a1591466ef7f2",
       "feature": "workstreams",
@@ -152,6 +146,12 @@
       "path": ".idea-realization/schemas/local.schema.json",
       "sha256": "b78bbf6e56d784477238bcfe5344a15061a711cdb45d01778cd55c84fb04c893",
       "feature": "project",
+      "owner": "plugin"
+    },
+    {
+      "path": ".idea-realization/schemas/systems.schema.json",
+      "sha256": "f4b7e37eaf745db2092d08716beda711a41763cec22f8e3d3066ae28c04d9332",
+      "feature": "documents",
       "owner": "plugin"
     }
   ],

@@ -106,6 +106,9 @@ jobs:
 
       # ---- Python (pyproject.toml at the root) ----------------------------------------------
       # REPLACE: keep only the commands the project uses; add a type check if it has one.
+      # ruff is pinned to the version the control repository locks (its pyproject.toml and uv.lock),
+      # so a new ruff release cannot turn this check red; move all three together. Without a
+      # [tool.ruff] section of the product's own, ruff applies its default rules.
       - name: Set up uv
         if: hashFiles('pyproject.toml') != ''
         uses: astral-sh/setup-uv@v10
@@ -116,7 +119,7 @@ jobs:
         if: hashFiles('pyproject.toml') != ''
         run: |
           if [ -f uv.lock ]; then uv sync --locked; else uv sync; fi
-          uvx ruff check .
+          uvx ruff@0.17.0 check .
           # pytest exits 5 when it collects no tests; that is not a failure while the project is new.
           uv run --with pytest pytest -q || [ $? -eq 5 ]
 

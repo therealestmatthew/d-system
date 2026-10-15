@@ -105,7 +105,7 @@ def main_checkout(root: Path) -> Path | None:
     directory. For a linked worktree this is the checkout it was added from; for the main checkout
     it is `root` itself. None when git cannot say."""
     result = subprocess.run(["git", "rev-parse", "--git-common-dir"], cwd=root,
-                            capture_output=True, text=True)
+                            capture_output=True, text=True, check=False)
     if result.returncode != 0 or not result.stdout.strip():
         return None
     common = Path(result.stdout.strip())

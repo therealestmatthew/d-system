@@ -182,6 +182,21 @@ def test_a_working_phase_without_a_handle_is_an_error(repo: Path) -> None:
     ]
 
 
+def test_a_working_phase_whose_handle_is_not_a_developer_is_an_error(repo: Path) -> None:
+    write_registry(repo, [stream("ui", "product:web/", "ana")])
+    write_backlog(repo, [
+        phase("phase-stranger", "zed/agent-builder", ["README.md"]),
+        phase("phase-later", "zed/agent-builder", ["README.md"], status="queued"),
+        phase("phase-owner", "repository-owner/agent-builder", ["README.md"]),
+    ])
+    assert problems(repo) == [
+        "backlog/backlog.yaml: phase phase-owner is claimed by agent handle repository-owner, "
+        "which is not a developer handle (an owners key with emails in systems.yaml)",
+        "backlog/backlog.yaml: phase phase-stranger is claimed by agent handle zed, "
+        "which is not a developer handle (an owners key with emails in systems.yaml)",
+    ]
+
+
 def test_agents_are_not_checked_without_workstreams(repo: Path) -> None:
     write_registry(repo, [])
     write_backlog(repo, [phase("phase-anon", "agent-builder", ["README.md"])])

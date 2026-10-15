@@ -167,17 +167,18 @@ def test_this_repositorys_product_record_integrates_on_dev() -> None:
     assert "remote" not in record and "github" not in record
 
 
-def evidence_errors(root: Path, product_root: Path | None, evidence: str) -> list[str]:
+def evidence_errors(root: Path, product_root: Path | None, evidence: str,
+                    note: Any = None, **changes: str) -> list[str]:
     catalog = {"schema_version": 1, "updated": TODAY.isoformat(), "items": [phase(
         status="complete", session="doc-session", completion_evidence=[evidence],
-        result="Checks passed", deliverables=["product:src/api.py"])]}
+        result="Checks passed", deliverables=["product:src/api.py"], **changes)]}
     documents = {"doc-plan": {"kind": "plan", "status": "approved"},
                  "doc-decisions": {"kind": "governance", "status": "active"},
                  "doc-session": {"kind": "session", "status": "active"}}
     (root / "backlog").mkdir(exist_ok=True)
     (root / "backlog/backlog.yaml").write_text(json.dumps(catalog))
     return feature.inspect(root, catalog, documents, {"sys-demo"}, {"repository-owner"}, TODAY,
-                           product_root)
+                           product_root, note=note)
 
 
 def test_product_evidence_is_checked_in_the_product_checkout(repos: tuple[Path, Path]) -> None:
@@ -187,6 +188,61 @@ def test_product_evidence_is_checked_in_the_product_checkout(repos: tuple[Path, 
     (checkout / "src").mkdir()
     (checkout / "src/api.py").write_text("print('ok')\n")
     assert evidence_errors(control, checkout, "product:src/api.py") == []
+
+
+def commit_all(checkout: Path, message: str) -> str:
+    git(checkout, "add", "-A")
+    git(checkout, "-c", "user.email=a@example.com", "-c", "user.name=a", "commit", "-qm", message)
+    return subprocess.run(["git", "rev-parse", "HEAD"], cwd=checkout, check=True,
+                          capture_output=True, text=True).stdout.strip()
+
+
+def test_product_evidence_of_a_merged_phase_is_read_at_its_product_merge(
+        repos: tuple[Path, Path]) -> None:
+    """A checkout whose working tree is behind the phase's merge does not report the phase's
+    evidence missing (workflow-sim M4): the evidence is read at ``product_merge``."""
+    control, checkout = repos
+    (checkout / "README.md").write_text("base\n")
+    commit_all(checkout, "base")
+    git(checkout, "checkout", "-q", "-b", f"agent/{phase()['id']}")
+    (checkout / "src").mkdir()
+    (checkout / "src/api.py").write_text("print('ok')\n")
+    merge = commit_all(checkout, "phase work")
+    git(checkout, "checkout", "-q", "main")  # the working tree no longer has src/api.py
+    assert not (checkout / "src/api.py").exists()
+    assert evidence_errors(control, checkout, "product:src/api.py", product_merge=merge) == []
+
+
+def test_product_evidence_absent_at_the_product_merge_is_missing(
+        repos: tuple[Path, Path]) -> None:
+    """A file in the working tree does not stand in for evidence the merged commit lacks."""
+    control, checkout = repos
+    (checkout / "README.md").write_text("base\n")
+    merge = commit_all(checkout, "base")
+    (checkout / "src").mkdir()
+    (checkout / "src/api.py").write_text("print('ok')\n")  # present, but never committed
+    errors = evidence_errors(control, checkout, "product:src/api.py", product_merge=merge)
+    assert any("missing completion evidence product:src/api.py" in e for e in errors), errors
+    with_directory = commit_all(checkout, "src/api.py committed")  # src is a directory here
+    errors = evidence_errors(control, checkout, "product:src", product_merge=with_directory)
+    assert any("missing completion evidence product:src" in e for e in errors), errors
+    (checkout / "link.py").symlink_to("README.md")
+    linked = commit_all(checkout, "a symlink")
+    errors = evidence_errors(control, checkout, "product:link.py", product_merge=linked)
+    assert any("missing completion evidence product:link.py" in e for e in errors), errors
+
+
+def test_product_evidence_at_an_unfetched_merge_cannot_be_told(repos: tuple[Path, Path]) -> None:
+    """A product_merge this checkout has not fetched is a note to fetch, never a missing-evidence
+    error."""
+    control, checkout = repos
+    (checkout / "README.md").write_text("base\n")
+    commit_all(checkout, "base")
+    notes: list[str] = []
+    errors = evidence_errors(control, checkout, "product:src/api.py", note=notes.append,
+                             product_merge="d" * 40)
+    assert errors == []
+    assert len(notes) == 1 and "cannot tell" in notes[0] and "fetch" in notes[0], notes
 
 
 def test_product_evidence_is_taken_as_given_without_a_checkout(repos: tuple[Path, Path]) -> None:

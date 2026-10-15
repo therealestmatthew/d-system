@@ -51,8 +51,12 @@ When the option was never saved, Claude Code leaves that text unsubstituted, so 
 reads ``${user_config.`` counts as unset.
 
 Relative paths resolve against the repository root: ``--root``, then ``IDEA_REALIZATION_ROOT``,
-then ``CLAUDE_PROJECT_DIR``, then the git top level of the working directory, then the working
-directory. No path is ever derived from a script's own location except the plugin's own files.
+then the git top level of the working directory, then ``CLAUDE_PROJECT_DIR``, then the working
+directory. A command run inside a worktree therefore resolves that worktree even when
+``CLAUDE_PROJECT_DIR`` names the primary checkout. The one case where ``CLAUDE_PROJECT_DIR``
+comes before the git top level is a project directory inside that working tree (a repository kept
+in a subdirectory of another one) with the command run inside the project directory. No path is
+ever derived from a script's own location except the plugin's own files.
 
 ``worktree_dir`` is the exception: it names a directory beside the repository rather than a file
 in one checkout, so it resolves against the primary checkout, the first entry of
@@ -1040,7 +1044,7 @@ Exit codes: always 0.
 
 | Flag | Help | Choices | Default | Required |
 |---|---|---|---|---|
-| `--root` | repository root (env IDEA_REALIZATION_ROOT, then CLAUDE_PROJECT_DIR; default: git top level) |  |  |  |
+| `--root` | repository root (env IDEA_REALIZATION_ROOT; default: git top level, then CLAUDE_PROJECT_DIR) |  |  |  |
 | `--hook` | print the SessionStart hook JSON instead of plain text |  |  |  |
 | `--today` | the date to count days from, YYYY-MM-DD (default: today) |  |  |  |
 
@@ -1080,13 +1084,16 @@ Subcommands:
 
 ``problems`` reports, one line each and sorted: schema violations; duplicate ids; a claimed
 workstream whose owner is not a developer handle, or an open one with an owner; two workstreams
-whose paths overlap; and an ``active`` or ``blocked`` phase whose agent is ``<handle>/<anything>``
-and which declares a deliverable inside a workstream claimed by another developer, unless its
-``cross_workstream`` list holds ``{workstream: <id>, approved_by: <owner>}`` for that workstream.
-Paths outside every workstream are shared ground. Once the registry defines a workstream, an
-``active`` or ``blocked`` phase whose agent carries no handle (``agent-builder`` rather than
-``ana/agent-builder``) is a problem too, because nobody can tell whose paths it may touch. An
-absent registry means the feature is not in use, and nothing is reported.
+whose paths overlap; an ``active`` or ``blocked`` phase whose agent's handle is not a developer
+handle (an ``owners`` key with emails), once the registry defines a workstream; and an ``active`` or
+``blocked`` phase whose agent is ``<handle>/<anything>`` and which declares a deliverable inside a
+workstream claimed by another developer, unless its ``cross_workstream`` list holds
+``{workstream: <id>, approved_by: <owner>}`` for that workstream. Paths outside every workstream
+are shared ground.
+Once the registry defines a workstream, an ``active`` or ``blocked`` phase whose agent carries no
+handle (``agent-builder`` rather than ``ana/agent-builder``) is a problem too, because nobody can
+tell whose paths it may touch. An absent registry means the feature is not in use, and nothing is
+reported.
 
 Writing the file uses ``yaml.safe_dump`` in the file's own key order, so comments are not kept.
 

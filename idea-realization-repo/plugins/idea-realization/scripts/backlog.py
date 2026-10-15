@@ -187,8 +187,16 @@ def inspect_backlog(
     owners: set[str],
     check_file: Callable[[str], bool],
     today: date,
+    check_evidence: Callable[[dict[str, Any], str], bool] | None = None,
 ) -> list[str]:
-    """Check a schema-validated catalog against source documents and local evidence."""
+    """Check a schema-validated catalog against source documents and local evidence.
+
+    ``check_file`` validates a declared path and says whether it exists. ``check_evidence``, when
+    given, says whether one phase's completion evidence path exists, with the phase in hand (the
+    caller can read a merged phase's evidence at the commit it merged as); otherwise
+    ``check_file`` answers for evidence too.
+    """
+    evidence_exists = check_evidence or (lambda _item, path: check_file(path))
     errors = []
     items = {item["id"]: item for item in catalog["items"]}
     if len(items) != len(catalog["items"]):
@@ -263,7 +271,7 @@ def inspect_backlog(
             for path in item["deliverables"]:
                 check_file(path)  # Validate public path, but planned files need not exist yet.
             for path in item.get("completion_evidence", []):
-                if not check_file(path):
+                if not evidence_exists(item, path):
                     errors.append(f"{key}: missing completion evidence {path}")
         except ValueError as exc:
             errors.append(f"{key}: {exc}")

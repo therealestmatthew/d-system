@@ -119,7 +119,9 @@ the work should have had a claim, say so under `## Unresolved`; never invent one
    (files that exist now) and `result` (actual progress, not a completion claim) may be recorded.
    Returning the phase to `queued` releases the claim: clear `agent`, `session`,
    `completion_evidence` and `result` in the same edit. Mirror the same facts into `## Backlog`.
-6. **Prune `next_up`** of any phase that is now genuinely complete, and nothing else.
+6. **Prune `next_up`** of any phase that is now genuinely complete, and nothing else. If that
+   empties the list, write `next_up: []`: a key with no entries reads as null, which the schema
+   refuses.
 7. **Regenerate the catalog** and run the check:
 
    ```bash

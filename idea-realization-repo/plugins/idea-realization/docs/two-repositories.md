@@ -104,7 +104,10 @@ verification:
 - The concurrency check compares declared paths as written, so two phases that both declare
   `product:src/api/` collide, and `product:src/` and `src/` do not.
 - A `product:` completion evidence file is checked in the product checkout when this machine has
-  one; without one, only its shape is checked.
+  one; without one, only its shape is checked. For a phase that names its `product_merge`, the
+  file is read at that commit, not in the working tree, so a checkout that has not pulled the
+  merge still finds it. When the checkout does not hold the commit, the check prints a
+  `cannot tell` note: fetch the product checkout and run the check again.
 - A verification command runs in the product worktree unless it starts with `control:`.
 
 ## Approval
@@ -137,10 +140,28 @@ the merge landed; it means the completion record was written by hand, or the pro
 branch lost the commit. The check reports it as `stranded` wherever a product checkout is
 configured.
 
-Reopen the phase in the control repository: set it back to `active` with a `next_action` naming the
-stranded merge, and remove its `product_merge`, in one commit directly on the control integration
-branch. Then rebase the product branch, run the verification, review the new `HEAD`, and close the
-session again.
+A product checkout that has not fetched does not know a peer's merge, so before reporting
+`stranded` the check asks `origin` where the integration branch is now (`git ls-remote`, which
+changes nothing). It reports `stranded` only when this checkout already holds origin's tip and the
+commit is not in its history. When origin cannot be read, or has commits this checkout has not
+fetched, it prints `cannot tell whether product_merge … landed` instead, which is not an error.
+
+1. **Fetch the product checkout and run the check again** (`git -C <product checkout> fetch
+   origin`). A `cannot tell` note, or a `stranded` line that goes away after the fetch, means the
+   checkout was behind: the phase is complete and nothing else is done. Never reopen a phase on a
+   `cannot tell` note.
+2. Only if `stranded` remains after the fetch: confirm it on the forge, which is the record of what
+   merged (`gh pr view <n> --json state,mergeCommit` in the product checkout, where `<n>` is the
+   phase's product pull request). If the pull request merged as `product_merge`, the product
+   integration branch lost the commit; stop and report it to the owner rather than reopening.
+3. Otherwise reopen the phase in the control repository: set it back to `active` with a
+   `next_action` naming the stranded merge, and remove its `product_merge`, in one commit directly
+   on the control integration branch. Then rebase the product branch, run the verification, review
+   the new `HEAD`, and close the session again.
+
+Without any product checkout on this machine (control CI is one such place) the check cannot test
+landing at all, and prints `product_merge … not checked: no product checkout is configured` for
+each complete phase instead.
 
 Never edit `product_merge` to a commit the recorded verdict did not judge: it is the commit the
 verdict judged (a fast-forward) or a merge commit whose second parent is that commit.

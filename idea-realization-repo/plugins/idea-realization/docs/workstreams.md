@@ -81,6 +81,8 @@ Only a workstream's owner releases it.
 - two workstreams whose paths overlap;
 - a claimed workstream whose owner is not a developer, or an open one that names an owner;
 - once at least one workstream exists, an active or blocked phase whose `agent` carries no handle;
+- once at least one workstream exists, an active or blocked phase whose `agent` handle is not a
+  developer (an `owners` key with emails), such as `zed/agent-z` when `zed` is not in `owners`;
 - an active or blocked phase whose deliverables fall inside a workstream claimed by another
   developer, unless the phase records that developer's approval:
 

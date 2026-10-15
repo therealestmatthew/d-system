@@ -125,7 +125,7 @@
           "paths": {
             "type": "array",
             "uniqueItems": true,
-            "description": "Existing repository-relative paths that locate this component.",
+            "description": "Repository-relative or product: paths that locate this component; they must exist for implemented and scaffold systems.",
             "items": {
               "type": "string",
               "minLength": 1,

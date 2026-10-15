@@ -108,8 +108,8 @@ def banner(root_flag: str | None, today: datetime.date) -> list[str]:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Print the resolved configuration and the mode menu at session start.")
-    parser.add_argument("--root", help="repository root (env IDEA_REALIZATION_ROOT, then "
-                                       "CLAUDE_PROJECT_DIR; default: git top level)")
+    parser.add_argument("--root", help="repository root (env IDEA_REALIZATION_ROOT; default: "
+                                       "git top level, then CLAUDE_PROJECT_DIR)")
     parser.add_argument("--hook", action="store_true",
                         help="print the SessionStart hook JSON instead of plain text")
     parser.add_argument("--today", help="the date to count days from, YYYY-MM-DD (default: today)")

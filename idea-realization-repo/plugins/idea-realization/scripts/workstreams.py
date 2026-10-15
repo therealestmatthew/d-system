@@ -30,13 +30,16 @@ Subcommands:
 
 ``problems`` reports, one line each and sorted: schema violations; duplicate ids; a claimed
 workstream whose owner is not a developer handle, or an open one with an owner; two workstreams
-whose paths overlap; and an ``active`` or ``blocked`` phase whose agent is ``<handle>/<anything>``
-and which declares a deliverable inside a workstream claimed by another developer, unless its
-``cross_workstream`` list holds ``{workstream: <id>, approved_by: <owner>}`` for that workstream.
-Paths outside every workstream are shared ground. Once the registry defines a workstream, an
-``active`` or ``blocked`` phase whose agent carries no handle (``agent-builder`` rather than
-``ana/agent-builder``) is a problem too, because nobody can tell whose paths it may touch. An
-absent registry means the feature is not in use, and nothing is reported.
+whose paths overlap; an ``active`` or ``blocked`` phase whose agent's handle is not a developer
+handle (an ``owners`` key with emails), once the registry defines a workstream; and an ``active`` or
+``blocked`` phase whose agent is ``<handle>/<anything>`` and which declares a deliverable inside a
+workstream claimed by another developer, unless its ``cross_workstream`` list holds
+``{workstream: <id>, approved_by: <owner>}`` for that workstream. Paths outside every workstream
+are shared ground.
+Once the registry defines a workstream, an ``active`` or ``blocked`` phase whose agent carries no
+handle (``agent-builder`` rather than ``ana/agent-builder``) is a problem too, because nobody can
+tell whose paths it may touch. An absent registry means the feature is not in use, and nothing is
+reported.
 
 Writing the file uses ``yaml.safe_dump`` in the file's own key order, so comments are not kept.
 
@@ -123,8 +126,9 @@ def _approved(phase: dict[str, Any], stream: dict[str, Any]) -> bool:
                and entry.get("approved_by") == stream["owner"] for entry in approvals)
 
 
-def phase_errors(registry: dict[str, Any], catalog: Any) -> list[str]:
-    """Every working phase's deliverable inside a workstream another developer claimed."""
+def phase_errors(registry: dict[str, Any], catalog: Any, team: set[str]) -> list[str]:
+    """Every working phase claimed by an agent whose handle is not a developer in ``team``, and
+    every working phase's deliverable inside a workstream another developer claimed."""
     if not isinstance(catalog, dict) or not isinstance(catalog.get("items"), list):
         return []
     claimed = [stream for stream in registry["workstreams"] if stream["status"] == "claimed"]
@@ -141,6 +145,10 @@ def phase_errors(registry: dict[str, Any], catalog: Any) -> list[str]:
                               "(agent must be <handle>/agent-...)")
             continue
         handle = agent.split("/", 1)[0]
+        if registry["workstreams"] and handle not in team:
+            errors.append(f"phase {phase.get('id')} is claimed by agent handle {handle}, which is "
+                          "not a developer handle (an owners key with emails in systems.yaml)")
+            continue
         for deliverable in phase.get("deliverables") or []:
             if not isinstance(deliverable, str):
                 continue
@@ -177,7 +185,7 @@ def problems(config: paths.Config) -> list[str]:
         except yaml.YAMLError as exc:
             errors.append(f"{backlog_name}: not valid YAML: {exc}")
         else:
-            errors += [f"{backlog_name}: {line}" for line in phase_errors(registry, catalog)]
+            errors += [f"{backlog_name}: {line}" for line in phase_errors(registry, catalog, team)]
     return sorted(errors)
 
 

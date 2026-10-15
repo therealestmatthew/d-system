@@ -106,8 +106,45 @@ def test_root_precedence(tmp_path: Path) -> None:
     assert paths.repository_root(str(a), {"IDEA_REALIZATION_ROOT": str(b)}) == a
     env = {"IDEA_REALIZATION_ROOT": str(b), "CLAUDE_PROJECT_DIR": str(c)}
     assert paths.repository_root(None, env) == b
-    assert paths.repository_root(None, {"CLAUDE_PROJECT_DIR": str(c)}) == c
+    # Outside a git repository, CLAUDE_PROJECT_DIR comes before the working directory.
+    assert paths.repository_root(None, {"CLAUDE_PROJECT_DIR": str(c)}, cwd=tmp_path) == c
     assert paths.repository_root(None, {}, cwd=tmp_path) == tmp_path.resolve()
+
+
+def _git(cwd: Path, *args: str) -> None:
+    subprocess.run(["git", "-C", str(cwd), "-c", "user.name=fixture",
+                    "-c", "user.email=fixture@example", *args],
+                   capture_output=True, text=True, check=True)
+
+
+def test_a_command_run_in_a_worktree_resolves_that_worktree(tmp_path: Path) -> None:
+    primary = tmp_path / "sample"
+    primary.mkdir()
+    _git(primary, "init", "-q")
+    _git(primary, "commit", "-q", "--allow-empty", "-m", "fixture")
+    worktree = tmp_path / "sample-worktrees" / "session"
+    _git(primary, "worktree", "add", "-q", "-b", "session", str(worktree))
+    (worktree / "docs").mkdir()
+    env = {"CLAUDE_PROJECT_DIR": str(primary)}
+    assert paths.repository_root(None, env, cwd=worktree / "docs") == worktree.resolve()
+    # A worktree inside the project directory (as Claude Code's own worktrees are) is its own root.
+    inner = primary / ".claude" / "worktrees" / "inner"
+    _git(primary, "worktree", "add", "-q", "-b", "inner", str(inner))
+    assert paths.repository_root(None, env, cwd=inner) == inner.resolve()
+    # The explicit sources still come first.
+    assert paths.repository_root(str(primary), env, cwd=worktree) == primary.resolve()
+    env_root = {**env, "IDEA_REALIZATION_ROOT": str(primary)}
+    assert paths.repository_root(None, env_root, cwd=worktree) == primary.resolve()
+
+
+def test_a_project_directory_nested_in_another_repository_is_kept(tmp_path: Path) -> None:
+    outer = tmp_path / "outer"
+    nested = outer / "control"
+    (nested / "docs").mkdir(parents=True)
+    _git(outer, "init", "-q")
+    env = {"CLAUDE_PROJECT_DIR": str(nested)}
+    assert paths.repository_root(None, env, cwd=nested / "docs") == nested.resolve()
+    assert paths.repository_root(None, env, cwd=outer) == outer.resolve()
 
 
 def test_help_lists_every_path_flag(capsys: object) -> None:

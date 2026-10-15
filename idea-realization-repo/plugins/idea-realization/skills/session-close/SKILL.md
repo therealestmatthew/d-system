@@ -251,8 +251,9 @@ git pull --rebase
 
 Set the phase's `status: complete`, with `session`, `completion_evidence` (files that exist;
 product files written `product:<path>`), `product_merge` (the full product merge commit from step
-6) and `result` (the actual verification and review outcome), and remove it from `next_up`. Update
-the session record's `## Backlog` to match in the same commit. The check refuses a complete phase
+6) and `result` (the actual verification and review outcome), and remove it from `next_up`; if
+that empties the list, write `next_up: []`, because a key with no entries reads as null and the
+schema refuses it. Update the session record's `## Backlog` to match in the same commit. The check refuses a complete phase
 without a passing gating verdict whose `reviewed_commit` equals its `product_merge` or that merge
 commit's second parent.
 
@@ -294,9 +295,11 @@ remains, including anything the review surfaced. Closing honestly incomplete is 
 
 ## 8. Clean up
 
-Run the check once more, with the product checkout configured: it must not report the phase as
-stranded. If it does, follow *A stranded phase* in `${CLAUDE_PLUGIN_ROOT}/docs/two-repositories.md` before doing
-anything else.
+Fetch the product checkout (`git -C <product checkout> fetch origin`), then run the check once
+more, with the product checkout configured: it must not report the phase as stranded, and must
+print no `cannot tell` note for it. If it does either, follow *A stranded phase* in
+`${CLAUDE_PLUGIN_ROOT}/docs/two-repositories.md`, whose first step is to fetch and check again, before doing anything
+else.
 
 Remove both worktrees and both local `agent/<phase-id>` branches, copying any ignored content out
 first. Delete each remote `agent/<phase-id>` branch (`git push origin --delete agent/<phase-id>`)

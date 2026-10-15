@@ -83,12 +83,27 @@ uv run "${CLAUDE_PLUGIN_ROOT}/scripts/cli.py" ready
 **Neither primary checkout's branch is ever switched.** Make the claim in the control primary
 checkout, then move to the worktrees and stay there.
 
-**Pull before anything else.** Before step 1, in the control primary checkout on its integration
-branch, pull the remote integration branch so orientation reads what peers have pushed:
+**Pull before anything else.** Before step 1, bring both primary checkouts up to date so
+orientation reads what peers have pushed. In the control primary checkout, on its integration
+branch, pull the remote integration branch:
 
 ```bash
 git pull --rebase origin <control integration branch>
 ```
+
+Then, when there is a product repository, fetch the product checkout and fast-forward its
+integration branch. Confirm it is on that branch first (`git -C <product checkout> branch
+--show-current`); if it is on another branch, stop and report:
+
+```bash
+git -C <product checkout> fetch origin
+git -C <product checkout> merge --ff-only origin/<product integration branch>
+```
+
+The check in step 1 reads the product checkout, and a checkout that has not fetched a peer's
+product merge cannot confirm that peer's completed phase: it prints `cannot tell` notes. If the
+fast-forward fails, the product primary checkout holds commits origin does not have: stop and
+report it rather than merging or resetting.
 
 A repository with no remote skips every pull, fetch and push in this skill, and uses its local
 integration branch wherever a step below names `origin/<integration branch>`.

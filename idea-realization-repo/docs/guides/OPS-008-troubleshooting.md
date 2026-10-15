@@ -128,9 +128,11 @@ Two rules apply to every entry:
 - **Symptom.** `check.py` (or `paths.py`, `doctor.py`) reports a `root:` that is not this
   repository, or errors about files that are not here.
 - **Cause.** The scripts take the root from `--root`, then `IDEA_REALIZATION_ROOT`, then
-  `CLAUDE_PROJECT_DIR`, then `git rev-parse --show-toplevel`. When this repository sits inside
-  another git repository's working tree, or Claude Code was started in another directory, the
-  later sources resolve to the wrong place.
+  `git rev-parse --show-toplevel` of the directory the command runs in, then `CLAUDE_PROJECT_DIR`
+  (which comes first only when it is a folder inside that working tree and the command runs
+  inside it). When this repository sits inside another git repository's working tree and the
+  command runs outside Claude Code's project directory, or the command runs from another
+  directory, the later sources resolve to the wrong place.
 - **Fix.** Set the root on the one command, from this repository's root:
 
   ```bash

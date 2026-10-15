@@ -46,7 +46,9 @@ jobs:
           IDEA_REALIZATION_ROOT: ${{ github.workspace }}
         run: uv run plugins/idea-realization/scripts/doctor.py
 
-      # No product root is configured in CI, so the product checks are skipped by design.
+      # No product root is configured in CI, so the product checks cannot run here: the reviews
+      # check prints "product_merge ... not checked" for each complete phase, and those lines
+      # do not fail the run.
       - name: Repository check
         env:
           IDEA_REALIZATION_ROOT: ${{ github.workspace }}

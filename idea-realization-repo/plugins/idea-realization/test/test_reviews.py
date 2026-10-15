@@ -119,13 +119,18 @@ def test_a_shadow_or_rejecting_verdict_does_not_complete_a_phase(
 @pytest.fixture
 def two_repos(tmp_path: Path) -> tuple[Path, Path, str, str]:
     """A control folder naming a product checkout whose main has one commit and whose phase
-    branch has one more: (control, product checkout, main commit, branch commit)."""
+    branch has one more: (control, product checkout, main commit, branch commit).
+
+    The checkout's ``origin`` is a bare repository beside it, holding main at the first commit and
+    fetched, so the check can ask ``origin`` where main is without a network."""
     control, checkout = tmp_path / "control", tmp_path / "hack-product"
+    origin = tmp_path / "hack-product.git"
     control.mkdir()
     checkout.mkdir()
     git(control, "init", "-q", "-b", "main")
+    git(tmp_path, "init", "-q", "--bare", "-b", "main", str(origin))
     git(checkout, "init", "-q", "-b", "main")
-    git(checkout, "remote", "add", "origin", "https://forge.example.com/team/hack-product")
+    git(checkout, "remote", "add", "origin", str(origin))
     for message in ("base", "phase work"):
         if message == "phase work":
             git(checkout, "checkout", "-q", "-b", "agent/build-api")
@@ -135,10 +140,11 @@ def two_repos(tmp_path: Path) -> tuple[Path, Path, str, str]:
             message)
     base, tip = git(checkout, "rev-parse", "main"), git(checkout, "rev-parse", "HEAD")
     git(checkout, "checkout", "-q", "main")
+    git(checkout, "push", "-q", "origin", "main")
+    git(checkout, "fetch", "-q", "origin")
     (control / ".idea-realization").mkdir()
     (control / product.RECORD).write_text(
-        "schema_version: 1\nname: hack-product\n"
-        "remote: https://forge.example.com/team/hack-product\nintegration_branch: main\n")
+        f"schema_version: 1\nname: hack-product\nremote: {origin}\nintegration_branch: main\n")
     return control, checkout, base, tip
 
 
@@ -242,6 +248,81 @@ def test_a_refused_product_checkout_is_an_error(two_repos: tuple[Path, Path, str
     control, checkout, _, tip = two_repos
     complete_phase(control, product_merge=tip)
     check(control, stamped(phase="build-api", reviewed_commit=tip))
-    git(checkout, "remote", "set-url", "origin", "https://forge.example.com/team/other")
+    git(checkout, "remote", "set-url", "origin", str(checkout.parent / "other.git"))
     errors = run(control, checkout)
     assert any("product checkout refused" in e for e in errors)
+
+
+def test_a_completion_without_a_checkout_says_it_was_not_checked(
+        two_repos: tuple[Path, Path, str, str], capsys: pytest.CaptureFixture[str]) -> None:
+    """Control CI has no product checkout: a made-up product_merge and verdict cannot be caught
+    there, and the check says so per phase instead of passing silently (workflow-sim M3)."""
+    control, _, _, _ = two_repos
+    made_up = "1" * 40
+    complete_phase(control, product_merge=made_up)
+    assert check(control, stamped(phase="build-api", reviewed_commit=made_up)) == []
+    printed = capsys.readouterr().err
+    assert "reviews: build-api: product_merge " + made_up + " not checked" in printed
+    assert "no product checkout" in printed
+
+
+def peer_merges(checkout: Path, fast_forward: bool) -> str:
+    """A peer merges the phase branch on origin's main; ``checkout`` does not fetch it."""
+    git(checkout, "push", "-q", "origin", "agent/build-api")
+    peer = checkout.parent / "peer"
+    git(checkout.parent, "clone", "-q", git(checkout, "remote", "get-url", "origin"), str(peer))
+    flag = "--ff-only" if fast_forward else "--no-ff"
+    git(peer, "-c", "user.email=b@example.com", "-c", "user.name=b", "merge", "-q", flag,
+        "-m", "Merge agent/build-api", "origin/agent/build-api")
+    git(peer, "push", "-q", "origin", "main")
+    return git(peer, "rev-parse", "HEAD")
+
+
+@pytest.mark.parametrize("fast_forward", [False, True])
+def test_a_checkout_behind_origin_does_not_report_a_peer_merge_as_stranded(
+        two_repos: tuple[Path, Path, str, str], capsys: pytest.CaptureFixture[str],
+        fast_forward: bool) -> None:
+    """A peer's phase merged on origin is not stranded because this checkout has not fetched
+    (workflow-sim M4)."""
+    control, checkout, _, tip = two_repos
+    merge = peer_merges(checkout, fast_forward)
+    complete_phase(control, product_merge=merge)
+    check(control, stamped(phase="build-api", reviewed_commit=tip))
+    capsys.readouterr()
+    errors = run(control, checkout)
+    assert not any("stranded" in e for e in errors), errors
+    assert errors == []
+    if not fast_forward:  # the merge commit is not here, so nothing about it can be read
+        assert "behind origin" in capsys.readouterr().err
+    git(checkout, "fetch", "-q", "origin")
+    assert run(control, checkout) == []
+
+
+def test_a_phase_not_on_origin_is_stranded_even_when_the_checkout_is_behind(
+        two_repos: tuple[Path, Path, str, str]) -> None:
+    """Origin moved on without the phase: the commit is known here and not on origin's main."""
+    control, checkout, _, tip = two_repos
+    peer = checkout.parent / "peer"
+    git(checkout.parent, "clone", "-q", git(checkout, "remote", "get-url", "origin"), str(peer))
+    (peer / "other.txt").write_text("other")
+    git(peer, "add", "-A")
+    git(peer, "-c", "user.email=b@example.com", "-c", "user.name=b", "commit", "-qm", "other")
+    git(peer, "push", "-q", "origin", "main")
+    complete_phase(control, product_merge=tip)
+    check(control, stamped(phase="build-api", reviewed_commit=tip))
+    git(checkout, "fetch", "-q", "origin")
+    assert any("stranded" in e for e in run(control, checkout))
+
+
+def test_an_unreachable_origin_cannot_tell_stranding(
+        two_repos: tuple[Path, Path, str, str], capsys: pytest.CaptureFixture[str]) -> None:
+    control, checkout, _, _ = two_repos
+    complete_phase(control, product_merge="c" * 40)
+    check(control, stamped(phase="build-api", reviewed_commit="c" * 40))
+    origin = Path(git(checkout, "remote", "get-url", "origin"))
+    for path in sorted(origin.rglob("*"), reverse=True):
+        path.unlink() if path.is_file() else path.rmdir()
+    origin.rmdir()
+    capsys.readouterr()
+    assert run(control, checkout) == []
+    assert "cannot tell" in capsys.readouterr().err
