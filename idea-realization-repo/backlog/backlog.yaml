@@ -22,7 +22,8 @@ items:
   - Keep code reservations for one developer's concurrent agents on one machine.
   acceptance:
   - Two developers allocating a plan code offline receive different codes.
-  - The documents check accepts the author-scoped forms and rejects a code without a handle.
+  - The documents check accepts the author-scoped forms and rejects a new code without a handle
+    (codes in the register's legacy list and unscoped governance codes excepted).
   verification:
   - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
   - 'control: uv run plugins/idea-realization/scripts/check.py'
@@ -32,8 +33,14 @@ items:
   - plugins/idea-realization/templates/codes.yaml
   - plugins/idea-realization/schemas/
   - plugins/idea-realization/test/
-  next_action: Read scripts/codes.py's allocation and decide the code form with the owner before changing
-    it.
+  - plugins/idea-realization/scripts/documents.py
+  - plugins/idea-realization/scripts/backlog.py
+  - plugins/idea-realization/scripts/checks/backlog.py
+  - plugins/idea-realization/scripts/plan_check.py
+  - plugins/idea-realization/docs/document-codes.md
+  - plugins/idea-realization/skills/next-code/SKILL.md
+  next_action: Built on branch agent/hackathon-owner-rulings-code (owner chose handle-scoped codes and a
+    legacy list, 2026-10-15); once merged, close this phase through the review gate.
 - id: phase-boot-02
   title: Generated workstream board with a staleness check
   plan: doc-bootstrap-follow-ons
@@ -958,3 +965,29 @@ items:
   deliverables:
   - product:.github/workflows/deploy-sandbox.yml
   next_action: Wait for the owner's decision on PLAN-002's open questions; deploy stays local until then.
+- id: phase-boot-18
+  title: Mark developers who leave the team as departed
+  plan: doc-bootstrap-follow-ons
+  sources: []
+  systems:
+  - sys-pipeline
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-boot-01
+  scope:
+  - Add a departed flag to a developer's owners entry in docs/systems.yaml, so their handle-scoped codes
+    and phase ids stay valid while they can no longer claim or allocate.
+  acceptance:
+  - A departed developer's existing codes and phase ids pass the checks.
+  - A claim or a code allocation by a departed developer is refused.
+  verification:
+  - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - plugins/idea-realization/scripts/
+  - plugins/idea-realization/schemas/
+  - plugins/idea-realization/test/
+  next_action: Read how codes.py and the workstreams check resolve a handle against systems.yaml owners.

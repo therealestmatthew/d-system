@@ -500,8 +500,11 @@ class TargetRepo:
         stamp = self.today.isoformat()
         docs = root / "docs"
         docs.mkdir(parents=True)
-        for name in ("codes.yaml", "systems.yaml"):
-            shutil.copy(PLUGIN_ROOT / "templates" / name, docs / name)
+        shutil.copy(PLUGIN_ROOT / "templates" / "systems.yaml", docs / "systems.yaml")
+        # The fixture's codes carry no handle, so the code register lists them as legacy.
+        register = yaml.safe_load((PLUGIN_ROOT / "templates" / "codes.yaml").read_text())
+        register["legacy"] = ["PLAN" + "-001", "SESS" + f"-{stamp}-01"]
+        (docs / "codes.yaml").write_text(yaml.safe_dump(register, sort_keys=False))
         registry = yaml.safe_load((docs / "systems.yaml").read_text())
         registry["systems"] = [
             {"id": sys_id, "name": sys_id, "domain": "application", "status": "planned",

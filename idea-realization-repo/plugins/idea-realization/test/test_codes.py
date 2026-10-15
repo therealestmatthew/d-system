@@ -26,6 +26,9 @@ def code(series: str, rest: str) -> str:
 
 PLAN_1, PLAN_2, PLAN_3 = code("PLAN", "001"), code("PLAN", "002"), code("PLAN", "003")
 SESS_1 = code("SESS", f"{STAMP}-01")
+ANA, BEN = "ana", "ben"
+#: The registered developers every code check is given.
+TEAM = {ANA, BEN}
 
 
 @pytest.fixture
@@ -220,7 +223,7 @@ CASES: list[tuple[dict[str, Any], str]] = [
 @pytest.mark.parametrize(("documents", "expected"), CASES)
 def test_code_rules_reject(register: dict[str, Any], documents: dict[str, Any],
                            expected: str) -> None:
-    errors = codes.inspect_codes(register, documents)
+    errors = codes.inspect_codes(register, documents, developers=TEAM)
     assert any(expected in error for error in errors), errors
 
 
@@ -228,14 +231,15 @@ def test_a_reserved_or_retired_code_on_a_document_is_rejected(register: dict[str
     documents = {"doc-a": doc(PLAN_1, f"plans/{PLAN_1}-a.md")}
     register["reserved"] = [{"code": PLAN_1, "reason": "planned"}]
     assert any("is reserved; remove the reservation" in e
-               for e in codes.inspect_codes(register, documents))
+               for e in codes.inspect_codes(register, documents, developers=TEAM))
     register["reserved"] = []
     register["retired"] = [{"code": PLAN_1, "reason": "withdrawn"}]
     assert any("is retired and can never be reused" in e
-               for e in codes.inspect_codes(register, documents))
+               for e in codes.inspect_codes(register, documents, developers=TEAM))
 
 
 def test_a_correct_tree_produces_no_code_errors(register: dict[str, Any]) -> None:
+    register["legacy"] = [PLAN_3, code("OPS", "001"), SESS_1]
     documents = {
         "doc-p": doc(PLAN_3, f"plans/{PLAN_3}-set/{PLAN_3}-overview.md"),
         "doc-c": doc(CHILD, f"plans/{PLAN_3}-set/{CHILD}-child.md", parent="doc-p"),
@@ -243,15 +247,16 @@ def test_a_correct_tree_produces_no_code_errors(register: dict[str, Any]) -> Non
                      kind="operation"),
         "doc-s": doc(SESS_1, f"sessions/{SESS_1}-notes.md", kind="session"),
     }
-    assert codes.inspect_codes(register, documents) == []
+    assert codes.inspect_codes(register, documents, developers=TEAM) == []
 
 
 def test_a_child_plan_may_sit_in_an_area_folder(register: dict[str, Any]) -> None:
+    register["legacy"] = [PLAN_3]
     documents = {
         "doc-p": doc(PLAN_3, f"plans/{PLAN_3}-set/{PLAN_3}-overview.md"),
         "doc-c": doc(CHILD, f"plans/{PLAN_3}-set/An Area/{CHILD}-child.md", parent="doc-p"),
     }
-    assert codes.inspect_codes(register, documents) == []
+    assert codes.inspect_codes(register, documents, developers=TEAM) == []
 
 
 # --- The catalog ------------------------------------------------------------------------------
@@ -297,10 +302,6 @@ def test_catalog_is_deterministic(register: dict[str, Any]) -> None:
 # handle, so two developers allocating on separate machines never take the same code. Codes
 # without a handle, written before the change, stay valid.
 
-ANA, BEN = "ana", "ben"
-TEAM = {ANA, BEN}
-
-
 def scoped(series: str, handle: str, rest: str) -> str:
     return code(series, f"{handle}-{rest}")
 
@@ -340,7 +341,8 @@ def test_a_malformed_handle_scoped_code_is_rejected(
 ) -> None:
     assert codes.parse_code(value) is None
     documents = {"doc-a": doc(value, f"plans/{value}-a.md")}
-    assert any(f"malformed code {value}" in e for e in codes.inspect_codes(register, documents))
+    assert any(f"malformed code {value}" in e
+               for e in codes.inspect_codes(register, documents, developers=TEAM))
 
 
 def test_two_developers_allocating_offline_get_different_codes(register: dict[str, Any]) -> None:
@@ -401,6 +403,7 @@ def test_governance_codes_stay_unscoped(register: dict[str, Any]) -> None:
 def test_unscoped_codes_written_before_the_change_still_validate(
     register: dict[str, Any],
 ) -> None:
+    register["legacy"] = [PLAN_3, SESS_1, code("OPS", "001")]
     ana_1 = scoped("PLAN", ANA, "001")
     ana_s = scoped("SESS", ANA, f"{STAMP}-01")
     documents = {
@@ -416,6 +419,7 @@ def test_unscoped_codes_written_before_the_change_still_validate(
 
 
 def test_a_duplicate_is_refused_in_either_form(register: dict[str, Any]) -> None:
+    register["legacy"] = [PLAN_1]
     ana_1 = scoped("PLAN", ANA, "001")
     documents = {
         "doc-a": doc(ana_1, f"plans/{ana_1}-a.md"),
@@ -435,8 +439,6 @@ def test_a_handle_must_be_a_registered_developer(register: dict[str, Any]) -> No
     documents = {"doc-z": doc(zed, f"plans/{zed}-z.md")}
     assert any("handle zed is not a developer" in e
                for e in codes.inspect_codes(register, documents, developers=TEAM))
-    # Without a registry to check against, a well-formed handle is accepted.
-    assert codes.inspect_codes(register, documents) == []
 
 
 def test_a_scoped_filename_and_folder_follow_the_code(register: dict[str, Any]) -> None:
@@ -485,3 +487,74 @@ def test_the_code_patterns_in_the_schemas_accept_both_forms() -> None:
     for pattern in patterns:
         assert all(pattern.match(value) for value in good)
         assert not any(pattern.match(value) for value in bad)
+
+
+# --- Legacy codes and the developer set ------------------------------------------------------
+#
+# A code without a handle in a scoped series is valid only when the register's ``legacy`` list
+# names it (or, for a sub-code, names its parent's code): the codes that existed before the series
+# was scoped. Nothing new without a handle can enter a scoped series. The developer set is always
+# given; an empty set (no registry) refuses every handle.
+
+
+def test_an_unscoped_code_in_a_scoped_series_needs_a_legacy_entry(
+    register: dict[str, Any],
+) -> None:
+    documents = {"doc-a": doc(PLAN_1, f"plans/{PLAN_1}-a.md")}
+    assert any(f"{PLAN_1} carries no developer handle and is not in the register's legacy list"
+               in e for e in codes.inspect_codes(register, documents, developers=TEAM))
+    register["legacy"] = [PLAN_1]
+    assert codes.inspect_codes(register, documents, developers=TEAM) == []
+
+
+def test_a_legacy_parents_sub_codes_need_no_entry_of_their_own(
+    register: dict[str, Any],
+) -> None:
+    register["legacy"] = [PLAN_3]
+    documents = {
+        "doc-p": doc(PLAN_3, f"plans/{PLAN_3}-set/{PLAN_3}-overview.md"),
+        "doc-c": doc(CHILD, f"plans/{PLAN_3}-set/{CHILD}-child.md", parent="doc-p"),
+    }
+    assert codes.inspect_codes(register, documents, developers=TEAM) == []
+    assert codes.next_code("plan", register, documents, parent="doc-p",
+                           handle=ANA) == PLAN_3 + ".02"
+
+
+def test_an_unscoped_series_needs_no_legacy_entry(register: dict[str, Any]) -> None:
+    gov = code("GOV", "004")
+    documents = {"doc-g": doc(gov, f"governance/{gov}-g.md", kind="governance")}
+    assert codes.inspect_codes(register, documents, developers=TEAM) == []
+
+
+@pytest.mark.parametrize(("value", "message"), [
+    ("plan-1", "malformed or names an unknown series"),
+    (code("NOPE", "001"), "malformed or names an unknown series"),
+    (scoped("PLAN", ANA, "001"), "carries a handle"),
+    (code("GOV", "001"), "GOV is unscoped"),
+    (CHILD, "a sub-code"),
+])
+def test_the_register_rejects_a_bad_legacy_entry(
+    register: dict[str, Any], value: str, message: str
+) -> None:
+    register["legacy"] = [value]
+    assert any(f"codes: legacy code {value}" in e and message in e
+               for e in codes.inspect_register(register, KINDS))
+
+
+def test_the_template_register_has_an_empty_legacy_list(register: dict[str, Any]) -> None:
+    assert register["legacy"] == []
+
+
+def test_the_developer_set_is_always_given() -> None:
+    import inspect
+
+    parameter = inspect.signature(codes.inspect_codes).parameters["developers"]
+    assert parameter.default is inspect.Parameter.empty
+    assert "None" not in str(parameter.annotation)
+
+
+def test_no_registry_refuses_every_handle(register: dict[str, Any]) -> None:
+    value = scoped("PLAN", ANA, "001")
+    documents = {"doc-a": doc(value, f"plans/{value}-a.md")}
+    assert any(f"handle {ANA} is not a developer" in e
+               for e in codes.inspect_codes(register, documents, developers=set()))

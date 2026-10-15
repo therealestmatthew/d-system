@@ -37,14 +37,17 @@ def plan_meta(**changes: Any) -> dict[str, Any]:
 
 
 class Repo:
-    """A fixture repository with the template registers under ``docs/``."""
+    """A fixture repository with the template registers under ``docs/``. The codes its documents
+    use carry no handle, so the code register lists them as ``legacy``."""
 
     def __init__(self, root: Path) -> None:
         self.root = root
         self.docs = root / "docs"
         self.docs.mkdir(parents=True)
-        for name in ("codes.yaml", "systems.yaml"):
-            shutil.copy(PLUGIN_ROOT / "templates" / name, self.docs / name)
+        shutil.copy(PLUGIN_ROOT / "templates" / "systems.yaml", self.docs / "systems.yaml")
+        register = yaml.safe_load((PLUGIN_ROOT / "templates" / "codes.yaml").read_text())
+        register["legacy"] = [PLAN_1, PLAN_2, REQ_1, ADR_1]
+        (self.docs / "codes.yaml").write_text(yaml.safe_dump(register, sort_keys=False))
 
     def config(self, **flags: str) -> paths.Config:
         return paths.resolve({"root": str(self.root), **flags}, env={})
@@ -405,3 +408,12 @@ def test_a_skill_runs_nothing_but_its_script(skill: str) -> None:
         assert words[:2] == ["uv", "run"], command
         assert words[2].startswith('"${CLAUDE_PLUGIN_ROOT}/scripts/'), command
         assert not any(w in {">", ">>", "|", "&&", ";", "tee"} for w in words), command
+
+
+def test_a_code_without_a_handle_outside_the_legacy_list_fails(repo: Repo) -> None:
+    register = yaml.safe_load((repo.docs / "codes.yaml").read_text())
+    register["legacy"] = []
+    (repo.docs / "codes.yaml").write_text(yaml.safe_dump(register, sort_keys=False))
+    repo.plan()
+    assert any(f"{PLAN_1} carries no developer handle and is not in the register's legacy list"
+               in e for e in repo.errors())

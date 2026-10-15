@@ -4,8 +4,9 @@ schema_version: 1
 # hand: allocate it with the next-code command.
 # Every series is scoped unless it says scoped: false: a new code carries the allocating
 # developer's handle after the prefix and numbers per handle, so developers on separate
-# machines never take the same code. Codes without a handle stay valid. Governance is
-# unscoped because its rules are the team's, written by the repository owner.
+# machines never take the same code. A code without a handle stays valid only when the legacy
+# list below names it. Governance is unscoped because its rules are the team's, written by the
+# repository owner.
 series:
 - code: PLAN
   kind: plan
@@ -67,3 +68,24 @@ series:
 reserved: []
 # Codes withdrawn from use. Never reissued.
 retired: []
+# Codes without a developer handle in a scoped series, written before the series was scoped.
+# Only these, and sub-codes under them, stay valid without a handle. Nothing new is added here:
+# a new code comes from next-code and carries a handle. An unscoped series (GOV) needs no entry.
+legacy:
+- ADR-001
+- ARCH-001
+- ARCH-002
+- OPS-001
+- OPS-002
+- OPS-003
+- OPS-004
+- OPS-005
+- OPS-006
+- OPS-007
+- OPS-008
+- OPS-009
+- OPS-010
+- PLAN-001
+- PLAN-002
+- PLAN-003
+- REQ-001

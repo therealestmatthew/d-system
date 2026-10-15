@@ -31,6 +31,12 @@ for arg in "$@"; do
 done
 case "$*" in
   "auth status") exit 0 ;;
+  *"/collaborators/"* | "api orgs/"*"/repos/"*)
+    # Repository access: 204 (no output, exit 0) unless the actor is named in $GH_NO_ACCESS.
+    if [ -n "${GH_NO_ACCESS:-}" ] && [[ "$*" == *"$GH_NO_ACCESS"* ]]; then
+      echo "gh: Not Found (HTTP 404)" >&2; exit 1
+    fi
+    exit 0 ;;
   "api users/"*) echo 4242 ;;
   "api orgs/"*) echo 4343 ;;
   *"/branches/"*) exit 0 ;;
@@ -213,3 +219,35 @@ def test_the_main_merger_bypasses_main_through_pull_requests_only(machine: Path)
 def test_no_committed_ruleset_names_a_bypass_actor() -> None:
     for path in sorted((IRR / ".github" / "rulesets").glob("*.json")):
         assert json.loads(path.read_text(encoding="utf-8"))["bypass_actors"] == [], path.name
+
+
+@pytest.mark.parametrize(("merger", "check"), [
+    ("user:outsider", f"api repos/{CONTROL}/collaborators/outsider"),
+    ("team:team-org/strangers", f"api orgs/team-org/teams/strangers/repos/{CONTROL}"),
+])
+def test_a_main_merger_without_access_to_the_repository_is_refused(
+        machine: Path, monkeypatch: pytest.MonkeyPatch, merger: str, check: str) -> None:
+    both_named(machine)
+    monkeypatch.setenv("GH_NO_ACCESS", merger.rsplit("/", 1)[-1].removeprefix("user:"))
+    result = run(CONTROL, "control", merger)
+    assert result.returncode != 0
+    assert "has no access to" in result.stderr
+    calls = gh_calls()
+    assert any(call.startswith(check) for call in calls), calls
+    assert sent_rulesets() == {}, "no ruleset may be sent for an actor without access"
+    assert not any("-X PATCH" in call for call in calls), "the repository must not be changed"
+
+
+@pytest.mark.parametrize(("merger", "check"), [
+    ("user:owner", f"api repos/{CONTROL}/collaborators/owner"),
+    ("team:team-org/owners", f"api orgs/team-org/teams/owners/repos/{CONTROL}"),
+])
+def test_a_main_merger_with_access_to_the_repository_passes(
+        machine: Path, merger: str, check: str) -> None:
+    both_named(machine)
+    result = run(CONTROL, "control", merger)
+    assert result.returncode == 0, result.stdout + result.stderr
+    calls = gh_calls()
+    assert any(call.startswith(check) for call in calls), calls
+    first_send = next(i for i, call in enumerate(calls) if "--input" in call)
+    assert calls.index(next(c for c in calls if c.startswith(check))) < first_send

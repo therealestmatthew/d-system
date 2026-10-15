@@ -12,9 +12,11 @@ A scoped series (every series unless its register entry says ``scoped: false``) 
 allocating developer's handle after the prefix, ``<SERIES>-<handle>-NNN`` or
 ``<SERIES>-<handle>-YYYY-MM-DD-NN``, and numbers per handle, so two developers allocating on
 separate machines, which share no reservation, never take the same code. The handle is the one
-``identity.py`` resolves; allocation in a scoped series refuses without one. Codes without a
-handle, written before a series was scoped, stay valid. In an unscoped series a code carries no
-handle. A sub-code follows its parent's stem, handle included, whoever allocates it.
+``identity.py`` resolves; allocation in a scoped series refuses without one. A code without a
+handle in a scoped series is valid only when the register's ``legacy`` list names it, or names
+its parent for a sub-code: the codes written before the series was scoped. In an unscoped series a
+code carries no handle. A sub-code follows its parent's stem, handle included, whoever allocates
+it.
 
 Run directly, this script is the ``next-code`` command: it scans the document root, then
 allocates the next free code for a kind and holds it with a pre-merge reservation (see
@@ -87,6 +89,11 @@ def series_by_kind(register: dict[str, Any]) -> dict[str, dict[str, Any]]:
 def is_scoped(series: dict[str, Any]) -> bool:
     """Whether new codes in this series carry the allocating developer's handle (default yes)."""
     return bool(series.get("scoped", True))
+
+
+def legacy_codes(register: dict[str, Any]) -> set[str]:
+    """The handle-less codes a scoped series still accepts (the register's ``legacy`` list)."""
+    return set(register.get("legacy", []))
 
 
 def held_codes(register: dict[str, Any]) -> dict[str, str]:
@@ -187,6 +194,20 @@ def inspect_register(register: dict[str, Any], kinds: set[str]) -> list[str]:
         parsed = parse_code(code)
         if not parsed or parsed["series"] not in known:
             errors.append(f"codes: held code {code} is malformed or names an unknown series")
+    scoped_series = {entry["code"]: is_scoped(entry) for entry in series}
+    for code in sorted(legacy_codes(register)):
+        parsed = parse_code(code)
+        if not parsed or parsed["series"] not in known:
+            errors.append(f"codes: legacy code {code} is malformed or names an unknown series")
+        elif parsed["handle"]:
+            errors.append(f"codes: legacy code {code} carries a handle; only a code without one "
+                          "needs a legacy entry")
+        elif not scoped_series[parsed["series"]]:
+            errors.append(f"codes: legacy code {code} needs no entry: {parsed['series']} is "
+                          "unscoped")
+        elif parsed.get("sub") is not None:
+            errors.append(f"codes: legacy code {code} is a sub-code; list its parent's code, "
+                          "which covers every sub-code under it")
     return errors
 
 
@@ -225,16 +246,19 @@ def naming_errors(
 
 
 def inspect_codes(
-    register: dict[str, Any], documents: dict[str, Any], developers: set[str] | None = None
+    register: dict[str, Any], documents: dict[str, Any], developers: set[str]
 ) -> list[str]:
     """Check every document's code against the register, its kind, its path and its parent.
 
     ``developers`` is the set of developer handles (owners with emails in ``systems.yaml``); a
-    code's handle must be one of them. None skips that check, for a tree with no registry.
+    code's handle must be one of them. A tree with no registry passes an empty set, so every code
+    with a handle fails. A code without a handle in a scoped series must be in the register's
+    ``legacy`` list, or be a sub-code whose parent's code is.
     """
     errors: list[str] = []
     series_index = series_by_kind(register)
     held = held_codes(register)
+    legacy = legacy_codes(register)
     seen: dict[str, str] = {}
 
     for key, meta in sorted(documents.items()):
@@ -261,9 +285,12 @@ def inspect_codes(
             continue
         if parsed["handle"] and not is_scoped(series):
             errors.append(f"{path}: {series['code']} codes carry no handle, not {code}")
-        elif parsed["handle"] and developers is not None and parsed["handle"] not in developers:
+        elif parsed["handle"] and parsed["handle"] not in developers:
             errors.append(f"{path}: handle {parsed['handle']} is not a developer (an owner with "
                           "emails) in systems.yaml")
+        elif not parsed["handle"] and is_scoped(series) and parsed["stem"] not in legacy:
+            errors.append(f"{path}: {code} carries no developer handle and is not in the "
+                          "register's legacy list; allocate a new code with next-code")
         if code in seen:
             errors.append(f"{path}: duplicate code {code}, already held by {seen[code]}")
         seen[code] = path

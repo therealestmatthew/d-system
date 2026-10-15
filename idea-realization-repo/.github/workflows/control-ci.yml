@@ -22,7 +22,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      # persist-credentials is off: no later step uses git credentials for this repository (the
+      # only network git call, the reviews check's ls-remote, goes to the product checkout), so
+      # the job token is not left in the checkout's git config.
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - uses: astral-sh/setup-uv@v10.3.0
         with:

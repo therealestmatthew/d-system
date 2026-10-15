@@ -29,7 +29,9 @@
 # repository or the reverse. It reads `control_github` or `product_github` (as <org>/<repo>), or,
 # when that is unset, the GitHub repository in `control_remote` or `product_remote`, through the
 # plugin's scripts/paths.py: .idea-realization/local.yaml or IDEA_REALIZATION_<KEY>. The
-# comparison ignores case, as GitHub does. It refuses when the value is unset or differs.
+# comparison ignores case, as GitHub does. It refuses when the value is unset or differs. It then
+# refuses a <main-merger> that has no access to <owner/repo> (a user who is not a collaborator, a
+# team the repository is not shared with), before it changes any setting or sends any ruleset.
 #
 # The repository owner runs this by hand, with `gh` signed in as an account that administers the
 # repository. Nothing runs it automatically. It is idempotent: a ruleset whose name already exists
@@ -113,6 +115,23 @@ else
   actor_id="$(gh api "orgs/${actor_ref%%/*}/teams/${actor_ref#*/}" --jq .id)" \
     || { echo "error: team '$actor_ref' not found (it must belong to the organization)" >&2; exit 1; }
 fi
+# The bypass goes only to an actor that already has access to the repository, so a mistyped login
+# or the wrong team cannot be granted it. GitHub answers 204 for access and 404 for none:
+#   user  GET repos/<owner>/<repo>/collaborators/<login>   (outside collaborators, members with
+#         direct, team or base-permission access, and organization owners count)
+#   team  GET orgs/<org>/teams/<team-slug>/repos/<owner>/<repo>
+if [ "$actor_type" = User ]; then
+  access_call="repos/$repo/collaborators/$actor_ref"
+else
+  access_call="orgs/${actor_ref%%/*}/teams/${actor_ref#*/}/repos/$repo"
+fi
+if ! access_error="$(gh api "$access_call" --silent 2>&1)"; then
+  echo "error: $actor_type '$actor_ref' has no access to $repo (gh api $access_call: ${access_error:-no answer})." >&2
+  echo "       Refusing: the main merger must already be a collaborator on, or a team with access to," >&2
+  echo "       the repository. Check the spelling, or grant access first. Nothing was changed on GitHub." >&2
+  exit 1
+fi
+
 echo "main merger: $actor_type $actor_ref (id $actor_id), bypass mode pull_request on main, always on demo-* tag creation"
 
 # The default branch can only point at a branch that exists.

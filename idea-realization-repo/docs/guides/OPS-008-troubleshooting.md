@@ -231,6 +231,19 @@ Two rules apply to every entry:
 
   Source: `docs/guides/OPS-001-branching-and-ci.md`, section 7.
 
+### `apply_rulesets.sh` says the main merger has no access
+
+- **Symptom.** `tools/github/apply_rulesets.sh` stops with
+  `error: User '<login>' has no access to <org>/<repo>` (or `Team '<org>/<team-slug>'`), and says
+  nothing was changed on GitHub.
+- **Cause.** The script gives the bypass on `main` and on `demo-*` tag creation only to an actor
+  that already has access to the repository. GitHub answered 404 to the access check: the user is
+  not a collaborator, the team does not have the repository, or the name is misspelled.
+- **Fix.** Check the third argument's spelling. If it is right, grant the account or team access to
+  the repository first (a team needs at least write access), then run the script again.
+
+  Source: `docs/guides/OPS-001-branching-and-ci.md`, section 9.
+
 ### A merge into `main` is refused
 
 - **Symptom.** A pull request from `dev` to `main` cannot be merged, or a push to `main` is

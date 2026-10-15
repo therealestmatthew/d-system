@@ -287,6 +287,15 @@ for `product` (or, when those are unset, the GitHub repository in `control_remot
 `product_remote`). It refuses when the value is unset or differs, so the control rulesets cannot be
 applied to the product repository or the reverse.
 
+It then checks that the main merger (the third argument) already has access to that repository,
+and refuses before it changes any setting or sends any ruleset when it does not. For
+`user:<login>` it calls `gh api repos/<org>/<repo>/collaborators/<login>`, which GitHub answers
+with 204 for a collaborator (outside collaborators, organization members with direct, team or
+base-permission access, and organization owners) and 404 otherwise. For `team:<org>/<team-slug>`
+it calls `gh api orgs/<org>/teams/<team-slug>/repos/<org>/<repo>`, which answers 204 when the team
+has access and 404 when it does not. This stops a mistyped login, or the wrong team, from being
+given the bypass on `main` and on `demo-*` tag creation.
+
 The script needs `gh` signed in as an administrator of the repository. It is safe to run again: a
 ruleset whose name already exists on the repository is updated in place, otherwise it is created.
 It prints each action it took.

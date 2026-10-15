@@ -239,9 +239,11 @@ A scoped series (every series unless its register entry says ``scoped: false``) 
 allocating developer's handle after the prefix, ``<SERIES>-<handle>-NNN`` or
 ``<SERIES>-<handle>-YYYY-MM-DD-NN``, and numbers per handle, so two developers allocating on
 separate machines, which share no reservation, never take the same code. The handle is the one
-``identity.py`` resolves; allocation in a scoped series refuses without one. Codes without a
-handle, written before a series was scoped, stay valid. In an unscoped series a code carries no
-handle. A sub-code follows its parent's stem, handle included, whoever allocates it.
+``identity.py`` resolves; allocation in a scoped series refuses without one. A code without a
+handle in a scoped series is valid only when the register's ``legacy`` list names it, or names
+its parent for a sub-code: the codes written before the series was scoped. In an unscoped series a
+code carries no handle. A sub-code follows its parent's stem, handle included, whoever allocates
+it.
 
 Run directly, this script is the ``next-code`` command: it scans the document root, then
 allocates the next free code for a kind and holds it with a pre-merge reservation (see

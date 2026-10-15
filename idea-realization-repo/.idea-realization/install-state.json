@@ -3,7 +3,7 @@
   "plugin": "idea-realization",
   "plugin_version": "0.1.0",
   "installed_at": "2026-10-14T23:06:45Z",
-  "updated_at": "2026-10-15T14:36:09Z",
+  "updated_at": "2026-10-15T15:00:25Z",
   "features": [
     "backlog",
     "brain",
@@ -108,7 +108,7 @@
     },
     {
       "path": ".idea-realization/schemas/codes.schema.json",
-      "sha256": "a1fea00ca5ae11201a19d4062d07e85723c35917ea84b10c00f62ca36e5f80e0",
+      "sha256": "47ff0b46ba13d96222e3b8b33c08e9db8f70890aac703153425b894513e2a878",
       "feature": "documents",
       "owner": "plugin"
     },

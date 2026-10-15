@@ -32,7 +32,7 @@ the `check` command regenerates it in memory and fails on any difference.
 
 | Code | Plan | Status | Queued | Active | Complete | Agents |
 |---|---|---|---|---|---|---|
-| PLAN-001 | doc-bootstrap-follow-ons | approved | 17 | 0 | 0 | — |
+| PLAN-001 | doc-bootstrap-follow-ons | approved | 18 | 0 | 0 | — |
 | PLAN-002 | doc-ci-deploy-to-aws | draft | 1 | 0 | 0 | — |
 | PLAN-003 | doc-ux-kit-plan | draft | 15 | 0 | 0 | — |
 

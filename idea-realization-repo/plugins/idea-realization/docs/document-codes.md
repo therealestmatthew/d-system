@@ -12,7 +12,8 @@ allocates from them.
   locations.
 - The register has one series per kind, with no duplicate prefix or kind, and every kind covered.
   A dated series never allows sub-codes. A held code is never both reserved and retired, and is
-  well-formed in a known series.
+  well-formed in a known series. A `legacy` entry is a well-formed top-level code without a handle
+  in a known, scoped series.
 - A document fails the check if its kind has no series, its code belongs to another series, or its
   code uses the wrong numbering.
 
@@ -37,11 +38,16 @@ The default register (`templates/codes.yaml`), with locations relative to the do
   unscoped one, optionally with a sub-code `.NN`.
 - A dated code reads `<SERIES>-<handle>-YYYY-MM-DD-NN` in a scoped series and
   `<SERIES>-YYYY-MM-DD-NN` in an unscoped one, and its date equals the document's `created`.
-- A code without a handle in a scoped series was allocated before the series was scoped. It stays
-  valid and permanent (section 5). A code with a handle in an unscoped series fails.
-- A code's handle must be a developer: an `owners` key with `emails` in `systems.yaml`. A
-  developer who leaves the team keeps that entry, or every code carrying their handle fails the
-  check.
+- A code without a handle in a scoped series is valid only when the register's `legacy` list names
+  it, or, for a sub-code, names its parent's code. The list holds the codes allocated before the
+  series was scoped; they stay valid and permanent (section 5). Nothing new is added to it: a new
+  code comes from `next-code` and carries a handle, so a code without a handle that is not listed
+  fails. An unscoped series needs no `legacy` entry. A code with a handle in an unscoped series
+  fails.
+- A code's handle must be a developer: an `owners` key with `emails` in `systems.yaml`. Without a
+  `systems.yaml`, or with no owner that lists emails, there are no developers and every code with a
+  handle fails. A developer who leaves the team keeps that entry, or every code carrying their
+  handle fails the check.
 - `GOV` is unscoped because a governance document states a rule for the whole team, written by
   the repository owner, so its code names no individual. Two `GOV` allocations on separate
   machines can still collide; the duplicate check finds it and the second to integrate renumbers.
@@ -63,8 +69,10 @@ The default register (`templates/codes.yaml`), with locations relative to the do
 - A dated code takes today's date and the highest same-day sequence for the same handle plus one,
   and takes no parent.
 - Two developers on separate machines therefore never allocate the same top-level code in a scoped
-  series. Two sub-codes under one parent, or two codes in an unscoped series, allocated on separate
-  machines can still be the same; the second to integrate renumbers (section 5).
+  series. Two sub-codes under one parent, allocated on two machines, can be the same code: the
+  sub-code keeps the parent's stem, and the machines share no reservation. The duplicate check
+  catches it when the second branch merges, and whoever integrates second renumbers (section 5).
+  Two codes in an unscoped series allocated on separate machines can collide the same way.
 - Allocation takes the code: computing it and holding it are one operation from a peer's point of
   view.
 - Allocation runs only on a clean document tree. On failure nothing is reserved.

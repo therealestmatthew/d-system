@@ -365,9 +365,10 @@ the checks and the review; never merge an unreviewed head.
 - **`backlog.yaml` conflicts are normal**: two agents edited different phases in one file. Keep
   both sides: the peer's phases verbatim and your own phase's edits. Never resolve this file with
   `--ours` or `--theirs`; either one silently deletes a peer's work.
-- **A duplicate document code** means a peer on another machine took the same number. Codes are
-  free before merge and permanent after, so whoever integrates second renumbers: allocate again,
-  rename the file and update every reference.
+- **A duplicate document code** now arises only for a governance code, two sub-codes under one
+  plan, or one developer allocating on two machines, because codes carry the allocating developer's
+  handle. Codes are free before merge and permanent after, so whoever integrates second renumbers:
+  allocate again, rename the file and update every reference.
 - **A source conflict between two phases** means their declared `systems` or `deliverables` were
   wrong. Stop, do not force the merge, and report it; the declarations are fixed before either
   phase completes.

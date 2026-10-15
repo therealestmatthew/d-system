@@ -84,7 +84,7 @@
           },
           "scoped": {
             "type": "boolean",
-            "description": "Whether new codes carry the allocating developer's handle after the prefix and number per handle. Defaults to true. Codes without a handle stay valid in a scoped series; an unscoped series refuses a code with one."
+            "description": "Whether new codes carry the allocating developer's handle after the prefix and number per handle. Defaults to true. In a scoped series a code without a handle is valid only when the legacy list names it or its parent; an unscoped series refuses a code with one."
           }
         }
       }
@@ -103,6 +103,17 @@
       "description": "Codes withdrawn from use; never reissued to another document.",
       "items": {
         "$ref": "#/definitions/ledgerEntry"
+      }
+    },
+    "legacy": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Codes without a developer handle in a scoped series, written before the series was scoped. Only these, and sub-codes under them, stay valid without a handle; nothing new joins the list. Optional; absent means empty.",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "description": "A top-level code without a handle in a scoped series.",
+        "pattern": "^[A-Z]+-(?:[0-9]{3}|[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2})$"
       }
     }
   },
