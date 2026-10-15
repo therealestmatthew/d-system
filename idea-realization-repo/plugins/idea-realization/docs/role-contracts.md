@@ -17,12 +17,13 @@ No contract grants an agent an owner-reserved decision. The reserved decisions a
 - partition acceptance;
 - plan approval (the plan-approval gate);
 - ranking `next_up` and all cross-track priority (`backlog-protocol.md`, section 4);
-- integration onto the integration branch (`protocol.md`, section 12);
+- merging the integration branch into the release branch (`main`) for a release;
 - edits to the agent instruction files (`protocol.md`, section 3);
 - anything in the confidential directory (`protocol.md`, section 10).
 
 Phase completion is not a role's decision: it follows the three completion conditions of
-`backlog-protocol.md` section 10.
+`backlog-protocol.md` section 10. A merge of a phase branch into the integration branch is not an
+owner-reserved decision: a passing gating review approves it (`protocol.md`, section 12).
 
 Every "proposes" in a contract names a proposal waiting for the owner's gate, never the decision
 itself. A role never describes its own output as accepted, approved or ratified.

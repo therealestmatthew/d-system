@@ -188,8 +188,8 @@ exits 0 before any hand-off.
 
 - Every session works in its own worktree on its own branch, whatever the work touches, and the
   primary checkout's branch is never switched. The only work in the primary checkout is the claim
-  commit plus the catalog regeneration it forces, committed together; recording ideas; the
-  fast-forward that integrates a branch; and the completion edit that follows it
+  commit plus the catalog regeneration it forces, committed together; recording ideas; a local
+  merge in a repository with no remote; and the completion edit that follows a merge
   (`backlog-protocol.md`, section 10).
   While sessions run under `multi-session.md`, its turn purposes are the complete list.
 - The branch is `agent/<phase-id>` and the worktree is `<worktree directory>/<phase-id>`. The
@@ -212,16 +212,18 @@ The `session-start` skill carries these steps.
 
 ## 12. Integration
 
-- Integration onto the integration branch needs the owner's explicit yes for every phase. A green
-  branch is ready to integrate, not cleared to.
+- A branch reaches the integration branch through a pull request merged with a merge commit. In a
+  repository with no remote, the same merge is made locally with `git merge --no-ff`.
+- A passing gating review approves the merge. No separate per-merge approval is asked for. A green
+  branch without a passing review is not cleared to merge.
 - A branch qualifies for integration only when the check and the tests pass after rebasing onto
-  the current integration branch. A red rebase is never integrated.
-- Before every fast-forward the primary checkout is confirmed clean (`backlog-protocol.md`,
-  section 11).
-- Integration is a fast-forward made from the primary checkout. A non-fast-forward means rebase
-  again and re-run the check, never a merge commit.
+  the current remote integration branch. A red rebase is never integrated.
+- The merge is pinned to the reviewed commit (`gh pr merge --merge --match-head-commit`), and after
+  it the merge commit's second parent is confirmed to be that commit.
+- Bookkeeping commits (claims, completion edits, ideas, workstream claims) go directly onto the
+  control integration branch and are pushed immediately; they never go through a pull request.
+- Before every commit or local merge in the primary checkout, the checkout is confirmed clean
+  (`backlog-protocol.md`, section 11).
 - After integration the worktree is removed and the branch deleted.
-- Without the owner's yes the branch stays unmerged and is reported ready for review, with
-  `git diff <integration branch>..agent/<phase-id>`.
 - A branch that fails after rebase is fixed on that branch against the current integration branch.
-  A peer's commit is never reverted.
+  A peer's commit is never reverted, and neither is a merge that passed its gating review.

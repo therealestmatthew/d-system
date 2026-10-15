@@ -100,9 +100,11 @@ illustrative. Source ids stay stable when a file moves.
 - The owner is asked before a claim is committed. An unanswered question is not a yes.
 - A claim is one commit on the integration branch in the primary checkout. It holds this phase's
   `status: active` and `agent`, the backlog `updated` set to today, and the regenerated catalog,
-  and nothing else. It is pushed before work begins.
-- The primary checkout is brought up to date by a fast-forward pull and never switched. If it is
-  not on the integration branch, the session stops and reports it.
+  and nothing else. It goes directly onto the integration branch, not through a pull request, and
+  is pushed immediately, before work begins.
+- Before any work the primary checkout pulls the remote integration branch
+  (`git pull --rebase origin <integration branch>`), and it is never switched. If it is not on the
+  integration branch, the session stops and reports it.
 - The check runs before the claim is committed. It rejects overlap with an active peer's systems,
   deliverables or dependency chain, and a full `max_active`. A rejection means choosing different
   work, never waiting.
@@ -162,9 +164,11 @@ The `session-start` skill carries these steps.
   1. every verification command ran green, and its real output is in the session record;
   2. an independent adversarial review of the diff against the phase's acceptance ran, and every
      finding is fixed or explicitly accepted by the owner;
-  3. the branch is integrated onto the integration branch with the owner's approval.
-- The completion edit is one small commit on the integration branch right after integration,
-  together with the regenerated catalog.
+  3. the branch is merged into the integration branch through a pull request with a merge commit
+     (with `git merge --no-ff` in a repository with no remote), after that review passed. The
+     passing review is the approval for the merge; no separate per-merge approval is asked for.
+- The completion edit is one small commit made directly on the integration branch right after the
+  merge, together with the regenerated catalog, and pushed immediately.
 - The review runs in a fresh agent that does not share the session's context, never a fork. It
   receives the phase's scope, acceptance and verification, the diff range and the record. Its
   findings are recorded verbatim, each with its disposition.
@@ -182,9 +186,9 @@ The `session-start` skill carries these steps.
 ## 11. Hand-off
 
 - In the worktree, in this order: run verification, write the session record, rebase onto the
-  integration branch and re-run the check and the tests, confirm the primary checkout is clean,
-  ask the owner.
-- Before every fast-forward onto the integration branch the primary checkout is confirmed clean.
+  remote integration branch and re-run the check and the tests, run the gating review, then merge
+  through `session-close`.
+- Before every commit or merge made in the primary checkout the primary checkout is confirmed clean.
   A peer's uncommitted work is never stashed or forced around; it is reported and waited on.
 - An interrupted phase returns to queued with an exact `next_action`, clearing `agent`, `session`,
   `completion_evidence` and `result`, or goes to blocked with a reason. Its worktree is removed so

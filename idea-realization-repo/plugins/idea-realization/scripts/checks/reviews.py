@@ -7,14 +7,21 @@ unique.
 
 It also ties completion to review. A phase with ``status: complete`` needs a record for it with
 ``verdict: pass`` and ``gating: true``. When a product repository is set up, the phase must also
-name its ``product_merge``, that record must have judged exactly that commit, and, where this
-machine has a verified product checkout, the commit must be on the product integration branch: a
-phase recorded complete whose product merge never landed is stranded, and is reported as such.
+name its ``product_merge``, and that record must have judged the commit the merge brought in:
+``product_merge`` itself when the branch was fast-forwarded (a repository with no remote, or an
+older record), or the merge commit's second parent when a pull request was merged with a merge
+commit. Where this machine has a verified product checkout, the commit must also be on the product
+integration branch: a phase recorded complete whose product merge never landed is stranded, and is
+reported as such.
+
+Without a product checkout on this machine a merge commit's parents cannot be read, so a
+``product_merge`` that no verdict names directly is left unchecked there, as landing is.
 """
 
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -26,6 +33,7 @@ from jsonschema import Draft7Validator, FormatChecker
 
 SCHEMA = paths.PLUGIN_ROOT / "schemas" / "review-verdict.schema.json"
 DIRECTORY = "reviews"
+COMMIT = re.compile(r"[0-9a-f]{40}")
 
 
 def record_errors(path: Path, schema: dict[str, object]) -> tuple[list[str], dict[str, Any]]:
@@ -73,6 +81,20 @@ def on_integration_branch(root: Path, commit: str, branch: str) -> bool:
     return False
 
 
+def known_commit(root: Path, commit: str) -> bool:
+    """Whether the product checkout holds ``commit``."""
+    return subprocess.run(["git", "-C", str(root), "cat-file", "-e", f"{commit}^{{commit}}"],
+                          capture_output=True, text=True, check=False).returncode == 0
+
+
+def second_parent(root: Path, commit: str) -> str | None:
+    """The second parent of a merge commit, or None for a commit with one parent."""
+    found = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "-q",
+                            f"{commit}^2^{{commit}}"],
+                           capture_output=True, text=True, check=False)
+    return found.stdout.strip() if found.returncode == 0 else None
+
+
 def completion_errors(config: paths.Config, records: list[dict[str, Any]]) -> list[str]:
     """Every complete phase that no passing gating review supports."""
     two_repositories = product.read_record(config.root) is not None
@@ -93,16 +115,28 @@ def completion_errors(config: paths.Config, records: list[dict[str, Any]]) -> li
         if not merge:
             errors.append(f"{key}: complete without product_merge, the product commit it merged as")
             continue
-        if not any(record["repository"] == "product" and record["reviewed_commit"] == merge
-                   for record in passing):
+        if not isinstance(merge, str) or not COMMIT.fullmatch(merge):
+            errors.append(f"{key}: product_merge {merge!r} is not a full commit id")
+            continue
+        reviewed = {record["reviewed_commit"] for record in passing
+                    if record["repository"] == "product"}
+        if not reviewed:
             errors.append(f"{key}: no passing gating verdict judged its product_merge {merge}")
             continue
-        if product_root is not None:
-            branch = product.load(config).integration_branch
-            if not on_integration_branch(product_root, merge, branch):
-                errors.append(f"{key}: stranded: recorded complete, but its product_merge {merge} "
-                              f"is not on the product branch {branch} (see "
-                              "docs/two-repositories.md, A stranded phase)")
+        if product_root is None:
+            continue
+        branch = product.load(config).integration_branch
+        stranded = (f"{key}: stranded: recorded complete, but its product_merge {merge} is not on "
+                    f"the product branch {branch} (see docs/two-repositories.md, A stranded phase)")
+        if not known_commit(product_root, merge):
+            errors.append(stranded)
+            continue
+        if merge not in reviewed and second_parent(product_root, merge) not in reviewed:
+            errors.append(f"{key}: no passing gating verdict judged its product_merge {merge} "
+                          "(fast-forward) or that merge commit's second parent")
+            continue
+        if not on_integration_branch(product_root, merge, branch):
+            errors.append(stranded)
     return errors
 
 

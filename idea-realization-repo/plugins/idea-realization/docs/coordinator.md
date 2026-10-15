@@ -23,9 +23,10 @@ governing text, not from memory:
   complete during the run accumulates claims and stalls at `max_active`.
 - When units cannot be completed during the run, a batch holds at most `max_active` units, all
   mutually non-colliding and dependency-independent.
-- The first design question is whether the coordinator can finish anything. Completion needs the
-  owner's yes at integration for every unit. The design secures that or plans for hand-off; it
-  never assumes an authority nobody granted.
+- The first design question is whether the coordinator can finish anything. Completion needs a
+  passing gating review for every unit, and that review is the approval for the unit's merges
+  (`protocol.md`, section 12). The design runs the review and the merges for each unit or plans for
+  hand-off; it never assumes an authority nobody granted.
 
 ## 3. Partitioning
 

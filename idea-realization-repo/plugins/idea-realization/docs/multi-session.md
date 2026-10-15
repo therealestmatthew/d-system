@@ -24,7 +24,7 @@ phases.
 
 | Role | Kind | Claim slots | Does |
 |---|---|---|---|
-| Session Manager | meta | none | Holds the primary-checkout lock, allocates claim slots, relays merges to the owner, keeps the board |
+| Session Manager | meta | none | Holds the primary-checkout lock, allocates claim slots, serializes merges through the merge gate, keeps the board |
 | Ideation | meta | none | Records ideas; triages open ideas the owner names when none are waiting |
 | Prompt Planner | meta | none | Writes the prompts the owner runs in execution sessions |
 | Batch Runner | execution | one at a time | Runs the coordinator through its batches one phase at a time (`coordinator.md`, `batches.md`) |
@@ -96,7 +96,9 @@ branch still passes after peers' merges.
 
 ## 6. The merge gate
 
-- A branch reaches the integration branch only with the owner's approval, relayed as below.
+- A branch reaches the integration branch on a passing gating review, which is the approval for
+  its merges (`protocol.md`, section 12). The merge gate serializes merges and re-checks the gate;
+  it adds no per-merge owner approval.
 - `READY` carries the phase's review verdict, with every finding fixed or accepted by the owner, and
   the tail of the session's post-rebase gate runs.
 - The gate is the check, the repository's tests, and every further gate the repository's working
@@ -104,18 +106,18 @@ branch still passes after peers' merges.
 - The Session Manager re-runs the gate on the branch tip in a detached temporary worktree,
   `<worktree directory>/verify-<phase-id>`, and removes it afterwards. It touches neither the
   primary checkout nor the session's worktree.
-- The Session Manager brings the owner both sets of gate results and
-  `git diff --stat <integration branch>..<branch>`.
-- On the owner's yes, the Session Manager sends `GRANTED merge`. It is the owner's approval for
-  every session, and it hands the session the lock.
+- The Session Manager records both sets of gate results and
+  `git diff --stat origin/<integration branch>..<branch>` on the board.
+- When both are clean, the Session Manager sends `GRANTED merge`, which hands the session the lock.
 - If the integration branch moved since the re-run, the session rebases, re-runs the gate while
   holding the lock and reports the new tip. The Session Manager re-runs the gate again before the
-  fast-forward. Nothing else lands while the lock is held.
-- Before the fast-forward, the primary checkout is confirmed clean (`backlog-protocol.md`, section
-  11).
-- In the same turn the session fast-forwards, makes the completion edit through the `session-close`
-  skill with the catalog regenerated in the same commit, runs the check on the integration branch
-  (no tests), and sends `TURN DONE`.
+  merge. Nothing else lands while the lock is held.
+- Before the completion edit, the primary checkout is confirmed clean (`backlog-protocol.md`,
+  section 11).
+- In the same turn the session merges through the `session-close` skill (pull requests merged with
+  merge commits, or `git merge --no-ff` with no remote), makes the completion edit directly on the
+  integration branch with the catalog regenerated in the same commit, runs the check on the
+  integration branch (no tests), pushes, and sends `TURN DONE`.
 - After a merge lands, the Session Manager sends `REBASE` to every session with an open branch.
 - A failing commit hook is never bypassed. The session commits the fix. If the hook itself is wrong,
   the session stops and reports to the Session Manager and the owner.

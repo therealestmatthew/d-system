@@ -67,13 +67,14 @@ Roster
 4. MERGE: send READY <branch> with (a) the phase's review verdict, every finding fixed or
    accepted by the owner, and (b) the tail of the post-rebase gate runs: the plugin's check,
    the repository's tests, and <further gates>. Every gate reports clean; matching an earlier
-   count is not enough. The owner approves every merge; I relay, and a GRANTED merge from me is
-   the owner's approval. Merge only after GRANTED merge. Inside that turn: (i) if
+   count is not enough. The passing gating review is the approval for the merge; GRANTED merge
+   from me hands you the lock. Merge only after GRANTED merge. Inside that turn: (i) if
    <integration branch> moved, rebase, re-run the whole gate, report the new tip and wait for my
    go; (ii) in every case, confirm `git status --short` in the primary checkout shows nothing, and
-   continue only if it does; (iii) fast-forward, make the completion edit on <integration branch>
-   through the session-close skill, with the catalog regenerated and committed in the same
-   commit, run the plugin's check (no tests), and send TURN DONE <sha(s)>.
+   continue only if it does; (iii) merge through the session-close skill (pull requests merged
+   with merge commits), make the completion edit directly on <integration branch> through the
+   same skill, with the catalog regenerated and committed in the same commit, run the plugin's
+   check (no tests), push, and send TURN DONE <sha(s)>.
 5. After any merge onto <integration branch> I send REBASE. Rebase onto it at your next safe
    point.
 6. BLOCKED <reason> when stuck outside your worktree. FREE when you have no assignment.
@@ -98,14 +99,14 @@ Keep running the coordinator (the plugin's docs/coordinator.md) on the batch the
 Its batches run one phase at a time, so they fit one slot.
 
 Changes to how the coordinator runs:
-- Its claim, catalog and fast-forward steps in the primary checkout go through TURN? / TURN DONE.
+- Its claim, catalog and merge steps go through TURN? / TURN DONE.
 - Its preflight tests run in the phase worktree, never the primary checkout (contract item 9).
-- Its "ask the owner before integrating" step goes through READY to me. I relay to the owner and
-  return GRANTED merge, which is the owner's approval.
+- Its merge step goes through READY to me. Its passing gating review is the approval; I re-run the
+  gate and return GRANTED merge, which hands you the lock.
 - Before you open the next batch, send NEXT-BATCH <batch id> so I can check slots against the
   builders first.
 - Its post-rebase run and merge follow contract item 4: the whole gate, and the clean-checkout
-  confirmation before the fast-forward.
+  confirmation before the completion edit.
 
 In your ACK include: your agent id, the phase you hold, its worktree, and the step you are on.
 ```
@@ -130,7 +131,7 @@ On ASSIGN:
 4. Run the session-close skill up to and including its independent review, fix every finding or
    have the owner accept it, and send READY. The phase stays active: session-close cannot complete
    it before the merge.
-5. On GRANTED merge, follow contract item 4: clean-checkout confirmation, fast-forward, then the
+5. On GRANTED merge, follow contract item 4: clean-checkout confirmation, the merge, then the
    completion edit through the session-close skill, with the catalog regenerated and committed
    with it, then the plugin's check (no tests). Send TURN DONE, remove your worktree and branch,
    then send FREE.
@@ -207,7 +208,7 @@ ROLE: <Prompt Planner>. You write the prompts the owner runs in the execution se
 nothing.
 
 Work in a worktree (agent/prompt-<slug>). A prompt committed as a prompt document merges like any
-branch: READY -> the owner approves through me -> GRANTED merge.
+branch: its review passes -> READY -> I re-run the gate -> GRANTED merge.
 
 When a prompt is meant for a specific execution session, tell me: PROMPT-FOR <session> <one line on
 what it does>. I check it against that session's role, claim slot and the primary-checkout lock

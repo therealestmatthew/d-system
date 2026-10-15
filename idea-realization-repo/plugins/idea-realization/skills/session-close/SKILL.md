@@ -24,10 +24,11 @@ phase to `status: complete` when, and only when, **all three** of these hold:
 2. **A gating review passed.** A dedicated reviewer agent that did not share this session's context
    judged the diff against the phase's `acceptance` and returned `pass`, and every finding is fixed
    or explicitly accepted by the developer who owns the workstream, with the disposition recorded.
-3. **The branches are integrated.** The control branch is fast-forwarded into the control
-   integration branch with the completion record, then the product branch into the product
-   integration branch, after that pass. **A passing gating review is the approval for both merges**; no separate per-merge
-   approval is asked for.
+3. **The branches are integrated.** After that pass, the control pull request (the session and
+   review records) and then the product pull request were merged into their integration branches
+   with merge commits (in a repository with no GitHub remote, `git merge --no-ff` locally), and
+   the product merge commit's second parent is the reviewed commit. **A passing gating review is
+   the approval for both merges**; no separate per-merge approval is asked for.
 
 Where any one is unmet, the phase stays `active` (or `queued`, if handed off unfinished): say
 plainly that the session looks done, run `checkpoint` to record where it stands, and stop. The
@@ -70,8 +71,7 @@ Run every step of the `checkpoint` skill now, against the current state, so `## 
 ## 2. Rebase both branches and run the verification
 
 1. In the product worktree: `git fetch` and `git rebase origin/<product integration branch>`.
-2. In the control worktree: `git rebase <control integration branch>` after pulling it in the
-   control primary checkout.
+2. In the control worktree: `git fetch` and `git rebase origin/<control integration branch>`.
 3. Run every command in the phase's `verification` list and keep the real output. A command runs in
    the product worktree unless it starts with `control:`, which runs the rest in the control
    worktree. A failing check is a result to record, not a step to retry until quiet.
@@ -91,7 +91,7 @@ prompt:
   unclaimed session: the instruction as given, the self-declared conditions, and a plain statement
   that the session being reviewed wrote them);
 - the product worktree path and the range `origin/<product integration branch>...HEAD` there, and
-  the control worktree path and `<control integration branch>...HEAD` there, with instructions to
+  the control worktree path and `origin/<control integration branch>...HEAD` there, with instructions to
   run `git diff` and `git log` on each itself;
 - the paths of the requirement and plan documents the phase names, in the control worktree;
 - the step 2 output, as evidence it may re-run but must not take on trust;
@@ -129,35 +129,129 @@ record's path, and each disposition. Commit the record and the session record on
 
 Write these as narrative someone could read in six months, not as a restatement of the scope.
 
-## 6. Prepare the product merge — locally, not pushed
+## 6. Merge both branches — only on a passing verdict
 
-Only on a passing verdict. Confirm each primary checkout is clean (`git -C <checkout> status
---short` shows nothing). Never stash a peer's uncommitted work and never force an integration
-around it. In the product primary checkout, on its integration branch:
+Only on a passing verdict, and only when the product worktree's `HEAD`
+(`git -C <product worktree> rev-parse HEAD`) still equals the verdict's `reviewed_commit`. If it
+does not, the branch gained a commit after the review: go back to step 2.
+
+**Which path applies.** Each repository is merged through a GitHub pull request when its `origin`
+is a GitHub repository that `gh` can reach: `gh repo view --json nameWithOwner` succeeds when run
+in that repository's worktree. A repository with no GitHub remote (a test repository, local-only
+use) uses the local fallback at the end of this step instead. Say in the session record which path
+each repository took.
+
+Every `gh` command below runs inside the worktree it names, so `gh` resolves the repository from
+that worktree's `origin`.
+
+### 6a. Push both branches and open the pull requests
 
 ```bash
-git -C <product checkout> pull --ff-only
-git -C <product checkout> merge --ff-only agent/<phase-id>
-git -C <product checkout> rev-parse HEAD
+git -C <control worktree> push --force-with-lease -u origin agent/<phase-id>
+git -C <product worktree> push --force-with-lease -u origin agent/<phase-id>
 ```
 
-**Do not push yet.** The printed commit must equal the verdict's `reviewed_commit`; that is the
-**product merge**. If the merge is not a fast-forward, or the commit differs, the product
-integration branch moved or the branch gained a commit after the review: reset the product
-checkout to its upstream (`git -C <product checkout> reset --hard @{u}`, which discards only this
-local merge), go back to step 2, rebase, re-run the verification and review the new `HEAD`.
+`--force-with-lease` is needed only because step 2 rebased a branch you may have pushed before; it
+applies to your own `agent/<phase-id>` branch and never to an integration branch.
 
-## 7. Record completion in the control repository first — the only step that may write `status: complete`
+In each worktree, reuse the open pull request for `agent/<phase-id>` if there is one
+(`gh pr view agent/<phase-id> --json number,state,headRefOid`), and otherwise open one against
+that repository's integration branch:
 
-The control record goes first, so product code never lands without one. Only if **all three**
-conditions hold, on the control branch in the control worktree: set the phase's
-`status: complete`, with `session`, `completion_evidence` (files that exist; product files written
-`product:<path>`), `product_merge` (the full product merge commit from step 6) and `result` (the
-actual verification and review outcome), and remove it from `next_up`. Update the record's
-`## Backlog` to match. The check refuses a complete phase without a passing gating verdict whose
-`reviewed_commit` equals its `product_merge`.
+```bash
+gh pr create --base <control integration branch> --head agent/<phase-id> \
+  --title "<phase-id>: <phase title>" --body "<session record code>; verdict <verdict record path>"
+gh pr create --base <product integration branch> --head agent/<phase-id> \
+  --title "<phase-id>: <phase title>" --body "<session record code>; verdict <verdict record path>"
+```
 
-Regenerate the catalog and run the check in the control worktree:
+The first runs in the control worktree, the second in the product worktree. Keep both pull request
+numbers.
+
+### 6b. Merge the control pull request
+
+The control pull request carries the session record and the verdict records. Merge it with a merge
+commit, pinned to the commit you pushed:
+
+```bash
+gh pr merge <control pr> --merge --match-head-commit "$(git -C <control worktree> rev-parse HEAD)"
+```
+
+`--match-head-commit` makes GitHub refuse the merge if the branch head moved after you pushed it.
+The phase is still `active`: this merge records the review, it does not complete the phase.
+
+### 6c. Merge the product pull request
+
+When `product.yaml` names a `ci_workflow` other than `none`, wait for the required check (the
+`verify` job) to finish and pass first:
+
+```bash
+gh pr checks <product pr> --watch --required --fail-fast
+```
+
+A non-zero exit means the required check failed or is missing: do not merge. Fix the cause on the
+branch, which changes the product diff, and go back to step 2 for a fresh review. Then merge,
+pinned to the reviewed commit:
+
+```bash
+gh pr merge <product pr> --merge --match-head-commit <reviewed_commit>
+```
+
+If GitHub refuses the merge (the head moved, the check failed, or the branch conflicts with the
+integration branch), nothing landed in the product repository. Go back to step 2: rebase, re-run
+the verification and review the new `HEAD`; the new review records reach the control repository
+through a new control pull request.
+
+### 6d. Confirm the product merge
+
+```bash
+gh pr view <product pr> --json mergeCommit --jq .mergeCommit.oid
+git -C <product worktree> fetch origin
+git -C <product worktree> rev-parse <merge commit>^2
+git -C <product worktree> merge-base --is-ancestor <merge commit> origin/<product integration branch>
+```
+
+The second parent must equal the verdict's `reviewed_commit`, and the merge commit must be on the
+product integration branch. Together they show that the pull request head, the merge commit's
+second parent and the reviewed commit are one commit. The merge commit is the **product merge**.
+If either test fails, stop and report it; do not record completion.
+
+### Local fallback: a repository with no GitHub remote
+
+For each repository without a GitHub remote, in place of 6a to 6d for that repository: confirm its
+primary checkout is clean (`git -C <checkout> status --short` shows nothing; never stash a peer's
+uncommitted work and never force an integration around it) and is on its integration branch, then:
+
+```bash
+git -C <checkout> pull --rebase                   # only when the branch has an upstream
+git -C <checkout> merge --no-ff -m "Merge agent/<phase-id>" agent/<phase-id>
+git -C <checkout> rev-parse HEAD HEAD^2
+git -C <checkout> push                            # only when the branch has an upstream
+```
+
+Merge the control repository first, then the product repository. In the product repository,
+`HEAD^2` must equal the verdict's `reviewed_commit`; `HEAD` is the **product merge**. If the merge
+conflicts, abort it (`git -C <checkout> merge --abort`) and go back to step 2.
+
+## 7. Record completion directly on the control integration branch — the only step that may write `status: complete`
+
+The completion record is bookkeeping, so it goes straight onto the control integration branch in
+the control primary checkout, not through a pull request. Only if **all three** conditions hold:
+confirm the control primary checkout is clean and on its integration branch, bring it up to date,
+and edit the backlog there:
+
+```bash
+git pull --rebase
+```
+
+Set the phase's `status: complete`, with `session`, `completion_evidence` (files that exist;
+product files written `product:<path>`), `product_merge` (the full product merge commit from step
+6) and `result` (the actual verification and review outcome), and remove it from `next_up`. Update
+the session record's `## Backlog` to match in the same commit. The check refuses a complete phase
+without a passing gating verdict whose `reviewed_commit` equals its `product_merge` or that merge
+commit's second parent.
+
+Regenerate the catalog and run the check, with the product checkout configured:
 
 ```bash
 CLAUDE_PLUGIN_OPTION_DOCS_ROOT='${user_config.docs_root}' \
@@ -169,39 +263,39 @@ CLAUDE_PLUGIN_OPTION_BACKLOG_PATH='${user_config.backlog_path}' \
 CLAUDE_PLUGIN_OPTION_DOCS_ROOT='${user_config.docs_root}' \
 CLAUDE_PLUGIN_OPTION_EXEMPT_FILES='${user_config.exempt_files}' \
 CLAUDE_PLUGIN_OPTION_INTEGRATION_BRANCH='${user_config.integration_branch}' \
+CLAUDE_PLUGIN_OPTION_PRODUCT_ROOT='${user_config.product_root}' \
 uv run "${CLAUDE_PLUGIN_ROOT}/scripts/check.py"
 ```
 
-Commit the completion edit and the catalog together on the control branch, then, from the control
-primary checkout on its integration branch:
+Commit the completion edit and the catalog together in one commit that changes nothing else, then
+push it at once:
 
 ```bash
-git pull --ff-only
-git merge --ff-only agent/<phase-id>
+git pull --rebase
 git push
 ```
 
-If the control merge is not a fast-forward, rebase the control branch, regenerate the catalog, run
-the check and try again. If the control push fails, stop: nothing has reached the product
-repository yet, so reset the local product merge (`git -C <product checkout> reset --hard @{u}`)
-and report it.
+If the pull brought in a peer's commit, regenerate the catalog and run the check again before the
+push. If the push is rejected, repeat the pull, regenerate, check and push. A backlog conflict in
+the rebase is resolved as `session-start` describes: keep both sides.
+
+**The product merge has already landed, so it is never reverted.** Until the completion commit
+lands, the phase stays `active` with its code merged; follow *A merged phase without its completion
+record* in `docs/two-repositories.md` if the push keeps failing.
 
 An unclaimed session completes nothing, however clean its review: there is no phase line to write.
 If any condition does not hold, the phase stays open with a `next_action` that names exactly what
 remains, including anything the review surfaced. Closing honestly incomplete is a correct outcome.
 
-## 8. Push the product merge, then clean up
+## 8. Clean up
 
-```bash
-git -C <product checkout> push
-```
+Run the check once more, with the product checkout configured: it must not report the phase as
+stranded. If it does, follow *A stranded phase* in `docs/two-repositories.md` before doing
+anything else.
 
-Then run the check again with the product checkout configured: it must not report the phase as
-stranded. **If the product push is rejected**, the control repository now records a merge that has
-not landed, and the check reports the phase as stranded. Follow *A stranded phase* in
-`docs/two-repositories.md` before doing anything else.
-
-Remove both worktrees and both `agent/<phase-id>` branches, copying any ignored content out first.
+Remove both worktrees and both local `agent/<phase-id>` branches, copying any ignored content out
+first. Delete each remote `agent/<phase-id>` branch (`git push origin --delete agent/<phase-id>`)
+unless the repository already deletes merged pull request branches.
 
 ## 9. Report
 

@@ -21,7 +21,7 @@ every machine:
 schema_version: 1
 name: <product name>
 remote: <git URL of the product repository>
-integration_branch: main
+integration_branch: dev
 ci_workflow: none
 ```
 
@@ -41,20 +41,36 @@ Without `product_root`, everything that only reads or writes the control reposit
 ideas, plans, the backlog, the checks. Anything that needs the product checkout says it is not
 configured and stops.
 
+## Branches
+
+Both repositories have the same branches and names.
+
+| Branch | Holds | How work reaches it |
+|---|---|---|
+| `main` | released work | a pull request from `dev`, merged with a merge commit, per release |
+| `dev` | the integration branch (`integration_branch` in `product.yaml` and in the control repository's configuration) | feature branches through a pull request merged with a merge commit; in the control repository, bookkeeping commits directly |
+| `agent/<phase-id>` | one claimed phase; the same name in both repositories | cut from `origin/dev`, merged by `session-close` |
+| `agent/<handle>-<slug>` | owner-directed work with no phase | cut from `origin/dev`, merged the same way |
+
+Bookkeeping commits go directly onto control `dev`, never through a pull request: claim commits,
+completion commits, idea commits and workstream claims. Pull `origin dev` before any work, and push
+a bookkeeping commit as soon as it is made, so peers see it.
+
 ## Where each step happens
 
 | Step | Repository | Where |
 |---|---|---|
 | Ideas, triage, partition, plans, requirements, decisions | control | as usual |
-| The backlog, the claim commit, the catalog | control | primary checkout, control integration branch |
+| The backlog, the claim commit, the catalog | control | primary checkout, control integration branch, pushed at once |
 | The phase's code, tests and verification commands | product | `agent/<phase-id>` in `<product worktree dir>/<phase-id>` |
 | The session record, checkpoints, review verdict records | control | the paired `agent/<phase-id>` in `<worktree dir>/<phase-id>` |
 | The gating review | both | judges the product diff against the control documents |
-| The product merge, prepared | product | fast-forwarded locally, not yet pushed |
-| The completion record | control | on the control branch, merged and pushed first |
-| The product push | product | after the control push |
+| The control merge | control | pull request from `agent/<phase-id>` into the integration branch, merged with a merge commit |
+| The product merge | product | pull request from `agent/<phase-id>`, merged with a merge commit after the required check passes; its second parent must be the reviewed commit |
+| The completion record | control | one commit directly on the control integration branch, after the product merge, pushed at once |
 
-The `session-start` and `session-close` skills carry out these steps in order.
+The `session-start` and `session-close` skills carry out these steps in order. A repository with no
+GitHub remote makes the same merges locally with `git merge --no-ff`.
 
 ## Paths in a phase
 
@@ -84,22 +100,34 @@ A passing gating review approves the product merge and the control merge that ca
 phase's records. There is no separate per-merge approval. The owner keeps every decision the
 backlog protocol reserves, such as accepting plans and ranking the queue.
 
+## A merged phase without its completion record
+
+`session-close` merges the product pull request before it writes the completion record, so the one
+state a failed close can leave behind is product code merged on the product integration branch
+while the control repository still records the phase `active`. Nothing is wrong with the merged
+code: it passed the gating review, which is the approval.
+
+Recover it by landing the completion commit, never by undoing the merge:
+
+1. In the control primary checkout, `git pull --rebase`, regenerate the catalog, run the check, and
+   `git push`. Repeat until the push lands. A backlog conflict keeps both sides.
+2. The completion commit names the merge commit as `product_merge`. Read it from the pull request
+   (`gh pr view <n> --json mergeCommit`) if the session that merged it has ended.
+3. **Never revert the product merge** to make the two repositories agree. Until the completion
+   commit lands, the phase stays `active` and its claim stays held.
+
 ## A stranded phase
 
-`session-close` pushes the control record before the product merge, so product code never lands
-without a record. The one state that can be left behind is the reverse: the control repository
-records a phase complete with a `product_merge` that is not on the product integration branch,
-because the product push failed. The check reports it as `stranded` wherever a product checkout is
+The reverse state is a phase recorded `complete` whose `product_merge` is not on the product
+integration branch. `session-close` does not produce it, because it records completion only after
+the merge landed; it means the completion record was written by hand, or the product integration
+branch lost the commit. The check reports it as `stranded` wherever a product checkout is
 configured.
 
-Recover it in this order:
+Reopen the phase in the control repository: set it back to `active` with a `next_action` naming the
+stranded merge, and remove its `product_merge`, in one commit directly on the control integration
+branch. Then rebase the product branch, run the verification, review the new `HEAD`, and close the
+session again.
 
-1. If the product checkout still holds the prepared merge (`git -C <product checkout> log -1`
-   shows the `product_merge` commit) and the integration branch has not moved, push it. The check
-   then reports nothing.
-2. Otherwise, reopen the phase in the control repository: set it back to `active` with a
-   `next_action` naming the stranded merge, and remove its `product_merge`, in one commit. Then
-   rebase the product branch, run the verification, review the new `HEAD`, and close the session
-   again.
-
-Never edit `product_merge` to a commit the recorded verdict did not judge.
+Never edit `product_merge` to a commit the recorded verdict did not judge: it is the commit the
+verdict judged (a fast-forward) or a merge commit whose second parent is that commit.

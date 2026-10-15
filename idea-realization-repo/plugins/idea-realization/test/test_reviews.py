@@ -151,10 +151,79 @@ def test_two_repositories_need_the_product_merge(two_repos: tuple[Path, Path, st
 
 def test_the_verdict_must_have_judged_the_merged_commit(
         two_repos: tuple[Path, Path, str, str]) -> None:
-    control, _, base, tip = two_repos
+    control, checkout, base, tip = two_repos
     complete_phase(control, product_merge=tip)
-    errors = check(control, stamped(phase="build-api", reviewed_commit=base))
+    check(control, stamped(phase="build-api", reviewed_commit=base))
+    assert any("judged its product_merge" in e for e in run(control, checkout))
+
+
+def test_a_phase_needs_a_passing_product_verdict(two_repos: tuple[Path, Path, str, str]) -> None:
+    control, _, _, tip = two_repos
+    complete_phase(control, product_merge=tip)
+    errors = check(control, stamped(phase="build-api", repository="control", reviewed_commit=tip))
     assert any("judged its product_merge" in e for e in errors)
+
+
+def test_product_merge_must_be_a_full_commit_id(two_repos: tuple[Path, Path, str, str]) -> None:
+    control, _, _, tip = two_repos
+    complete_phase(control, product_merge="--" + tip[:10])
+    errors = check(control, stamped(phase="build-api", reviewed_commit=tip))
+    assert any("is not a full commit id" in e for e in errors)
+
+
+def merge_commit(checkout: Path) -> str:
+    """Merge the phase branch into main with a merge commit, as a pull request merge does."""
+    git(checkout, "-c", "user.email=a@example.com", "-c", "user.name=a", "merge", "-q", "--no-ff",
+        "-m", "Merge agent/build-api", "agent/build-api")
+    return git(checkout, "rev-parse", "HEAD")
+
+
+def test_a_merge_commit_whose_second_parent_was_reviewed_is_clean(
+        two_repos: tuple[Path, Path, str, str]) -> None:
+    control, checkout, _, tip = two_repos
+    merge = merge_commit(checkout)
+    assert merge != tip
+    complete_phase(control, product_merge=merge)
+    check(control, stamped(phase="build-api", reviewed_commit=tip))
+    assert run(control, checkout) == []
+
+
+def test_a_merge_commit_whose_second_parent_was_not_reviewed_fails(
+        two_repos: tuple[Path, Path, str, str]) -> None:
+    control, checkout, base, _ = two_repos
+    merge = merge_commit(checkout)
+    complete_phase(control, product_merge=merge)
+    check(control, stamped(phase="build-api", reviewed_commit=base))  # the first parent
+    errors = run(control, checkout)
+    assert any("judged its product_merge" in e and "second parent" in e for e in errors)
+
+
+def test_a_merge_commit_is_unchecked_without_a_checkout(
+        two_repos: tuple[Path, Path, str, str]) -> None:
+    """Without a product checkout on this machine a merge commit's parents cannot be read."""
+    control, checkout, base, _ = two_repos
+    merge = merge_commit(checkout)
+    complete_phase(control, product_merge=merge)
+    assert check(control, stamped(phase="build-api", reviewed_commit=base)) == []
+
+
+def test_an_unmerged_merge_commit_is_stranded(two_repos: tuple[Path, Path, str, str]) -> None:
+    """A merge commit made on a side branch, never on the integration branch, is stranded."""
+    control, checkout, _, tip = two_repos
+    git(checkout, "checkout", "-q", "-b", "side")
+    merge = merge_commit(checkout)
+    git(checkout, "checkout", "-q", "main")
+    complete_phase(control, product_merge=merge)
+    check(control, stamped(phase="build-api", reviewed_commit=tip))
+    assert any("stranded" in e for e in run(control, checkout))
+
+
+def test_a_product_merge_unknown_to_the_checkout_is_stranded(
+        two_repos: tuple[Path, Path, str, str]) -> None:
+    control, checkout, _, _ = two_repos
+    complete_phase(control, product_merge="c" * 40)
+    check(control, stamped(phase="build-api", reviewed_commit="c" * 40))
+    assert any("stranded" in e for e in run(control, checkout))
 
 
 def test_a_complete_phase_whose_merge_never_landed_is_stranded(

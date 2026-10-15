@@ -83,6 +83,16 @@ uv run "${CLAUDE_PLUGIN_ROOT}/scripts/cli.py" ready
 **Neither primary checkout's branch is ever switched.** Make the claim in the control primary
 checkout, then move to the worktrees and stay there.
 
+**Pull before anything else.** Before step 1, in the control primary checkout on its integration
+branch, pull the remote integration branch so orientation reads what peers have pushed:
+
+```bash
+git pull --rebase origin <control integration branch>
+```
+
+A repository with no remote skips every pull, fetch and push in this skill, and uses its local
+integration branch wherever a step below names `origin/<integration branch>`.
+
 ## 1. Orient — run the `backlog` skill
 
 Run the `backlog` skill, naming the phase if one was given. It runs the check, shows the queue,
@@ -121,7 +131,7 @@ Only once the answer is yes. Confirm the control primary checkout is on its inte
 bring it up to date:
 
 ```bash
-git pull --ff-only
+git pull --rebase origin <control integration branch>
 ```
 
 In the backlog, edit **only this phase's lines**: `status: active` and
@@ -143,25 +153,35 @@ another developer's workstream without that developer's recorded approval. **Tha
 answer, not an obstacle**: choose a different phase.
 
 Commit the claim and the regenerated catalog together, in one commit that changes nothing else,
-and push it. If the push is rejected as non-fast-forward, `git pull --rebase`, re-run the check,
-and confirm the claim is still safe: a peer claimed in between, and its systems may now collide.
+directly on the control integration branch (a claim is bookkeeping and takes no pull request), and
+push it immediately, before cutting any branch. If the push is rejected as non-fast-forward,
+`git pull --rebase`, re-run the check, and confirm the claim is still safe: a peer claimed in
+between, and its systems may now collide.
 
 ## 4. Cut the branches and the worktrees
+
+Both branches are cut from the remote integration branch, `origin/<integration branch>`, so they
+start from what peers have merged on the remote rather than from a local copy that may lag it.
 
 **Product repository**, from its primary checkout on the product integration branch (confirm with
 `git -C <product checkout> branch --show-current`; if it is on another branch, stop and report):
 
 ```bash
-git -C <product checkout> pull --ff-only
-git -C <product checkout> worktree add -b agent/<phase-id> \
-  <product worktree directory>/<phase-id> <product integration branch>
+git -C <product checkout> fetch origin
+git -C <product checkout> worktree add --no-track -b agent/<phase-id> \
+  <product worktree directory>/<phase-id> origin/<product integration branch>
 ```
 
-**Control repository**, from its primary checkout on the up-to-date control integration branch:
+**Control repository**, from its primary checkout, after the claim push:
 
 ```bash
-git worktree add -b agent/<phase-id> <control worktree directory>/<phase-id> <control integration branch>
+git fetch origin
+git worktree add --no-track -b agent/<phase-id> \
+  <control worktree directory>/<phase-id> origin/<control integration branch>
 ```
+
+`--no-track` keeps the new branch from tracking the integration branch, so a plain `git push` from
+the worktree can never push to it; `session-close` pushes `agent/<phase-id>` by name.
 
 - Both branches are `agent/<phase-id>`, one in each repository. Both worktree directories sit
   beside their repositories, never inside them, so no test or scanner walks a second copy.
@@ -191,7 +211,7 @@ worktree must be copied out by hand before the worktree is removed.
 - In the backlog, touch only this phase's lines and the catalog's `updated`.
 - Commit narrow diffs, one concern per commit, each on its own repository's `agent/<phase-id>`.
 - **Rebase onto each integration branch, never merge it in**, whenever a peer integrates, not only
-  at the end.
+  at the end: `git fetch origin`, then `git rebase origin/<integration branch>` in each worktree.
 - Pushing either `agent/<phase-id>` needs no approval; backing up your own work is not publishing.
 - Record progress with the `checkpoint` skill as often as useful. It writes in the control worktree
   and never marks a phase complete.
