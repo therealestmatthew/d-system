@@ -21,6 +21,7 @@ the `check` command regenerates it in memory and fails on any difference.
 | OPS-007 | operation | draft | repository-owner | docs/guides/OPS-007-cost-guardrails.md |
 | OPS-008 | operation | draft | repository-owner | docs/guides/OPS-008-troubleshooting.md |
 | OPS-009 | operation | draft | repository-owner | docs/guides/OPS-009-mode-cheat-sheets.md |
+| OPS-010 | operation | draft | repository-owner | docs/guides/OPS-010-day-one-prompts.md |
 | PLAN-001 | plan | approved | repository-owner | docs/plans/PLAN-001-bootstrap-follow-ons.md |
 | PLAN-002 | plan | draft | repository-owner | docs/plans/PLAN-002-ci-deploy-to-aws.md |
 | PLAN-003 | plan | draft | repository-owner | docs/plans/PLAN-003-ux-component-kit.md |
@@ -40,4 +41,4 @@ the `check` command regenerates it in memory and fails on any difference.
 |---|---|---|
 | — | — | — |
 
-18 documents — adr: 1, architecture: 2, governance: 2, operation: 9, plan: 3, requirement: 1.
+19 documents — adr: 1, architecture: 2, governance: 2, operation: 10, plan: 3, requirement: 1.

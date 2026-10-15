@@ -225,7 +225,7 @@ Then run `/idea-realization:start` and choose a mode:
 | Implementing | Claim one phase, build it, verify it, merge it | `docs/guides/OPS-003-implementing-mode.md` |
 | Validating | Review a plan, a peer's branch, infrastructure or spend; change nothing | `docs/guides/OPS-004-validating-mode.md` |
 
-The one-page versions are in `docs/guides/OPS-009-mode-cheat-sheets.md`.
+The one-page versions are in `docs/guides/OPS-009-mode-cheat-sheets.md`; prompts to paste for each mode are in `docs/guides/OPS-010-day-one-prompts.md`.
 
 ## 6. Your first phase, end to end
 
@@ -298,7 +298,7 @@ phase, record learnings in the brain, push every branch). The table is in `OPS-0
 | `backlog/backlog.yaml` | Phases, one session each; on `dev` it is also the lock table |
 | `backlog/batches.yaml` | Owner-approved, ordered batches of phases grouped into stages |
 | `docs/` | Governed documents: `plans/`, `requirements/`, `decisions/`, `architecture/`, `governance/`, `sessions/`, `prompts/`, plus `codes.yaml`, `systems.yaml`, `workstreams.yaml` and the generated `catalog.md` |
-| `docs/guides/` | The operating guides (`OPS-001` to `OPS-009`): branching and CI, the three modes, team workflow, demo day, cost, troubleshooting, cheat sheets |
+| `docs/guides/` | The operating guides (`OPS-001` to `OPS-010`): branching and CI, the three modes, team workflow, demo day, cost, troubleshooting, cheat sheets, day-one prompts |
 | `docs/reviews/` | Review verdict records |
 | `brain/` | The team's shared memory: decisions, research, concepts, entities, learnings |
 | `.claude/agents/` | The planner, the review-gate agents and the AWS agents |

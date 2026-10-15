@@ -16,7 +16,7 @@ depends_on: []
 
 One page per mode: the skills, agents and commands in the order they are used, one line each. The
 full procedure for each mode is in its guide: planning (`OPS-002`), implementing (`OPS-003`),
-validating (`OPS-004`). Where this page and a guide differ, the guide wins.
+validating (`OPS-004`). Where this page and a guide differ, the guide wins. Prompts to paste for each mode are in `OPS-010`.
 
 **Entry point for every mode: `/idea-realization:start`.** It asks which mode you are in and points to that mode's
 first step.
