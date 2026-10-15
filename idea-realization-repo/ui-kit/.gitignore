@@ -1,5 +1,5 @@
-# The built CSS is committed so Python generators can inline it without Node; the d-system
-# root ignores every dist/, so re-include this one.
+# The built CSS is committed so Python generators can inline it without Node. A parent
+# .gitignore may ignore every dist/, so re-include this one.
 !dist/
 node_modules/
 playground-dist/

@@ -2,7 +2,7 @@
   ui-kit design tokens. GENERATED: do not edit by hand.
 
   Source:     ui-kit/tokens/tokens.json (ui-kit design tokens 0.1.0)
-  sha256:     0d1e872adc630b359eb552c6b59392a4665c52a6179d067a19d8416354922945
+  sha256:     e38e3765ad1e05f11ace33f6a77d64f7282e2edc111488da244bbc7197e953ea
   Regenerate: uv run python ui-kit/tools/build_tokens.py
   Check:      uv run python ui-kit/tools/build_tokens.py --check
 
