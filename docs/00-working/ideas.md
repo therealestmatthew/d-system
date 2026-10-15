@@ -29477,3 +29477,13 @@ From Session 1 - Builder A, 2026-10-14.
 port the plugin changes made in idea-realization-repo/plugins/idea-realization/ on agent/idea-realization-team-kit (PR merge-commit flow, local.yaml config, doctor edited/stale classes, batch check, start skill, templates) back to d-system's own plugins/idea-realization/ copy, or decide the two copies diverge on purpose.
 
 From Session 2 - Builder B, 2026-10-14.
+
+---
+
+## 000707 · test_the_cli_refuses_an_unknown_phase_id fails in pull-request CI because a PR checkout has no local dev branch
+
+**Created 2026-10-15T00:36:45-04:00 · Status: `open`**
+
+test/test_run_review_checks.py::test_the_cli_refuses_an_unknown_phase_id fails in pull-request CI runs ("refused: dev does not resolve") because a PR checkout has no local dev branch; it passes on dev pushes. Make the test (or run_review_checks' backlog ref) work in a PR checkout. Seen on draft PR #4, run 38680738298.
+
+From Session 3 - Standby Builder, 2026-10-15.
