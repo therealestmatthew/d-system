@@ -29409,3 +29409,17 @@ Owner, 2026-10-14; relayed by Session Manager.
 **Links**
 
 - relates_to → `000698`
+
+---
+
+## 000701 · Hackathon repo: build out the second brain functionality for the idea realization repo
+
+**Created 2026-10-14T20:16:46-04:00 · Status: `open`**
+
+"we need to make sure the second brain functionality is built out for the hackathon idea realization repo too"
+
+Context relayed by Session Manager: not yet accounted for in the hackathon control repository (000698). d-system's brain/ (concepts, decisions, entities, procedures, index), docs/05-memories and tools/load_context.py were stripped as personal, and PLAN-001's 14 phases include no knowledge store or retrieval.
+
+Owner's scope ruling (2026-10-14, in the Session Manager session, relayed): contents are decisions + research, concepts + glossary, entities, and session learnings; retrieval is markdown + a loader; built before copy-out; team-shared.
+
+Owner, 2026-10-14; relayed by Session Manager.
