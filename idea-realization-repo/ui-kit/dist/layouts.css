@@ -9,6 +9,7 @@
   layout.css stacks the regions in one column.
   Layouts:
     dashboard: Dashboard: header, main, status strip
+    examiner: Examiner workbench: screen nav, case and findings, decision inspector, run dock
     focus: Focus: header and main
     ide: Workbench: nav, main, inspector, dock
 */
@@ -25,6 +26,22 @@
   .ui-shell[data-layout="dashboard"] > [data-region="header"] { grid-area: header; }
   .ui-shell[data-layout="dashboard"] > [data-region="main"] { grid-area: main; }
   .ui-shell[data-layout="dashboard"] > [data-region="strip"] { grid-area: strip; }
+
+  .ui-shell[data-layout="examiner"] {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 4fr) minmax(0, 1.8fr);
+    grid-template-rows: auto minmax(0, 4fr) minmax(0, 1fr) auto;
+    grid-template-areas:
+      "header header header"
+      "nav main inspector"
+      "nav dock inspector"
+      "strip strip strip";
+  }
+  .ui-shell[data-layout="examiner"] > [data-region="header"] { grid-area: header; }
+  .ui-shell[data-layout="examiner"] > [data-region="nav"] { grid-area: nav; }
+  .ui-shell[data-layout="examiner"] > [data-region="main"] { grid-area: main; }
+  .ui-shell[data-layout="examiner"] > [data-region="inspector"] { grid-area: inspector; }
+  .ui-shell[data-layout="examiner"] > [data-region="dock"] { grid-area: dock; }
+  .ui-shell[data-layout="examiner"] > [data-region="strip"] { grid-area: strip; }
 
   .ui-shell[data-layout="focus"] {
     grid-template-columns: minmax(0, 1fr);

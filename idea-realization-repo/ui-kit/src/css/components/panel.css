@@ -12,7 +12,12 @@
 
   The body scrolls (or, for terminal, ticker and chart, clips and lets its content manage
   itself); the page never does. Collapsed hides the body with display:none and maximized
-  repositions the panel, so neither state remounts the panel's content.
+  repositions the panel, so neither state remounts the panel's content. React collapses the body
+  with the hidden attribute; base.css keeps [hidden] at display: none !important, so no rule here
+  can show a hidden body.
+
+  Below 1100x800 the frame takes the compact density tokens that dist/tokens.css applies to the
+  shell; there are no compact rules in this file.
 */
 
 .ui-panel {
@@ -43,7 +48,7 @@
   flex: 0 0 auto;
   align-items: center;
   gap: var(--ui-space-2);
-  min-block-size: calc(var(--ui-ctl-sm) + 2 * var(--ui-space-2));
+  min-block-size: var(--ui-ctl-md);
   padding-block: var(--ui-space-1);
   padding-inline: var(--ui-space-3) var(--ui-space-2);
   border-block-end: 1px solid var(--ui-color-line);
@@ -193,26 +198,6 @@
 
 .ui-panel[data-state="maximized"] > .ui-panel__header {
   background: var(--ui-color-surface);
-}
-
-/* Compact shell below 1100x800: the frame steps down to the next token. */
-@media (width < 68.75em), (height < 50em) {
-  .ui-panel__header {
-    min-block-size: calc(var(--ui-ctl-sm) + 2 * var(--ui-space-1));
-    padding-inline: var(--ui-space-2) var(--ui-space-1);
-  }
-
-  .ui-panel__title {
-    font-size: var(--ui-fs-sm);
-  }
-
-  .ui-panel__body:is([data-body="document"], [data-body="form"]) {
-    padding: var(--ui-space-3);
-  }
-
-  .ui-panel__body[data-body="chart"] {
-    padding: var(--ui-space-2);
-  }
 }
 
 /* Stacked shell below 1024px wide: panels take their content height and the page scrolls; a

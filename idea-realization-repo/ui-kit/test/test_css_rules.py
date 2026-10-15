@@ -185,6 +185,17 @@ def test_no_state_classes(path: Path) -> None:
     assert not bad, f"{path.name}: state expressed as a class (use ARIA/data attributes): {bad}"
 
 
+def test_hidden_attribute_always_wins() -> None:
+    """React collapses a panel body with the hidden attribute. base.css pins [hidden] to
+    display: none !important, and no other rule may raise display to !important over it."""
+    base = _strip((SRC / "base.css").read_text(encoding="utf-8"))
+    assert re.search(r"(^|\})\s*\[hidden\]\s*\{\s*display:\s*none\s*!important;?\s*\}", base)
+    for path in CSS_FILES:
+        for prop, value in _sheet(path).declarations:
+            if prop == "display" and "!important" in value:
+                assert path.name == "base.css" and value.startswith("none"), (path.name, value)
+
+
 # ---- the linter itself ----
 
 

@@ -20,7 +20,15 @@ The generated sheet has these blocks, always in this order:
     :root[data-theme="dark"] { dark neutrals, default accent (dark) }   forced dark
     :root[data-theme="dark"][data-accent="<name>"], ... { accent set, dark }
     [data-density="compact"] / [data-density="comfortable"] { type and space only }
+    @media (width < W), (height < H) {                        automatic density (auto_density)
+      .ui-shell:not([data-density="comfortable"], [data-density="comfortable"] *) { compact }
+    }
     @media (prefers-reduced-motion: reduce) { :root { durations 0ms } }
+
+The automatic-density block repeats one density's declarations inside a viewport media query,
+scoped to the app shell, so every component in a small shell steps down and a report page (no
+.ui-shell) does not. `src/css/layout.css` names the same breakpoint in its header; a test keeps
+any media query there equal to this one.
 
 Dark blocks set colour properties and `color-scheme` only. The forced-light block carries no
 accent roles because its specificity (0,2,0) would beat `[data-accent]` (0,1,0) on <html>.
@@ -54,6 +62,12 @@ PREFIX = "--ui-"
 THEMES = ("light", "dark")
 DENSITIES = ("compact", "comfortable")
 DENSITY_GROUPS = ("fs", "lh", "space", "ctl")
+AUTO_DENSITY_KEYS = ("density", "below")
+AUTO_DENSITY_BELOW = ("width", "height")
+# The shell, unless it or an ancestor asks for comfortable explicitly. An explicit
+# data-density="compact" needs no exception: it sets the same values.
+AUTO_DENSITY_SCOPE = '.ui-shell:not([data-density="comfortable"], [data-density="comfortable"] *)'
+_EM = r"\d+(\.\d+)?em"
 GENERIC_FAMILIES = ("sans-serif", "serif", "monospace", "system-ui", "cursive", "fantasy")
 
 _PX = r"\d+(\.\d+)?px"
@@ -87,7 +101,7 @@ NEUTRAL_ROLES = (
 ACCENT_ROLES = ("accent", "accent-hover", "on-accent", "accent-2", "focus", "selection", "ai")
 COLOUR_ROLES = NEUTRAL_ROLES + ACCENT_ROLES
 TOP_LEVEL = (
-    "meta", *SCALAR_GROUPS, "reduced_motion", "density", "color", "accents",
+    "meta", *SCALAR_GROUPS, "reduced_motion", "density", "auto_density", "color", "accents",
     "ai_distinctness", "contrast_pairs",
 )
 META_KEYS = ("name", "version", "description", "origin")
@@ -126,11 +140,24 @@ class Distinctness:
 
 
 @dataclass(frozen=True)
+class AutoDensity:
+    density: str
+    width: str  # em
+    height: str  # em
+
+    @property
+    def media(self) -> str:
+        """The media query condition, the same text layout.css uses."""
+        return f"(width < {self.width}), (height < {self.height})"
+
+
+@dataclass(frozen=True)
 class Tokens:
     meta: dict[str, str]
     scalars: dict[str, dict[str, str]]  # group -> key -> value
     reduced_motion: dict[str, dict[str, str]]
     density: dict[str, dict[str, dict[str, str]]]  # density -> group -> key -> value
+    auto_density: AutoDensity
     neutrals: dict[str, dict[str, str]]  # theme -> role -> hex
     default_accent: str
     accents: dict[str, AccentSet]
@@ -214,6 +241,15 @@ def parse_tokens(data: Any) -> Tokens:
             for g in groups
         }
 
+    auto = _obj(root["auto_density"], "auto_density")
+    _keys(auto, "auto_density", AUTO_DENSITY_KEYS, ("note",))
+    auto_name = _str(auto["density"], "auto_density.density")
+    if auto_name not in DENSITIES:
+        raise TokenError(f"auto_density.density: {auto_name!r} is not a density")
+    _str(auto.get("note", ""), "auto_density.note")
+    below = _strings(auto["below"], "auto_density.below", AUTO_DENSITY_BELOW, _EM)
+    auto_density = AutoDensity(auto_name, below["width"], below["height"])
+
     col = _obj(root["color"], "color")
     _keys(col, "color", THEMES)
     neutrals = {t: _strings(col[t], f"color.{t}", NEUTRAL_ROLES, HEX) for t in THEMES}
@@ -269,8 +305,8 @@ def parse_tokens(data: Any) -> Tokens:
                 raise TokenError(f"{where}: unknown colour role {role!r}")
         pairs.append(pair)
 
-    tokens = Tokens(meta, scalars, reduced, density, neutrals, default, accents, distinctness,
-                    tuple(pairs))
+    tokens = Tokens(meta, scalars, reduced, density, auto_density, neutrals, default, accents,
+                    distinctness, tuple(pairs))
     for theme in THEMES:
         for name in accents:
             palette = tokens.palette(theme, name)
@@ -393,6 +429,12 @@ def render_css(tokens: Tokens, source_text: str) -> str:
         lines += _block(
             [f'[data-density="{density}"]'], _decls(_flat(tokens.density[density]), "  ")
         )
+
+    auto = tokens.auto_density
+    lines.append("")
+    lines.append(f"@media {auto.media} {{")
+    lines += _block([AUTO_DENSITY_SCOPE], _decls(_flat(tokens.density[auto.density]), "    "), "  ")
+    lines.append("}")
 
     lines.append("")
     lines.append("@media (prefers-reduced-motion: reduce) {")

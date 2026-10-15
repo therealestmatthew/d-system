@@ -22,7 +22,7 @@
   ui-kit design tokens. GENERATED: do not edit by hand.
 
   Source:     ui-kit/tokens/tokens.json (ui-kit design tokens 0.1.0)
-  sha256:     4be2bc8d0e1f32dea733b967b99f8f50849cfa2dc090f061c874b5be10d62216
+  sha256:     0d1e872adc630b359eb552c6b59392a4665c52a6179d067a19d8416354922945
   Regenerate: uv run python ui-kit/tools/build_tokens.py
   Check:      uv run python ui-kit/tools/build_tokens.py --check
 
@@ -491,6 +491,22 @@
   --ui-space-7: 40px;
 }
 
+@media (width < 68.75em), (height < 50em) {
+  .ui-shell:not([data-density="comfortable"], [data-density="comfortable"] *) {
+    --ui-ctl-lg: 32px;
+    --ui-ctl-md: 28px;
+    --ui-fs-lg: 15px;
+    --ui-fs-md: 13px;
+    --ui-fs-sm: 12px;
+    --ui-lh-ui: 1.35;
+    --ui-space-3: 6px;
+    --ui-space-4: 8px;
+    --ui-space-5: 12px;
+    --ui-space-6: 16px;
+    --ui-space-7: 24px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     --ui-dur-base: 0ms;
@@ -677,13 +693,16 @@ pre {
 
   Breakpoints are in em, which media queries resolve against the browser's initial 16px:
     64em      = 1024px   below it the shell stacks in one column and the page may scroll
-    68.75em   = 1100px   } below either, the shell switches to compact type and spacing
+    68.75em   = 1100px   } below either, everything inside the shell takes the compact density
     50em      = 800px    }
-  Compact here means the shell and panel frame step down to the next token (fs-md to fs-sm,
-  space-3 to space-2, header height ctl-lg to ctl-md). For the full compact density of every
-  component, put data-density="compact" on the shell; that block lives in dist/tokens.css.
+  The compact step is not written here. dist/tokens.css emits the compact density tokens inside
+  @media (width < 68.75em), (height < 50em) on .ui-shell, unless the shell or an ancestor says
+  data-density="comfortable" (the breakpoint is data: "auto_density" in tokens/tokens.json). Every
+  component in the shell steps down with it; a report page has no .ui-shell and keeps its size.
 */
 
+/* font-size and line-height are set here, not inherited from body, so they resolve against the
+   shell's own (possibly compact) tokens. */
 .ui-shell {
   display: grid;
   block-size: 100vh;
@@ -692,6 +711,8 @@ pre {
   overflow: hidden;
   background: var(--ui-color-bg);
   color: var(--ui-color-text);
+  font-size: var(--ui-fs-md);
+  line-height: var(--ui-lh-ui);
 }
 
 .ui-shell__region {
@@ -701,6 +722,17 @@ pre {
   min-block-size: 0;
   overflow: auto;
   overscroll-behavior: contain;
+}
+
+/* Regions are focusable (tabindex="-1") so F6 and the skip link can move focus to them. That
+   focus is programmatic: no ring after a pointer action, and after a key the ring is drawn
+   inside the region, because the shell clips anything outside its edges. */
+.ui-shell__region:focus:not(:focus-visible, [data-focus-visible]) {
+  outline: none;
+}
+
+.ui-shell__region:is(:focus-visible, [data-focus-visible]) {
+  outline-offset: calc(var(--ui-focus-width) * -1);
 }
 
 /* A panel placed directly in a region shares the region with its siblings. */
@@ -749,27 +781,6 @@ pre {
 .ui-shell__region[data-region="dock"] {
   background: var(--ui-color-surface);
   border-block-start: 1px solid var(--ui-color-line);
-}
-
-/* Compact below 1100x800: type and spacing step down to the next token. */
-@media (width < 68.75em), (height < 50em) {
-  .ui-shell {
-    font-size: var(--ui-fs-sm);
-  }
-
-  .ui-shell__region[data-region="header"] {
-    min-block-size: var(--ui-ctl-md);
-  }
-
-  .ui-shell__region[data-region="strip"] {
-    min-block-size: var(--ui-ctl-sm);
-    font-size: var(--ui-fs-xs);
-  }
-
-  .ui-shell__region[data-region="header"],
-  .ui-shell__region[data-region="strip"] {
-    gap: var(--ui-space-2);
-  }
 }
 
 /* Below 1024px wide: one column in document order, and the page may scroll. dist/layouts.css
@@ -870,6 +881,7 @@ pre {
   layout.css stacks the regions in one column.
   Layouts:
     dashboard: Dashboard: header, main, status strip
+    examiner: Examiner workbench: screen nav, case and findings, decision inspector, run dock
     focus: Focus: header and main
     ide: Workbench: nav, main, inspector, dock
 */
@@ -886,6 +898,22 @@ pre {
   .ui-shell[data-layout="dashboard"] > [data-region="header"] { grid-area: header; }
   .ui-shell[data-layout="dashboard"] > [data-region="main"] { grid-area: main; }
   .ui-shell[data-layout="dashboard"] > [data-region="strip"] { grid-area: strip; }
+
+  .ui-shell[data-layout="examiner"] {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 4fr) minmax(0, 1.8fr);
+    grid-template-rows: auto minmax(0, 4fr) minmax(0, 1fr) auto;
+    grid-template-areas:
+      "header header header"
+      "nav main inspector"
+      "nav dock inspector"
+      "strip strip strip";
+  }
+  .ui-shell[data-layout="examiner"] > [data-region="header"] { grid-area: header; }
+  .ui-shell[data-layout="examiner"] > [data-region="nav"] { grid-area: nav; }
+  .ui-shell[data-layout="examiner"] > [data-region="main"] { grid-area: main; }
+  .ui-shell[data-layout="examiner"] > [data-region="inspector"] { grid-area: inspector; }
+  .ui-shell[data-layout="examiner"] > [data-region="dock"] { grid-area: dock; }
+  .ui-shell[data-layout="examiner"] > [data-region="strip"] { grid-area: strip; }
 
   .ui-shell[data-layout="focus"] {
     grid-template-columns: minmax(0, 1fr);
@@ -921,7 +949,8 @@ pre {
 /* ---- src/css/components/button.css ---- */
 /*
   Button. Classes: .ui-button, .ui-button--primary --secondary --ghost --danger, --icon,
-  --sm --lg (md is the default), .ui-button__label, .ui-button__icon, .ui-button__spinner.
+  --sm --lg (md is the default), .ui-button__label, .ui-button__icon, .ui-button__spinner;
+  .ui-reason, the reason text shown beside a disabled control.
 
   State is never a class. Each state is styled in its native/ARIA form and its React Aria
   Components (RAC) data-* form:
@@ -931,7 +960,14 @@ pre {
     disabled  :disabled, [aria-disabled="true"], [data-disabled]
     toggle on [aria-pressed="true"], [data-selected]   (RAC ToggleButton)
     loading   [aria-busy="true"]: the spinner takes the icon's slot, so a button with an icon
-              keeps its width while its label stays the same.
+              keeps its width while its label stays the same. When the label changes
+              ("Generate" to "Generating…"), .ui-button__label holds two layers in one grid
+              cell, idle and loading; the inactive layer is aria-hidden and invisible, so the
+              button is as wide as the wider layer in both states.
+
+  Boundary: --secondary and the default button draw their border in line-strong, which meets 3:1
+  against bg, surface and surface-e1 in both themes (WCAG 1.4.11). --ghost has no boundary by
+  design; its text alone identifies it.
 
   A button with no variant modifier looks like --secondary. One --primary per view.
 */
@@ -947,7 +983,7 @@ pre {
   block-size: var(--ui-ctl-md);
   margin: 0;
   padding: 0 var(--ui-space-4);
-  border: 1px solid var(--ui-color-line);
+  border: 1px solid var(--ui-color-line-strong);
   border-radius: var(--ui-radius-md);
   background: var(--ui-color-surface-e1);
   box-shadow: var(--ui-shadow-e1);
@@ -985,8 +1021,26 @@ pre {
   text-overflow: ellipsis;
 }
 
-.ui-button__icon,
-.ui-button__spinner {
+/* Two label layers (idle, loading) share one grid cell; the wider sets the width in both states. */
+.ui-button__label:has(> [aria-hidden]) {
+  display: inline-grid;
+  gap: inherit;
+  overflow: visible;
+}
+
+.ui-button__label:has(> [aria-hidden]) > * {
+  display: inline-flex;
+  grid-area: 1 / 1;
+  align-items: center;
+  justify-content: center;
+  gap: inherit;
+}
+
+.ui-button__label > [aria-hidden="true"] {
+  visibility: hidden;
+}
+
+.ui-button__icon {
   display: inline-flex;
   flex: none;
   inline-size: 1.15em;
@@ -998,12 +1052,17 @@ pre {
   block-size: 100%;
 }
 
-.ui-button__spinner {
+/* .ui-button scoped (0,2,0) so these win over .ui-spinner, which React puts on the same element. */
+.ui-button .ui-button__spinner {
   display: none;
+  flex: none;
   box-sizing: border-box;
+  inline-size: 1.15em;
+  block-size: 1.15em;
   border: var(--ui-space-1) solid color-mix(in srgb, currentColor 30%, transparent);
   border-block-start-color: currentColor;
   border-radius: var(--ui-radius-pill);
+  vertical-align: middle;
   animation: ui-button-spin calc(var(--ui-dur-slow) * 3) linear infinite;
 }
 
@@ -1017,13 +1076,13 @@ pre {
 
 .ui-button--secondary {
   background: var(--ui-color-surface-e1);
-  border-color: var(--ui-color-line);
+  border-color: var(--ui-color-line-strong);
   color: var(--ui-color-text);
 }
 
 .ui-button:is(:hover, [data-hovered]):not(:disabled, [aria-disabled="true"], [data-disabled], [aria-busy="true"]) {
   background: var(--ui-color-surface-2);
-  border-color: var(--ui-color-line-strong);
+  border-color: color-mix(in srgb, var(--ui-color-line-strong) 50%, var(--ui-color-text));
 }
 
 .ui-button:is(:active, [data-pressed]):not(:disabled, [aria-disabled="true"], [data-disabled], [aria-busy="true"]) {
@@ -1132,11 +1191,14 @@ pre {
   cursor: progress;
 }
 
-.ui-button[aria-busy="true"] .ui-button__spinner {
+/* The spinner shows in the busy button's icon slot; inside a label layer it is always laid out
+   (the layer's visibility hides it), so the loading layer's width does not change. */
+.ui-button[aria-busy="true"] > .ui-button__spinner,
+.ui-button__label .ui-button__spinner {
   display: inline-flex;
 }
 
-.ui-button[aria-busy="true"] .ui-button__icon {
+.ui-button[aria-busy="true"] > .ui-button__icon {
   display: none;
 }
 
@@ -1155,8 +1217,17 @@ pre {
   border-color: transparent;
 }
 
+/* The reason a control is disabled, shown beside it and linked by aria-describedby (ARCH-001
+   principle 8). Muted on bg, surface and surface-2 meets 4.5:1 in both themes. */
+.ui-reason {
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-regular);
+  line-height: var(--ui-lh-ui);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .ui-button__spinner {
+  .ui-button .ui-button__spinner {
     animation: none;
   }
 }
@@ -1165,7 +1236,8 @@ pre {
 /*
   Card. Classes: .ui-card, .ui-card--accent (attention), .ui-card--ai (machine-generated),
   .ui-card--stat; parts .ui-card__kicker __title __body __meta __actions; stat parts
-  .ui-card__value __delta; and the grid .ui-card-grid.
+  .ui-card__value __delta; and the grid .ui-card-grid. A stat value that is absent carries
+  data-state="not-recorded" and reads "Not recorded" in muted text, never a made-up zero.
 
   Surface: elevation 1 (surface-e1 + shadow-e1 + a line border). --accent marks attention with an
   inline-start rule in the accent colour; --ai marks generated content with the --ui-color-ai
@@ -1274,6 +1346,22 @@ pre {
   line-height: var(--ui-lh-tight);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
+}
+
+.ui-card__value[data-state="not-recorded"] {
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-md);
+  font-weight: var(--ui-fw-regular);
+  font-style: italic;
+  letter-spacing: normal;
+  line-height: var(--ui-lh-ui);
+}
+
+/* A stat card's title is the label of its number: small and muted, above the value. */
+.ui-card--stat .ui-card__title {
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-semibold);
 }
 
 .ui-card__delta {
@@ -1494,7 +1582,12 @@ dialog.ui-dialog[open] {
 
   The body scrolls (or, for terminal, ticker and chart, clips and lets its content manage
   itself); the page never does. Collapsed hides the body with display:none and maximized
-  repositions the panel, so neither state remounts the panel's content.
+  repositions the panel, so neither state remounts the panel's content. React collapses the body
+  with the hidden attribute; base.css keeps [hidden] at display: none !important, so no rule here
+  can show a hidden body.
+
+  Below 1100x800 the frame takes the compact density tokens that dist/tokens.css applies to the
+  shell; there are no compact rules in this file.
 */
 
 .ui-panel {
@@ -1525,7 +1618,7 @@ dialog.ui-dialog[open] {
   flex: 0 0 auto;
   align-items: center;
   gap: var(--ui-space-2);
-  min-block-size: calc(var(--ui-ctl-sm) + 2 * var(--ui-space-2));
+  min-block-size: var(--ui-ctl-md);
   padding-block: var(--ui-space-1);
   padding-inline: var(--ui-space-3) var(--ui-space-2);
   border-block-end: 1px solid var(--ui-color-line);
@@ -1677,26 +1770,6 @@ dialog.ui-dialog[open] {
   background: var(--ui-color-surface);
 }
 
-/* Compact shell below 1100x800: the frame steps down to the next token. */
-@media (width < 68.75em), (height < 50em) {
-  .ui-panel__header {
-    min-block-size: calc(var(--ui-ctl-sm) + 2 * var(--ui-space-1));
-    padding-inline: var(--ui-space-2) var(--ui-space-1);
-  }
-
-  .ui-panel__title {
-    font-size: var(--ui-fs-sm);
-  }
-
-  .ui-panel__body:is([data-body="document"], [data-body="form"]) {
-    padding: var(--ui-space-3);
-  }
-
-  .ui-panel__body[data-body="chart"] {
-    padding: var(--ui-space-2);
-  }
-}
-
 /* Stacked shell below 1024px wide: panels take their content height and the page scrolls; a
    long body still scrolls inside its panel. Main keeps filling its region. */
 @media (width < 64em) {
@@ -1716,13 +1789,15 @@ dialog.ui-dialog[open] {
 
 /* ---- src/css/components/pill.css ---- */
 /*
-  Pill, badge and chip. Classes: .ui-pill (+ .ui-pill__dot), .ui-badge, .ui-chip (+ .ui-chip__remove).
+  Pill, badge and chip. Classes: .ui-pill (+ .ui-pill__dot), .ui-badge, .ui-chip (+ .ui-chip__label,
+  .ui-chip__remove).
 
   .ui-pill   status, data-status="ok|warn|info|err|neutral|ai" (absent = neutral). Status colour on
              its pale fill, and the status is always in words: the colour never stands alone.
   .ui-badge  a count. Neutral; inside a primary button it switches to the on-accent colour.
   .ui-chip   a filter chip. Its one action is .ui-chip__remove, a real <button> labelled
-             "Remove filter: X", 24x24 so it meets the target-size floor.
+             "Remove filter: X", 24x24 so it meets the target-size floor. The text sits in
+             .ui-chip__label, which truncates with an ellipsis so the remove button stays whole.
 */
 
 .ui-pill {
@@ -1826,6 +1901,12 @@ dialog.ui-dialog[open] {
   line-height: var(--ui-lh-tight);
   white-space: nowrap;
   vertical-align: middle;
+}
+
+.ui-chip__label {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ui-chip__remove {
@@ -2040,13 +2121,20 @@ dialog.ui-dialog[open] {
 /* ---- src/css/components/table.css ---- */
 /*
   Table. Classes: .ui-table-wrap (scroll container, sticky header), table.ui-table,
-  button.ui-table__sort inside th[aria-sort], .ui-table__num (right, tabular numerals),
-  .ui-table__id (monospace), .ui-table__toolbar, .ui-table__count ("42 of 310").
+  .ui-table__sort (the label and sort indicator inside a sortable header), .ui-table__num (right,
+  tabular numerals) and .ui-table__id (monospace) on th and td, .ui-table__select (the checkbox
+  column's th and td), .ui-table__checkbox (React Aria Checkbox label), .ui-table__toolbar,
+  .ui-table__count ("42 of 310").
 
-  Selected row: tr[aria-selected="true"] or [data-selected]. Sort state: aria-sort on the header
-  cell, "ascending" | "descending" | "none" (the server order); the indicator is drawn by the
-  sort button from that attribute. React Aria renders role="grid"/"row"/"columnheader"/"gridcell"
-  on the same elements; the selectors below cover both forms.
+  Sorting: the sortable header cell itself is the pressable, focusable control. React Aria makes
+  th[role="columnheader"] focusable and pressable (Enter or click sorts) and marks it
+  [data-allows-sorting]; .ui-table__sort is a span inside it, never a nested button. Sort state is
+  aria-sort on the header cell: "ascending" | "descending" | "none" (the server order). A static
+  table may still put a <button class="ui-table__sort"> in the th; it is reset to look the same.
+
+  Selected row: tr[aria-selected="true"] or [data-selected]. React Aria renders a real <table
+  role="grid"> with role="row"/"columnheader"/"gridcell"/"rowheader"; the selectors below cover
+  both forms.
 */
 
 .ui-table-wrap {
@@ -2098,25 +2186,52 @@ dialog.ui-dialog[open] {
   color: var(--ui-color-text);
 }
 
+/* The sortable header is the control: hover, pressed and focus on the cell, native and RAC. */
+.ui-table :is(th, [role="columnheader"]):is([aria-sort], [data-allows-sorting]) {
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--ui-dur-fast) var(--ui-ease-standard),
+    color var(--ui-dur-fast) var(--ui-ease-standard);
+}
+
+.ui-table :is(th, [role="columnheader"]):is([aria-sort], [data-allows-sorting]):is(:hover, [data-hovered]) {
+  background: color-mix(in srgb, var(--ui-color-text) 7%, var(--ui-color-surface));
+  color: var(--ui-color-text);
+}
+
+.ui-table :is(th, [role="columnheader"]):is([aria-sort], [data-allows-sorting]):is(:active, [data-pressed]) {
+  background: color-mix(in srgb, var(--ui-color-text) 12%, var(--ui-color-surface));
+}
+
+/* The ring is drawn inside the cell: the scroll container would clip a ring outside it. */
+.ui-table :is(th, [role="columnheader"]):is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: calc(var(--ui-focus-width) * -1);
+}
+
+.ui-table :is(th, [role="columnheader"]):focus:not(:focus-visible) {
+  outline: none;
+}
+
 .ui-table__sort {
   display: inline-flex;
   align-items: center;
   gap: var(--ui-space-2);
-  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+/* Static form only: a native button in the th, reset so it looks like the React form. */
+button.ui-table__sort {
   min-block-size: var(--ui-ctl-sm);
-  margin: 0 calc(var(--ui-space-2) * -1);
-  padding: 0 var(--ui-space-2);
+  margin: 0;
+  padding: 0;
   border: 0;
-  border-radius: var(--ui-radius-sm);
   background: transparent;
   color: inherit;
   font: inherit;
   text-align: inherit;
-  white-space: nowrap;
   cursor: pointer;
-  transition:
-    background-color var(--ui-dur-fast) var(--ui-ease-standard),
-    color var(--ui-dur-fast) var(--ui-ease-standard);
 }
 
 .ui-table__sort::after {
@@ -2129,43 +2244,20 @@ dialog.ui-dialog[open] {
   opacity: 0.55;
 }
 
-:is(th, [role="columnheader"])[aria-sort="ascending"] > .ui-table__sort::after {
+:is(th, [role="columnheader"])[aria-sort="ascending"] .ui-table__sort::after {
   content: "\2191";
   color: var(--ui-color-text);
   opacity: 1;
 }
 
-:is(th, [role="columnheader"])[aria-sort="descending"] > .ui-table__sort::after {
+:is(th, [role="columnheader"])[aria-sort="descending"] .ui-table__sort::after {
   content: "\2193";
   color: var(--ui-color-text);
   opacity: 1;
 }
 
-.ui-table__sort:is(:hover, [data-hovered]) {
-  background: color-mix(in srgb, var(--ui-color-text) 7%, transparent);
-  color: var(--ui-color-text);
-}
-
-.ui-table__sort:is(:hover, [data-hovered])::after {
+:is(th, [role="columnheader"]):is(:hover, [data-hovered]) .ui-table__sort::after {
   opacity: 1;
-}
-
-.ui-table__sort:is(:active, [data-pressed]) {
-  background: color-mix(in srgb, var(--ui-color-text) 12%, transparent);
-}
-
-.ui-table__sort:is(:focus-visible, [data-focus-visible]) {
-  outline: var(--ui-focus-width) solid var(--ui-color-focus);
-  outline-offset: var(--ui-focus-offset);
-}
-
-.ui-table__sort:focus:not(:focus-visible) {
-  outline: none;
-}
-
-.ui-table__sort:is(:disabled, [aria-disabled="true"], [data-disabled]) {
-  cursor: not-allowed;
-  opacity: 0.6;
 }
 
 /* ---- body ---- */
@@ -2223,12 +2315,79 @@ dialog.ui-dialog[open] {
   color: var(--ui-color-muted);
 }
 
-.ui-table input[type="checkbox"] {
+/* ---- selection column ---- */
+
+.ui-table :is(th, td, [role="columnheader"], [role="gridcell"]).ui-table__select {
+  inline-size: var(--ui-ctl-md);
+  padding-inline: var(--ui-space-3);
+  text-align: center;
+}
+
+/* A native checkbox in a static table. */
+.ui-table input[type="checkbox"]:not(.ui-table__checkbox > input) {
   inline-size: var(--ui-space-5);
   block-size: var(--ui-space-5);
   margin: 0;
   accent-color: var(--ui-color-accent);
   vertical-align: middle;
+}
+
+/* React Aria Checkbox: a label around a visually hidden input. The label draws the box and is
+   the 24x24 target. State: RAC [data-selected] / [data-indeterminate], or the native input. */
+.ui-table__checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--ui-ctl-sm);
+  block-size: var(--ui-ctl-sm);
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.ui-table__checkbox::before {
+  content: "";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  inline-size: var(--ui-space-5);
+  block-size: var(--ui-space-5);
+  border: 1px solid var(--ui-color-line-strong);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-color-bg);
+  color: var(--ui-color-on-accent);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-bold);
+  line-height: 1;
+  transition:
+    background-color var(--ui-dur-fast) var(--ui-ease-standard),
+    border-color var(--ui-dur-fast) var(--ui-ease-standard);
+}
+
+.ui-table__checkbox:is(:hover, [data-hovered])::before {
+  border-color: var(--ui-color-text);
+}
+
+.ui-table__checkbox:is([data-selected], :has(> input:checked))::before {
+  content: "\2713";
+  border-color: var(--ui-color-accent);
+  background: var(--ui-color-accent);
+}
+
+.ui-table__checkbox:is([data-indeterminate], :has(> input:indeterminate))::before {
+  content: "\2212";
+  border-color: var(--ui-color-accent);
+  background: var(--ui-color-accent);
+}
+
+.ui-table__checkbox:is([data-focus-visible], :has(> input:focus-visible))::before {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-table__checkbox:is([data-disabled], :has(> input:disabled)) {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .ui-table__num {
@@ -2241,7 +2400,7 @@ dialog.ui-dialog[open] {
   text-align: end;
 }
 
-:is(th, [role="columnheader"]).ui-table__num > .ui-table__sort {
+:is(th, [role="columnheader"]).ui-table__num .ui-table__sort {
   flex-direction: row-reverse;
 }
 
@@ -2249,6 +2408,11 @@ dialog.ui-dialog[open] {
   font-family: var(--ui-font-mono);
   font-size: var(--ui-fs-xs);
   white-space: nowrap;
+}
+
+/* An id column's header keeps the header type; only its cells are monospace. */
+:is(th, [role="columnheader"]).ui-table__id {
+  font-family: inherit;
 }
 
 /* ---- toolbar and count ---- */
@@ -2442,11 +2606,14 @@ dialog.ui-dialog[open] {
 /* ---- src/css/components/toast.css ---- */
 /*
   Toast. Classes: .ui-toast-region (bottom-right stack), .ui-toast data-status="ok|info|err",
-  parts .ui-toast__title __body __actions __close.
+  parts .ui-toast__content (wraps title and body) .ui-toast__title __body __actions __close.
 
-  The region is a polite status region (role="region" with an aria-label holding the live
-  toasts); an error toast uses role="alert". Toasts never take focus. At most three are visible:
-  the newest is last in the DOM, and every toast older than the last three is hidden.
+  ARIA follows React Aria's toast pattern: the region is a role="region" landmark named
+  "Notifications"; each toast is role="alertdialog" (aria-modal="false", tabindex="0") and its
+  .ui-toast__content is role="alert". Toasts never take focus by themselves; F8 moves focus into
+  the region. React Aria wraps the toasts in <ol>/<li> with display: contents, so each toast is
+  still laid out as a flex item of the region. At most three are visible: React Aria's queue caps
+  them, and for a static page every toast older than the last three is hidden here.
   Status is a coloured inline-start rule plus the words of the title, never colour alone.
   Motion: each toast slides up and fades in; RAC data-exiting fades it out.
 */
@@ -2468,7 +2635,8 @@ dialog.ui-dialog[open] {
   pointer-events: none;
 }
 
-.ui-toast-region > :nth-last-child(n + 4) {
+.ui-toast-region > .ui-toast:nth-last-child(n + 4),
+.ui-toast-region li:nth-last-child(n + 4) > .ui-toast {
   display: none;
 }
 
@@ -2513,6 +2681,14 @@ dialog.ui-dialog[open] {
   outline-offset: var(--ui-focus-offset);
 }
 
+.ui-toast__content {
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-1);
+  min-inline-size: 0;
+}
+
 .ui-toast__title {
   grid-column: 1;
   margin: 0;
@@ -2545,10 +2721,12 @@ dialog.ui-dialog[open] {
   margin-block-start: var(--ui-space-1);
 }
 
+/* React renders the close glyph as a bare text span, so the glyph size comes from here. */
 .ui-toast__close {
   grid-column: 2;
   grid-row: 1 / span 3;
   align-self: start;
+  font-size: var(--ui-fs-lg);
 }
 
 @keyframes ui-toast-in {

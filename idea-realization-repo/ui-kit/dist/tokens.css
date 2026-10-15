@@ -2,7 +2,7 @@
   ui-kit design tokens. GENERATED: do not edit by hand.
 
   Source:     ui-kit/tokens/tokens.json (ui-kit design tokens 0.1.0)
-  sha256:     4be2bc8d0e1f32dea733b967b99f8f50849cfa2dc090f061c874b5be10d62216
+  sha256:     0d1e872adc630b359eb552c6b59392a4665c52a6179d067a19d8416354922945
   Regenerate: uv run python ui-kit/tools/build_tokens.py
   Check:      uv run python ui-kit/tools/build_tokens.py --check
 
@@ -469,6 +469,22 @@
   --ui-space-5: 20px;
   --ui-space-6: 32px;
   --ui-space-7: 40px;
+}
+
+@media (width < 68.75em), (height < 50em) {
+  .ui-shell:not([data-density="comfortable"], [data-density="comfortable"] *) {
+    --ui-ctl-lg: 32px;
+    --ui-ctl-md: 28px;
+    --ui-fs-lg: 15px;
+    --ui-fs-md: 13px;
+    --ui-fs-sm: 12px;
+    --ui-lh-ui: 1.35;
+    --ui-space-3: 6px;
+    --ui-space-4: 8px;
+    --ui-space-5: 12px;
+    --ui-space-6: 16px;
+    --ui-space-7: 24px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

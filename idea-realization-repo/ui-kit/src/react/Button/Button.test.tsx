@@ -50,6 +50,56 @@ describe('Button', () => {
     expect(onPress).not.toHaveBeenCalled()
   })
 
+  it('loadingLabel stacks both labels so the width holds, and names the button by the active one', () => {
+    const { rerender } = render(
+      <Button icon="↓" loadingLabel="Generating…">
+        Generate
+      </Button>,
+    )
+    const idle = screen.getByRole('button', { name: 'Generate' })
+    expect(idle).not.toHaveAttribute('aria-busy')
+    const label = idle.querySelector('.ui-button__label')
+    expect(label).not.toBeNull()
+    const layers = Array.from(label?.children ?? [])
+    expect(layers).toHaveLength(2)
+    expect(layers[0]).not.toHaveAttribute('aria-hidden')
+    expect(layers[0]).toHaveTextContent('Generate')
+    expect(layers[1]).toHaveAttribute('aria-hidden', 'true')
+    expect(layers[1]).toHaveTextContent('Generating…')
+    // Both layers are always in the DOM: the same grid cell holds the wider of the two.
+    expect(layers[1]?.querySelector('.ui-button__spinner')).not.toBeNull()
+
+    rerender(
+      <Button icon="↓" loadingLabel="Generating…" isLoading>
+        Generate
+      </Button>,
+    )
+    const busy = screen.getByRole('button', { name: 'Generating…' })
+    expect(busy).toBe(idle)
+    expect(busy).toHaveAttribute('aria-busy', 'true')
+    expect(layers[0]).toHaveAttribute('aria-hidden', 'true')
+    expect(layers[1]).not.toHaveAttribute('aria-hidden')
+    expect(screen.queryByRole('button', { name: /Generate$/ })).toBeNull()
+  })
+
+  it('disabledReason renders .ui-reason and links it by aria-describedby while disabled', () => {
+    const { rerender } = render(
+      <Button isDisabled disabledReason="Publishing needs a reviewer." aria-describedby="extra">
+        Publish
+      </Button>,
+    )
+    const button = screen.getByRole('button', { name: 'Publish' })
+    expect(button).toBeDisabled()
+    const reason = screen.getByText('Publishing needs a reviewer.')
+    expect(reason).toHaveClass('ui-reason')
+    expect(button.getAttribute('aria-describedby')?.split(' ')).toEqual(['extra', reason.id])
+    expect(button).toHaveAccessibleDescription(/Publishing needs a reviewer\./)
+
+    rerender(<Button disabledReason="Publishing needs a reviewer.">Publish</Button>)
+    expect(screen.queryByText('Publishing needs a reviewer.')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Publish' })).not.toHaveAttribute('aria-describedby')
+  })
+
   it('requires aria-label on an icon-only button at the type level', () => {
     // @ts-expect-error an icon-only button without aria-label must not compile
     const missingLabel = <Button iconOnly icon="⟳" />

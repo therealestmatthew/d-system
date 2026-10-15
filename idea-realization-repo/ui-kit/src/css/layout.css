@@ -8,13 +8,16 @@
 
   Breakpoints are in em, which media queries resolve against the browser's initial 16px:
     64em      = 1024px   below it the shell stacks in one column and the page may scroll
-    68.75em   = 1100px   } below either, the shell switches to compact type and spacing
+    68.75em   = 1100px   } below either, everything inside the shell takes the compact density
     50em      = 800px    }
-  Compact here means the shell and panel frame step down to the next token (fs-md to fs-sm,
-  space-3 to space-2, header height ctl-lg to ctl-md). For the full compact density of every
-  component, put data-density="compact" on the shell; that block lives in dist/tokens.css.
+  The compact step is not written here. dist/tokens.css emits the compact density tokens inside
+  @media (width < 68.75em), (height < 50em) on .ui-shell, unless the shell or an ancestor says
+  data-density="comfortable" (the breakpoint is data: "auto_density" in tokens/tokens.json). Every
+  component in the shell steps down with it; a report page has no .ui-shell and keeps its size.
 */
 
+/* font-size and line-height are set here, not inherited from body, so they resolve against the
+   shell's own (possibly compact) tokens. */
 .ui-shell {
   display: grid;
   block-size: 100vh;
@@ -23,6 +26,8 @@
   overflow: hidden;
   background: var(--ui-color-bg);
   color: var(--ui-color-text);
+  font-size: var(--ui-fs-md);
+  line-height: var(--ui-lh-ui);
 }
 
 .ui-shell__region {
@@ -32,6 +37,17 @@
   min-block-size: 0;
   overflow: auto;
   overscroll-behavior: contain;
+}
+
+/* Regions are focusable (tabindex="-1") so F6 and the skip link can move focus to them. That
+   focus is programmatic: no ring after a pointer action, and after a key the ring is drawn
+   inside the region, because the shell clips anything outside its edges. */
+.ui-shell__region:focus:not(:focus-visible, [data-focus-visible]) {
+  outline: none;
+}
+
+.ui-shell__region:is(:focus-visible, [data-focus-visible]) {
+  outline-offset: calc(var(--ui-focus-width) * -1);
 }
 
 /* A panel placed directly in a region shares the region with its siblings. */
@@ -80,27 +96,6 @@
 .ui-shell__region[data-region="dock"] {
   background: var(--ui-color-surface);
   border-block-start: 1px solid var(--ui-color-line);
-}
-
-/* Compact below 1100x800: type and spacing step down to the next token. */
-@media (width < 68.75em), (height < 50em) {
-  .ui-shell {
-    font-size: var(--ui-fs-sm);
-  }
-
-  .ui-shell__region[data-region="header"] {
-    min-block-size: var(--ui-ctl-md);
-  }
-
-  .ui-shell__region[data-region="strip"] {
-    min-block-size: var(--ui-ctl-sm);
-    font-size: var(--ui-fs-xs);
-  }
-
-  .ui-shell__region[data-region="header"],
-  .ui-shell__region[data-region="strip"] {
-    gap: var(--ui-space-2);
-  }
 }
 
 /* Below 1024px wide: one column in document order, and the page may scroll. dist/layouts.css

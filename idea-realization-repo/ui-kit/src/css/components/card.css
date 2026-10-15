@@ -1,7 +1,8 @@
 /*
   Card. Classes: .ui-card, .ui-card--accent (attention), .ui-card--ai (machine-generated),
   .ui-card--stat; parts .ui-card__kicker __title __body __meta __actions; stat parts
-  .ui-card__value __delta; and the grid .ui-card-grid.
+  .ui-card__value __delta; and the grid .ui-card-grid. A stat value that is absent carries
+  data-state="not-recorded" and reads "Not recorded" in muted text, never a made-up zero.
 
   Surface: elevation 1 (surface-e1 + shadow-e1 + a line border). --accent marks attention with an
   inline-start rule in the accent colour; --ai marks generated content with the --ui-color-ai
@@ -110,6 +111,22 @@
   line-height: var(--ui-lh-tight);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
+}
+
+.ui-card__value[data-state="not-recorded"] {
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-md);
+  font-weight: var(--ui-fw-regular);
+  font-style: italic;
+  letter-spacing: normal;
+  line-height: var(--ui-lh-ui);
+}
+
+/* A stat card's title is the label of its number: small and muted, above the value. */
+.ui-card--stat .ui-card__title {
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-semibold);
 }
 
 .ui-card__delta {

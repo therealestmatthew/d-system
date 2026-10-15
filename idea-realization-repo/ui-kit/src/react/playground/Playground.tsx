@@ -196,10 +196,13 @@ function MainContent() {
           </Button>
         </p>
         <p>
-          <Button variant="primary" isLoading={loading} onPress={() => setLoading(true)}>
-            {loading ? 'Generating…' : 'Start loading'}
+          <Button variant="primary" isLoading={loading} loadingLabel="Generating…" onPress={() => setLoading(true)}>
+            Start loading
           </Button>{' '}
-          <Button onPress={() => setLoading(false)}>Stop loading</Button> <Button isDisabled>Disabled</Button>{' '}
+          <Button onPress={() => setLoading(false)}>Stop loading</Button>{' '}
+          <Button isDisabled disabledReason="Nothing to publish yet.">
+            Publish
+          </Button>{' '}
           <ToggleButton isSelected={pinned} onChange={setPinned}>
             Pin
           </ToggleButton>

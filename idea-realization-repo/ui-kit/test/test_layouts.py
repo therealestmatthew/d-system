@@ -29,7 +29,7 @@ LAYOUTS = KIT / "layouts"
 SCHEMA = LAYOUTS / "layout.schema.json"
 DIST = KIT / "dist" / "layouts.css"
 SCRIPT = KIT / "tools" / "build_layouts.py"
-SHIPPED = {"ide", "dashboard", "focus"}
+SHIPPED = {"ide", "dashboard", "focus", "examiner"}
 
 
 def _run(*args: str) -> subprocess.CompletedProcess[str]:

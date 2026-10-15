@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Examiner workbench (static mock)</title>
+<!--
+  Static mock of the examiner workbench, built from Kit v0 parts only, so the kit can be matched
+  to the real screens. It loads only ../dist/ui.css and uses the "examiner" layout
+  (layouts/examiner.json). All case data is synthetic and fictional; every accuracy figure is a
+  sample figure, not a result.
+
+  Five screens share one shell. Each screen's panels carry data-screen="<screen>" and every id on
+  a screen starts with the screen's name. The style block below is gallery furniture, not a kit
+  part: it shows the screen whose id (or an id inside it) is the URL fragment, and the queue when
+  there is none, so every screen is reachable from the nav links with script off (:target).
+  The one inline script toggles the theme only.
+-->
+<link rel="stylesheet" href="../dist/ui.css">
+<style>
+  /* GALLERY ONLY: screen switching by :target. Only ever sets display: none, so the kit's own
+     display values (grid above 1024px, stacked below) are untouched. */
+  body:not(:has(:target:is([id^="case"], [id^="decision"], [id^="supervisor"], [id^="accuracy"]))) [data-screen]:not([data-screen~="queue"]),
+  body:has(:target[id^="case"]) [data-screen]:not([data-screen~="case"]),
+  body:has(:target[id^="decision"]) [data-screen]:not([data-screen~="decision"]),
+  body:has(:target[id^="supervisor"]) [data-screen]:not([data-screen~="supervisor"]),
+  body:has(:target[id^="accuracy"]) [data-screen]:not([data-screen~="accuracy"]) {
+    display: none;
+  }
+</style>
+</head>
+<body>
+<svg hidden aria-hidden="true">
+  <symbol id="i-x" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 16 16"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v3h-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<a class="ui-skip-link" data-screen="queue" href="#queue">Skip to the queue</a>
+<a class="ui-skip-link" data-screen="case" href="#case">Skip to the case review</a>
+<a class="ui-skip-link" data-screen="decision" href="#decision">Skip to the decision</a>
+<a class="ui-skip-link" data-screen="supervisor" href="#supervisor">Skip to the supervisor queue</a>
+<a class="ui-skip-link" data-screen="accuracy" href="#accuracy">Skip to the accuracy view</a>
+
+<div class="ui-shell" data-layout="examiner">
+
+  <!-- ==================== HEADER (shared) ==================== -->
+  <header class="ui-shell__region" data-region="header">
+    <h1 class="ui-visually-hidden">Examiner workbench (static mock, synthetic cases)</h1>
+    <section class="ui-panel" data-variant="compact" aria-labelledby="app-title">
+      <div class="ui-panel__header">
+        <div class="ui-panel__identity">
+          <h2 class="ui-panel__title" id="app-title">Examiner workbench</h2>
+          <span class="ui-pill" data-status="info"><span class="ui-pill__dot" aria-hidden="true"></span>synthetic cases only</span>
+        </div>
+        <div class="ui-panel__controls" role="toolbar" aria-label="View">
+          <button class="ui-button ui-button--ghost ui-button--sm" type="button" data-gallery="theme" aria-pressed="false">
+            <span class="ui-button__label">Dark theme</span>
+          </button>
+        </div>
+      </div>
+      <div class="ui-panel__body" data-body="ticker">Unemployment insurance determinations. Claude recommends; the examiner decides.</div>
+    </section>
+  </header>
+
+  <!-- ==================== NAV (one copy per screen, so aria-current is right without script) ==================== -->
+  <nav class="ui-shell__region" data-region="nav" aria-label="Screens">
+    <section class="ui-panel" data-variant="standard" data-screen="queue" aria-labelledby="nav-q-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="nav-q-title">Screens</h2></div></div>
+      <div class="ui-panel__body" data-body="tree">
+        <ul class="ui-prose">
+          <li><a href="#queue" aria-current="page">Prioritized queue</a> <span class="ui-badge">8</span></li>
+          <li><a href="#case">Case review</a></li>
+          <li><a href="#decision">Decision</a></li>
+          <li><a href="#supervisor">Supervisor review</a> <span class="ui-badge">3</span></li>
+          <li><a href="#accuracy">Accuracy</a></li>
+        </ul>
+      </div>
+    </section>
+    <section class="ui-panel" data-variant="standard" data-screen="case" aria-labelledby="nav-c-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="nav-c-title">Screens</h2></div></div>
+      <div class="ui-panel__body" data-body="tree">
+        <ul class="ui-prose">
+          <li><a href="#queue">Prioritized queue</a> <span class="ui-badge">8</span></li>
+          <li><a href="#case" aria-current="page">Case review</a></li>
+          <li><a href="#decision">Decision</a></li>
+          <li><a href="#supervisor">Supervisor review</a> <span class="ui-badge">3</span></li>
+          <li><a href="#accuracy">Accuracy</a></li>
+        </ul>
+      </div>
+    </section>
+    <section class="ui-panel" data-variant="standard" data-screen="decision" aria-labelledby="nav-d-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="nav-d-title">Screens</h2></div></div>
+      <div class="ui-panel__body" data-body="tree">
+        <ul class="ui-prose">
+          <li><a href="#queue">Prioritized queue</a> <span class="ui-badge">8</span></li>
+          <li><a href="#case">Case review</a></li>
+          <li><a href="#decision" aria-current="page">Decision</a></li>
+          <li><a href="#supervisor">Supervisor review</a> <span class="ui-badge">3</span></li>
+          <li><a href="#accuracy">Accuracy</a></li>
+        </ul>
+      </div>
+    </section>
+    <section class="ui-panel" data-variant="standard" data-screen="supervisor" aria-labelledby="nav-s-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="nav-s-title">Screens</h2></div></div>
+      <div class="ui-panel__body" data-body="tree">
+        <ul class="ui-prose">
+          <li><a href="#queue">Prioritized queue</a> <span class="ui-badge">8</span></li>
+          <li><a href="#case">Case review</a></li>
+          <li><a href="#decision">Decision</a></li>
+          <li><a href="#supervisor" aria-current="page">Supervisor review</a> <span class="ui-badge">3</span></li>
+          <li><a href="#accuracy">Accuracy</a></li>
+        </ul>
+      </div>
+    </section>
+    <section class="ui-panel" data-variant="standard" data-screen="accuracy" aria-labelledby="nav-a-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="nav-a-title">Screens</h2></div></div>
+      <div class="ui-panel__body" data-body="tree">
+        <ul class="ui-prose">
+          <li><a href="#queue">Prioritized queue</a> <span class="ui-badge">8</span></li>
+          <li><a href="#case">Case review</a></li>
+          <li><a href="#decision">Decision</a></li>
+          <li><a href="#supervisor">Supervisor review</a> <span class="ui-badge">3</span></li>
+          <li><a href="#accuracy" aria-current="page">Accuracy</a></li>
+        </ul>
+      </div>
+    </section>
+  </nav>
+
+  <!-- ==================== MAIN ==================== -->
+  <main class="ui-shell__region" data-region="main">
+
+    <!-- ---------- 1. Prioritized queue ---------- -->
+    <section class="ui-panel" data-variant="standard" data-screen="queue" id="queue" tabindex="-1" aria-labelledby="queue-title">
+      <div class="ui-panel__header">
+        <div class="ui-panel__identity"><h2 class="ui-panel__title" id="queue-title">Prioritized queue</h2></div>
+        <div class="ui-panel__controls" role="toolbar" aria-label="Queue actions">
+          <button class="ui-button ui-button--secondary ui-button--sm" type="button"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-refresh"/></svg></span><span class="ui-button__label">Refresh</span></button>
+        </div>
+      </div>
+      <div class="ui-panel__body" data-body="table">
+        <div class="ui-table__toolbar" role="group" aria-label="Active filters">
+          <span class="ui-chip">Status: open<button type="button" class="ui-chip__remove" aria-label="Remove filter: Status: open"><svg viewBox="0 0 16 16" aria-hidden="true"><use href="#i-x"/></svg></button></span>
+          <span class="ui-chip">Assigned: my team<button type="button" class="ui-chip__remove" aria-label="Remove filter: Assigned: my team"><svg viewBox="0 0 16 16" aria-hidden="true"><use href="#i-x"/></svg></button></span>
+          <button type="button" class="ui-button ui-button--ghost ui-button--sm"><span class="ui-button__label">Clear all</span></button>
+          <span class="ui-table__count" role="status">8 of 23 · updated 09:30</span>
+        </div>
+        <div class="ui-table-wrap" tabindex="0" role="region" aria-label="Cases, scrollable">
+          <table class="ui-table" aria-label="Prioritized cases">
+            <thead>
+              <tr>
+                <th scope="col" class="ui-table__num" aria-sort="ascending"><button type="button" class="ui-table__sort">Priority</button></th>
+                <th scope="col">Case</th>
+                <th scope="col">Issue</th>
+                <th scope="col">Improper-payment risk</th>
+                <th scope="col">Improper-denial risk</th>
+                <th scope="col" class="ui-table__num" aria-sort="none"><button type="button" class="ui-table__sort">Age</button></th>
+                <th scope="col">Examiner</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr aria-selected="true">
+                <td class="ui-table__num">1</td>
+                <td class="ui-table__id"><a href="#case">SYN-0142</a></td>
+                <td>Discharge: attendance</td>
+                <td><span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>low</span></td>
+                <td><span class="ui-pill" data-status="err"><span class="ui-pill__dot" aria-hidden="true"></span>high</span></td>
+                <td class="ui-table__num">6 d</td>
+                <td>Avery</td>
+                <td><span class="ui-pill" data-status="info"><span class="ui-pill__dot" aria-hidden="true"></span>ready</span></td>
+              </tr>
+              <tr>
+                <td class="ui-table__num">2</td>
+                <td class="ui-table__id">SYN-0150</td>
+                <td>Voluntary quit: hours cut</td>
+                <td><span class="ui-pill" data-status="err"><span class="ui-pill__dot" aria-hidden="true"></span>high</span></td>
+                <td><span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>low</span></td>
+                <td class="ui-table__num">9 d</td>
+                <td>Blake</td>
+                <td><span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>escalated</span></td>
+              </tr>
+              <tr>
+                <td class="ui-table__num">3</td>
+                <td class="ui-table__id">SYN-0137</td>
+                <td>Able and available</td>
+                <td><span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>elevated</span></td>
+                <td><span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>elevated</span></td>
+                <td class="ui-table__num">4 d</td>
+                <td>Avery</td>
+                <td><span class="ui-pill" data-status="info"><span class="ui-pill__dot" aria-hidden="true"></span>ready</span></td>
+              </tr>
+              <tr>
+                <td class="ui-table__num">4</td>
+                <td class="ui-table__id">SYN-0129</td>
+                <td>Refusal of suitable work</td>
+                <td><span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>low</span></td>
+                <td><span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>elevated</span></td>
+                <td class="ui-table__num">12 d</td>
+                <td>Blake</td>
+                <td><span class="ui-pill" data-status="neutral"><span class="ui-pill__dot" aria-hidden="true"></span>in review</span></td>
+              </tr>
+              <tr>
+                <td class="ui-table__num">5</td>
+                <td class="ui-table__id">SYN-0155</td>
+                <td>Discharge: misconduct</td>
+                <td><span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>elevated</span></td>
+                <td><span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>low</span></td>
+                <td class="ui-table__num">1 d</td>
+                <td>Casey</td>
+                <td><span class="ui-pill" data-status="info"><span class="ui-pill__dot" aria-hidden="true"></span>ready</span></td>
+              </tr>
+              <tr>
+                <td class="ui-table__num">6</td>
+                <td class="ui-table__id">SYN-0148</td>
+                <td>Wage dispute</td>
+                <td><span class="ui-state" data-state="not-recorded"><span class="ui-state__title">not recorded</span></span></td>
+                <td><span class="ui-state" data-state="not-recorded"><span class="ui-state__title">not recorded</span></span></td>
+                <td class="ui-table__num">3 d</td>
+                <td>Casey</td>
+                <td><span class="ui-pill" data-status="err"><span class="ui-pill__dot" aria-hidden="true"></span>held at gate</span></td>
+              </tr>
+              <tr>
+                <td class="ui-table__num">7</td>
+                <td class="ui-table__id">SYN-0161</td>
+                <td>Separation: lack of work</td>
+                <td><span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>low</span></td>
+                <td><span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>low</span></td>
+                <td class="ui-table__num">1 d</td>
+                <td>Avery</td>
+                <td><span class="ui-pill" data-status="info"><span class="ui-pill__dot" aria-hidden="true"></span>ready</span></td>
+              </tr>
+              <tr aria-busy="true">
+                <td class="ui-table__num">8</td>
+                <td class="ui-table__id">SYN-0163</td>
+                <td>Voluntary quit: relocation</td>
+                <td><span class="ui-skeleton"></span></td>
+                <td><span class="ui-skeleton"></span></td>
+                <td class="ui-table__num">0 d</td>
+                <td>Casey</td>
+                <td><span role="status"><span class="ui-spinner" aria-hidden="true"></span> Pass 1 running</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- 2. Case review ---------- -->
+    <section class="ui-panel" data-variant="standard" data-screen="case" id="case" tabindex="-1" aria-labelledby="case-title">
+      <div class="ui-panel__header">
+        <div class="ui-panel__identity">
+          <h2 class="ui-panel__title" id="case-title">Case review: SYN-0142</h2>
+          <span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>Pass 1 complete</span>
+        </div>
+        <div class="ui-panel__controls" role="toolbar" aria-label="Case actions">
+          <a class="ui-button ui-button--ghost ui-button--sm" href="#queue"><span class="ui-button__label">Back to queue</span></a>
+        </div>
+      </div>
+      <div class="ui-panel__body" data-body="document">
+        <div class="ui-card-grid">
+
+          <div class="ui-prose">
+            <article class="ui-card" aria-labelledby="case-facts-title">
+              <p class="ui-card__kicker">From the claim package (synthetic)</p>
+              <h3 class="ui-card__title" id="case-facts-title">Claim facts</h3>
+              <div class="ui-table-wrap">
+                <table class="ui-table" aria-labelledby="case-facts-title">
+                  <tbody>
+                    <tr><th scope="row">Claim</th><td>Regular benefits, filed 2026-08-14</td></tr>
+                    <tr><th scope="row">Separation</th><td>Discharge, 2026-08-11</td></tr>
+                    <tr><th scope="row">Employer says</th><td>Absent after a written final warning</td></tr>
+                    <tr><th scope="row">Claimant says</th><td>Never received a final warning</td></tr>
+                    <tr><th scope="row">Wage records</th><td>Four base-period quarters on file</td></tr>
+                    <tr><th scope="row">Documents</th><td>Application, two separation statements, employer exhibit 3</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="ui-card ui-card--ai" aria-labelledby="case-det-title">
+              <p class="ui-card__kicker">Generated by Claude: determinative fact</p>
+              <h3 class="ui-card__title" id="case-det-title">Did the claimant receive the final warning before the last absence?</h3>
+              <div class="ui-card__body"><p>The two accounts conflict. The employer says a written warning was given on 2026-08-03; the claimant says none was received. Exhibit 3 is the warning, and it has no claimant signature or delivery record.</p></div>
+              <p class="ui-card__meta"><span class="ui-pill" data-status="ai"><span class="ui-pill__dot" aria-hidden="true"></span>AI finding</span><span>Claude via Amazon Bedrock · Case Synthesis (Sonnet 5)</span><span>2026-10-14 09:12</span></p>
+              <p class="ui-card__meta"><span>Sources:</span><a class="ui-pill" href="#case-src-5">Claim document: employer statement, p. 1</a><a class="ui-pill" href="#case-src-6">Claim document: claimant statement, p. 2</a><a class="ui-pill" href="#case-src-4">Claim document: employer exhibit 3</a></p>
+            </article>
+          </div>
+
+          <div class="ui-prose">
+            <article class="ui-card ui-card--ai" aria-labelledby="case-f1-title">
+              <p class="ui-card__kicker">Generated by Claude: finding 1 of 4</p>
+              <h3 class="ui-card__title" id="case-f1-title">Misconduct needs a knowing breach of a reasonable rule</h3>
+              <div class="ui-card__body"><p>A discharge disqualifies only if the claimant knew the attendance rule and the consequence. The rule itself is reasonable.</p></div>
+              <p class="ui-card__meta"><span class="ui-pill" data-status="ai"><span class="ui-pill__dot" aria-hidden="true"></span>AI finding</span><span>Claude via Amazon Bedrock · Statutory Application (Opus 5.5)</span></p>
+              <p class="ui-card__meta"><span>Sources:</span><a class="ui-pill" href="#case-src-1">Statute: SS UI Act § 4-210(b)</a><a class="ui-pill" href="#case-src-2">Policy manual: Benefit Policy Manual 7.3</a></p>
+            </article>
+
+            <article class="ui-card ui-card--ai" aria-labelledby="case-f2-title">
+              <p class="ui-card__kicker">Generated by Claude: finding 2 of 4</p>
+              <h3 class="ui-card__title" id="case-f2-title">An unsigned warning does not show the claimant knew</h3>
+              <div class="ui-card__body"><p>Precedent treats an unsigned, undelivered warning as no proof of notice. On this record, knowledge is not established.</p></div>
+              <p class="ui-card__meta"><span class="ui-pill" data-status="ai"><span class="ui-pill__dot" aria-hidden="true"></span>AI finding</span><span>Claude via Amazon Bedrock · Statutory Application (Opus 5.5)</span></p>
+              <p class="ui-card__meta"><span>Sources:</span><a class="ui-pill" href="#case-src-3">Precedent: Appeal Board P-B-17</a><a class="ui-pill" href="#case-src-4">Claim document: employer exhibit 3</a></p>
+            </article>
+
+            <article class="ui-card ui-card--ai" aria-labelledby="case-f3-title">
+              <p class="ui-card__kicker">Generated by Claude: finding 3 of 4</p>
+              <h3 class="ui-card__title" id="case-f3-title">Both error directions, assessed separately</h3>
+              <div class="ui-card__body">
+                <p><span class="ui-pill" data-status="err"><span class="ui-pill__dot" aria-hidden="true"></span>Improper-denial risk: high</span> A denial would rest on a warning the record does not show was received.</p>
+                <p><span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>Improper-payment risk: low</span> Wage records and the separation date agree; no earnings after separation.</p>
+              </div>
+              <p class="ui-card__meta"><span class="ui-pill" data-status="ai"><span class="ui-pill__dot" aria-hidden="true"></span>AI finding</span><span>Claude via Amazon Bedrock · Bidirectional Flagging (Opus 5.5)</span></p>
+              <p class="ui-card__meta"><span>Sources:</span><a class="ui-pill" href="#case-src-4">Claim document: employer exhibit 3</a><a class="ui-pill" href="#case-src-7">Claim document: wage record, 2026 Q2</a></p>
+            </article>
+
+            <div class="ui-card" aria-busy="true" aria-labelledby="case-f4-title">
+              <div class="ui-state" data-state="loading" role="status">
+                <p class="ui-state__title" id="case-f4-title"><span class="ui-spinner" aria-hidden="true"></span>Finding 4 of 4: able and available</p>
+                <p class="ui-state__body">Claude is drafting (step 3 of 4). Statutory Application.</p>
+              </div>
+              <span class="ui-skeleton"></span>
+              <span class="ui-skeleton"></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- 3. Decision ---------- -->
+    <section class="ui-panel" data-variant="standard" data-screen="decision" id="decision" tabindex="-1" aria-labelledby="decision-title">
+      <div class="ui-panel__header">
+        <div class="ui-panel__identity">
+          <h2 class="ui-panel__title" id="decision-title">Decision: SYN-0142</h2>
+          <span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>awaiting examiner</span>
+          <span>The examiner decides. Always.</span>
+        </div>
+        <div class="ui-panel__controls" role="toolbar" aria-label="Decision actions">
+          <a class="ui-button ui-button--ghost ui-button--sm" href="#case"><span class="ui-button__label">Back to case review</span></a>
+        </div>
+      </div>
+      <div class="ui-panel__body" data-body="document">
+        <div class="ui-card-grid">
+          <section class="ui-dialog" data-variant="form" id="decision-edit" tabindex="-1" aria-labelledby="decision-edit-title">
+            <div class="ui-dialog__header">
+              <h3 class="ui-dialog__title" id="decision-edit-title">Edit the drafted notice</h3>
+              <a class="ui-button ui-button--ghost ui-button--icon ui-button--sm" href="#decision" aria-label="Close"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-x"/></svg></span></a>
+            </div>
+            <div class="ui-dialog__body">
+              <p>Edit opens this form (rendered in place for reference). Your changes are marked as examiner text; Claude's draft stays in the case record.</p>
+              <p><label for="decision-edit-text">Notice text</label></p>
+              <p><textarea id="decision-edit-text" rows="4">We have decided you can receive unemployment benefits. Your employer said you were let go for missing work. Our records do not show that you got the written warning before your last absence.</textarea></p>
+            </div>
+            <div class="ui-dialog__footer">
+              <a class="ui-button ui-button--ghost" href="#decision"><span class="ui-button__label">Cancel</span></a>
+              <button type="button" class="ui-button ui-button--primary"><span class="ui-button__label">Save and accept</span></button>
+            </div>
+          </section>
+
+          <section class="ui-dialog" data-variant="confirm" id="decision-reject" tabindex="-1" aria-labelledby="decision-reject-title">
+            <div class="ui-dialog__header"><h3 class="ui-dialog__title" id="decision-reject-title">Reject Claude's recommendation?</h3></div>
+            <div class="ui-dialog__body">
+              <p>Reject opens this confirmation. Your own determination replaces the recommendation. Disagreeing with Claude does not, on its own, send the case to a supervisor.</p>
+              <p><label for="decision-reject-reason">Your reason (kept in the case record)</label></p>
+              <p><textarea id="decision-reject-reason" rows="3"></textarea></p>
+            </div>
+            <div class="ui-dialog__footer">
+              <a class="ui-button ui-button--secondary" href="#decision"><span class="ui-button__label">Cancel</span></a>
+              <button type="button" class="ui-button ui-button--danger"><span class="ui-button__label">Reject recommendation</span></button>
+            </div>
+          </section>
+          <article class="ui-card ui-card--ai" aria-labelledby="decision-rec-title">
+            <p class="ui-card__kicker">Generated by Claude: recommendation</p>
+            <h3 class="ui-card__title" id="decision-rec-title">Allow benefits: misconduct not established</h3>
+            <div class="ui-card__body"><p>Rests on findings 1 to 3. Finding 4 (able and available) is still being drafted, so this recommendation may change.</p></div>
+            <p class="ui-card__meta"><span class="ui-pill" data-status="ai"><span class="ui-pill__dot" aria-hidden="true"></span>AI recommendation</span><span>Claude via Amazon Bedrock · Statutory Application (Opus 5.5)</span></p>
+          </article>
+          <article class="ui-card" aria-labelledby="decision-after-title">
+            <p class="ui-card__kicker">After Accept (static example)</p>
+            <h3 class="ui-card__title" id="decision-after-title">Decision record</h3>
+            <div class="ui-card__body"><p>Accepted by Examiner Avery, 2026-10-14 10:05. The notice was sent as drafted. Pass 2 checked the proposed determination before it was recorded.</p></div>
+            <p class="ui-card__meta"><span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>accepted by examiner</span></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- 4. Supervisor review queue ---------- -->
+    <section class="ui-panel" data-variant="standard" data-screen="supervisor" id="supervisor" tabindex="-1" aria-labelledby="supervisor-title">
+      <div class="ui-panel__header">
+        <div class="ui-panel__identity"><h2 class="ui-panel__title" id="supervisor-title">Supervisor review queue</h2></div>
+        <div class="ui-panel__controls" role="toolbar" aria-label="Supervisor queue actions">
+          <button class="ui-button ui-button--secondary ui-button--sm" type="button"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-refresh"/></svg></span><span class="ui-button__label">Refresh</span></button>
+        </div>
+      </div>
+      <div class="ui-panel__body" data-body="table">
+        <div class="ui-table__toolbar" role="group" aria-label="Active filters">
+          <span class="ui-chip">Reason: any<button type="button" class="ui-chip__remove" aria-label="Remove filter: Reason: any"><svg viewBox="0 0 16 16" aria-hidden="true"><use href="#i-x"/></svg></button></span>
+          <span class="ui-table__count" role="status">3 of 3</span>
+          <span>Escalation is recommended for high-risk, ambiguous or suspected-fraud cases. Disagreeing with the system never sends a case here on its own.</span>
+        </div>
+        <div class="ui-table-wrap" tabindex="0" role="region" aria-label="Escalated cases, scrollable">
+          <table class="ui-table" aria-label="Escalated cases">
+            <thead>
+              <tr>
+                <th scope="col">Case</th>
+                <th scope="col">Escalation reason</th>
+                <th scope="col">What the rule saw</th>
+                <th scope="col">Flags, both directions</th>
+                <th scope="col">Examiner</th>
+                <th scope="col" class="ui-table__num" aria-sort="descending"><button type="button" class="ui-table__sort">Age</button></th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr aria-selected="true">
+                <td class="ui-table__id">SYN-0150</td>
+                <td><span class="ui-pill" data-status="err"><span class="ui-pill__dot" aria-hidden="true"></span>high risk</span></td>
+                <td>Earnings reported after the separation date</td>
+                <td><span class="ui-pill" data-status="err"><span class="ui-pill__dot" aria-hidden="true"></span>payment: high</span> <span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>denial: low</span></td>
+                <td>Blake</td>
+                <td class="ui-table__num">5 d</td>
+                <td><span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>awaiting review</span></td>
+              </tr>
+              <tr>
+                <td class="ui-table__id">SYN-0118</td>
+                <td><span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>ambiguous</span></td>
+                <td>Two separation dates that Case Synthesis could not reconcile</td>
+                <td><span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>payment: elevated</span> <span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>denial: elevated</span></td>
+                <td>Casey</td>
+                <td class="ui-table__num">3 d</td>
+                <td><span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>awaiting review</span></td>
+              </tr>
+              <tr>
+                <td class="ui-table__id">SYN-0109</td>
+                <td><span class="ui-pill" data-status="err"><span class="ui-pill__dot" aria-hidden="true"></span>suspected fraud</span></td>
+                <td>Identity document conflicts with the wage-record employer</td>
+                <td><span class="ui-pill" data-status="err"><span class="ui-pill__dot" aria-hidden="true"></span>payment: high</span> <span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>denial: low</span></td>
+                <td>Avery</td>
+                <td class="ui-table__num">1 d</td>
+                <td><span class="ui-pill" data-status="info"><span class="ui-pill__dot" aria-hidden="true"></span>in review</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- 5. Accuracy view ---------- -->
+    <section class="ui-panel" data-variant="standard" data-screen="accuracy" id="accuracy" tabindex="-1" aria-labelledby="accuracy-title">
+      <div class="ui-panel__header">
+        <div class="ui-panel__identity">
+          <h2 class="ui-panel__title" id="accuracy-title">Measured accuracy</h2>
+          <span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>sample figures</span>
+        </div>
+      </div>
+      <div class="ui-panel__body" data-body="document">
+          <div class="ui-card-grid">
+            <article class="ui-card ui-card--accent" aria-labelledby="accuracy-read-title">
+              <p class="ui-card__kicker">Read first</p>
+              <h3 class="ui-card__title" id="accuracy-read-title">Sample figures, not measurements</h3>
+              <div class="ui-card__body"><p>Reported results, not claimed benefit. Each figure sits beside the "always affirmed" baseline, which never flags a case.</p></div>
+            </article>
+            <article class="ui-card ui-card--stat" aria-label="Recall on reversals, sample figure">
+              <p class="ui-card__kicker">Recall on reversals (sample figure)</p>
+              <p class="ui-card__value">0.62</p>
+              <p class="ui-card__delta">Baseline 0.00: "always affirmed" flags none</p>
+            </article>
+            <article class="ui-card ui-card--stat" aria-label="Lift on reversals, sample figure">
+              <p class="ui-card__kicker">Lift on reversals (sample figure)</p>
+              <p class="ui-card__value">2.4×</p>
+              <p class="ui-card__delta">Baseline: not defined, no flags to compare</p>
+            </article>
+            <article class="ui-card ui-card--stat" aria-label="Flag rate, sample figure">
+              <p class="ui-card__kicker">Flag rate (sample figure)</p>
+              <p class="ui-card__value">21%</p>
+              <p class="ui-card__delta">Baseline 0%</p>
+            </article>
+          </div>
+      </div>
+    </section>
+    <section class="ui-panel" data-variant="standard" data-screen="accuracy" id="accuracy-baseline" aria-labelledby="accuracy-baseline-title">
+      <div class="ui-panel__header">
+        <div class="ui-panel__identity">
+          <h2 class="ui-panel__title" id="accuracy-baseline-title">Beside the "always affirmed" baseline</h2>
+          <span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>sample figures</span>
+        </div>
+      </div>
+      <div class="ui-panel__body" data-body="table">
+          <div class="ui-table-wrap">
+            <table class="ui-table" aria-label="Accuracy beside the always-affirmed baseline, sample figures">
+              <thead>
+                <tr>
+                  <th scope="col">Measure (sample figures)</th>
+                  <th scope="col" class="ui-table__num">This system</th>
+                  <th scope="col" class="ui-table__num">"Always affirmed"</th>
+                  <th scope="col">Basis</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">Recall on reversals</th><td class="ui-table__num">0.62</td><td class="ui-table__num">0.00</td><td>Reversed decisions the system flagged</td></tr>
+                <tr><th scope="row">Lift on reversals</th><td class="ui-table__num">2.4×</td><td class="ui-table__num">not defined</td><td>Reversal rate among flagged cases over the base reversal rate</td></tr>
+                <tr><th scope="row">Flag rate</th><td class="ui-table__num">21%</td><td class="ui-table__num">0%</td><td>Share of all decisions flagged</td></tr>
+                <tr><th scope="row">Recall, improper-denial lens</th><td class="ui-table__num">0.66</td><td class="ui-table__num">0.00</td><td>Reversals in the claimant's favour</td></tr>
+                <tr><th scope="row">Recall, improper-payment lens</th><td class="ui-table__num">0.55</td><td class="ui-table__num">0.00</td><td>Reversals in the employer's favour</td></tr>
+                <tr><th scope="row">Decisions in the set</th><td class="ui-table__num"><span class="ui-state" data-state="not-recorded"><span class="ui-state__title">not recorded</span></span></td><td class="ui-table__num">same set</td><td>Published appeal-board decisions, outcome removed by code</td></tr>
+              </tbody>
+            </table>
+          </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== INSPECTOR ==================== -->
+  <aside class="ui-shell__region" data-region="inspector" aria-label="Inspector">
+
+    <!-- queue: selected case -->
+    <section class="ui-panel" data-variant="standard" data-screen="queue" aria-labelledby="insp-q-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="insp-q-title">Selected case</h2></div></div>
+      <div class="ui-panel__body" data-body="document">
+        <div class="ui-prose">
+          <article class="ui-card ui-card--ai" aria-labelledby="insp-q-case">
+            <p class="ui-card__kicker">Generated by Claude: flags for SYN-0142</p>
+            <h3 class="ui-card__title" id="insp-q-case">Discharge: attendance</h3>
+            <div class="ui-card__body">
+              <p><span class="ui-pill" data-status="err"><span class="ui-pill__dot" aria-hidden="true"></span>Improper-denial risk: high</span></p>
+              <p><span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>Improper-payment risk: low</span></p>
+              <p>Determinative fact: whether the claimant received the final warning before the last absence.</p>
+            </div>
+            <p class="ui-card__meta"><span class="ui-pill" data-status="ai"><span class="ui-pill__dot" aria-hidden="true"></span>AI flags</span><span>Claude via Amazon Bedrock · Bidirectional Flagging (Opus 5.5)</span><span>Pass 1, 2026-10-14 09:12</span></p>
+            <div class="ui-card__actions">
+              <a class="ui-button ui-button--primary ui-button--sm" href="#case"><span class="ui-button__label">Open case review</span></a>
+            </div>
+          </article>
+          <p>Queue order comes from the server. Sorting a column here changes the view, not the ranking.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- case and decision: decision panel with the drafted notice -->
+    <section class="ui-panel" data-variant="standard" data-screen="case decision" aria-labelledby="insp-d-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="insp-d-title">Decision and drafted notice</h2></div></div>
+      <div class="ui-panel__body" data-body="document">
+        <div class="ui-prose">
+          <article class="ui-card ui-card--accent" aria-labelledby="insp-d-act">
+            <p class="ui-card__kicker">Your decision</p>
+            <h3 class="ui-card__title" id="insp-d-act">The examiner decides. Always.</h3>
+            <div class="ui-card__body"><p>Claude recommends: allow benefits, misconduct not established. Claude recommends; it never determines.</p></div>
+            <div class="ui-card__actions">
+              <button type="button" class="ui-button ui-button--primary ui-button--sm"><span class="ui-button__label">Accept and send notice</span></button>
+              <a class="ui-button ui-button--secondary ui-button--sm" href="#decision-edit"><span class="ui-button__label">Edit</span></a>
+              <a class="ui-button ui-button--secondary ui-button--sm" href="#decision-reject"><span class="ui-button__label">Reject</span></a>
+            </div>
+            <p class="ui-card__meta"><span>Decided by:</span><span class="ui-state" data-state="not-recorded"><span class="ui-state__title">not recorded</span></span></p>
+          </article>
+
+          <article class="ui-card ui-card--ai" aria-labelledby="insp-d-notice">
+            <p class="ui-card__kicker">Drafted by Claude: plain-language notice</p>
+            <h3 class="ui-card__title" id="insp-d-notice">Notice of determination (draft)</h3>
+            <div class="ui-card__body ui-prose">
+              <p>We have decided you can receive unemployment benefits.</p>
+              <p>Your employer said you were let go for missing work. To deny benefits for that reason, the law needs proof that you knew about the attendance warning before your last absence. Our records do not show that you got the warning.</p>
+              <p>If you disagree with this decision, you can appeal. The appeal deadline and how to file are on the back of this notice.</p>
+            </div>
+            <p class="ui-card__meta"><span class="ui-pill" data-status="ai"><span class="ui-pill__dot" aria-hidden="true"></span>AI draft</span><span>Claude via Amazon Bedrock · Notice Drafting (Sonnet 5)</span><span>2026-10-14 09:14</span></p>
+            <p class="ui-card__meta"><span>Comprehension test:</span><span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>passed (sample)</span></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- supervisor: selected escalation -->
+    <section class="ui-panel" data-variant="standard" data-screen="supervisor" aria-labelledby="insp-s-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="insp-s-title">Escalation: SYN-0150</h2></div></div>
+      <div class="ui-panel__body" data-body="document">
+        <div class="ui-prose">
+          <article class="ui-card ui-card--accent" aria-labelledby="insp-s-why">
+            <p class="ui-card__kicker">Why it is here</p>
+            <h3 class="ui-card__title" id="insp-s-why">High risk: improper payment</h3>
+            <div class="ui-card__body"><p>The escalation rule in the orchestrator (code) recommended review because the improper-payment lens is high. The examiner's view of Claude's findings played no part.</p></div>
+            <div class="ui-card__actions">
+              <button type="button" class="ui-button ui-button--primary ui-button--sm"><span class="ui-button__label">Take the case</span></button>
+              <button type="button" class="ui-button ui-button--secondary ui-button--sm"><span class="ui-button__label">Return to examiner</span></button>
+            </div>
+          </article>
+          <article class="ui-card ui-card--ai" aria-labelledby="insp-s-flag">
+            <p class="ui-card__kicker">Generated by Claude: flags</p>
+            <h3 class="ui-card__title" id="insp-s-flag">Earnings after separation</h3>
+            <div class="ui-card__body"><p>A wage record shows earnings in the two weeks after the stated separation date.</p></div>
+            <p class="ui-card__meta"><span class="ui-pill" data-status="ai"><span class="ui-pill__dot" aria-hidden="true"></span>AI finding</span><span>Claude via Amazon Bedrock · Bidirectional Flagging (Opus 5.5)</span></p>
+            <p class="ui-card__meta"><span>Sources:</span><span class="ui-pill">Claim document: wage record, 2026 Q3</span></p>
+          </article>
+          <div class="ui-state" data-state="missing">
+            <p class="ui-state__title">Drafted notice: agent unavailable</p>
+            <p class="ui-state__body">The Notice Drafting agent is not configured in this environment. The findings can be reviewed; no notice can be drafted here.</p>
+          </div>
+          <h3 id="insp-s-returned">Returned to examiners today</h3>
+          <div class="ui-state" data-state="empty" aria-labelledby="insp-s-returned">
+            <p class="ui-state__title">None returned yet</p>
+            <p class="ui-state__body">Cases you return to an examiner appear here with your note.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- accuracy: method -->
+    <section class="ui-panel" data-variant="standard" data-screen="accuracy" aria-labelledby="insp-a-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="insp-a-title">How this is measured</h2></div></div>
+      <div class="ui-panel__body" data-body="document">
+        <div class="ui-prose">
+          <p>Labels are published appeal-board decisions. Code removes the outcome before the agents see a case; the agents' flags are then compared with the published outcome.</p>
+          <p>Recall, lift and flag rate are reported on reversals, beside the "always affirmed" baseline. They are reported results, not a claimed benefit.</p>
+          <p>Results feed prompt and retrieval tuning. They never change a determination.</p>
+          <div class="ui-state" data-state="missing">
+            <p class="ui-state__title">Calibration data not loaded</p>
+            <p class="ui-state__body">Published appeal reversal rates and improper-denial rates are not loaded in this environment, so calibration is not shown.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </aside>
+
+  <!-- ==================== DOCK ==================== -->
+  <aside class="ui-shell__region" data-region="dock" aria-label="Runs and sources">
+    <section class="ui-panel" data-variant="standard" data-screen="queue" aria-labelledby="dock-q-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="dock-q-title">Runs</h2></div></div>
+      <div class="ui-panel__body" data-body="stream" role="log">
+        <div class="ui-state" data-state="error" role="alert">
+          <p class="ui-state__title">SYN-0148: Pass 1 held at the hop gate</p>
+          <p class="ui-state__body">The Statutory Application output failed validation, so no finding or flag was recorded. The model reports; code decides.</p>
+          <div class="ui-state__action"><button type="button" class="ui-button ui-button--secondary ui-button--sm"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-refresh"/></svg></span><span class="ui-button__label">Retry Pass 1</span></button></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ui-panel" data-variant="standard" data-screen="case" aria-labelledby="dock-c-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="dock-c-title">Sources cited</h2> <span class="ui-badge">7</span></div></div>
+      <div class="ui-panel__body" data-body="document">
+        <ol class="ui-prose">
+          <li id="case-src-1">Statute: SS UI Act § 4-210(b), discharge for misconduct. Synthetic State corpus.</li>
+          <li id="case-src-2">Policy manual: Benefit Policy Manual 7.3, attendance and warnings. Synthetic State corpus.</li>
+          <li id="case-src-3">Precedent: Appeal Board P-B-17, notice of a warning. Synthetic State corpus.</li>
+          <li id="case-src-4">Claim document: employer exhibit 3, written final warning, p. 1.</li>
+          <li id="case-src-5">Claim document: employer separation statement, p. 1.</li>
+          <li id="case-src-6">Claim document: claimant separation statement, p. 2.</li>
+          <li id="case-src-7">Claim document: wage record, 2026 Q2.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="ui-panel" data-variant="standard" data-screen="decision" aria-labelledby="dock-d-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="dock-d-title">Pass 2</h2></div></div>
+      <div class="ui-panel__body" data-body="stream" role="log">
+        <div class="ui-state" data-state="empty">
+          <p class="ui-state__title">No proposed determination yet</p>
+          <p class="ui-state__body">Pass 2 checks each proposed determination. It starts when you accept, edit or reject.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="ui-panel" data-variant="standard" data-screen="supervisor" aria-labelledby="dock-s-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="dock-s-title">Escalation rules</h2></div></div>
+      <div class="ui-panel__body" data-body="document">
+        <ul class="ui-prose">
+          <li>High risk in either direction: escalation recommended.</li>
+          <li>Ambiguous record the agents could not reconcile: escalation recommended.</li>
+          <li>Suspected fraud: escalation recommended.</li>
+          <li>An examiner disagreeing with Claude: not a reason on its own.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="ui-panel" data-variant="standard" data-screen="accuracy" aria-labelledby="dock-a-title">
+      <div class="ui-panel__header"><div class="ui-panel__identity"><h2 class="ui-panel__title" id="dock-a-title">Evaluation runs</h2></div></div>
+      <div class="ui-panel__body" data-body="stream" role="log">
+        <div class="ui-state" data-state="loading" role="status">
+          <p class="ui-state__title"><span class="ui-spinner" aria-hidden="true"></span>Scoring the synthetic validation set</p>
+          <p class="ui-state__body">Step 2 of 4: comparing flags with published outcomes.</p>
+        </div>
+      </div>
+    </section>
+  </aside>
+
+  <!-- ==================== STRIP (shared) ==================== -->
+  <footer class="ui-shell__region" data-region="strip">
+    <section class="ui-panel" data-variant="compact" aria-labelledby="strip-title">
+      <div class="ui-panel__header">
+        <div class="ui-panel__identity">
+          <h2 class="ui-panel__title ui-visually-hidden" id="strip-title">Model and usage</h2>
+          <span class="ui-pill" data-status="ai"><span class="ui-pill__dot" aria-hidden="true"></span>Claude via Amazon Bedrock</span>
+        </div>
+      </div>
+      <div class="ui-panel__body" data-body="ticker">Sonnet 5: Case Synthesis, Notice Drafting · Opus 5.5: Statutory Application, Bidirectional Flagging · Usage (sample figures): 41,200 in, 6,900 out tokens</div>
+    </section>
+  </footer>
+</div>
+
+<!-- GALLERY ONLY: not part of the kit. Toggles data-theme on <html>; ?theme=dark starts dark.
+     Screens switch by :target with or without this script. -->
+<script>
+  (function () {
+    var root = document.documentElement;
+    var button = document.querySelector('[data-gallery="theme"]');
+    function setTheme(dark) {
+      root.setAttribute("data-theme", dark ? "dark" : "light");
+      button.setAttribute("aria-pressed", String(dark));
+    }
+    var theme = new URLSearchParams(location.search).get("theme");
+    if (theme) setTheme(theme === "dark");
+    button.addEventListener("click", function () {
+      setTheme(button.getAttribute("aria-pressed") !== "true");
+    });
+  })();
+</script>
+</body>
+</html>

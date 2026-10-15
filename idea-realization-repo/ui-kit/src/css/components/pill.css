@@ -1,11 +1,13 @@
 /*
-  Pill, badge and chip. Classes: .ui-pill (+ .ui-pill__dot), .ui-badge, .ui-chip (+ .ui-chip__remove).
+  Pill, badge and chip. Classes: .ui-pill (+ .ui-pill__dot), .ui-badge, .ui-chip (+ .ui-chip__label,
+  .ui-chip__remove).
 
   .ui-pill   status, data-status="ok|warn|info|err|neutral|ai" (absent = neutral). Status colour on
              its pale fill, and the status is always in words: the colour never stands alone.
   .ui-badge  a count. Neutral; inside a primary button it switches to the on-accent colour.
   .ui-chip   a filter chip. Its one action is .ui-chip__remove, a real <button> labelled
-             "Remove filter: X", 24x24 so it meets the target-size floor.
+             "Remove filter: X", 24x24 so it meets the target-size floor. The text sits in
+             .ui-chip__label, which truncates with an ellipsis so the remove button stays whole.
 */
 
 .ui-pill {
@@ -109,6 +111,12 @@
   line-height: var(--ui-lh-tight);
   white-space: nowrap;
   vertical-align: middle;
+}
+
+.ui-chip__label {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ui-chip__remove {

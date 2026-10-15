@@ -1,0 +1,15 @@
+{
+  "id": "examiner",
+  "label": "Examiner workbench: screen nav, case and findings, decision inspector, run dock",
+  "regions": ["header", "nav", "main", "inspector", "dock", "strip"],
+  "grid": {
+    "columns": ["minmax(0, 0.8fr)", "minmax(0, 4fr)", "minmax(0, 1.8fr)"],
+    "rows": ["auto", "minmax(0, 4fr)", "minmax(0, 1fr)", "auto"],
+    "areas": [
+      "header header header",
+      "nav main inspector",
+      "nav dock inspector",
+      "strip strip strip"
+    ]
+  }
+}

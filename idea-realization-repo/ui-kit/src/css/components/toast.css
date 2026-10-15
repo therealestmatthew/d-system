@@ -1,10 +1,13 @@
 /*
   Toast. Classes: .ui-toast-region (bottom-right stack), .ui-toast data-status="ok|info|err",
-  parts .ui-toast__title __body __actions __close.
+  parts .ui-toast__content (wraps title and body) .ui-toast__title __body __actions __close.
 
-  The region is a polite status region (role="region" with an aria-label holding the live
-  toasts); an error toast uses role="alert". Toasts never take focus. At most three are visible:
-  the newest is last in the DOM, and every toast older than the last three is hidden.
+  ARIA follows React Aria's toast pattern: the region is a role="region" landmark named
+  "Notifications"; each toast is role="alertdialog" (aria-modal="false", tabindex="0") and its
+  .ui-toast__content is role="alert". Toasts never take focus by themselves; F8 moves focus into
+  the region. React Aria wraps the toasts in <ol>/<li> with display: contents, so each toast is
+  still laid out as a flex item of the region. At most three are visible: React Aria's queue caps
+  them, and for a static page every toast older than the last three is hidden here.
   Status is a coloured inline-start rule plus the words of the title, never colour alone.
   Motion: each toast slides up and fades in; RAC data-exiting fades it out.
 */
@@ -26,7 +29,8 @@
   pointer-events: none;
 }
 
-.ui-toast-region > :nth-last-child(n + 4) {
+.ui-toast-region > .ui-toast:nth-last-child(n + 4),
+.ui-toast-region li:nth-last-child(n + 4) > .ui-toast {
   display: none;
 }
 
@@ -71,6 +75,14 @@
   outline-offset: var(--ui-focus-offset);
 }
 
+.ui-toast__content {
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-1);
+  min-inline-size: 0;
+}
+
 .ui-toast__title {
   grid-column: 1;
   margin: 0;
@@ -103,10 +115,12 @@
   margin-block-start: var(--ui-space-1);
 }
 
+/* React renders the close glyph as a bare text span, so the glyph size comes from here. */
 .ui-toast__close {
   grid-column: 2;
   grid-row: 1 / span 3;
   align-self: start;
+  font-size: var(--ui-fs-lg);
 }
 
 @keyframes ui-toast-in {

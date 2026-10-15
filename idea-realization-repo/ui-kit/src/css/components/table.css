@@ -1,12 +1,19 @@
 /*
   Table. Classes: .ui-table-wrap (scroll container, sticky header), table.ui-table,
-  button.ui-table__sort inside th[aria-sort], .ui-table__num (right, tabular numerals),
-  .ui-table__id (monospace), .ui-table__toolbar, .ui-table__count ("42 of 310").
+  .ui-table__sort (the label and sort indicator inside a sortable header), .ui-table__num (right,
+  tabular numerals) and .ui-table__id (monospace) on th and td, .ui-table__select (the checkbox
+  column's th and td), .ui-table__checkbox (React Aria Checkbox label), .ui-table__toolbar,
+  .ui-table__count ("42 of 310").
 
-  Selected row: tr[aria-selected="true"] or [data-selected]. Sort state: aria-sort on the header
-  cell, "ascending" | "descending" | "none" (the server order); the indicator is drawn by the
-  sort button from that attribute. React Aria renders role="grid"/"row"/"columnheader"/"gridcell"
-  on the same elements; the selectors below cover both forms.
+  Sorting: the sortable header cell itself is the pressable, focusable control. React Aria makes
+  th[role="columnheader"] focusable and pressable (Enter or click sorts) and marks it
+  [data-allows-sorting]; .ui-table__sort is a span inside it, never a nested button. Sort state is
+  aria-sort on the header cell: "ascending" | "descending" | "none" (the server order). A static
+  table may still put a <button class="ui-table__sort"> in the th; it is reset to look the same.
+
+  Selected row: tr[aria-selected="true"] or [data-selected]. React Aria renders a real <table
+  role="grid"> with role="row"/"columnheader"/"gridcell"/"rowheader"; the selectors below cover
+  both forms.
 */
 
 .ui-table-wrap {
@@ -58,25 +65,52 @@
   color: var(--ui-color-text);
 }
 
+/* The sortable header is the control: hover, pressed and focus on the cell, native and RAC. */
+.ui-table :is(th, [role="columnheader"]):is([aria-sort], [data-allows-sorting]) {
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--ui-dur-fast) var(--ui-ease-standard),
+    color var(--ui-dur-fast) var(--ui-ease-standard);
+}
+
+.ui-table :is(th, [role="columnheader"]):is([aria-sort], [data-allows-sorting]):is(:hover, [data-hovered]) {
+  background: color-mix(in srgb, var(--ui-color-text) 7%, var(--ui-color-surface));
+  color: var(--ui-color-text);
+}
+
+.ui-table :is(th, [role="columnheader"]):is([aria-sort], [data-allows-sorting]):is(:active, [data-pressed]) {
+  background: color-mix(in srgb, var(--ui-color-text) 12%, var(--ui-color-surface));
+}
+
+/* The ring is drawn inside the cell: the scroll container would clip a ring outside it. */
+.ui-table :is(th, [role="columnheader"]):is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: calc(var(--ui-focus-width) * -1);
+}
+
+.ui-table :is(th, [role="columnheader"]):focus:not(:focus-visible) {
+  outline: none;
+}
+
 .ui-table__sort {
   display: inline-flex;
   align-items: center;
   gap: var(--ui-space-2);
-  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+/* Static form only: a native button in the th, reset so it looks like the React form. */
+button.ui-table__sort {
   min-block-size: var(--ui-ctl-sm);
-  margin: 0 calc(var(--ui-space-2) * -1);
-  padding: 0 var(--ui-space-2);
+  margin: 0;
+  padding: 0;
   border: 0;
-  border-radius: var(--ui-radius-sm);
   background: transparent;
   color: inherit;
   font: inherit;
   text-align: inherit;
-  white-space: nowrap;
   cursor: pointer;
-  transition:
-    background-color var(--ui-dur-fast) var(--ui-ease-standard),
-    color var(--ui-dur-fast) var(--ui-ease-standard);
 }
 
 .ui-table__sort::after {
@@ -89,43 +123,20 @@
   opacity: 0.55;
 }
 
-:is(th, [role="columnheader"])[aria-sort="ascending"] > .ui-table__sort::after {
+:is(th, [role="columnheader"])[aria-sort="ascending"] .ui-table__sort::after {
   content: "\2191";
   color: var(--ui-color-text);
   opacity: 1;
 }
 
-:is(th, [role="columnheader"])[aria-sort="descending"] > .ui-table__sort::after {
+:is(th, [role="columnheader"])[aria-sort="descending"] .ui-table__sort::after {
   content: "\2193";
   color: var(--ui-color-text);
   opacity: 1;
 }
 
-.ui-table__sort:is(:hover, [data-hovered]) {
-  background: color-mix(in srgb, var(--ui-color-text) 7%, transparent);
-  color: var(--ui-color-text);
-}
-
-.ui-table__sort:is(:hover, [data-hovered])::after {
+:is(th, [role="columnheader"]):is(:hover, [data-hovered]) .ui-table__sort::after {
   opacity: 1;
-}
-
-.ui-table__sort:is(:active, [data-pressed]) {
-  background: color-mix(in srgb, var(--ui-color-text) 12%, transparent);
-}
-
-.ui-table__sort:is(:focus-visible, [data-focus-visible]) {
-  outline: var(--ui-focus-width) solid var(--ui-color-focus);
-  outline-offset: var(--ui-focus-offset);
-}
-
-.ui-table__sort:focus:not(:focus-visible) {
-  outline: none;
-}
-
-.ui-table__sort:is(:disabled, [aria-disabled="true"], [data-disabled]) {
-  cursor: not-allowed;
-  opacity: 0.6;
 }
 
 /* ---- body ---- */
@@ -183,12 +194,79 @@
   color: var(--ui-color-muted);
 }
 
-.ui-table input[type="checkbox"] {
+/* ---- selection column ---- */
+
+.ui-table :is(th, td, [role="columnheader"], [role="gridcell"]).ui-table__select {
+  inline-size: var(--ui-ctl-md);
+  padding-inline: var(--ui-space-3);
+  text-align: center;
+}
+
+/* A native checkbox in a static table. */
+.ui-table input[type="checkbox"]:not(.ui-table__checkbox > input) {
   inline-size: var(--ui-space-5);
   block-size: var(--ui-space-5);
   margin: 0;
   accent-color: var(--ui-color-accent);
   vertical-align: middle;
+}
+
+/* React Aria Checkbox: a label around a visually hidden input. The label draws the box and is
+   the 24x24 target. State: RAC [data-selected] / [data-indeterminate], or the native input. */
+.ui-table__checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--ui-ctl-sm);
+  block-size: var(--ui-ctl-sm);
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.ui-table__checkbox::before {
+  content: "";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  inline-size: var(--ui-space-5);
+  block-size: var(--ui-space-5);
+  border: 1px solid var(--ui-color-line-strong);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-color-bg);
+  color: var(--ui-color-on-accent);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-bold);
+  line-height: 1;
+  transition:
+    background-color var(--ui-dur-fast) var(--ui-ease-standard),
+    border-color var(--ui-dur-fast) var(--ui-ease-standard);
+}
+
+.ui-table__checkbox:is(:hover, [data-hovered])::before {
+  border-color: var(--ui-color-text);
+}
+
+.ui-table__checkbox:is([data-selected], :has(> input:checked))::before {
+  content: "\2713";
+  border-color: var(--ui-color-accent);
+  background: var(--ui-color-accent);
+}
+
+.ui-table__checkbox:is([data-indeterminate], :has(> input:indeterminate))::before {
+  content: "\2212";
+  border-color: var(--ui-color-accent);
+  background: var(--ui-color-accent);
+}
+
+.ui-table__checkbox:is([data-focus-visible], :has(> input:focus-visible))::before {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-table__checkbox:is([data-disabled], :has(> input:disabled)) {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .ui-table__num {
@@ -201,7 +279,7 @@
   text-align: end;
 }
 
-:is(th, [role="columnheader"]).ui-table__num > .ui-table__sort {
+:is(th, [role="columnheader"]).ui-table__num .ui-table__sort {
   flex-direction: row-reverse;
 }
 
@@ -209,6 +287,11 @@
   font-family: var(--ui-font-mono);
   font-size: var(--ui-fs-xs);
   white-space: nowrap;
+}
+
+/* An id column's header keeps the header type; only its cells are monospace. */
+:is(th, [role="columnheader"]).ui-table__id {
+  font-family: inherit;
 }
 
 /* ---- toolbar and count ---- */

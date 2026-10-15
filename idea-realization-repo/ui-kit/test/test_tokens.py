@@ -124,8 +124,10 @@ def test_rule_parser_sees_every_block(css: str, tokens: gen.Tokens) -> None:
     assert ("(prefers-reduced-motion: reduce)", ":root") in selectors
     for name in tokens.accents:
         assert ("", f'[data-accent="{name}"]') in selectors
-    # 1 root + 1 forced light + accents + 2 x (dark base + accents) + 2 densities + 1 motion
-    assert len(_rules(css)) == 1 + 1 + 3 * len(tokens.accents) + 2 + 2 + 1
+    assert (tokens.auto_density.media, gen.AUTO_DENSITY_SCOPE) in selectors
+    # 1 root + 1 forced light + accents + 2 x (dark base + accents) + 2 densities + 1 automatic
+    # density + 1 motion
+    assert len(_rules(css)) == 1 + 1 + 3 * len(tokens.accents) + 2 + 2 + 1 + 1
 
 
 # ---- generation is deterministic and the committed file is current ----
@@ -288,6 +290,49 @@ def test_density_blocks_set_no_colour(css: str, density: str) -> None:
         assert name in EXPECTED_NAMES
 
 
+def _auto_block(css: str, tokens: gen.Tokens) -> dict[str, str]:
+    return _rule(css, gen.AUTO_DENSITY_SCOPE, tokens.auto_density.media)
+
+
+def test_auto_density_sets_no_colour(css: str, tokens: gen.Tokens) -> None:
+    block = _auto_block(css, tokens)
+    assert block
+    for name, value in block.items():
+        assert not name.startswith("--ui-color-") and name != "color-scheme", name
+        assert not COLOUR_LITERAL.search(value), f"automatic density {name} carries a colour"
+        group = name.removeprefix("--ui-").split("-", 1)[0]
+        assert group in gen.DENSITY_GROUPS, f"automatic density sets {name}"
+
+
+def test_auto_density_repeats_the_named_density(css: str, tokens: gen.Tokens) -> None:
+    auto = tokens.auto_density
+    assert auto.density == "compact"
+    assert _auto_block(css, tokens) == _rule(css, f'[data-density="{auto.density}"]')
+
+
+def test_auto_density_is_scoped_to_the_shell_and_yields_to_comfortable() -> None:
+    scope = gen.AUTO_DENSITY_SCOPE
+    assert scope.startswith(".ui-shell:not(")
+    assert '[data-density="comfortable"]' in scope
+    assert '[data-density="comfortable"] *' in scope
+    assert ":root" not in scope and "html" not in scope and "body" not in scope
+
+
+def test_auto_density_media_is_the_layout_breakpoint(css: str, tokens: gen.Tokens) -> None:
+    """The breakpoint is data; tokens.css emits it, and any query on it in src/css matches."""
+    auto = tokens.auto_density
+    assert auto.media == "(width < 68.75em), (height < 50em)"
+    assert f"@media {auto.media} {{" in css
+    layout = (KIT / "src" / "css" / "layout.css").read_text(encoding="utf-8")
+    assert auto.media in layout, "layout.css no longer names the compact breakpoint"
+    for path in sorted((KIT / "src" / "css").rglob("*.css")):
+        text = re.sub(r"/\*.*?\*/", "", path.read_text(encoding="utf-8"), flags=re.S)
+        for query in re.findall(r"@media\s*([^{]+)\{", text):
+            query = " ".join(query.split())
+            if auto.width in query or auto.height in query:
+                assert query == auto.media, f"{path.name}: {query!r} != {auto.media!r}"
+
+
 def test_density_keeps_targets_at_the_wcag_floor(tokens: gen.Tokens) -> None:
     for groups in tokens.density.values():
         for size in groups.get("ctl", {}).values():
@@ -442,6 +487,11 @@ def _mutations() -> list[tuple[str, Any]]:
         ("unknown density", put(("density", "cozy"), {})),
         ("density key not in base group", put(("density", "compact", "space", "12"), "1px")),
         ("reduced motion outside dur", put(("reduced_motion", "ease"), {})),
+        ("missing auto density", drop(("auto_density",))),
+        ("auto density not a density", put(("auto_density", "density"), "cozy")),
+        ("auto density breakpoint in px", put(("auto_density", "below", "width"), "1100px")),
+        ("unknown auto density key", put(("auto_density", "scope"), ".x")),
+        ("missing auto density bound", drop(("auto_density", "below", "height"))),
         ("unknown pair role", pair(fg="brand")),
         ("unknown pair key", pair(level="AA")),
         ("translucent pair role", pair(fg="overlay")),
