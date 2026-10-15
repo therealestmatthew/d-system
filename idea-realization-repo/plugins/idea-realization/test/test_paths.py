@@ -221,6 +221,28 @@ def test_project_yaml_sits_between_the_plugin_option_and_the_default(tmp_path: P
     assert option.sources["integration_branch"] == "CLAUDE_PLUGIN_OPTION_INTEGRATION_BRANCH"
 
 
+def test_the_integration_branch_option_is_declared_empty() -> None:
+    manifest = json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text())
+    assert manifest["userConfig"]["integration_branch"]["default"] == ""
+    assert paths.KEYS["integration_branch"].default == "main"
+
+
+def test_a_saved_empty_integration_branch_option_leaves_project_yaml_in_force(
+        tmp_path: Path) -> None:
+    _write(tmp_path, "project.yaml", PROJECT)
+    config = paths.resolve({"root": str(tmp_path)},
+                           env={"CLAUDE_PLUGIN_OPTION_INTEGRATION_BRANCH": ""})
+    assert config.text("integration_branch") == "dev"
+    assert config.sources["integration_branch"] == "project.yaml"
+
+
+def test_main_is_the_integration_branch_when_nothing_sets_it(tmp_path: Path) -> None:
+    config = paths.resolve({"root": str(tmp_path)},
+                           env={"CLAUDE_PLUGIN_OPTION_INTEGRATION_BRANCH": ""})
+    assert config.text("integration_branch") == "main"
+    assert config.sources["integration_branch"] == "default"
+
+
 def test_local_yaml_sits_between_the_environment_and_the_plugin_option(tmp_path: Path) -> None:
     _write(tmp_path, "project.yaml", PROJECT)
     _write(tmp_path, "local.yaml", "aws_region: us-west-2\naws_read_profile: hack-read\n")

@@ -17,7 +17,13 @@ Every key is resolved with one precedence:
 4. the plugin option ``CLAUDE_PLUGIN_OPTION_<KEY>``,
 5. the tracked ``.idea-realization/project.yaml`` or ``.idea-realization/product.yaml``, for the
    keys they carry,
-6. the default declared in ``.claude-plugin/plugin.json``.
+6. the default declared in ``.claude-plugin/plugin.json``, or, where that default is empty, the
+   built-in fallback in ``FALLBACKS``.
+
+``integration_branch`` declares an empty default and falls back to ``main``. Claude Code can save a
+plugin option with its declared default even when the developer never chose it, and a saved option
+(level 4) outranks ``project.yaml`` (level 5). An empty default saves as an empty option, which
+counts as unset, so the team's ``control.integration_branch`` in ``project.yaml`` still applies.
 
 ``local.yaml`` is gitignored and holds what differs per machine: a flat map of key to value for
 the keys ``schemas/local.schema.json`` allows. It is read from the primary checkout, the first

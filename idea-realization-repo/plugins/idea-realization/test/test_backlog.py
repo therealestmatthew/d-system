@@ -678,8 +678,8 @@ def test_no_skill_names_an_integration_branch() -> None:
 
     from conftest import PLUGIN_ROOT
 
-    default = json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text())[
-        "userConfig"]["integration_branch"]["default"]
+    default = paths.KEYS["integration_branch"].default
+    assert isinstance(default, str) and default
     for path in sorted((PLUGIN_ROOT / "skills").glob("*/SKILL.md")):
         text = path.read_text(encoding="utf-8")
         for name in {default, "dev", "master", "trunk"}:

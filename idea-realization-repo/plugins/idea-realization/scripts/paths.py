@@ -12,7 +12,13 @@ Every key is resolved with one precedence:
 4. the plugin option ``CLAUDE_PLUGIN_OPTION_<KEY>``,
 5. the tracked ``.idea-realization/project.yaml`` or ``.idea-realization/product.yaml``, for the
    keys they carry,
-6. the default declared in ``.claude-plugin/plugin.json``.
+6. the default declared in ``.claude-plugin/plugin.json``, or, where that default is empty, the
+   built-in fallback in ``FALLBACKS``.
+
+``integration_branch`` declares an empty default and falls back to ``main``. Claude Code can save a
+plugin option with its declared default even when the developer never chose it, and a saved option
+(level 4) outranks ``project.yaml`` (level 5). An empty default saves as an empty option, which
+counts as unset, so the team's ``control.integration_branch`` in ``project.yaml`` still applies.
 
 ``local.yaml`` is gitignored and holds what differs per machine: a flat map of key to value for
 the keys ``schemas/local.schema.json`` allows. It is read from the primary checkout, the first
@@ -141,6 +147,10 @@ PRIMARY_KEYS = {"worktree_dir"}
 #: Keys that locate the product repository; they may be unset and resolve outside this repository.
 PRODUCT_KEYS = {"product_root", "product_worktree_dir"}
 
+#: The value a key takes when nothing sets it and its manifest default is empty. A manifest default
+#: would be saved as a plugin option and outrank ``project.yaml``; this one never is.
+FALLBACKS = {"integration_branch": "main"}
+
 
 def load_keys(manifest: Path = MANIFEST) -> dict[str, Key]:
     """Read every configurable key and its default from the manifest's ``userConfig``."""
@@ -148,8 +158,10 @@ def load_keys(manifest: Path = MANIFEST) -> dict[str, Key]:
     keys = {}
     for name, spec in config.items():
         kind = "paths" if spec.get("multiple") else "text" if name in TEXT_KEYS else "path"
-        keys[name] = Key(name, kind, spec.get("default", [] if kind == "paths" else ""),
-                         spec["description"])
+        default = spec.get("default", [] if kind == "paths" else "")
+        if not default and name in FALLBACKS:
+            default = FALLBACKS[name]
+        keys[name] = Key(name, kind, default, spec["description"])
     return keys
 
 

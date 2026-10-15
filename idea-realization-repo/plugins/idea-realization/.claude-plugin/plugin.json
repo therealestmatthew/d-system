@@ -45,8 +45,8 @@
     "integration_branch": {
       "type": "string",
       "title": "Integration branch",
-      "description": "Branch that finished work merges into.",
-      "default": "main"
+      "description": "Branch that finished work merges into. Leave empty to use the project's control.integration_branch, or main when none is set.",
+      "default": ""
     },
     "worktree_dir": {
       "type": "string",
