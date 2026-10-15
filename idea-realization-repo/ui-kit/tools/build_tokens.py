@@ -2,8 +2,8 @@
 """Generate the ui-kit token stylesheet from its tokens file.
 
 `ui-kit/tokens/tokens.json` is the only place the kit's design values live. This tool turns it
-into `ui-kit/dist/tokens.css`, which no one edits by hand. Port of d-system's
-`tools/generate_house_css.py`, with a strict loader, accent sets and a contrast gate added.
+into `ui-kit/dist/tokens.css`, which no one edits by hand. It loads the file strictly, writes a
+block per accent set, and `--contrast` checks every colour pair for every theme and accent.
 
 Every custom property is named `--ui-<group>-<name>`; colours are `--ui-color-<role>`.
 

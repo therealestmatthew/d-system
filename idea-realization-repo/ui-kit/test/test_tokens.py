@@ -1,10 +1,9 @@
 """The ui-kit tokens file, its generator and the generated stylesheet.
 
-Ported from d-system's `test/test_house_css.py` where it applies: regeneration is byte-identical,
-`--check` catches a stale file, dark mode and densities stay in their lanes, font stacks end in a
-generic family. Added: no external request at all, every contrast pair for every theme and accent,
-the AI hue's distinctness, the strict loader, and the pinned list of variable names that the
-component CSS and React units build on.
+Covers: regeneration is byte-identical, `--check` catches a stale file, dark mode and densities
+stay in their lanes, font stacks end in a generic family, no external request at all, every
+contrast pair for every theme and accent, the AI hue's distinctness, the strict loader, and the
+pinned list of variable names that the component CSS and React units build on.
 """
 
 from __future__ import annotations

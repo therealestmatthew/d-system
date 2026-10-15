@@ -25,7 +25,7 @@ machine rule, the wrapper) is in `aws/README.md`.
 | Create or change a budget, an alert, a cost allocation tag activation | The sandbox administrator (a person with administrator or billing access in the account) | `aws/iam/deploy-policy.json` denies `budgets:*`, `ce:*`, `cur:*`, `billing:*` and the other billing actions explicitly. The read role has `ReadOnlyAccess`, which grants no create or update action. `.claude/settings.json` also asks a person before any `tools/aws-sandbox write budgets`, `ce` or `cur` command. |
 | Read spend and find idle resources | The `aws-cost-optimizer` agent, with the read role | It runs `tools/aws-sandbox read ce get-cost-and-usage ...` and describe/list calls. It changes nothing. |
 | Stop or delete a resource | The `aws-deploy` agent with a person's approval per deletion, or a person | Only `aws-deploy` runs `write` and `exec`. Every delete, stop or destroy command prompts for approval. |
-| Delete an execution role under `/app/` | The `aws-deploy` agent, as part of the stack's destroy; the sandbox administrator for a role a person created | The deploy role creates, changes and deletes `/app/` roles that carry the permission boundary (`aws/README.md`, "The roles and policies"), so the stack's own roles go with the stack. It cannot touch any other role. |
+| Delete an execution role under `/app/` | The `aws-deploy` agent, as part of the stack's destroy; the sandbox administrator for a role a person created | The deploy role creates, changes and deletes `/app/` roles that carry the permission boundary (`aws/README.md`, "The roles and policies"), so the stack's own roles go with the stack. It cannot create, change or delete any other role. |
 
 ## Budget alarm
 

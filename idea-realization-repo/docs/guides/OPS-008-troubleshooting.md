@@ -145,20 +145,20 @@ Two rules apply to every entry:
 
 ### `gh` cannot reach the repository
 
-- **Symptom.** `gh repo view --json nameWithOwner`, run in a worktree, fails: `gh` is not logged in,
-  its token expired, the organization's single sign-on is not authorized for it, or you have no
-  access to the repository.
-- **Cause.** `session-close` merges through a pull request only when that command succeeds. When it
-  fails, the skill takes the local fallback meant for repositories with no GitHub remote: a
-  `git merge --no-ff` in the primary checkout and a push. Control `dev` has no pull-request rule,
-  so that push would land a merge with no pull request; product `dev` refuses it.
+- **Symptom.** `session-close` stops before merging and reports that `gh` cannot reach a
+  repository whose `origin` is on GitHub: `gh repo view --json nameWithOwner` fails in that
+  worktree because `gh` is not logged in, its token expired, the organization's single sign-on is
+  not authorized for it, or you have no access to the repository.
+- **Cause.** `session-close` merges a repository whose `origin` is on GitHub only through a pull
+  request. When `gh` cannot reach it, the skill stops and reports; it never falls back to a local
+  merge for a GitHub origin, because control `dev` has no pull-request rule and would accept a
+  merge with no pull request. The local `git merge --no-ff` fallback is only for a repository
+  whose `origin` is not on GitHub.
 - **Fix.**
-  1. Before `session-close`, run `gh auth status` and `gh repo view --json nameWithOwner` in both
-     worktrees. Fix the login (`gh auth login`, or authorize the token for the organization's
-     single sign-on) until both succeed.
-  2. If `gh` fails partway through `session-close` and the repository's `origin` is on GitHub,
-     stop the close and fix `gh` first. Do not let it take the local fallback.
-  3. If you lack write access to either repository, ask the owner for it.
+  1. Fix the login: `gh auth login`, or authorize the token for the organization's single sign-on.
+     Check with `gh auth status` and `gh repo view --json nameWithOwner` in both worktrees.
+  2. If you lack write access to either repository, ask the owner for it.
+  3. Run `session-close` again. Never merge or push to `dev` by hand to get past the stop.
 
   Source: the `session-close` skill, step 6, "Which path applies".
 
