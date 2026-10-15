@@ -51,3 +51,11 @@ systems:
   paths: [brain/]
   depends_on: []
   description: The team's shared memory of decisions, research, concepts, entities and learnings, recorded and loaded with the plugin's brain command.
+- id: sys-ui-kit
+  name: UX component kit
+  domain: application
+  status: scaffold
+  owner: repository-owner
+  paths: [ui-kit/]
+  depends_on: []
+  description: The tokens, CSS, React components, static behaviours, gallery and page generators that give the product app and generated pages one look and one accessibility standard.

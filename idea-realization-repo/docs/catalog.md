@@ -7,15 +7,20 @@ the `check` command regenerates it in memory and fails on any difference.
 
 | Code | Kind | Status | Owner | Path |
 |---|---|---|---|---|
+| ADR-001 | adr | draft | repository-owner | docs/decisions/ADR-001-ux-kit-on-react-aria.md |
+| ARCH-001 | architecture | draft | repository-owner | docs/architecture/ARCH-001-ux-design-guide.md |
 | GOV-001 | governance | draft | repository-owner | docs/governance/GOV-001-standing-rules.md |
 | GOV-002 | governance | draft | repository-owner | docs/governance/GOV-002-anti-pattern-procedures.md |
 | PLAN-001 | plan | approved | repository-owner | docs/plans/PLAN-001-bootstrap-follow-ons.md |
+| PLAN-003 | plan | draft | repository-owner | docs/plans/PLAN-003-ux-component-kit.md |
+| REQ-001 | requirement | draft | repository-owner | docs/requirements/REQ-001-ux-kit-requirements.md |
 
 ## Plans and their phases
 
 | Code | Plan | Status | Queued | Active | Complete | Agents |
 |---|---|---|---|---|---|---|
 | PLAN-001 | doc-bootstrap-follow-ons | approved | 17 | 0 | 0 | — |
+| PLAN-003 | doc-ux-kit-plan | draft | 15 | 0 | 0 | — |
 
 ## Held codes
 
@@ -23,4 +28,4 @@ the `check` command regenerates it in memory and fails on any difference.
 |---|---|---|
 | — | — | — |
 
-3 documents — governance: 2, plan: 1.
+7 documents — adr: 1, architecture: 1, governance: 2, plan: 2, requirement: 1.

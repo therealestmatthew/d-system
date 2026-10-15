@@ -416,3 +416,517 @@ items:
   - plugins/idea-realization/scripts/
   next_action: Wait until the brain holds enough entries that text matching misses; ask the owner which
     search service is approved.
+- id: phase-ux-01
+  title: Kit gallery generator and browser test harness for every REQ-001 row
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 1
+  session_budget: 1
+  depends_on: []
+  scope:
+  - Generate the gallery index and one page per component from the catalogue markup, in light and dark.
+  - Add one command that builds the gallery and runs the Python, component and browser tests.
+  - Add browser tests for axe, focus rings, request origins, candidate accents and shell fit at 1024x768,
+    1280x720, 1366x768 and 1920x1080, plus keyboard specs for the dialog, tabs and toast Kit v0 shipped.
+  - Add a test for any REQ-001 row Kit v0 left without one, each with the fixture that must fail.
+  acceptance:
+  - One command builds the gallery and runs every test, and exits nonzero when any test fails.
+  - axe reports zero serious or critical issues on every gallery page in both themes.
+  - Each REQ-001 row from R01 to R09, R11 and R13 has a test that rejects its failing fixture.
+  verification:
+  - 'control: uv run --with pytest pytest -q ui-kit/test'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/tools/build_gallery.py
+  - ui-kit/gallery/
+  - ui-kit/test/
+  - ui-kit/playwright.config.ts
+  - ui-kit/package.json
+  next_action: Read what Kit v0 shipped under ui-kit/test/ and ui-kit/gallery/, then list the REQ-001 rows
+    with no test yet.
+- id: phase-ux-02
+  title: Static overlay behaviours in ui.js for toolbar, menu, popover and tooltip
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ux-01
+  scope:
+  - Add the toolbar (roving focus), menu and context menu, popover and tooltip and toggletip behaviours,
+    attached through data-ui attributes.
+  - Create the component manifest ui-kit/components.yaml and declare each behaviour in it.
+  - Add catalogue markup, gallery pages and keyboard specs for each widget.
+  acceptance:
+  - Each widget's keyboard spec from ARCH-001 passes in the browser tests, and Escape returns focus to the
+    trigger.
+  - A gallery page with no data-ui attribute contains no script element.
+  - axe and the focus-ring test still pass on every gallery page.
+  verification:
+  - 'control: uv run --with pytest pytest -q ui-kit/test'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/src/behaviours/
+  - ui-kit/dist/ui.js
+  - ui-kit/components.yaml
+  - ui-kit/src/css/components/
+  - ui-kit/gallery/
+  - ui-kit/test/
+  next_action: Port the measured-fit popover placement described in ARCH-001 first; the menu and toolbar
+    reuse its positioning.
+- id: phase-ux-03
+  title: Static disclosure and data behaviours in ui.js within 8 KB gzip
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ux-02
+  scope:
+  - Add accordion deep-link opening and expand-all, JavaScript tabs beside the CSS-only tabs, table sort
+    and filter, in-page search with the / shortcut, the theme toggle and copy.
+  - Declare each behaviour in ui-kit/components.yaml and add its gallery page and keyboard spec.
+  - Measure the gzip size of dist/ui.js in a test.
+  acceptance:
+  - dist/ui.js is at most 8 KB gzip, and a test fails when it grows past that.
+  - Filtering 1,000 static table rows takes at most 50 ms, measured in the browser test.
+  - The theme toggle sets data-theme on the root, and REQ-001 R04's test passes.
+  verification:
+  - 'control: uv run --with pytest pytest -q ui-kit/test'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/src/behaviours/
+  - ui-kit/dist/ui.js
+  - ui-kit/components.yaml
+  - ui-kit/src/css/components/
+  - ui-kit/gallery/
+  - ui-kit/test/
+  next_action: Start with the table sort and filter and its 1,000-row timing, since it is the behaviour
+    most likely to miss its budget.
+- id: phase-ux-04
+  title: Remaining static display components with the class-contract test
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ux-01
+  scope:
+  - Add CSS and catalogue markup for the stat row, callout, breadcrumbs, form and input styles, progress,
+    code and JSON viewer, count badge, filter chip, tag and gate badge.
+  - Add a class-contract test that every class in the catalogue exists in the CSS and every component class
+    in the CSS appears in the catalogue.
+  acceptance:
+  - Every component above has a gallery page in light and dark, and axe and the focus-ring test pass on it.
+  - The class-contract test fails on a fixture class that is in the catalogue but not in the CSS.
+  - No file under ui-kit/src/css/ contains a colour literal (REQ-001 R13).
+  verification:
+  - 'control: uv run --with pytest pytest -q ui-kit/test'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/src/css/components/
+  - ui-kit/components.yaml
+  - ui-kit/gallery/
+  - ui-kit/test/
+  next_action: Read the Kit v0 catalogue markup for buttons and pills and follow its naming for the new
+    components.
+- id: phase-ux-05
+  title: React app shell completion with typed bar elements and transient frame actions
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ux-01
+  scope:
+  - Add typed bar elements (help, action, choice, toggle, status) that a panel places into its frame's
+    sub-slots, throwing on a type the slot does not admit.
+  - Add the panel registry, maximize and collapse as transient state, a per-panel error boundary with
+    Retry, the status strip, a skip link, F6 region cycling and the app theme toggle.
+  - Add the test that compares React-rendered classes and state attributes with the catalogue (REQ-001
+    R12).
+  acceptance:
+  - An unadmitted bar element type shows in that panel's error boundary and leaves other panels working.
+  - Maximizing and restoring a panel keeps its component state, and nothing about it is saved across a
+    reload.
+  - The shell-fit test passes for every layout at the four sizes, and the class comparison test passes.
+  verification:
+  - 'control: cd ui-kit && npx vitest run'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/src/react/
+  - ui-kit/src/css/components/
+  - ui-kit/layouts/
+  - ui-kit/gallery/
+  - ui-kit/test/
+  next_action: Read the Kit v0 AppShell and Panel components and list which panel frame parts from ARCH-001
+    they do not yet have.
+- id: phase-ux-06
+  title: React toolbar, menu, popover, tooltip, accordion and breadcrumbs on React Aria
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ux-02
+  - phase-ux-04
+  - phase-ux-05
+  scope:
+  - Build Toolbar, Menu (including context and overflow menus), Popover, Tooltip, Toggletip, Accordion and
+    Breadcrumbs as React components on React Aria Components that render the catalogue classes.
+  - Add component tests and React gallery entries with keyboard specs.
+  acceptance:
+  - Each component's rendered classes and state attributes match its catalogue entry.
+  - Each component's keyboard spec from ARCH-001 passes, and Escape returns focus to the trigger.
+  - Component tests report no accessibility violation.
+  verification:
+  - 'control: cd ui-kit && npx vitest run'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/src/react/
+  - ui-kit/gallery/
+  - ui-kit/test/
+  next_action: Build Menu first; Toolbar's overflow and the context menu both use it.
+- id: phase-ux-07
+  title: React forms and inputs on React Aria
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ux-04
+  - phase-ux-05
+  scope:
+  - Build text field, textarea with the Ctrl+Enter prompt input, select, combobox, checkbox, radio group,
+    switch, segmented control, slider, file drop zone with a button alternative, and search field.
+  - Each has a visible label, hint and error message linked by aria-describedby, and validates on blur and
+    submit only.
+  acceptance:
+  - Each input's rendered classes match the form styles' catalogue entry.
+  - An invalid field sets aria-invalid and its error message is announced through aria-describedby.
+  - The file drop zone can be used with the keyboard alone.
+  verification:
+  - 'control: cd ui-kit && npx vitest run'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/src/react/
+  - ui-kit/gallery/
+  - ui-kit/test/
+  next_action: Build the text field with its label, hint and error first; every other input reuses that
+    field anatomy.
+- id: phase-ux-08
+  title: React DataTable with filters, three-state sort and virtualization
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ux-03
+  - phase-ux-07
+  scope:
+  - Build DataTable on React Aria's table with a toolbar (search, filter chips, count such as 42 of 310),
+    a sticky header, three-state sort with aria-sort, row selection, and loading, empty and error states.
+  - Virtualize above 500 rows.
+  acceptance:
+  - Sorting cycles ascending, descending, then the server order, and aria-sort reflects each state.
+  - Filtering 1,000 rows takes at most 50 ms in the browser test.
+  - The table's classes match the Kit v0 table catalogue entry.
+  verification:
+  - 'control: cd ui-kit && npx vitest run'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/src/react/
+  - ui-kit/gallery/
+  - ui-kit/test/
+  next_action: Read the static table sort and filter from phase-ux-03 and keep the same sort cycle and
+    count wording.
+- id: phase-ux-09
+  title: React command palette and tree view
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ux-06
+  scope:
+  - Build the Ctrl/Cmd+K command palette as a modal dialog with a combobox and grouped listbox, fed by a
+    data list of commands.
+  - Build the tree view with expand and collapse, Home/End, typeahead and a filter that hides folders with
+    no match.
+  acceptance:
+  - The palette's keyboard spec passes, Escape closes it and returns focus, and it shows No matches for an
+    unmatched query.
+  - The tree's keyboard spec passes, and filtering hides folders with no matching descendant.
+  verification:
+  - 'control: cd ui-kit && npx vitest run'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/src/react/
+  - ui-kit/gallery/
+  - ui-kit/test/
+  next_action: Build the tree first; the explorer panel type in ARCH-001 needs it.
+- id: phase-ux-10
+  title: AI stream output, run timeline, output label and model badge
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  - doc-ux-kit-on-react-aria
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ux-05
+  - phase-ux-06
+  scope:
+  - Build StreamOutput with the queued, thinking, streaming, stopped, done, error and throttled states, Stop,
+    Copy and Regenerate, following Cloudscape's generative-AI loading states pattern.
+  - Build RunTimeline, the AI output label and the model and usage badge.
+  - Drive them in the gallery from a mock asynchronous iterator.
+  acceptance:
+  - Stop keeps the partial output, and error keeps the partial output with a Retry action.
+  - Screen reader announcements are polite and at most one per sentence or per second, and focus never
+    moves while streaming.
+  - The working indicator appears within 100 ms of send in the browser test.
+  verification:
+  - 'control: cd ui-kit && npx vitest run'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/src/react/
+  - ui-kit/src/css/components/
+  - ui-kit/gallery/
+  - ui-kit/test/
+  next_action: Ask the owner for the shape of the product's model stream before writing the mock iterator.
+- id: phase-ux-11
+  title: AI citations, provenance stamp, confidence and approval card
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  - doc-ux-kit-on-react-aria
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ux-10
+  scope:
+  - Build the citation chip and source drawer, the provenance stamp, the confidence indicator and the
+    approval card, following Cloudscape's user-authorized actions pattern.
+  - Add static catalogue variants of the stamp, citation list and approval record for generated reports.
+  - Add a sanitizer for model-written HTML shown inline.
+  acceptance:
+  - The approval card records who decided and when, and Approve is not the default Enter action when the
+    impact is destructive.
+  - The sanitizer test removes script elements and event-handler attributes from a fixture.
+  - The confidence indicator shows a category with its basis and never a percentage.
+  verification:
+  - 'control: cd ui-kit && npx vitest run'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/src/react/
+  - ui-kit/src/css/components/
+  - ui-kit/components.yaml
+  - ui-kit/gallery/
+  - ui-kit/test/
+  next_action: Build the approval card first; it is the component the demo's human checkpoints depend on.
+- id: phase-ux-12
+  title: Page generation with render.py and lint_html.py
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 2
+  session_budget: 1
+  depends_on:
+  - phase-ux-04
+  scope:
+  - Add the report and fragment page templates, the catalogue page and a template library that declares
+    each template's slots and which are AI slots.
+  - Add render.py, which fills deterministic slots strictly and returns an adaptation brief for AI slots
+    without calling a model.
+  - Add lint_html.py, which fails an unknown class, a colour literal, a missing landmark or alt text, and a
+    script element on a page that declares no behaviour.
+  acceptance:
+  - render.py refuses an unknown or unfilled slot.
+  - lint_html.py fails each of its fixtures and passes a sample report, and the sample report renders with
+    script disabled.
+  - The sample report inlines its CSS and makes no external request.
+  verification:
+  - 'control: uv run --with pytest pytest -q ui-kit/test'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/templates/
+  - ui-kit/tools/render.py
+  - ui-kit/tools/lint_html.py
+  - ui-kit/test/
+  next_action: Write lint_html.py first against the Kit v0 catalogue, so render.py's output is checked from
+    its first run.
+- id: phase-ux-13
+  title: The ui-page skill for composing pages and screens from the kit
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  - sys-agents
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-ux-12
+  scope:
+  - Write a skill that tells agents to compose generated pages from the catalogue and templates and app
+    screens from the React components only, to run render.py and lint_html.py, and never to write colour
+    literals.
+  - Propose, without applying, a pointer line for CLAUDE.md, for the owner's approval.
+  acceptance:
+  - The skill names the commands it runs and what to do when lint fails.
+  - A page produced by following the skill passes lint_html.py.
+  verification:
+  - 'control: uv run --with pytest pytest -q ui-kit/test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - .claude/skills/ui-page/
+  next_action: Read the skills under plugins/idea-realization/skills/ for the front matter and length this
+    repository uses.
+- id: phase-ux-14
+  title: Two exemplars built only from kit parts
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-kit-requirements
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-ux-08
+  - phase-ux-09
+  - phase-ux-11
+  - phase-ux-13
+  scope:
+  - Generate an agent run report page with render.py from sample data.
+  - Build an app screen with nav, explorer, viewer, inspector, agent panel and dock from the React
+    components and a layout file.
+  acceptance:
+  - Both exemplars pass lint_html.py where it applies, axe with zero serious or critical issues, and the
+    shell-fit test at the four sizes.
+  - Neither exemplar contains a class or colour value that is not in the kit.
+  verification:
+  - 'control: uv run --with pytest pytest -q ui-kit/test'
+  - 'control: cd ui-kit && npx vitest run'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/examples/
+  - ui-kit/layouts/
+  - ui-kit/test/
+  next_action: Ask the owner for the product name, or use a placeholder name and say so in the session
+    record.
+- id: phase-ux-15
+  title: Kit cheat sheet and guidelines page in the gallery
+  plan: doc-ux-kit-plan
+  sources:
+  - doc-ux-design-guide
+  systems:
+  - sys-ui-kit
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-ux-14
+  scope:
+  - Write a one-page cheat sheet in the gallery showing how to build a new panel and a new report page
+    from the kit.
+  - Render a guidelines page in the gallery from the design guide's principles and guidelines.
+  acceptance:
+  - Both pages pass axe and lint_html.py.
+  - A teammate builds a new panel from the cheat sheet in under 30 minutes, as observed by the owner.
+  verification:
+  - 'control: uv run --with pytest pytest -q ui-kit/test'
+  - 'control: cd ui-kit && npx playwright test'
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - ui-kit/gallery/
+  - ui-kit/tools/build_gallery.py
+  next_action: Base the cheat sheet on the app screen exemplar from phase-ux-14, one step per panel part.
