@@ -29487,3 +29487,13 @@ From Session 2 - Builder B, 2026-10-14.
 test/test_run_review_checks.py::test_the_cli_refuses_an_unknown_phase_id fails in pull-request CI runs ("refused: dev does not resolve") because a PR checkout has no local dev branch; it passes on dev pushes. Make the test (or run_review_checks' backlog ref) work in a PR checkout. Seen on draft PR #4, run 38680738298.
 
 From Session 3 - Standby Builder, 2026-10-15.
+
+---
+
+## 000708 · check_aws_machine.py --probe reports OK on any sts failure, so a network error or timeout reads as "no credentials"
+
+**Created 2026-10-15T01:44:39-04:00 · Status: `open`**
+
+idea-realization-repo tools/check_aws_machine.py --probe reads any failure of `aws sts get-caller-identity` as "the default chain resolves to nobody" and prints OK. A network error or timeout is not "no credentials"; tell them apart (AWS CLI exit code or stderr) and report "not checked" instead of OK.
+
+From Session 3 - Standby Builder (track C group 1), 2026-10-15.
