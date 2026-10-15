@@ -9,6 +9,7 @@ the `check` command regenerates it in memory and fails on any difference.
 |---|---|---|---|---|
 | ADR-001 | adr | draft | repository-owner | docs/decisions/ADR-001-ux-kit-on-react-aria.md |
 | ARCH-001 | architecture | draft | repository-owner | docs/architecture/ARCH-001-ux-design-guide.md |
+| ARCH-002 | architecture | draft | repository-owner | docs/architecture/ARCH-002-bidirectional-integrity-architecture.md |
 | GOV-001 | governance | draft | repository-owner | docs/governance/GOV-001-standing-rules.md |
 | GOV-002 | governance | draft | repository-owner | docs/governance/GOV-002-anti-pattern-procedures.md |
 | PLAN-001 | plan | approved | repository-owner | docs/plans/PLAN-001-bootstrap-follow-ons.md |
@@ -28,4 +29,4 @@ the `check` command regenerates it in memory and fails on any difference.
 |---|---|---|
 | — | — | — |
 
-7 documents — adr: 1, architecture: 1, governance: 2, plan: 2, requirement: 1.
+8 documents — adr: 1, architecture: 2, governance: 2, plan: 2, requirement: 1.
