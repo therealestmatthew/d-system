@@ -29435,3 +29435,15 @@ Owner, 2026-10-14; relayed by Session Manager.
 Dictation fixes applied as relayed by Session Manager: "c I" -> CI, "signing batches" -> assigning batches. For the hackathon control repository (000698, 000701).
 
 Owner, 2026-10-14; relayed by Session Manager.
+
+---
+
+## 000703 · Hackathon repo: map out design and UX principles, guidelines and a generalized HTML UX component set from the workbench
+
+**Created 2026-10-14T21:09:29-04:00 · Status: `open`**
+
+"map out key design / ux principles, guidelines, and ux component set (covering things like toolbars, menu bars, tool tips, info dialogs, collapsible sections, panel types, etc. This html component needs to be a generalized manifestation of the workbench and html generation system to greatly amplify the ux design of my colleagues. In addition to the ones I listed, have another subagent scout other principles and best practices that we should implement to ensure an efficient, effective, beautifully designed, and professional user experience."
+
+Dictation fix applied as relayed by Session Manager: "profession" -> "professional". For the hackathon control repository (000698).
+
+Owner, 2026-10-14; relayed by Session Manager.
