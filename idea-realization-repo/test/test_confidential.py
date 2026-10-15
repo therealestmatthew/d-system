@@ -454,3 +454,28 @@ def test_both_hook_directories_install_every_hook() -> None:
     for hooks in (IRR / "tools" / "git-hooks", TEMPLATE_TOOLS / "git-hooks"):
         for name in ("pre-commit", "commit-msg", "pre-push"):
             assert (hooks / name).is_file() and os.access(hooks / name, os.X_OK), hooks / name
+
+
+@pytest.mark.parametrize("leaky", [False, True])
+def test_a_push_after_someone_else_pushed_first_is_checked_without_a_traceback(
+        pushing: tuple[Path, Path], tmp_path: Path, leaky: bool) -> None:
+    """The everyday reject-then-rebase path: the remote's tip is a commit this clone has never
+    fetched. The new commits are still checked; the push is refused as a non-fast-forward (or by
+    the check, for a leak), with no traceback."""
+    repo, remote = pushing
+    peer = tmp_path / "peer"
+    git(tmp_path, "clone", "-q", str(remote), str(peer))
+    (peer / "peer.md").write_text("A peer's change.\n", encoding="utf-8")
+    git(peer, "add", "peer.md")
+    assert run_git(peer, "commit", "-q", "--no-verify", "-m", "Peer change").returncode == 0
+    assert run_git(peer, "push", "-q", "--no-verify", "origin", "main").returncode == 0
+    text = "Call with Zorblaxian on Friday.\n" if leaky else "Nothing confidential.\n"
+    skip_hooks_commit(repo, "notes.md", text, "Add notes")
+    result = run_git(repo, "push", "origin", "main")
+    output = result.stdout + result.stderr
+    assert result.returncode != 0 and "Traceback" not in output, output
+    if leaky:
+        assert "notes.md: adds deny-listed identifier 'zorblaxian'" in output
+    else:
+        assert "check_confidential: OK (push: 1 commits" in output
+        assert "rejected" in output or "fetch first" in output

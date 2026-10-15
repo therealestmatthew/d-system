@@ -60,8 +60,10 @@ Two checks:
    and each file it adds or changes, by path and by the lines it adds (against its first parent;
    a root commit against nothing). A leak a later commit removed is still refused, because the
    commit that added it is pushed too. A pushed annotated tag's own message is checked as well.
-   The commits are those in ``<remote sha>..<local sha>``; for a new ref, those reachable from it
-   and from no ref the remote is already known to have (``--not --remotes=<remote>``).
+   The commits are those in ``<remote sha>..<local sha>``; for a new ref, or a remote tip this
+   clone has not fetched (someone pushed first), those reachable from it and from no ref the
+   remote is already known to have (``--not --remotes=<remote>``). A git error fails the push
+   with a one-line reason, never a traceback.
 
        git push   # the hook runs: python3 tools/check_confidential.py --pre-push origin
 
@@ -220,7 +222,12 @@ def pushed_commits(root: Path, remote: str,
         local, remote_sha = fields[1], fields[3]
         if git_out(root, "cat-file", "-t", local).strip() == "tag":
             tags.append(local)
-        if set(remote_sha) == {"0"}:
+        known = subprocess.run(["git", "cat-file", "-e", f"{remote_sha}^{{commit}}"], cwd=root,
+                               capture_output=True).returncode == 0
+        if set(remote_sha) == {"0"} or not known:
+            # A new ref, or a remote tip this clone has not fetched (someone pushed first, so
+            # the push will be refused as a non-fast-forward): send-able commits are those on no
+            # ref this clone knows the remote has.
             listed = git_out(root, "rev-list", "--reverse", local, "--not",
                              f"--remotes={remote}")
         else:
@@ -321,7 +328,13 @@ def main(root: Path = ROOT, argv: list[str] | None = None) -> int:
     violations: list[str] = []
     if args.pre_push is not None:
         identifiers = load_identifiers(root, violations)
-        commits, tags = pushed_commits(root, args.pre_push, sys.stdin.read().splitlines())
+        try:
+            commits, tags = pushed_commits(root, args.pre_push, sys.stdin.read().splitlines())
+        except subprocess.CalledProcessError as error:
+            reason = error.stderr.decode("utf-8", errors="replace").strip().splitlines()
+            return report_failure([f"cannot list the commits this push sends ({' '.join(error.cmd)}"
+                                   f"{': ' + reason[-1] if reason else ''}); nothing was checked, "
+                                   "so the push is refused"])
         for tag in tags:
             violations += check_message(git_out(root, "cat-file", "tag", tag), identifiers or set(),
                                         f"tag {tag[:12]}")
