@@ -4,7 +4,7 @@
 
 - every `ui-` class the catalogue uses is defined in some stylesheet under `src/css/`, so the
   page never shows a class the kit does not style;
-- every class defined in the eight display-component stylesheets appears in the catalogue, so
+- every class defined in the ten display-component stylesheets appears in the catalogue, so
   no styled class goes without a reference rendering.
 
 Classes are read from `class="…"` attributes in the HTML and from selectors in the CSS
@@ -33,6 +33,8 @@ DISPLAY_COMPONENTS = (
     "dialog.css",
     "tabs.css",
     "toast.css",
+    "citation.css",
+    "approval.css",
 )
 CLASS = re.compile(r"\.(-?[_a-zA-Z][\w-]*)")
 

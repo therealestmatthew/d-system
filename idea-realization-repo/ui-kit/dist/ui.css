@@ -6,8 +6,10 @@
     src/css/base.css
     src/css/layout.css
     dist/layouts.css
+    src/css/components/approval.css
     src/css/components/button.css
     src/css/components/card.css
+    src/css/components/citation.css
     src/css/components/dialog.css
     src/css/components/panel.css
     src/css/components/pill.css
@@ -946,6 +948,261 @@ pre {
 .ui-shell[data-layout="dashboard"] > [data-region]:not([data-region="header"], [data-region="main"], [data-region="strip"]) { display: none; }
 .ui-shell[data-layout="focus"] > [data-region]:not([data-region="header"], [data-region="main"]) { display: none; }
 
+/* ---- src/css/components/approval.css ---- */
+/*
+  Approval card: an agent's proposed action that waits for a person. Classes: .ui-approval with
+  parts .ui-approval__header __title __agent __statement __summary __preview __impact __actions
+  (+ __escalate) __record, and the reason field .ui-approval__field + .ui-approval__input + .ui-approval__error
+  (used in the Reject dialog and the Edit form until the kit has form controls).
+
+  The card is a region with a heading: <section class="ui-approval" aria-labelledby="<title id>">.
+    data-state="pending|approved|edited|rejected|escalated"   (absent = pending)
+    data-risk="routine|consequential"                         (absent = routine)
+
+  header     what is proposed (__title) and by which agent (__agent, marked with --ui-color-ai and
+             the words "Proposed by"), plus the state in words (a .ui-pill).
+  statement  the fixed sentence "Claude recommends; the examiner decides."
+  summary    why the agent proposes it.
+  preview    the drafted artefact or diff. Scrolls inside a fixed maximum height; give it
+             tabindex="0", role="region" and an aria-label so the keyboard can scroll it.
+  impact     the consequence ("Sends the notice to the claimant") and whether it can be undone.
+             data-risk="consequential" on the card marks it in the warn colour; the words carry it.
+  actions    Approve (primary), Edit, Reject; Escalate to supervisor is secondary and sits last.
+             Approve is never the default Enter action: it is type="button", never autofocused,
+             never a form's submit button. For consequential impact, Approve opens a confirm
+             dialog naming the object and the consequence.
+  record     the decision record as a <dl>: who, when, outcome, optional comment. Before a
+             decision it holds a .ui-state[data-state="not-recorded"].
+  Decided states (approved, edited, rejected, escalated) show the record and hide the actions.
+*/
+
+.ui-approval {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-3);
+  box-sizing: border-box;
+  min-inline-size: 0;
+  padding: var(--ui-space-4) var(--ui-space-5);
+  border: 1px solid var(--ui-color-line);
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-color-surface-e1);
+  box-shadow: inset calc(var(--ui-space-1) * 1.5) 0 0 var(--ui-color-accent), var(--ui-shadow-e1);
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-md);
+  line-height: var(--ui-lh-ui);
+}
+
+.ui-approval[data-state="approved"],
+.ui-approval[data-state="edited"] {
+  box-shadow: inset calc(var(--ui-space-1) * 1.5) 0 0 var(--ui-color-ok), var(--ui-shadow-e1);
+}
+
+.ui-approval[data-state="rejected"] {
+  box-shadow: inset calc(var(--ui-space-1) * 1.5) 0 0 var(--ui-color-err), var(--ui-shadow-e1);
+}
+
+.ui-approval[data-state="escalated"] {
+  box-shadow: inset calc(var(--ui-space-1) * 1.5) 0 0 var(--ui-color-warn), var(--ui-shadow-e1);
+}
+
+.ui-approval__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ui-space-2) var(--ui-space-3);
+}
+
+.ui-approval__title {
+  flex: 1 1 14rem;
+  min-inline-size: 0;
+  margin: 0;
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-lg);
+  font-weight: var(--ui-fw-semibold);
+  line-height: var(--ui-lh-tight);
+}
+
+.ui-approval__agent {
+  display: flex;
+  flex-basis: 100%;
+  align-items: center;
+  gap: var(--ui-space-2);
+  order: 3;
+  margin: 0;
+  color: var(--ui-color-ai);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-semibold);
+}
+
+.ui-approval__agent::before {
+  content: "";
+  flex: none;
+  inline-size: 0.5em;
+  block-size: 0.5em;
+  border-radius: var(--ui-radius-pill);
+  background: currentColor;
+}
+
+.ui-approval__statement {
+  margin: 0;
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-semibold);
+}
+
+.ui-approval__summary {
+  margin: 0;
+  color: var(--ui-color-text);
+}
+
+.ui-approval__summary > :first-child,
+.ui-approval__preview > :first-child {
+  margin-block-start: 0;
+}
+
+.ui-approval__summary > * + *,
+.ui-approval__preview > * + * {
+  margin-block-start: var(--ui-space-3);
+}
+
+.ui-approval__summary > :last-child,
+.ui-approval__preview > :last-child {
+  margin-block-end: 0;
+}
+
+.ui-approval__preview {
+  flex: 0 1 auto;
+  box-sizing: border-box;
+  max-block-size: calc(var(--ui-ctl-lg) * 6);
+  min-block-size: 0;
+  overflow: auto;
+  padding: var(--ui-space-3) var(--ui-space-4);
+  border: 1px solid color-mix(in srgb, var(--ui-color-ai) 30%, var(--ui-color-line));
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-color-sunken);
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-sm);
+  line-height: var(--ui-lh-prose);
+}
+
+.ui-approval__preview:is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-approval__impact {
+  margin: 0;
+  padding: var(--ui-space-2) var(--ui-space-3);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-color-surface-2);
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-sm);
+}
+
+.ui-approval[data-risk="consequential"] .ui-approval__impact {
+  background: var(--ui-color-warn-bg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ui-color-warn) 40%, transparent);
+}
+
+.ui-approval__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-space-2);
+  padding-block-start: var(--ui-space-3);
+  border-block-start: 1px solid var(--ui-color-line);
+}
+
+/* Escalation is the secondary path: a ghost button pushed to the end of the row. */
+.ui-approval__escalate {
+  margin-inline-start: auto;
+}
+
+.ui-approval:is(
+  [data-state="approved"],
+  [data-state="edited"],
+  [data-state="rejected"],
+  [data-state="escalated"]
+) > .ui-approval__actions {
+  display: none;
+}
+
+.ui-approval__record {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--ui-space-1) var(--ui-space-4);
+  margin: 0;
+  padding-block-start: var(--ui-space-3);
+  border-block-start: 1px solid var(--ui-color-line);
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.ui-approval__record > dt {
+  color: var(--ui-color-muted);
+  font-weight: var(--ui-fw-semibold);
+}
+
+.ui-approval__record > dd {
+  min-inline-size: 0;
+  margin: 0;
+}
+
+/* Before a decision the record holds one not-recorded state across both columns. */
+.ui-approval__record > .ui-state {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+/* ---- reason field (Reject dialog, Edit form) ---- */
+
+.ui-approval__field {
+  display: grid;
+  gap: var(--ui-space-2);
+  margin-block: var(--ui-space-3) var(--ui-space-2);
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-semibold);
+}
+
+.ui-approval__input {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: calc(var(--ui-ctl-lg) * 2);
+  padding: var(--ui-space-2) var(--ui-space-3);
+  border: 1px solid var(--ui-color-line-strong);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-color-surface-e1);
+  color: var(--ui-color-text);
+  font: inherit;
+  font-size: var(--ui-fs-md);
+  font-weight: var(--ui-fw-regular);
+  line-height: var(--ui-lh-ui);
+  resize: vertical;
+}
+
+.ui-approval__input:is(:hover, [data-hovered]) {
+  border-color: color-mix(in srgb, var(--ui-color-line-strong) 50%, var(--ui-color-text));
+}
+
+.ui-approval__input:is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-approval__input:is([aria-invalid="true"], [data-invalid]) {
+  border-color: var(--ui-color-err);
+}
+
+.ui-approval__error {
+  margin: 0;
+  color: var(--ui-color-err);
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-semibold);
+}
+
 /* ---- src/css/components/button.css ---- */
 /*
   Button. Classes: .ui-button, .ui-button--primary --secondary --ghost --danger, --icon,
@@ -1390,6 +1647,162 @@ pre {
   grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
   gap: var(--ui-space-4);
   align-items: stretch;
+}
+
+/* ---- src/css/components/citation.css ---- */
+/*
+  Citation chip and sources list. Classes: .ui-citation (+ .ui-citation__index, .ui-citation__label),
+  .ui-sources (+ .ui-sources__item, .ui-sources__kind, .ui-sources__title, .ui-sources__location).
+
+  .ui-citation  an inline numbered chip, [1], on a claim. It is a real <a> (to the item in the
+                sources list, or to the source itself) or a <button>, never a bare span. Its
+                accessible name names the source: aria-label="Source 1: Statute, SS UI Act § 4-210(b)".
+                The visible index is inside that name (WCAG 2.5.3). .ui-citation__label is an
+                optional short label after the index ("§ 4-210(b)").
+                Target size: the chip is short enough to sit inside the line box (fs-xs, tight line
+                height, no block padding: about 16px), so it never pushes lines apart. Inline padding and a
+                min inline size give it 24px of width; a ::before layer extends the hit area to
+                24px or more in height without changing layout.
+                States: :hover/[data-hovered], :active/[data-pressed], :focus-visible/
+                [data-focus-visible], :visited (colour only, as browsers allow).
+  .ui-sources   the page- or panel-level list (<ol>) the chips point at. Each .ui-sources__item
+                carries the target id and names the kind (statute, policy, precedent, claim
+                document), the title and the location. The item that is the URL fragment (:target)
+                or carries [data-highlighted] is tinted and ringed, so a followed chip shows where
+                it landed.
+  No popover in Kit v0: the source drawer is a later phase.
+*/
+
+.ui-citation {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--ui-space-1);
+  box-sizing: border-box;
+  min-inline-size: var(--ui-ctl-sm);
+  margin: 0 var(--ui-space-1);
+  padding: 0 var(--ui-space-2);
+  border: 1px solid color-mix(in srgb, var(--ui-color-accent) 35%, var(--ui-color-line));
+  border-radius: var(--ui-radius-sm);
+  background: color-mix(in srgb, var(--ui-color-accent) 8%, var(--ui-color-surface-e1));
+  color: var(--ui-color-accent);
+  font: inherit;
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-semibold);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--ui-lh-tight);
+  text-decoration: none;
+  white-space: nowrap;
+  vertical-align: baseline;
+  cursor: pointer;
+  transition:
+    background-color var(--ui-dur-fast) var(--ui-ease-standard),
+    border-color var(--ui-dur-fast) var(--ui-ease-standard),
+    color var(--ui-dur-fast) var(--ui-ease-standard);
+}
+
+/* Hit area: at least 24px tall, centred on the chip, outside layout. */
+.ui-citation::before {
+  content: "";
+  position: absolute;
+  inset-block: calc(var(--ui-space-2) * -1);
+  inset-inline: 0;
+}
+
+.ui-citation__index::before {
+  content: "[" / "";
+}
+
+.ui-citation__index::after {
+  content: "]" / "";
+}
+
+.ui-citation__label {
+  color: var(--ui-color-text);
+  font-weight: var(--ui-fw-regular);
+}
+
+.ui-citation:visited {
+  color: var(--ui-color-accent-hover);
+}
+
+.ui-citation:is(:hover, [data-hovered]) {
+  border-color: var(--ui-color-accent);
+  background: color-mix(in srgb, var(--ui-color-accent) 16%, var(--ui-color-surface-e1));
+  color: var(--ui-color-accent-hover);
+}
+
+.ui-citation:is(:active, [data-pressed]) {
+  background: color-mix(in srgb, var(--ui-color-accent) 24%, var(--ui-color-surface-e1));
+}
+
+.ui-citation:is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-citation:focus:not(:focus-visible, [data-focus-visible]) {
+  outline: none;
+}
+
+/* ---- sources list ---- */
+
+.ui-sources {
+  display: grid;
+  gap: var(--ui-space-2);
+  margin: 0;
+  padding-inline-start: var(--ui-space-7);
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-sm);
+  line-height: var(--ui-lh-ui);
+  list-style: decimal;
+}
+
+.ui-sources__item {
+  display: list-item;
+  padding: var(--ui-space-2) var(--ui-space-3);
+  border-radius: var(--ui-radius-md);
+  box-shadow: inset 0 0 0 1px transparent;
+  transition:
+    background-color var(--ui-dur-base) var(--ui-ease-standard),
+    box-shadow var(--ui-dur-base) var(--ui-ease-standard);
+}
+
+.ui-sources__item::marker {
+  color: var(--ui-color-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--ui-fw-semibold);
+}
+
+.ui-sources__item:is(:target, [data-highlighted]) {
+  background: color-mix(in srgb, var(--ui-color-accent) 10%, transparent);
+  box-shadow: inset 0 0 0 1px var(--ui-color-accent);
+}
+
+.ui-sources__item:target:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.ui-sources__kind {
+  display: inline-block;
+  margin-inline-end: var(--ui-space-2);
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ui-sources__title {
+  color: var(--ui-color-text);
+  font-weight: var(--ui-fw-semibold);
+}
+
+.ui-sources__location {
+  display: block;
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-xs);
 }
 
 /* ---- src/css/components/dialog.css ---- */
