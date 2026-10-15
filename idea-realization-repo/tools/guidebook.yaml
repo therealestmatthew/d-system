@@ -55,6 +55,11 @@ known_issues:
       text: >-
         `git rebase --continue` does not run the pre-commit hook. After resolving a rejected claim
         push, run the repository check by hand before you push.
+    - id: M8
+      severity: major
+      text: >-
+        The confidentiality check scans tracked files but not commit messages. Before you commit,
+        read your own commit message and make sure it names no confidential identifier.
 
 chapters:
   - id: onboarding

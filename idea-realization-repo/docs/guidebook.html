@@ -3313,6 +3313,7 @@ button.ui-table__sort {
 <li><span class="ui-pill" data-status="warn"><span class="ui-pill__dot"></span>major M4</span> If your product checkout is behind, the check can report a peer&#x27;s completed phase as &quot;stranded&quot;. Pull the product checkout and run the check again before you reopen anything.</li>
 <li><span class="ui-pill" data-status="warn"><span class="ui-pill__dot"></span>major M6</span> Document and session codes allocated on two machines can be the same. The check refuses the duplicate at integration; whoever integrates second renumbers with <code>next-code</code> and <code>release-code</code>.</li>
 <li><span class="ui-pill" data-status="warn"><span class="ui-pill__dot"></span>major M7</span> <code>git rebase --continue</code> does not run the pre-commit hook. After resolving a rejected claim push, run the repository check by hand before you push.</li>
+<li><span class="ui-pill" data-status="warn"><span class="ui-pill__dot"></span>major M8</span> The confidentiality check scans tracked files but not commit messages. Before you commit, read your own commit message and make sure it names no confidential identifier.</li>
 </ul>
 </section>
 <section class="gb-chapter" aria-labelledby="onboarding">
@@ -5653,7 +5654,7 @@ marked <code>(unavailable: ...)</code> is a setup step above that is not done ye
 <tr><td><code>aws/README.md</code></td><td>AWS safety and cost guardrails</td><td class="ui-table__id gb-hash">2dee1fd7cf48b6f6a06969aee8904e266701d684d75a4c558b33d663bdc014ee</td></tr>
 <tr><td><code>docs/guides/OPS-007-cost-guardrails.md</code></td><td>AWS safety and cost guardrails</td><td class="ui-table__id gb-hash">0a67f80c17868bca9db80ebfe6f2fa737c03807565148e3c2fbf079fb5338198</td></tr>
 <tr><td><code>docs/guides/OPS-008-troubleshooting.md</code></td><td>Troubleshooting</td><td class="ui-table__id gb-hash">d267c7ca9f0ebe33b849d6bbc99ad603981fedbb10c85e7e7074b440fc9faf7d</td></tr>
-<tr><td><code>tools/guidebook.yaml</code></td><td>The chapter list</td><td class="ui-table__id gb-hash">7dbd762847aa5f8b3132078f23121f22e6dde8b1a23933eb0713f1b13c7a35e3</td></tr>
+<tr><td><code>tools/guidebook.yaml</code></td><td>The chapter list</td><td class="ui-table__id gb-hash">efc98d1ce09ff62ff3a119cfeab054c3ae2ddb5a776a91246b7abbdac758c7c3</td></tr>
 <tr><td><code>ui-kit/dist/ui.css</code></td><td>The page styles</td><td class="ui-table__id gb-hash">218773a1eaadb2377fe840169a6fd2bf807f4134e8435ba08fd36f874e254048</td></tr>
 </tbody></table></div>
 </section>
