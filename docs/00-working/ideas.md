@@ -29497,3 +29497,13 @@ From Session 3 - Standby Builder, 2026-10-15.
 idea-realization-repo tools/check_aws_machine.py --probe reads any failure of `aws sts get-caller-identity` as "the default chain resolves to nobody" and prints OK. A network error or timeout is not "no credentials"; tell them apart (AWS CLI exit code or stderr) and report "not checked" instead of OK.
 
 From Session 3 - Standby Builder (track C group 1), 2026-10-15.
+
+---
+
+## 000709 · .claude/settings.json deny rules written as Write(...) protect nothing; Claude Code matches only Edit(path) rules for file permissions
+
+**Created 2026-10-15T10:44:30-04:00 · Status: `open`**
+
+Claude Code warns that d-system's .claude/settings.json deny rules written as Write(...) are "not matched by file permission checks — only Edit(path) rules are": Write(_private/**), Write(.agents/**), Write(.codex/**), Write(_data/ideas.jsonl) and the Write(//code/d-system-worktrees/*/{AGENTS.md,CLAUDE.md,_private/**,.agents/**,.codex/**,_data/ideas.jsonl}) rules. They protect nothing as written; the fix is Edit(...) equivalents (the owner edits settings). Seen 2026-10-15 when a claude CLI call printed the warnings.
+
+From Session Manager, 2026-10-15.
