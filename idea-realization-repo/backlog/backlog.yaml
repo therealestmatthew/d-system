@@ -79,8 +79,8 @@ items:
   - plugins/idea-realization/docs/document-codes.md
   - plugins/idea-realization/skills/next-code/SKILL.md
   - plugins/idea-realization/scripts/scaffold.py
-  next_action: Built on branch agent/hackathon-owner-rulings-code (owner chose handle-scoped codes and a
-    legacy list, 2026-10-15); once merged, close this phase through the review gate.
+  next_action: Implemented on dev (handle-scoped codes and legacy_phase_ids, owner ruling 2026-10-15). The
+    team closes it through the review gate as its first exercise.
 - id: phase-boot-02
   title: Generated workstream board with a staleness check
   plan: doc-bootstrap-follow-ons
@@ -109,7 +109,7 @@ items:
   next_action: Read scripts/workstreams.py and the catalog generator, and reuse the catalog's staleness
     pattern.
 - id: phase-boot-03
-  title: Review runner, test baseline, diff patterns and CI gate for the product stack
+  title: Review runner, test baseline and diff patterns for the product stack
   plan: doc-bootstrap-follow-ons
   sources: []
   systems:
@@ -120,12 +120,15 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Run the phase's verification in the product worktree and record the evidence the reviewers read.
-  - Compare test results against the product integration branch and refuse risky diff patterns. The
-    CI workflows, the required verify check and the CI wait in session-close exist (docs/guides/OPS-001).
+  - Run the phase's verification in the product worktree and record the evidence files the gating reviewer
+    and the review judge read.
+  - 'Compare the branch''s test results with product dev''s and refuse risky diff patterns. (The product
+    CI verify job, its required check and the CI wait in session-close already exist: docs/guides/OPS-001.)'
   acceptance:
   - A review can cite the runner's recorded output instead of re-running every command.
-  - A test that passed on the integration branch and fails on the branch blocks the merge.
+  - A test that passes on product dev and fails on the branch is reported as a regression and blocks the
+    merge; a test already failing on product dev is reported separately.
+  - A diff matching a refused pattern blocks the merge and names the pattern.
   verification:
   - 'control: uv run pytest -q'
   - 'control: uv run plugins/idea-realization/scripts/check.py'
@@ -134,7 +137,7 @@ items:
   next_action: Wait until the product's language and test runner are chosen, then adapt the existing review
     runner design to them.
 - id: phase-boot-04
-  title: Stale-claim evidence and system path checks from the product repository
+  title: Stale-claim evidence from the product repository
   plan: doc-bootstrap-follow-ons
   sources: []
   systems:
@@ -145,17 +148,17 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Read stale-claim evidence (agent branches and worktrees) from the product repository.
-  - 'Check repository: product systems'' paths against the product checkout.'
+  - 'Read stale-claim evidence (agent/<phase-id> branches and worktrees) from the verified product checkout
+    as well as the control repository. (Product system paths are already checked: scripts/documents.py.)'
   acceptance:
   - A claim whose product branch has gone stale is reported as stale.
-  - A product system path that does not exist is reported when the product checkout is configured.
+  - Without a product checkout, the claim report says the product evidence was not read rather than reporting
+    the claim as not stale.
   verification:
   - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
   - 'control: uv run plugins/idea-realization/scripts/check.py'
   deliverables:
   - plugins/idea-realization/scripts/checks/backlog.py
-  - plugins/idea-realization/scripts/documents.py
   - plugins/idea-realization/test/
   next_action: Read claim_evidence in scripts/checks/backlog.py and route it through product.verify.
 - id: phase-boot-05
@@ -235,7 +238,7 @@ items:
   - plugins/idea-realization/test/
   next_action: Decide how a product path is passed to the triage agent without widening its write access.
 - id: phase-boot-08
-  title: Git hooks and a pointer CLAUDE.md in the product repository
+  title: Create the product repository from the template
   plan: doc-bootstrap-follow-ons
   sources: []
   systems:
@@ -246,8 +249,9 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Create the product repository from templates/product-repo/ (pointer CLAUDE.md, verify CI job,
-    confidentiality hook installer), with main and dev and the product rulesets applied.
+  - Create the product repository from templates/product-repo/ (pointer CLAUDE.md, verify CI job, hooks
+    and installer are complete and tested there), push main and dev, apply the product rulesets and set
+    the DENY_LIST secret.
   acceptance:
   - A commit in the product repository runs the confidentiality check.
   - An agent opened in the product repository is told to start from the control repository.
@@ -269,8 +273,8 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Write the plan-quality standard, promoted-plan staging, the planning reference, the planning protocol
-    and single-session orchestration for this repository.
+  - Write the plan-quality standard, promoted-plan staging, the planning reference and single-session orchestration
+    for this repository. (The planning protocol is the planning mode guide, docs/guides/OPS-002.)
   acceptance:
   - Each document states current rules only, with no history.
   - The documents check passes with each document registered.
@@ -381,6 +385,8 @@ items:
   scope:
   - Write the checkpoint skill for a session record in the control worktree that records the product branch's
     state.
+  - Remove the manual product-verification workaround from OPS-003 (its Current limitation paragraph) and
+    session-close step 1, once the skill records the product branch.
   acceptance:
   - A checkpoint records both branches' tips.
   - It still never marks a phase complete.
@@ -388,6 +394,8 @@ items:
   - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
   deliverables:
   - plugins/idea-realization/skills/checkpoint/
+  - docs/guides/OPS-003-implementing-mode.md
+  - plugins/idea-realization/skills/session-close/SKILL.md
   next_action: Read skills/checkpoint/SKILL.md and list each place it assumes one repository.
 - id: phase-boot-15
   title: Glossary generated from the brain's concepts
@@ -478,15 +486,20 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Generate the gallery index and one page per component from the catalogue markup, in light and dark.
-  - Add one command that builds the gallery and runs the Python, component and browser tests.
-  - Add browser tests for axe, focus rings, request origins, candidate accents and shell fit at 1024x768,
-    1280x720, 1366x768 and 1920x1080, plus keyboard specs for the dialog, tabs and toast Kit v0 shipped.
-  - Add a test for any REQ-001 row Kit v0 left without one, each with the fixture that must fail.
+  - Generate the gallery index and one page per component from gallery/catalogue.html markup, in light and
+    dark, with ui-kit/tools/build_gallery.py.
+  - Add one command that builds the gallery and runs pytest (ui-kit/test/), vitest and Playwright.
+  - Add Playwright and browser tests for axe (R08), focus rings (R07), request origins (R06 browser half),
+    accent selection (R05 browser half), theme following the system (R04) and shell fit at 1024x768, 1280x720,
+    1366x768 and 1920x1080 (R11), plus gallery keyboard specs for the dialog, tabs and toast (R09).
+  - Add a failing-fixture test for R03 (a spacing property inside a dark block). R01, R02 and R13 already
+    have tests with failing fixtures.
   acceptance:
-  - One command builds the gallery and runs every test, and exits nonzero when any test fails.
+  - One command builds the gallery and runs every pytest, vitest and Playwright test, and exits nonzero
+    when any test fails.
   - axe reports zero serious or critical issues on every gallery page in both themes.
-  - Each REQ-001 row from R01 to R09, R11 and R13 has a test that rejects its failing fixture.
+  - R03, R04, R05, R06, R07, R08, R09 (dialog, tabs, toast) and R11 each have a test that rejects its failing
+    fixture; the existing R01, R02 and R13 tests run from the one command.
   verification:
   - 'control: uv run --with pytest pytest -q ui-kit/test'
   - 'control: cd ui-kit && npx playwright test'
@@ -521,7 +534,8 @@ items:
   acceptance:
   - Each widget's keyboard spec from ARCH-001 passes in the browser tests, and Escape returns focus to the
     trigger.
-  - A gallery page with no data-ui attribute contains no script element.
+  - A kit page contains no script element; a gallery or demo page may carry a gallery-only script that a
+    test covers.
   - axe and the focus-ring test still pass on every gallery page.
   verification:
   - 'control: uv run --with pytest pytest -q ui-kit/test'
@@ -588,13 +602,16 @@ items:
   - phase-ux-01
   scope:
   - Add CSS and catalogue markup for the stat row, callout, breadcrumbs, form and input styles, progress,
-    code and JSON viewer, count badge, filter chip, tag and gate badge.
-  - Add a class-contract test that every class in the catalogue exists in the CSS and every component class
-    in the CSS appears in the catalogue.
+    code and JSON viewer, tag and gate badge. (The count badge .ui-badge and filter chip .ui-chip shipped
+    in Kit v0; reuse them.)
+  - Extend test/test_catalogue_contract.py to the new stylesheets and add a fixture test that a catalogue
+    class missing from the CSS, and a CSS class missing from the catalogue, each make the contract check
+    fail.
   acceptance:
-  - Every component above has a gallery page in light and dark, and axe and the focus-ring test pass on it.
-  - The class-contract test fails on a fixture class that is in the catalogue but not in the CSS.
-  - No file under ui-kit/src/css/ contains a colour literal (REQ-001 R13).
+  - Every component above has a gallery page in light and dark, and axe and the focus-ring test pass on
+    it.
+  - The class-contract check fails on a fixture class that is in the catalogue but not in the CSS.
+  - No file under ui-kit/src/css/ contains a colour literal (R13; the existing test keeps passing).
   verification:
   - 'control: uv run --with pytest pytest -q ui-kit/test'
   - 'control: cd ui-kit && npx playwright test'
@@ -621,17 +638,16 @@ items:
   depends_on:
   - phase-ux-01
   scope:
-  - Add typed bar elements (help, action, choice, toggle, status) that a panel places into its frame's
-    sub-slots, throwing on a type the slot does not admit.
-  - Add the panel registry, maximize and collapse as transient state, a per-panel error boundary with
-    Retry, the status strip, a skip link, F6 region cycling and the app theme toggle.
-  - Add the test that compares React-rendered classes and state attributes with the catalogue (REQ-001
-    R12).
+  - Add typed bar elements (help, action, choice, toggle, status) that a panel places into its frame's sub-slots,
+    throwing on a type the slot does not admit; replace the plain controls content of Panel.
+  - Add the panel registry, the status strip component for the strip region and the app theme toggle component.
+    (Transient maximize and collapse, the per-panel error boundary with Retry, the skip link and F6 cycling
+    shipped in Kit v0.)
+  - Add the test that compares React-rendered classes and state attributes with the catalogue (REQ-001 R12).
   acceptance:
   - An unadmitted bar element type shows in that panel's error boundary and leaves other panels working.
-  - Maximizing and restoring a panel keeps its component state, and nothing about it is saved across a
-    reload.
-  - The shell-fit test passes for every layout at the four sizes, and the class comparison test passes.
+  - The shell-fit test passes for every layout in ui-kit/layouts/ at the four sizes, and the R12 class comparison
+    test passes and fails on a component that renders a class absent from the catalogue.
   verification:
   - 'control: cd ui-kit && npx vitest run'
   - 'control: cd ui-kit && npx playwright test'
@@ -727,13 +743,15 @@ items:
   - phase-ux-03
   - phase-ux-07
   scope:
-  - Build DataTable on React Aria's table with a toolbar (search, filter chips, count such as 42 of 310),
-    a sticky header, three-state sort with aria-sort, row selection, and loading, empty and error states.
+  - Extend Kit v0's DataTable (src/react/DataTable/DataTable.tsx) with loading and error states (the sticky
+    header exists); supply the toolbar's search and filter chips from kit components; keep its three-state
+    sort, aria-sort, "N of M" count, selection and empty states.
   - Virtualize above 500 rows.
   acceptance:
-  - Sorting cycles ascending, descending, then the server order, and aria-sort reflects each state.
+  - Sorting still cycles ascending, descending, then the server order with aria-sort (the existing DataTable
+    test keeps passing), also when virtualized.
   - Filtering 1,000 rows takes at most 50 ms in the browser test.
-  - The table's classes match the Kit v0 table catalogue entry.
+  - The table's classes and state attributes match the catalogue table entry in the R12 comparison test.
   verification:
   - 'control: cd ui-kit && npx vitest run'
   - 'control: cd ui-kit && npx playwright test'
@@ -828,11 +846,12 @@ items:
   depends_on:
   - phase-ux-10
   scope:
-  - Build the source drawer that opens from Kit v0's citation chip, the provenance stamp and the
-    confidence indicator. The citation chip and the approval card moved into Kit v0 by the owner's
-    ruling of 2026-10-14; extend them here only where this scope needs it.
-  - Add static catalogue variants of the stamp and the citation list for generated reports.
-  - Add a sanitizer for model-written HTML shown inline.
+  - Build the source drawer that opens from Kit v0's citation chip (src/react/Citation/Citation.tsx); add
+    an excerpt field to Source. Build the provenance stamp and the confidence indicator. The citation chip,
+    the static citation list (SourceList, .ui-sources) and the approval card already exist in Kit v0; extend
+    them only where this scope needs it.
+  - Add a static catalogue variant of the provenance stamp for generated reports.
+  - Add a sanitizer for model-written HTML shown inline (Kit v0's safeHref covers link schemes only).
   acceptance:
   - The source drawer opens from a citation chip, shows the source's title, location and excerpt, and
     returns focus to the chip on close.
@@ -933,12 +952,12 @@ items:
   - phase-ux-11
   - phase-ux-13
   scope:
-  - Generate a case review report page (case summary, citation-traceable findings, the examiner's
-    decision record) with render.py from synthetic case data.
-  - Build the examiner workbench screens from ARCH-002 in React on the examiner layout - prioritized
-    queue with flag status per case in both error directions, case summary beside findings, accept /
-    edit / reject with the drafted notice alongside, supervisor review queue, accuracy view - replacing
-    Kit v0's static mock (ui-kit/gallery/examiner-workbench.html).
+  - Generate a case review report page (case summary, citation-traceable findings, the examiner's decision
+    record) with render.py from synthetic case data, reusing the static mock's synthetic case SYN-0142 content.
+  - Port the five screens of the static mock ui-kit/gallery/examiner-workbench.html (prioritized queue with
+    flag status in both error directions, case summary beside findings, accept / edit / reject with the
+    drafted notice alongside, supervisor review queue, accuracy view) to React on layouts/examiner.json,
+    using the kit's React components, and replace the static mock or mark it superseded.
   acceptance:
   - Both exemplars pass lint_html.py where it applies, axe with zero serious or critical issues, and the
     shell-fit test at the four sizes.
