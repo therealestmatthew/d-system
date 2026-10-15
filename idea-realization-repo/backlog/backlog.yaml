@@ -1,7 +1,7 @@
 # The phase catalog and the lock table every developer reads. Claim with session-start.
 schema_version: 1
 updated: '2026-10-14'
-max_active: 5
+max_active: 15
 next_up: []
 items:
 - id: phase-boot-01
@@ -73,8 +73,8 @@ items:
   depends_on: []
   scope:
   - Run the phase's verification in the product worktree and record the evidence the reviewers read.
-  - Compare test results against the product integration branch, refuse risky diff patterns, and poll
-    the product CI.
+  - Compare test results against the product integration branch and refuse risky diff patterns. The
+    CI workflows, the required verify check and the CI wait in session-close exist (docs/guides/OPS-001).
   acceptance:
   - A review can cite the runner's recorded output instead of re-running every command.
   - A test that passed on the integration branch and fails on the branch blocks the merge.
@@ -198,8 +198,8 @@ items:
   session_budget: 1
   depends_on: []
   scope:
-  - Install the confidentiality hook in the product repository with the developer's consent.
-  - Write a short CLAUDE.md there that points at the control repository.
+  - Create the product repository from templates/product-repo/ (pointer CLAUDE.md, verify CI job,
+    confidentiality hook installer), with main and dev and the product rulesets applied.
   acceptance:
   - A commit in the product repository runs the confidentiality check.
   - An agent opened in the product repository is told to start from the control repository.
@@ -208,7 +208,7 @@ items:
   - 'control: uv run plugins/idea-realization/scripts/check.py'
   deliverables:
   - tools/
-  next_action: Ask the owner who owns the product repository's CLAUDE.md before writing one.
+  next_action: Wait until the owner creates the product repository, then follow templates/product-repo/README-TEMPLATE.md.
 - id: phase-boot-09
   title: Planning standards for this repository
   plan: doc-bootstrap-follow-ons
@@ -934,3 +934,26 @@ items:
   - ui-kit/gallery/
   - ui-kit/tools/build_gallery.py
   next_action: Base the cheat sheet on the app screen exemplar from phase-ux-14, one step per panel part.
+- id: phase-deploy-01
+  title: Deploy the product to the AWS sandbox from GitHub Actions through OIDC
+  plan: doc-ci-deploy-to-aws
+  sources: []
+  systems:
+  - sys-control-tools
+  owner: repository-owner
+  status: queued
+  priority: 3
+  session_budget: 1
+  depends_on:
+  - phase-boot-08
+  scope:
+  - Carry out PLAN-002 once the owner decides to deploy from CI; an administrator creates the OIDC
+    provider and the ci-deploy role, the team adds deploy-sandbox.yml to the product repository.
+  acceptance:
+  - A workflow run on a demo tag deploys to the sandbox after the required reviewer approves it.
+  - A run from any other branch or without approval cannot assume the ci-deploy role.
+  verification:
+  - 'control: uv run plugins/idea-realization/scripts/check.py'
+  deliverables:
+  - product:.github/workflows/deploy-sandbox.yml
+  next_action: Wait for the owner's decision on PLAN-002's open questions; deploy stays local until then.

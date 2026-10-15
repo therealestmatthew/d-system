@@ -20,7 +20,7 @@ covers worktrees and integration; this document covers everything that touches t
 ## 2. The phase schema
 
 Top level: `schema_version` (1), `updated` (never in the future), `decision_record` (optional: a
-governance or adr document), `max_active` (1 to 4, default 1), `next_up` and `items`.
+governance or adr document), `max_active` (1 to 15, default 1), `next_up` and `items`.
 
 | Field | Rule |
 |---|---|

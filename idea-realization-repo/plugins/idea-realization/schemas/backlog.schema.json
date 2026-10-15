@@ -29,7 +29,7 @@
     "max_active": {
       "type": "integer",
       "minimum": 1,
-      "maximum": 12,
+      "maximum": 15,
       "default": 1,
       "description": "Simultaneous active phases allowed, for example one per developer in a team; concurrent phases must still be disjoint."
     },
