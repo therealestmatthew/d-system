@@ -61,3 +61,17 @@ def test_an_unregistered_stated_handle_is_refused(config: paths.Config,
     as_developer(monkeypatch, "zed")
     with pytest.raises(identity.IdentityError, match="not a developer"):
         identity.handle(config)
+
+
+def test_a_handle_in_local_yaml_is_asserted_like_the_variable(
+        tmp_path: Path, config: paths.Config, monkeypatch: pytest.MonkeyPatch) -> None:
+    (tmp_path / ".idea-realization").mkdir()
+    (tmp_path / ".idea-realization" / "local.yaml").write_text("handle: ana\n")
+    stated = paths.resolve({"root": str(tmp_path)}, env={})
+    as_developer(monkeypatch, "ana", "ben@example.com")
+    monkeypatch.delenv(identity.HANDLE_ENV)
+    with pytest.raises(identity.IdentityError, match="belongs to 'ben'"):
+        identity.handle(stated)
+    as_developer(monkeypatch, "ana")
+    monkeypatch.delenv(identity.HANDLE_ENV)
+    assert identity.handle(stated) == "ana"

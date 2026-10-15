@@ -8,8 +8,21 @@ Every key is resolved with one precedence:
 
 1. a command-line flag (``--ideas-path``),
 2. the environment variable ``IDEA_REALIZATION_<KEY>``,
-3. the plugin option ``CLAUDE_PLUGIN_OPTION_<KEY>``,
-4. the default declared in ``.claude-plugin/plugin.json``.
+3. this machine's ``.idea-realization/local.yaml`` (untracked),
+4. the plugin option ``CLAUDE_PLUGIN_OPTION_<KEY>``,
+5. the team's ``.idea-realization/project.yaml`` (tracked), for the keys it carries,
+6. the default declared in ``.claude-plugin/plugin.json``.
+
+``local.yaml`` is gitignored and holds what differs per machine: a flat map of key to value for
+the keys ``schemas/local.schema.json`` allows. It is read from the primary checkout, the first
+entry of ``git worktree list``, at the same place relative to the git top level as the root, so
+every session worktree sees the one file. ``local.example.yaml`` is its tracked template.
+
+``project.yaml`` is tracked and holds what the whole team shares (``schemas/project.schema.json``):
+``control.integration_branch`` supplies ``integration_branch`` and ``aws.region`` supplies
+``aws_region``. Its other values (the control remote, the demo dates, the team URLs) are read by
+``project.py``. A value in either file that starts with ``REPLACE-WITH-`` is a placeholder and
+counts as unset. A file that fails its schema raises ``PathError`` naming the file.
 
 Claude Code exports ``CLAUDE_PLUGIN_OPTION_<KEY>`` to hooks only. A skill passes the saved option
 to a script by prefixing the command with ``CLAUDE_PLUGIN_OPTION_<KEY>='${user_config.<key>}'``,
@@ -39,24 +52,43 @@ control repository. ``product_worktree_dir`` resolves against the product checko
 ``<product>`` in it is the product checkout's directory name. ``aws_read_profile``,
 ``aws_deploy_profile`` and ``aws_region`` are plain text, may be unset, and are read by the cloud
 agents, which refuse to run without them.
+
+``handle`` asserts this machine's developer handle (``identity.py`` still requires the git email
+to match it) and ``dev_port_range`` names the local ports a developer server may use, as
+``<first>-<last>``. Both are plain text and may be unset.
+
+``paths.py`` prints every resolved value; ``paths.py show`` also prints where each one came from.
 """
 
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import functools
 import json
 import os
+import re
 import subprocess
 import sys
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
+
+import yaml
+from jsonschema import Draft7Validator
 
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = PLUGIN_ROOT / ".claude-plugin" / "plugin.json"
 UNSUBSTITUTED = "${user_config."
 ROOT_ENV = "IDEA_REALIZATION_ROOT"
+PLACEHOLDER = "REPLACE-WITH-"
+LOCAL_RECORD = Path(".idea-realization") / "local.yaml"
+PROJECT_RECORD = Path(".idea-realization") / "project.yaml"
+
+#: Keys ``project.yaml`` supplies, and where in it each one sits.
+PROJECT_KEYS = {"integration_branch": ("control", "integration_branch"),
+                "aws_region": ("aws", "region")}
 
 
 @dataclass(frozen=True)
@@ -80,7 +112,8 @@ class Key:
 
 
 #: Keys that hold plain text rather than a path. A ``multiple`` key is a list of paths.
-TEXT_KEYS = {"integration_branch", "aws_read_profile", "aws_deploy_profile", "aws_region"}
+TEXT_KEYS = {"integration_branch", "aws_read_profile", "aws_deploy_profile", "aws_region",
+             "handle", "dev_port_range"}
 
 #: Keys that resolve against the primary checkout rather than the current one.
 PRIMARY_KEYS = {"worktree_dir"}
@@ -118,21 +151,35 @@ def add_arguments(parser: argparse.ArgumentParser, names: Sequence[str] | None =
 
 
 def _set(value: str | None) -> bool:
-    return value is not None and value != "" and UNSUBSTITUTED not in value
+    return (value is not None and value != "" and UNSUBSTITUTED not in value
+            and not value.startswith(PLACEHOLDER))
 
 
-def raw_value(name: str, flags: Mapping[str, str | None] | None = None,
-              env: Mapping[str, str] | None = None) -> str | list[str]:
-    """Return a key's value before path resolution, following the four-level precedence."""
+def raw_source(name: str, flags: Mapping[str, str | None] | None = None,
+               env: Mapping[str, str] | None = None, local: Mapping[str, str] | None = None,
+               project: Mapping[str, str] | None = None) -> tuple[str | list[str], str]:
+    """Return a key's value before path resolution and the source it came from, following the
+    six-level precedence. ``local`` and ``project`` are the keys read from the two files."""
     key = KEYS[name]
     env = os.environ if env is None else env
-    for candidate in ((flags or {}).get(name), env.get(key.env), env.get(key.option_env)):
+    candidates = (((flags or {}).get(name), key.flag), (env.get(key.env), key.env),
+                  ((local or {}).get(name), LOCAL_RECORD.name),
+                  (env.get(key.option_env), key.option_env),
+                  ((project or {}).get(name), PROJECT_RECORD.name))
+    for candidate, source in candidates:
         if _set(candidate):
             assert candidate is not None
             if key.kind == "paths":
-                return [part.strip() for part in candidate.split(",") if part.strip()]
-            return candidate
-    return list(key.default) if isinstance(key.default, list) else key.default
+                return [part.strip() for part in candidate.split(",") if part.strip()], source
+            return candidate, source
+    return (list(key.default) if isinstance(key.default, list) else key.default), "default"
+
+
+def raw_value(name: str, flags: Mapping[str, str | None] | None = None,
+              env: Mapping[str, str] | None = None, local: Mapping[str, str] | None = None,
+              project: Mapping[str, str] | None = None) -> str | list[str]:
+    """Return a key's value before path resolution, following the six-level precedence."""
+    return raw_source(name, flags, env, local, project)[0]
 
 
 def repository_root(flag: str | None = None, env: Mapping[str, str] | None = None,
@@ -161,6 +208,55 @@ def primary_checkout(root: Path) -> Path:
             if line.startswith("worktree "):
                 return Path(line.removeprefix("worktree ")).resolve()
     return root.resolve()
+
+
+def local_record(root: Path) -> Path:
+    """Where this machine's ``local.yaml`` is: in the primary checkout, at the root's place
+    relative to the git top level, so a session worktree reads the primary checkout's file."""
+    top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+                         capture_output=True, text=True, check=False)
+    offset = Path()
+    if top.returncode == 0:
+        try:
+            offset = root.resolve().relative_to(Path(top.stdout.strip()).resolve())
+        except ValueError:
+            offset = Path()
+    return primary_checkout(root) / offset / LOCAL_RECORD
+
+
+def read_yaml_record(location: Path, schema: str) -> dict[str, Any] | None:
+    """A configuration file validated against ``schemas/<schema>``; None when it is absent.
+    A file that does not parse or fails the schema raises ``PathError`` naming the file."""
+    if not location.is_file():
+        return None
+    try:
+        loaded = yaml.safe_load(location.read_text(encoding="utf-8"))
+    except yaml.YAMLError as error:
+        raise PathError(location.name, str(location), f"is not valid YAML: {error}") from error
+    validator = Draft7Validator(json.loads((PLUGIN_ROOT / "schemas" / schema)
+                                           .read_text(encoding="utf-8")))
+    issues = [f"{'.'.join(map(str, issue.absolute_path)) or '(top)'}: {issue.message}"
+              for issue in validator.iter_errors(loaded)]
+    if issues:
+        raise PathError(location.name, str(location), "; ".join(issues))
+    return dict(loaded)
+
+
+def local_values(root: Path) -> dict[str, str]:
+    """The keys this machine's ``local.yaml`` sets."""
+    record = read_yaml_record(local_record(root), "local.schema.json") or {}
+    return {name: str(value) for name, value in record.items() if name in KEYS}
+
+
+def project_values(root: Path) -> dict[str, str]:
+    """The keys the tracked ``project.yaml`` supplies (``PROJECT_KEYS``)."""
+    record = read_yaml_record(root / PROJECT_RECORD, "project.schema.json") or {}
+    found = {}
+    for name, (section, field) in PROJECT_KEYS.items():
+        value = (record.get(section) or {}).get(field)
+        if value is not None:
+            found[name] = str(value)
+    return found
 
 
 def _to_path(root: Path, value: str) -> Path:
@@ -213,12 +309,23 @@ def _branch(name: str, value: str) -> str:
     return value
 
 
+HANDLE = re.compile(r"^[a-z][a-z0-9]{0,15}$")
+
+
+def _port_range(name: str, value: str) -> str:
+    match = re.fullmatch(r"(\d+)-(\d+)", value)
+    if not match or not 1024 <= int(match.group(1)) <= int(match.group(2)) <= 65535:
+        raise PathError(name, value, "must be <first>-<last> with 1024 <= first <= last <= 65535")
+    return value
+
+
 @dataclass(frozen=True)
 class Config:
     """Resolved configuration: the root plus every key, validated as each is read."""
 
     root: Path
     values: Mapping[str, str | list[str]]
+    sources: Mapping[str, str] = dataclasses.field(default_factory=dict)
 
     def path(self, name: str) -> Path:
         value = self.values[name]
@@ -259,7 +366,13 @@ class Config:
     def text(self, name: str) -> str:
         value = self.values[name]
         assert isinstance(value, str), name
-        return _branch(name, value) if name == "integration_branch" else value
+        if name == "integration_branch":
+            return _branch(name, value)
+        if name == "handle" and value and not HANDLE.match(value):
+            raise PathError(name, value, f"a handle must match {HANDLE.pattern}")
+        if name == "dev_port_range" and value:
+            return _port_range(name, value)
+        return value
 
     def invalid(self) -> list[PathError]:
         """Every key that fails validation, in manifest order. Reads only."""
@@ -300,24 +413,44 @@ def resolve(args: argparse.Namespace | Mapping[str, str | None] | None = None,
     else:
         flags = args
     root = repository_root(flags.get("root"), env, cwd)
-    return Config(root, {name: raw_value(name, flags, env) for name in KEYS})
+    local, project = local_values(root), project_values(root)
+    resolved = {name: raw_source(name, flags, env, local, project) for name in KEYS}
+    return Config(root, {name: value for name, (value, _) in resolved.items()},
+                  {name: source for name, (_, source) in resolved.items()})
+
+
+def shown(config: Config, name: str) -> str:
+    """One key's resolved value as ``paths.py`` prints it."""
+    key = KEYS[name]
+    if name in PRODUCT_KEYS and config.product_root() is None:
+        return "(not set)"
+    if key.kind == "path":
+        return str(config.path(name))
+    if key.kind == "paths":
+        return ", ".join(str(p) for p in config.paths(name))
+    return config.text(name)
 
 
 @exits_on_path_error
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Print every resolved configuration value.")
+    parser.add_argument("command", nargs="?", choices=("show",),
+                        help="show: also print the source each value came from")
     add_arguments(parser)
-    config = resolve(parser.parse_args(argv))
-    print(f"root: {config.root}")
-    for name, key in KEYS.items():
-        if name in PRODUCT_KEYS and config.product_root() is None:
-            print(f"{name}: (not set)")
-        elif key.kind == "path":
-            print(f"{name}: {config.path(name)}")
-        elif key.kind == "paths":
-            print(f"{name}: {', '.join(str(p) for p in config.paths(name))}")
-        else:
-            print(f"{name}: {config.text(name)}")
+    args = parser.parse_args(argv)
+    config = resolve(args)
+    if args.command != "show":
+        print(f"root: {config.root}")
+        for name in KEYS:
+            print(f"{name}: {shown(config, name)}")
+        return 0
+    rows = [("key", "value", "source"), ("root", str(config.root), "")]
+    rows += [(name, shown(config, name), config.sources.get(name, "")) for name in KEYS]
+    width = max(len(row[0]) for row in rows)
+    value_width = max(len(row[1]) for row in rows)
+    for name, value, source in rows:
+        print(f"{name:<{width}}  {value:<{value_width}}  {source}".rstrip())
+    print(f"local file: {local_record(config.root)}")
     return 0
 
 

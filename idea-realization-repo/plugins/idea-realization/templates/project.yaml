@@ -1,0 +1,19 @@
+schema_version: 1
+# What the whole team shares about this control repository (schemas/project.schema.json).
+# What differs per machine goes in the untracked .idea-realization/local.yaml instead.
+# A value that starts with REPLACE-WITH- is a placeholder: scripts treat it as unset.
+control:
+  remote: REPLACE-WITH-THE-CONTROL-REPOSITORY-GIT-URL
+  github: REPLACE-WITH-THE-CONTROL-REPOSITORY-ORG-AND-NAME
+  integration_branch: main
+# Optional sections; dates are quoted YYYY-MM-DD.
+# demo:
+#   date: 'YYYY-MM-DD'
+#   freeze: 'YYYY-MM-DD'
+#   tag_prefix: demo-
+# urls:
+#   hackathon_portal: REPLACE-WITH-THE-HACKATHON-PORTAL-URL
+#   demo_app: REPLACE-WITH-THE-DEMO-APP-URL
+#   team_chat: REPLACE-WITH-THE-TEAM-CHAT-URL
+# aws:
+#   region: REPLACE-WITH-THE-TEAM-AWS-REGION

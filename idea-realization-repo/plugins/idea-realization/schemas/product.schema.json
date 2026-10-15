@@ -30,6 +30,11 @@
       "type": "string",
       "minLength": 1,
       "description": "The forge workflow file the CI gate polls, or none."
+    },
+    "github": {
+      "type": "string",
+      "pattern": "^([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+|REPLACE-WITH-[A-Z0-9-]+)$",
+      "description": "The product repository on GitHub, as <org>/<repo>, for gh commands. Optional."
     }
   }
 }

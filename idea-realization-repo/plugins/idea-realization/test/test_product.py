@@ -137,6 +137,35 @@ def test_cli_verify_reports_a_match(repos: tuple[Path, Path], capsys: Any) -> No
     assert "origin: matches" in capsys.readouterr().out
 
 
+def test_github_is_optional_and_printed(repos: tuple[Path, Path], capsys: Any) -> None:
+    control, checkout = repos
+    assert product.load(config(control, checkout)).github == ""
+    record = control / product.RECORD
+    record.write_text(record.read_text() + "github: team/hack-product\n")
+    assert product.load(config(control, checkout)).github == "team/hack-product"
+    assert product.main(["show", "--root", str(control), "--product-root", str(checkout)]) == 0
+    assert "github: team/hack-product" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("value", ["team", "a/b/c", "https://forge.example.com/team/x"])
+def test_a_malformed_github_is_refused(repos: tuple[Path, Path], value: str) -> None:
+    control, checkout = repos
+    record = control / product.RECORD
+    record.write_text(record.read_text() + f"github: {value}\n")
+    with pytest.raises(product.ProductError, match="github"):
+        product.load(config(control, checkout))
+
+
+def test_this_repositorys_product_record_integrates_on_dev() -> None:
+    from conftest import PLUGIN_ROOT
+
+    record = product.read_record(PLUGIN_ROOT.parent.parent)
+    assert record is not None
+    assert record["integration_branch"] == "dev"
+    assert record["ci_workflow"] == "product-ci.yml"
+    assert record["remote"].startswith("REPLACE-WITH-")
+
+
 def evidence_errors(root: Path, product_root: Path | None, evidence: str) -> list[str]:
     catalog = {"schema_version": 1, "updated": TODAY.isoformat(), "items": [phase(
         status="complete", session="doc-session", completion_evidence=[evidence],

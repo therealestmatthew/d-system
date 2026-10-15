@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Local machine configuration",
+  "description": "What differs per machine: the product checkout, worktree directories, AWS profiles and region, the asserted developer handle and the developer server ports. Untracked (gitignored); read from the primary checkout. Each value sits below a flag and an IDEA_REALIZATION_<KEY> variable and above the plugin option. A value that starts with REPLACE-WITH- counts as unset.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "product_root": {"type": "string", "description": "This machine's product checkout; an absolute path is clearest."},
+    "product_worktree_dir": {"type": "string", "description": "Where product worktrees go, beside the product checkout."},
+    "worktree_dir": {"type": "string", "description": "Where control worktrees go, outside the primary checkout."},
+    "aws_read_profile": {"type": "string", "description": "AWS CLI profile for the sandbox's read-only role."},
+    "aws_deploy_profile": {"type": "string", "description": "AWS CLI profile for the sandbox's deploy role."},
+    "aws_region": {"type": "string", "description": "AWS region on this machine; overrides project.yaml aws.region."},
+    "handle": {"type": "string", "description": "The developer handle this machine asserts; the git email must belong to it."},
+    "dev_port_range": {"type": "string", "pattern": "^\\d+-\\d+$", "description": "Local ports a development server may use, as <first>-<last>."}
+  }
+}

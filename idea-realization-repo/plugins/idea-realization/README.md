@@ -119,8 +119,16 @@ Every path a script reads is resolved by `scripts/paths.py`, in this order:
 
 1. a command-line flag, such as `--ideas-path`;
 2. the environment variable `IDEA_REALIZATION_<KEY>`, such as `IDEA_REALIZATION_IDEAS_PATH`;
-3. the plugin option `CLAUDE_PLUGIN_OPTION_<KEY>`, which the skills set from your saved options;
-4. the default in `.claude-plugin/plugin.json`.
+3. this machine's untracked `.idea-realization/local.yaml`, read from the primary checkout
+   (`schemas/local.schema.json`; the tracked `local.example.yaml` is its template);
+4. the plugin option `CLAUDE_PLUGIN_OPTION_<KEY>`, which the skills set from your saved options;
+5. the team's tracked `.idea-realization/project.yaml`, which supplies `integration_branch`
+   (`control.integration_branch`) and `aws_region` (`aws.region`); `scripts/project.py show`
+   prints the rest of it, and `check.py` and `doctor.py` report a control checkout whose `origin`
+   is not its `control.remote`;
+6. the default in `.claude-plugin/plugin.json`.
+
+A value that starts with `REPLACE-WITH-` is a placeholder and counts as unset.
 
 Relative paths resolve against the repository root: `--root`, then `IDEA_REALIZATION_ROOT`, then
 `CLAUDE_PROJECT_DIR`, then the git top level of the working directory. List options, such as
@@ -140,7 +148,8 @@ Relative paths resolve against the repository root: `--root`, then `IDEA_REALIZA
 | `staging_dir` | `.idea-realization/staging`, which must be gitignored |
 | `partitions_dir` | `ideas/partitions` |
 
-`uv run scripts/paths.py` prints every resolved value.
+`uv run scripts/paths.py` prints every resolved value; `uv run scripts/paths.py show` adds the
+source of each one.
 
 Every value is checked when a script reads it. A path option, and every entry of a list option,
 must resolve inside the repository, after following symlinks, and must not pass through `.git`; an

@@ -171,3 +171,41 @@ def test_scaffold_refuses_an_outside_docs_root_and_writes_nothing(tmp_path: Path
     assert code == 2
     assert listing(root) == {}
     assert not (tmp_path / "outside").exists()
+
+
+def test_the_project_feature_seeds_its_files_and_ignores_local_yaml(tmp_path: Path) -> None:
+    lines = scaffold.scaffold(config(tmp_path), ["project"], consent=["gitignore"])
+    for name in ("project.yaml", "local.example.yaml", "schemas/project.schema.json",
+                 "schemas/local.schema.json"):
+        assert (tmp_path / ".idea-realization" / name).is_file(), lines
+    assert (tmp_path / ".gitignore").read_text() == "/.idea-realization/local.yaml\n"
+    # The seeded project.yaml is valid and supplies the integration branch.
+    resolved = config(tmp_path)
+    assert (resolved.text("integration_branch"), resolved.sources["integration_branch"]) == (
+        "main", "project.yaml")
+
+
+def test_the_seeded_local_example_is_valid_local_yaml(tmp_path: Path) -> None:
+    scaffold.scaffold(config(tmp_path), ["project"])
+    example = tmp_path / ".idea-realization" / "local.example.yaml"
+    example.rename(tmp_path / ".idea-realization" / "local.yaml")
+    resolved = config(tmp_path)
+    assert resolved.text("dev_port_range") == "3000-3099"
+    assert resolved.product_root() is None  # the placeholder counts as unset
+    assert resolved.invalid() == []
+
+
+def test_edit_consent_is_recorded_once_per_selected_config_file(tmp_path: Path) -> None:
+    scaffold.scaffold(config(tmp_path), ["project"], consent=["edit"])
+    lines = scaffold.scaffold(config(tmp_path), ["product", "project"], consent=["edit"])
+    assert "recorded consent to edit .idea-realization/product.yaml" in lines
+    consent = record(tmp_path)["consent"]
+    assert isinstance(consent, list)
+    assert sorted(entry["path"] for entry in consent if entry["target"] == "edit") == [
+        ".idea-realization/product.yaml", ".idea-realization/project.yaml"]
+
+
+def test_edit_consent_on_a_dry_run_records_nothing(tmp_path: Path) -> None:
+    lines = scaffold.scaffold(config(tmp_path), ["project"], dry_run=True, consent=["edit"])
+    assert "would record  consent to edit .idea-realization/project.yaml" in lines
+    assert list(tmp_path.iterdir()) == []

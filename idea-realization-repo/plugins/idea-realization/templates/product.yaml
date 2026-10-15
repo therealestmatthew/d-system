@@ -6,3 +6,5 @@ name: product
 remote: REPLACE-WITH-THE-PRODUCT-REPOSITORY-GIT-URL
 integration_branch: main
 ci_workflow: none
+# Optional: the product repository on GitHub, for gh commands.
+# github: <org>/<repo>

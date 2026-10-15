@@ -1,0 +1,14 @@
+# Copy to .idea-realization/local.yaml in the primary checkout (the first entry of
+# `git worktree list`) and fill in this machine's values. local.yaml is gitignored: it is never
+# committed. Every key is optional; delete the ones you do not set. A flag or an
+# IDEA_REALIZATION_<KEY> environment variable overrides a value here.
+# The plugin's `scripts/paths.py show` prints each value and where it came from.
+# Schema: schemas/local.schema.json.
+product_root: REPLACE-WITH-THE-ABSOLUTE-PATH-OF-YOUR-PRODUCT-CHECKOUT
+# product_worktree_dir: ../<product>-worktrees
+# worktree_dir: ../<repository>-worktrees
+aws_read_profile: REPLACE-WITH-YOUR-READ-ONLY-AWS-PROFILE
+aws_deploy_profile: REPLACE-WITH-YOUR-DEPLOY-AWS-PROFILE
+# aws_region: overrides aws.region in project.yaml on this machine only.
+handle: REPLACE-WITH-YOUR-DEVELOPER-HANDLE
+dev_port_range: 3000-3099

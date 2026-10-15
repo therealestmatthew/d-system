@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Project configuration",
+  "description": "What the whole team shares about this control repository: its remote and integration branch, the demo dates and tag prefix, the team's links and the default AWS region. Tracked; what differs per machine goes in local.yaml. A value that starts with REPLACE-WITH- is a placeholder and counts as unset.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "control"],
+  "definitions": {
+    "placeholder": {
+      "type": "string",
+      "pattern": "^REPLACE-WITH-[A-Z0-9-]+$"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "url": {
+      "anyOf": [
+        {"type": "string", "pattern": "^https?://\\S+$"},
+        {"$ref": "#/definitions/placeholder"}
+      ]
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "description": "Record contract version."
+    },
+    "control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["remote", "integration_branch"],
+      "properties": {
+        "remote": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Git URL of this control repository. Once set, check.py and doctor.py report a checkout whose origin differs."
+        },
+        "github": {
+          "anyOf": [
+            {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+            {"$ref": "#/definitions/placeholder"}
+          ],
+          "description": "The control repository on GitHub, as <org>/<repo>, for gh commands."
+        },
+        "integration_branch": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^-]",
+          "description": "The control repository's integration branch. Supplies the integration_branch key below the plugin option."
+        }
+      }
+    },
+    "demo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "date": {"$ref": "#/definitions/date", "description": "The demo day, YYYY-MM-DD, quoted."},
+        "freeze": {"$ref": "#/definitions/date", "description": "The code freeze, YYYY-MM-DD, quoted; only hotfix phases merge after it."},
+        "tag_prefix": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$", "description": "Prefix of the demo release tags, such as demo- for demo-rc-1 and demo-final."}
+      }
+    },
+    "urls": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hackathon_portal": {"$ref": "#/definitions/url"},
+        "demo_app": {"$ref": "#/definitions/url"},
+        "team_chat": {"$ref": "#/definitions/url"}
+      }
+    },
+    "aws": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "region": {
+          "anyOf": [
+            {"type": "string", "pattern": "^[a-z]{2}(-[a-z]+)+-\\d+$"},
+            {"$ref": "#/definitions/placeholder"}
+          ],
+          "description": "The team's default AWS region. Supplies the aws_region key below the plugin option; local.yaml overrides it per machine."
+        }
+      }
+    }
+  }
+}

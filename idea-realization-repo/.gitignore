@@ -13,3 +13,6 @@ __pycache__/
 # Plugin staging (partition drafts, corpora) and ephemeral working notes.
 .idea-realization/staging/
 _working/
+
+# Per-machine configuration (paths.py reads it from the primary checkout).
+/.idea-realization/local.yaml

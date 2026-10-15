@@ -13,6 +13,7 @@ tracked in ``.idea-realization/product.yaml``::
     remote: <git URL of the product repository>
     integration_branch: main
     ci_workflow: none
+    github: <org>/<repo>        # optional
 
 Where the product checkout sits differs per machine, so it is configured, never tracked: the
 ``product_root`` key (``--product-root``, ``IDEA_REALIZATION_PRODUCT_ROOT``, then the plugin
@@ -62,6 +63,7 @@ class Product:
     ci_workflow: str
     root: Path
     worktree_dir: Path
+    github: str = ""
 
 
 def split(value: str) -> tuple[str, str]:
@@ -121,7 +123,7 @@ def load(config: paths.Config) -> Product:
         raise ProductError(f"product_root {root} is not a directory")
     worktrees = config.product_worktree_dir(root)
     return Product(record["name"], record["remote"], record["integration_branch"],
-                   record.get("ci_workflow", "none"), root, worktrees)
+                   record.get("ci_workflow", "none"), root, worktrees, record.get("github", ""))
 
 
 def origin(root: Path) -> str:
@@ -181,6 +183,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(f"remote: {product.remote}")
     print(f"integration_branch: {product.integration_branch}")
     print(f"ci_workflow: {product.ci_workflow}")
+    print(f"github: {product.github or '(not set)'}")
     print(f"root: {product.root}")
     print(f"worktree_dir: {product.worktree_dir}")
     if args.command == "verify":

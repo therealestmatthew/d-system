@@ -1,4 +1,5 @@
-"""Every data path resolves flag, then environment, then plugin option, then default."""
+"""Every data path resolves flag, then environment, then local.yaml, then plugin option, then
+project.yaml, then default."""
 
 from __future__ import annotations
 
@@ -14,7 +15,7 @@ EXPECTED_KEYS = {
     "ideas_path", "ideas_view_path", "priority_path", "backlog_path", "docs_root",
     "integration_branch", "worktree_dir", "triage_search", "exempt_files", "staging_dir",
     "partitions_dir", "brain_root", "product_root", "product_worktree_dir", "aws_read_profile",
-    "aws_deploy_profile", "aws_region",
+    "aws_deploy_profile", "aws_region", "handle", "dev_port_range",
 }
 
 
@@ -186,3 +187,152 @@ def test_a_malformed_integration_branch_is_refused(tmp_path: Path, branch: str) 
 @pytest.mark.parametrize("branch", ["dev", "main", "release/1.2"])
 def test_a_well_formed_integration_branch_is_accepted(tmp_path: Path, branch: str) -> None:
     assert _config(tmp_path, integration_branch=branch).text("integration_branch") == branch
+
+
+# --- local.yaml and project.yaml -------------------------------------------------------------
+
+
+def _git(cwd: Path, *args: str) -> None:
+    subprocess.run(["git", "-C", str(cwd), "-c", "user.name=fixture",
+                    "-c", "user.email=fixture@example", *args],
+                   capture_output=True, text=True, check=True)
+
+
+def _write(root: Path, name: str, text: str) -> None:
+    (root / ".idea-realization").mkdir(parents=True, exist_ok=True)
+    (root / ".idea-realization" / name).write_text(text)
+
+
+PROJECT = ("schema_version: 1\ncontrol:\n  remote: REPLACE-WITH-THE-CONTROL-REPOSITORY-GIT-URL\n"
+           "  integration_branch: dev\naws:\n  region: eu-west-1\n")
+
+
+def test_project_yaml_sits_between_the_plugin_option_and_the_default(tmp_path: Path) -> None:
+    _write(tmp_path, "project.yaml", PROJECT)
+    config = paths.resolve({"root": str(tmp_path)}, env={})
+    assert config.text("integration_branch") == "dev"
+    assert config.text("aws_region") == "eu-west-1"
+    assert config.sources["integration_branch"] == "project.yaml"
+    assert config.sources["ideas_path"] == "default"
+    option = paths.resolve({"root": str(tmp_path)},
+                           env={"CLAUDE_PLUGIN_OPTION_INTEGRATION_BRANCH": "trunk"})
+    assert option.text("integration_branch") == "trunk"
+    assert option.sources["integration_branch"] == "CLAUDE_PLUGIN_OPTION_INTEGRATION_BRANCH"
+
+
+def test_local_yaml_sits_between_the_environment_and_the_plugin_option(tmp_path: Path) -> None:
+    _write(tmp_path, "project.yaml", PROJECT)
+    _write(tmp_path, "local.yaml", "aws_region: us-west-2\naws_read_profile: hack-read\n")
+    env = {"CLAUDE_PLUGIN_OPTION_AWS_REGION": "ap-south-1",
+           "CLAUDE_PLUGIN_OPTION_AWS_READ_PROFILE": "option-read"}
+    config = paths.resolve({"root": str(tmp_path)}, env=env)
+    assert config.text("aws_region") == "us-west-2"
+    assert config.text("aws_read_profile") == "hack-read"
+    assert config.sources["aws_region"] == "local.yaml"
+    env["IDEA_REALIZATION_AWS_REGION"] = "ca-central-1"
+    config = paths.resolve({"root": str(tmp_path)}, env=env)
+    assert (config.text("aws_region"), config.sources["aws_region"]) == (
+        "ca-central-1", "IDEA_REALIZATION_AWS_REGION")
+    flagged = paths.resolve({"root": str(tmp_path), "aws_region": "sa-east-1"}, env=env)
+    assert (flagged.text("aws_region"), flagged.sources["aws_region"]) == (
+        "sa-east-1", "--aws-region")
+
+
+def test_a_placeholder_counts_as_unset(tmp_path: Path) -> None:
+    _write(tmp_path, "project.yaml", PROJECT.replace("eu-west-1", "REPLACE-WITH-THE-REGION"))
+    _write(tmp_path, "local.yaml", "aws_read_profile: REPLACE-WITH-YOUR-READ-ONLY-AWS-PROFILE\n")
+    config = paths.resolve({"root": str(tmp_path)}, env={})
+    assert config.text("aws_region") == ""
+    assert config.text("aws_read_profile") == ""
+    assert config.sources["aws_read_profile"] == "default"
+
+
+def test_local_yaml_is_read_from_the_primary_checkout(tmp_path: Path) -> None:
+    primary = tmp_path / "sample"
+    primary.mkdir()
+    _git(primary, "init", "-q")
+    _git(primary, "commit", "-q", "--allow-empty", "-m", "fixture")
+    worktree = tmp_path / "sample-worktrees" / "session"
+    _git(primary, "worktree", "add", "-q", "-b", "session", str(worktree))
+    _write(primary, "local.yaml", "handle: ana\n")
+    _write(worktree, "local.yaml", "handle: bo\n")  # a session worktree's copy is never read
+    config = paths.resolve({"root": str(worktree)}, env={})
+    assert config.text("handle") == "ana"
+    assert paths.local_record(worktree) == primary.resolve() / ".idea-realization" / "local.yaml"
+
+
+def test_local_yaml_keeps_the_roots_place_below_the_git_top_level(tmp_path: Path) -> None:
+    primary = tmp_path / "outer"
+    (primary / "inner").mkdir(parents=True)
+    _git(primary, "init", "-q")
+    _git(primary, "commit", "-q", "--allow-empty", "-m", "fixture")
+    worktree = tmp_path / "outer-worktrees" / "session"
+    _git(primary, "worktree", "add", "-q", "-b", "session", str(worktree))
+    (worktree / "inner").mkdir()
+    assert paths.local_record(worktree / "inner") == (
+        primary.resolve() / "inner" / ".idea-realization" / "local.yaml")
+
+
+def test_an_invalid_local_yaml_is_refused_by_name(tmp_path: Path) -> None:
+    _write(tmp_path, "local.yaml", "ideas_path: elsewhere.jsonl\n")
+    with pytest.raises(paths.PathError, match="local.yaml"):
+        paths.resolve({"root": str(tmp_path)}, env={})
+    _write(tmp_path, "local.yaml", "handle: [unclosed\n")
+    with pytest.raises(paths.PathError, match="not valid YAML"):
+        paths.resolve({"root": str(tmp_path)}, env={})
+
+
+def test_an_invalid_project_yaml_is_refused_by_name(tmp_path: Path) -> None:
+    # An unquoted date parses as a date, not the string the schema asks for.
+    unquoted = "-".join(["2030", "01", "02"])
+    _write(tmp_path, "project.yaml", f"schema_version: 1\ndemo:\n  date: {unquoted}\n")
+    with pytest.raises(paths.PathError, match="project.yaml"):
+        paths.resolve({"root": str(tmp_path)}, env={})
+
+
+@pytest.mark.parametrize(("name", "value"), [
+    ("handle", "Ana"), ("handle", "1ana"), ("dev_port_range", "3000"),
+    ("dev_port_range", "4000-3000"), ("dev_port_range", "80-90"),
+])
+def test_a_malformed_handle_or_port_range_is_refused(tmp_path: Path, name: str,
+                                                      value: str) -> None:
+    with pytest.raises(ValueError, match=name):
+        _config(tmp_path, **{name: value}).text(name)
+
+
+def test_a_well_formed_handle_and_port_range_are_accepted(tmp_path: Path) -> None:
+    config = _config(tmp_path, handle="ana", dev_port_range="3000-3099")
+    assert (config.text("handle"), config.text("dev_port_range")) == ("ana", "3000-3099")
+    assert config.invalid() == []
+
+
+def test_show_prints_a_source_column(tmp_path: Path, capsys: pytest.CaptureFixture[str],
+                                     monkeypatch: pytest.MonkeyPatch) -> None:
+    for name in [*paths.KEYS, "root"]:
+        monkeypatch.delenv("IDEA_REALIZATION_" + name.upper(), raising=False)
+        monkeypatch.delenv("CLAUDE_PLUGIN_OPTION_" + name.upper(), raising=False)
+    _write(tmp_path, "project.yaml", PROJECT)
+    monkeypatch.setenv("IDEA_REALIZATION_HANDLE", "ana")
+    assert paths.main(["show", "--root", str(tmp_path), "--docs-root", "notes"]) == 0
+    rows = {line.split()[0]: line.split() for line in capsys.readouterr().out.splitlines()}
+    assert rows["key"] == ["key", "value", "source"]
+    assert rows["integration_branch"][1:] == ["dev", "project.yaml"]
+    assert rows["handle"][1:] == ["ana", "IDEA_REALIZATION_HANDLE"]
+    assert rows["docs_root"][-1] == "--docs-root"
+    assert rows["ideas_path"][-1] == "default"
+    assert "local" in rows
+
+
+def test_plain_output_is_unchanged_without_show(tmp_path: Path,
+                                                capsys: pytest.CaptureFixture[str]) -> None:
+    assert paths.main(["--root", str(tmp_path)]) == 0
+    out = capsys.readouterr().out
+    assert out.splitlines()[0] == f"root: {tmp_path.resolve()}"
+    assert "integration_branch: " in out and "source" not in out
+
+
+def test_this_repository_integrates_on_dev_from_project_yaml() -> None:
+    repository = PLUGIN_ROOT.parent.parent
+    config = paths.resolve({"root": str(repository)}, env={})
+    assert config.text("integration_branch") == "dev"
+    assert config.sources["integration_branch"] == "project.yaml"

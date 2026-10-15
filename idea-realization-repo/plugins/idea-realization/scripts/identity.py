@@ -20,7 +20,9 @@ object with ``emails``::
 The handle is the owner whose ``emails`` contain ``git config user.email`` in the repository root.
 The git email is the identity; nothing else can name a developer. The environment variable
 ``IDEA_REALIZATION_HANDLE`` may state the expected handle, and is refused unless the git email
-belongs to that same developer, so it can assert an identity but never assume another one.
+belongs to that same developer, so it can assert an identity but never assume another one. The
+``handle`` key (``local.yaml``, the plugin option) asserts it the same way when the variable is
+unset.
 
 A handle is lower-case letters and digits, starting with a letter, at most 16 characters, so it can
 sit inside an identifier without ambiguity.
@@ -90,7 +92,7 @@ def handle(config: paths.Config, env: Mapping[str, str] | None = None) -> str:
     for name in team:
         if not HANDLE_PATTERN.match(name):
             raise IdentityError(f"developer handle {name!r} must match {HANDLE_PATTERN.pattern}")
-    chosen = env.get(HANDLE_ENV, "").strip()
+    chosen = env.get(HANDLE_ENV, "").strip() or str(config.values.get("handle", "")).strip()
     if chosen and chosen not in team:
         raise IdentityError(f"{HANDLE_ENV}={chosen!r} is not a developer in {REGISTRY} owners")
     email = git_email(config.root)

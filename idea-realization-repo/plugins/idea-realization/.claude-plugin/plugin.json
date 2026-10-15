@@ -117,6 +117,18 @@
       "title": "AWS region",
       "description": "The AWS region the cloud agents use on this machine. The agents refuse to run while it is empty.",
       "default": ""
+    },
+    "handle": {
+      "type": "string",
+      "title": "Developer handle",
+      "description": "The developer handle this machine asserts. It is refused unless git config user.email belongs to that developer in systems.yaml; leave it empty to take the handle from the git email alone.",
+      "default": ""
+    },
+    "dev_port_range": {
+      "type": "string",
+      "title": "Developer server ports",
+      "description": "The local ports a development server on this machine may use, as <first>-<last>, so two developers' servers on a shared host do not collide. Empty means no range is set.",
+      "default": ""
     }
   }
 }

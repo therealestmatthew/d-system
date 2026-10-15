@@ -3,7 +3,7 @@
   "plugin": "idea-realization",
   "plugin_version": "0.1.0",
   "installed_at": "2026-10-14T23:06:45Z",
-  "updated_at": "2026-10-15T00:21:23Z",
+  "updated_at": "2026-10-15T02:05:33Z",
   "features": [
     "backlog",
     "brain",
@@ -11,6 +11,7 @@
     "ideas",
     "partition",
     "product",
+    "project",
     "reviews",
     "workstreams"
   ],
@@ -57,7 +58,7 @@
     },
     {
       "path": "docs/codes.yaml",
-      "sha256": "28b73c75a09813e1cebbd413a810454c2626975503d393954a3e0e09b7d06c59",
+      "sha256": "1d6249673bcca4ebbc513e249a852b47eb7f4368c0d996a69b8444adf53e6d81",
       "feature": "documents"
     },
     {
@@ -102,7 +103,7 @@
     },
     {
       "path": ".idea-realization/schemas/product.schema.json",
-      "sha256": "585a0797e07472c7262986d9a843250c0e964d3858d0f37879f5077e73a1df15",
+      "sha256": "b28de79d0cbf9fdd15b7c06bec5af308fe787680e3605dced105dcb454f92fd1",
       "feature": "product"
     },
     {
@@ -119,6 +120,26 @@
       "path": ".idea-realization/schemas/brain-entry.schema.json",
       "sha256": "79a993dca9ff25c212d018e87a10f9bef57ebb15449347371be8a279dcd9b686",
       "feature": "brain"
+    },
+    {
+      "path": ".idea-realization/project.yaml",
+      "sha256": "82a727a5e4f1f67fb37fca156be949a38e0fb52d6b167987da39c43929d09351",
+      "feature": "project"
+    },
+    {
+      "path": ".idea-realization/local.example.yaml",
+      "sha256": "e50726d5516ae537fdf7458c7483d7a88804b89a0161c4869c832a41de996459",
+      "feature": "project"
+    },
+    {
+      "path": ".idea-realization/schemas/project.schema.json",
+      "sha256": "d6641e450ce86fcad8fb52d7f949e16bf275c107a7297850fed5de5523ab5bc7",
+      "feature": "project"
+    },
+    {
+      "path": ".idea-realization/schemas/local.schema.json",
+      "sha256": "21fc400f16e23b076b35fe4a2d690680f56cbfb51b552b05cad695f72b5377b5",
+      "feature": "project"
     }
   ],
   "directories": [
@@ -151,5 +172,16 @@
       "feature": "brain"
     }
   ],
-  "consent": []
+  "consent": [
+    {
+      "target": "edit",
+      "path": ".idea-realization/product.yaml",
+      "granted_at": "2026-10-15T02:05:33Z"
+    },
+    {
+      "target": "edit",
+      "path": ".idea-realization/project.yaml",
+      "granted_at": "2026-10-15T02:05:33Z"
+    }
+  ]
 }
