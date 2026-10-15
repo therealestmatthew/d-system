@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shell demo</title>
+  <link rel="stylesheet" href="../dist/ui.css">
+</head>
+<body>
+  <a class="ui-skip-link" href="#main">Skip to main content</a>
+
+  <div class="ui-shell" data-layout="ide">
+    <header class="ui-shell__region" data-region="header">
+      <h1 class="ui-visually-hidden">Shell demo</h1>
+      <section class="ui-panel" data-variant="compact" aria-labelledby="p-app">
+        <div class="ui-panel__header">
+          <div class="ui-panel__identity">
+            <h2 class="ui-panel__title" id="p-app">Idea realization workbench</h2>
+          </div>
+          <div class="ui-panel__controls" role="toolbar" aria-label="Gallery view">
+            <button class="ui-button ui-button--ghost ui-button--sm" type="button" data-gallery="theme" aria-pressed="false">
+              <span class="ui-button__label">Dark theme</span>
+            </button>
+            <select data-gallery="layout" aria-label="Layout">
+              <option value="ide" selected>Layout: ide</option>
+              <option value="dashboard">Layout: dashboard</option>
+              <option value="focus">Layout: focus</option>
+            </select>
+          </div>
+        </div>
+        <div class="ui-panel__body" data-body="ticker">Gallery: app shell and panel frame</div>
+      </section>
+    </header>
+
+    <nav class="ui-shell__region" data-region="nav" aria-label="Explorer">
+      <section class="ui-panel" data-variant="standard" aria-labelledby="p-explorer">
+        <div class="ui-panel__header">
+          <div class="ui-panel__identity">
+            <h2 class="ui-panel__title" id="p-explorer">Explorer</h2>
+          </div>
+          <div class="ui-panel__frame-actions">
+            <button class="ui-button ui-button--ghost ui-button--icon ui-button--sm" type="button" aria-label="Collapse Explorer" aria-expanded="true">
+              <svg class="ui-button__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="ui-panel__body" data-body="tree">
+          <ul class="ui-prose">
+            <li><a href="#main" aria-current="page">Overview</a></li>
+            <li><a href="#main">Ideas</a></li>
+            <li><a href="#main">Plans</a></li>
+            <li><a href="#main">Backlog</a></li>
+            <li><a href="#main">Reviews</a></li>
+            <li><a href="#main">Governance</a></li>
+          </ul>
+        </div>
+      </section>
+    </nav>
+
+    <main class="ui-shell__region" data-region="main" id="main" tabindex="-1">
+      <section class="ui-panel" data-variant="standard" aria-labelledby="p-doc">
+        <div class="ui-panel__header">
+          <div class="ui-panel__identity">
+            <h2 class="ui-panel__title" id="p-doc">Document: PLAN-003 UX component kit</h2>
+          </div>
+          <div class="ui-panel__help">
+            <button class="ui-button ui-button--ghost ui-button--icon ui-button--sm" type="button" aria-label="About this panel">
+              <svg class="ui-button__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><path d="M12 17h.01"/></svg>
+            </button>
+          </div>
+          <div class="ui-panel__controls" role="toolbar" aria-label="Document actions">
+            <button class="ui-button ui-button--secondary ui-button--sm" type="button">
+              <span class="ui-button__label">Refresh</span>
+            </button>
+            <span>Updated 2026-10-14 10:42</span>
+          </div>
+          <div class="ui-panel__frame-actions">
+            <button class="ui-button ui-button--ghost ui-button--icon ui-button--sm" type="button" aria-label="Maximize Document" aria-pressed="false">
+              <svg class="ui-button__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            </button>
+            <button class="ui-button ui-button--ghost ui-button--icon ui-button--sm" type="button" aria-label="Collapse Document" aria-expanded="true">
+              <svg class="ui-button__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="ui-panel__body" data-body="document">
+          <div class="ui-prose">
+            <h2>What the kit is for</h2>
+            <p>The kit gives every screen the same frame: a fixed shell of named regions, and a panel in each region with exactly one header. The body of a panel scrolls; the page does not.</p>
+            <p>Layouts are data. The grid for this page comes from <code>layouts/ide.json</code>, compiled into <code>dist/layouts.css</code>. Change the file and regenerate; no component CSS changes.</p>
+            <h3>Regions</h3>
+            <ul>
+              <li>Header: the app bar.</li>
+              <li>Nav: navigation, with the current item marked.</li>
+              <li>Main: the focal surface.</li>
+              <li>Inspector: properties of the current selection.</li>
+              <li>Dock: console, logs and runs; collapsible to its header.</li>
+              <li>Strip: one line of ambient status.</li>
+            </ul>
+            <h3>Density</h3>
+            <p>Below 1100 by 800 the shell and panel frame step down to the next type and spacing token. Below 1024 wide the regions stack in one column and the page may scroll.</p>
+            <p>This paragraph and the ones above are long enough that, on a small window, the document body scrolls inside the panel while the shell stays fixed.</p>
+            <p>Every number on a generated page names its source and its time. A missing value reads "not recorded", never zero.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="ui-shell__region" data-region="inspector" aria-label="Inspector">
+      <section class="ui-panel" data-variant="standard" aria-labelledby="p-props">
+        <div class="ui-panel__header">
+          <div class="ui-panel__identity">
+            <h2 class="ui-panel__title" id="p-props">Properties</h2>
+          </div>
+          <div class="ui-panel__frame-actions">
+            <button class="ui-button ui-button--ghost ui-button--icon ui-button--sm" type="button" aria-label="Collapse Properties" aria-expanded="true">
+              <svg class="ui-button__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="ui-panel__body" data-body="document">
+          <dl class="ui-prose">
+            <dt>Code</dt><dd><code>PLAN-003</code></dd>
+            <dt>Status</dt><dd>Proposed</dd>
+            <dt>Owner</dt><dd>repository-owner</dd>
+            <dt>Updated</dt><dd>2026-10-14</dd>
+          </dl>
+        </div>
+      </section>
+      <section class="ui-panel" data-variant="standard" aria-labelledby="p-links">
+        <div class="ui-panel__header">
+          <div class="ui-panel__identity">
+            <h2 class="ui-panel__title" id="p-links">Linked ideas</h2>
+          </div>
+        </div>
+        <div class="ui-panel__body" data-body="document">
+          <div class="ui-state" data-state="empty">
+            <p class="ui-state__title">Nothing here yet</p>
+            <p class="ui-state__body">No ideas are linked to this plan. Link one from the idea explorer.</p>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <aside class="ui-shell__region" data-region="dock" aria-label="Dock">
+      <section class="ui-panel" data-variant="standard" data-state="collapsed" aria-labelledby="p-logs">
+        <div class="ui-panel__header">
+          <div class="ui-panel__identity">
+            <h2 class="ui-panel__title" id="p-logs">Logs (collapsed)</h2>
+          </div>
+          <div class="ui-panel__frame-actions">
+            <button class="ui-button ui-button--ghost ui-button--icon ui-button--sm" type="button" aria-label="Expand Logs" aria-expanded="false">
+              <svg class="ui-button__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="ui-panel__body" data-body="stream" role="log">
+          <p>Collapsed panels keep their body in the DOM; it is not shown.</p>
+        </div>
+      </section>
+      <section class="ui-panel" data-variant="standard" aria-labelledby="p-console">
+        <div class="ui-panel__header">
+          <div class="ui-panel__identity">
+            <h2 class="ui-panel__title" id="p-console">Console</h2>
+          </div>
+          <div class="ui-panel__controls" role="toolbar" aria-label="Console actions">
+            <button class="ui-button ui-button--ghost ui-button--sm" type="button">
+              <span class="ui-button__label">Clear</span>
+            </button>
+          </div>
+          <div class="ui-panel__frame-actions">
+            <button class="ui-button ui-button--ghost ui-button--icon ui-button--sm" type="button" aria-label="Maximize Console" aria-pressed="false">
+              <svg class="ui-button__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="ui-panel__body" data-body="terminal">
+          <pre>$ uv run python ui-kit/tools/build_layouts.py
+wrote ui-kit/dist/layouts.css
+$ uv run python ui-kit/tools/build_css.py
+wrote ui-kit/dist/ui.css</pre>
+        </div>
+      </section>
+    </aside>
+
+    <footer class="ui-shell__region" data-region="strip">
+      <section class="ui-panel" data-variant="compact" aria-labelledby="p-status">
+        <div class="ui-panel__header">
+          <div class="ui-panel__identity">
+            <h2 class="ui-panel__title ui-visually-hidden" id="p-status">Status</h2>
+          </div>
+        </div>
+        <div class="ui-panel__body" data-body="ticker">Environment: local. Model: not connected. Last sync: not recorded.</div>
+      </section>
+    </footer>
+  </div>
+
+  <!-- GALLERY ONLY: not part of the kit. Toggles data-theme on <html> and data-layout on the
+       shell so the demo can be viewed in both themes and every layout. The app gets this
+       behaviour from React; static pages from the declared ui.js theme behaviour. -->
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var shell = document.querySelector(".ui-shell");
+      var themeButton = document.querySelector('[data-gallery="theme"]');
+      var layoutSelect = document.querySelector('[data-gallery="layout"]');
+      var hash = new URLSearchParams(location.hash.slice(1));
+      function setTheme(dark) {
+        root.setAttribute("data-theme", dark ? "dark" : "light");
+        themeButton.setAttribute("aria-pressed", String(dark));
+      }
+      if (hash.get("theme")) setTheme(hash.get("theme") === "dark");
+      if (hash.get("layout")) {
+        shell.setAttribute("data-layout", hash.get("layout"));
+        layoutSelect.value = hash.get("layout");
+      }
+      themeButton.addEventListener("click", function () {
+        setTheme(themeButton.getAttribute("aria-pressed") !== "true");
+      });
+      layoutSelect.addEventListener("change", function () {
+        shell.setAttribute("data-layout", layoutSelect.value);
+      });
+    })();
+  </script>
+</body>
+</html>

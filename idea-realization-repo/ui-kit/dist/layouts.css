@@ -1,0 +1,58 @@
+/*
+  ui-kit shell layouts. GENERATED: do not edit by hand.
+
+  Source:     ui-kit/layouts/*.json (schema: ui-kit/layouts/layout.schema.json)
+  Regenerate: uv run python ui-kit/tools/build_layouts.py
+  Check:      uv run python ui-kit/tools/build_layouts.py --check
+
+  Put data-layout="<id>" on .ui-shell. Below 1024px wide these rules do not apply and
+  layout.css stacks the regions in one column.
+  Layouts:
+    dashboard: Dashboard: header, main, status strip
+    focus: Focus: header and main
+    ide: Workbench: nav, main, inspector, dock
+*/
+
+@media (width >= 64em) {
+  .ui-shell[data-layout="dashboard"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "header"
+      "main"
+      "strip";
+  }
+  .ui-shell[data-layout="dashboard"] > [data-region="header"] { grid-area: header; }
+  .ui-shell[data-layout="dashboard"] > [data-region="main"] { grid-area: main; }
+  .ui-shell[data-layout="dashboard"] > [data-region="strip"] { grid-area: strip; }
+
+  .ui-shell[data-layout="focus"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+      "header"
+      "main";
+  }
+  .ui-shell[data-layout="focus"] > [data-region="header"] { grid-area: header; }
+  .ui-shell[data-layout="focus"] > [data-region="main"] { grid-area: main; }
+
+  .ui-shell[data-layout="ide"] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 4fr) minmax(0, 1.5fr);
+    grid-template-rows: auto minmax(0, 3fr) minmax(0, 1fr) auto;
+    grid-template-areas:
+      "header header header"
+      "nav main inspector"
+      "nav dock inspector"
+      "strip strip strip";
+  }
+  .ui-shell[data-layout="ide"] > [data-region="header"] { grid-area: header; }
+  .ui-shell[data-layout="ide"] > [data-region="nav"] { grid-area: nav; }
+  .ui-shell[data-layout="ide"] > [data-region="main"] { grid-area: main; }
+  .ui-shell[data-layout="ide"] > [data-region="inspector"] { grid-area: inspector; }
+  .ui-shell[data-layout="ide"] > [data-region="dock"] { grid-area: dock; }
+  .ui-shell[data-layout="ide"] > [data-region="strip"] { grid-area: strip; }
+}
+
+/* Regions a layout does not use have no grid area; they are not shown. */
+.ui-shell[data-layout="dashboard"] > [data-region]:not([data-region="header"], [data-region="main"], [data-region="strip"]) { display: none; }
+.ui-shell[data-layout="focus"] > [data-region]:not([data-region="header"], [data-region="main"]) { display: none; }

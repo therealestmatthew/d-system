@@ -1,0 +1,165 @@
+/*
+  ui-kit base: reset, body type, links, code, selection, the focus ring, reduced motion.
+  No component styling. Values come only from dist/tokens.css.
+  color-scheme is set by dist/tokens.css on :root per theme; it is not redeclared here, because
+  a later :root rule at the same specificity would override the theme's value.
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--ui-font-sans);
+  font-size: var(--ui-fs-md);
+  line-height: var(--ui-lh-ui);
+  font-weight: var(--ui-fw-regular);
+  color: var(--ui-color-text);
+  background: var(--ui-color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+canvas {
+  display: block;
+  max-inline-size: 100%;
+}
+
+svg {
+  flex-shrink: 0;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+p,
+li,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+/* Headings: the app scale. Report pages (.ui-page) keep the same tokens. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: var(--ui-fw-semibold);
+  line-height: var(--ui-lh-tight);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--ui-fs-2xl);
+}
+
+h2 {
+  font-size: var(--ui-fs-xl);
+}
+
+h3 {
+  font-size: var(--ui-fs-lg);
+}
+
+h4,
+h5,
+h6 {
+  font-size: var(--ui-fs-md);
+}
+
+a {
+  color: var(--ui-color-accent);
+  text-decoration-line: underline;
+  text-decoration-thickness: from-font;
+  text-underline-offset: 0.15em;
+}
+
+a:hover,
+a[data-hovered] {
+  color: var(--ui-color-accent-hover);
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--ui-font-mono);
+  font-size: 0.92em;
+}
+
+pre {
+  overflow: auto;
+  tab-size: 2;
+}
+
+::selection {
+  background: var(--ui-color-selection);
+  color: var(--ui-color-text);
+}
+
+/* The one focus ring (WCAG 2.4.7, 2.4.11). Native and React Aria Components forms. */
+:focus-visible,
+[data-focus-visible] {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+/* Keep a focused or targeted element clear of sticky bars when it is scrolled into view. */
+:focus-visible,
+:target {
+  scroll-margin-block: var(--ui-space-8);
+}
+
+/* Present to assistive technology, absent from the screen. */
+.ui-visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* tokens.css sets the --ui-dur-* tokens to 0ms under reduced motion; this also stops motion
+   that does not use the tokens (browser defaults, smooth scrolling, third-party content). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

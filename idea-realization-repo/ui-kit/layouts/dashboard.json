@@ -1,0 +1,10 @@
+{
+  "id": "dashboard",
+  "label": "Dashboard: header, main, status strip",
+  "regions": ["header", "main", "strip"],
+  "grid": {
+    "columns": ["minmax(0, 1fr)"],
+    "rows": ["auto", "minmax(0, 1fr)", "auto"],
+    "areas": ["header", "main", "strip"]
+  }
+}

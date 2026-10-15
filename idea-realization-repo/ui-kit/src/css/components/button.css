@@ -1,0 +1,241 @@
+/*
+  Button. Classes: .ui-button, .ui-button--primary --secondary --ghost --danger, --icon,
+  --sm --lg (md is the default), .ui-button__label, .ui-button__icon, .ui-button__spinner.
+
+  State is never a class. Each state is styled in its native/ARIA form and its React Aria
+  Components (RAC) data-* form:
+    hover     :hover            [data-hovered]
+    pressed   :active           [data-pressed]
+    focus     :focus-visible    [data-focus-visible]
+    disabled  :disabled, [aria-disabled="true"], [data-disabled]
+    toggle on [aria-pressed="true"], [data-selected]   (RAC ToggleButton)
+    loading   [aria-busy="true"]: the spinner takes the icon's slot, so a button with an icon
+              keeps its width while its label stays the same.
+
+  A button with no variant modifier looks like --secondary. One --primary per view.
+*/
+
+.ui-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-2);
+  box-sizing: border-box;
+  min-inline-size: var(--ui-ctl-md);
+  block-size: var(--ui-ctl-md);
+  margin: 0;
+  padding: 0 var(--ui-space-4);
+  border: 1px solid var(--ui-color-line);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-color-surface-e1);
+  box-shadow: var(--ui-shadow-e1);
+  color: var(--ui-color-text);
+  font-family: inherit;
+  font-size: var(--ui-fs-md);
+  font-weight: var(--ui-fw-semibold);
+  line-height: var(--ui-lh-tight);
+  white-space: nowrap;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--ui-dur-fast) var(--ui-ease-standard),
+    border-color var(--ui-dur-fast) var(--ui-ease-standard),
+    color var(--ui-dur-fast) var(--ui-ease-standard),
+    box-shadow var(--ui-dur-fast) var(--ui-ease-standard);
+}
+
+.ui-button:is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ---- parts ---- */
+
+.ui-button__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ui-button__icon,
+.ui-button__spinner {
+  display: inline-flex;
+  flex: none;
+  inline-size: 1.15em;
+  block-size: 1.15em;
+}
+
+.ui-button__icon > svg {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.ui-button__spinner {
+  display: none;
+  box-sizing: border-box;
+  border: var(--ui-space-1) solid color-mix(in srgb, currentColor 30%, transparent);
+  border-block-start-color: currentColor;
+  border-radius: var(--ui-radius-pill);
+  animation: ui-button-spin calc(var(--ui-dur-slow) * 3) linear infinite;
+}
+
+@keyframes ui-button-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* ---- variants ---- */
+
+.ui-button--secondary {
+  background: var(--ui-color-surface-e1);
+  border-color: var(--ui-color-line);
+  color: var(--ui-color-text);
+}
+
+.ui-button:is(:hover, [data-hovered]):not(:disabled, [aria-disabled="true"], [data-disabled], [aria-busy="true"]) {
+  background: var(--ui-color-surface-2);
+  border-color: var(--ui-color-line-strong);
+}
+
+.ui-button:is(:active, [data-pressed]):not(:disabled, [aria-disabled="true"], [data-disabled], [aria-busy="true"]) {
+  background: color-mix(in srgb, var(--ui-color-surface-2) 88%, var(--ui-color-text));
+  box-shadow: none;
+}
+
+.ui-button--primary {
+  background: var(--ui-color-accent);
+  border-color: var(--ui-color-accent);
+  color: var(--ui-color-on-accent);
+}
+
+.ui-button--primary:is(:hover, [data-hovered]):not(:disabled, [aria-disabled="true"], [data-disabled], [aria-busy="true"]) {
+  background: var(--ui-color-accent-hover);
+  border-color: var(--ui-color-accent-hover);
+}
+
+.ui-button--primary:is(:active, [data-pressed]):not(:disabled, [aria-disabled="true"], [data-disabled], [aria-busy="true"]) {
+  background: color-mix(in srgb, var(--ui-color-accent-hover) 85%, var(--ui-color-text));
+  border-color: color-mix(in srgb, var(--ui-color-accent-hover) 85%, var(--ui-color-text));
+}
+
+.ui-button--ghost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--ui-color-text);
+}
+
+.ui-button--ghost:is(:hover, [data-hovered]):not(:disabled, [aria-disabled="true"], [data-disabled], [aria-busy="true"]) {
+  background: color-mix(in srgb, var(--ui-color-text) 7%, transparent);
+  border-color: transparent;
+}
+
+.ui-button--ghost:is(:active, [data-pressed]):not(:disabled, [aria-disabled="true"], [data-disabled], [aria-busy="true"]) {
+  background: color-mix(in srgb, var(--ui-color-text) 12%, transparent);
+}
+
+/* The bg colour is the text on the error fill: white in light, near-black in dark. */
+.ui-button--danger {
+  background: var(--ui-color-err);
+  border-color: var(--ui-color-err);
+  color: var(--ui-color-bg);
+}
+
+.ui-button--danger:is(:hover, [data-hovered]):not(:disabled, [aria-disabled="true"], [data-disabled], [aria-busy="true"]) {
+  background: color-mix(in srgb, var(--ui-color-err) 86%, var(--ui-color-text));
+  border-color: color-mix(in srgb, var(--ui-color-err) 86%, var(--ui-color-text));
+}
+
+.ui-button--danger:is(:active, [data-pressed]):not(:disabled, [aria-disabled="true"], [data-disabled], [aria-busy="true"]) {
+  background: color-mix(in srgb, var(--ui-color-err) 74%, var(--ui-color-text));
+  border-color: color-mix(in srgb, var(--ui-color-err) 74%, var(--ui-color-text));
+}
+
+/* ---- toggle (aria-pressed, RAC ToggleButton data-selected) ---- */
+
+.ui-button:is([aria-pressed="true"], [data-selected]) {
+  background: var(--ui-color-selection);
+  border-color: var(--ui-color-line-strong);
+  box-shadow: inset 0 0 0 1px var(--ui-color-line-strong);
+  color: var(--ui-color-text);
+}
+
+.ui-button:is([aria-pressed="true"], [data-selected]):is(:hover, [data-hovered]):not(:disabled, [aria-disabled="true"], [data-disabled]) {
+  background: color-mix(in srgb, var(--ui-color-selection) 85%, var(--ui-color-text));
+}
+
+/* ---- sizes ---- */
+
+.ui-button--sm {
+  gap: var(--ui-space-1);
+  min-inline-size: var(--ui-ctl-sm);
+  block-size: var(--ui-ctl-sm);
+  padding: 0 var(--ui-space-3);
+  border-radius: var(--ui-radius-sm);
+  font-size: var(--ui-fs-sm);
+}
+
+.ui-button--lg {
+  gap: var(--ui-space-3);
+  min-inline-size: var(--ui-ctl-lg);
+  block-size: var(--ui-ctl-lg);
+  padding: 0 var(--ui-space-5);
+  font-size: var(--ui-fs-md);
+}
+
+/* Icon-only: square at every size. Needs an aria-label (and a tooltip). */
+.ui-button--icon {
+  inline-size: var(--ui-ctl-md);
+  padding: 0;
+}
+
+.ui-button--icon.ui-button--sm {
+  inline-size: var(--ui-ctl-sm);
+}
+
+.ui-button--icon.ui-button--lg {
+  inline-size: var(--ui-ctl-lg);
+}
+
+/* ---- loading ---- */
+
+.ui-button[aria-busy="true"] {
+  cursor: progress;
+}
+
+.ui-button[aria-busy="true"] .ui-button__spinner {
+  display: inline-flex;
+}
+
+.ui-button[aria-busy="true"] .ui-button__icon {
+  display: none;
+}
+
+/* ---- disabled: neutral in every variant; the reason is shown beside the button ---- */
+
+.ui-button:is(:disabled, [aria-disabled="true"], [data-disabled]) {
+  background: var(--ui-color-surface-2);
+  border-color: var(--ui-color-line);
+  box-shadow: none;
+  color: var(--ui-color-muted);
+  cursor: not-allowed;
+}
+
+.ui-button--ghost:is(:disabled, [aria-disabled="true"], [data-disabled]) {
+  background: transparent;
+  border-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-button__spinner {
+    animation: none;
+  }
+}

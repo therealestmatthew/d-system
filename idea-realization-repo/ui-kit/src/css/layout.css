@@ -1,0 +1,190 @@
+/*
+  ui-kit layout: the app shell, its regions, the skip link, the report page and prose measure.
+
+  .ui-shell is a full-viewport grid. Its tracks and areas come from dist/layouts.css, generated
+  from layouts/*.json and selected with data-layout="<id>". The shell never scrolls as a page at
+  1024x768 and above: every region has min-width/min-height 0 and scrolls itself, and a panel
+  body inside it scrolls before the region does.
+
+  Breakpoints are in em, which media queries resolve against the browser's initial 16px:
+    64em      = 1024px   below it the shell stacks in one column and the page may scroll
+    68.75em   = 1100px   } below either, the shell switches to compact type and spacing
+    50em      = 800px    }
+  Compact here means the shell and panel frame step down to the next token (fs-md to fs-sm,
+  space-3 to space-2, header height ctl-lg to ctl-md). For the full compact density of every
+  component, put data-density="compact" on the shell; that block lives in dist/tokens.css.
+*/
+
+.ui-shell {
+  display: grid;
+  block-size: 100vh;
+  block-size: 100dvh;
+  inline-size: 100%;
+  overflow: hidden;
+  background: var(--ui-color-bg);
+  color: var(--ui-color-text);
+}
+
+.ui-shell__region {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  min-block-size: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+/* A panel placed directly in a region shares the region with its siblings. */
+.ui-shell__region > * {
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+/* Compact bars: the app bar and the status strip. */
+.ui-shell__region[data-region="header"],
+.ui-shell__region[data-region="strip"] {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--ui-space-3);
+  overflow: hidden;
+  background: var(--ui-color-surface);
+}
+
+.ui-shell__region[data-region="header"] {
+  min-block-size: var(--ui-ctl-lg);
+  border-block-end: 1px solid var(--ui-color-line);
+}
+
+.ui-shell__region[data-region="strip"] {
+  min-block-size: var(--ui-ctl-md);
+  border-block-start: 1px solid var(--ui-color-line);
+  font-size: var(--ui-fs-sm);
+  color: var(--ui-color-muted);
+}
+
+/* Side surfaces. The border sits on the edge that faces main in the shipped layouts. */
+.ui-shell__region[data-region="nav"] {
+  background: var(--ui-color-surface);
+  border-inline-end: 1px solid var(--ui-color-line);
+}
+
+.ui-shell__region[data-region="inspector"] {
+  background: var(--ui-color-surface);
+  border-inline-start: 1px solid var(--ui-color-line);
+}
+
+.ui-shell__region[data-region="main"] {
+  background: var(--ui-color-bg);
+}
+
+.ui-shell__region[data-region="dock"] {
+  background: var(--ui-color-surface);
+  border-block-start: 1px solid var(--ui-color-line);
+}
+
+/* Compact below 1100x800: type and spacing step down to the next token. */
+@media (width < 68.75em), (height < 50em) {
+  .ui-shell {
+    font-size: var(--ui-fs-sm);
+  }
+
+  .ui-shell__region[data-region="header"] {
+    min-block-size: var(--ui-ctl-md);
+  }
+
+  .ui-shell__region[data-region="strip"] {
+    min-block-size: var(--ui-ctl-sm);
+    font-size: var(--ui-fs-xs);
+  }
+
+  .ui-shell__region[data-region="header"],
+  .ui-shell__region[data-region="strip"] {
+    gap: var(--ui-space-2);
+  }
+}
+
+/* Below 1024px wide: one column in document order, and the page may scroll. dist/layouts.css
+   applies only at 64em and wider, so no grid area reaches this mode. */
+@media (width < 64em) {
+  .ui-shell {
+    display: flex;
+    flex-direction: column;
+    block-size: auto;
+    min-block-size: 100vh;
+    min-block-size: 100dvh;
+    overflow: visible;
+  }
+
+  .ui-shell__region {
+    flex: none;
+    overflow: visible;
+  }
+
+  .ui-shell__region[data-region="nav"],
+  .ui-shell__region[data-region="inspector"] {
+    border-inline: 0;
+    border-block-end: 1px solid var(--ui-color-line);
+  }
+
+  .ui-shell__region[data-region="main"] {
+    min-block-size: 60vh;
+    min-block-size: 60dvh;
+  }
+}
+
+/* Skip link: visually hidden until it has focus, then shown above everything. */
+.ui-skip-link {
+  position: absolute;
+  inset-block-start: var(--ui-space-2);
+  inset-inline-start: var(--ui-space-2);
+  z-index: var(--ui-z-tooltip);
+  padding: var(--ui-space-2) var(--ui-space-4);
+  border: 1px solid var(--ui-color-line-strong);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-color-surface-e3);
+  box-shadow: var(--ui-shadow-e3);
+  color: var(--ui-color-accent);
+  font-weight: var(--ui-fw-semibold);
+}
+
+.ui-skip-link:not(:focus, :focus-visible, [data-focus-visible]) {
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Report page: one column, generous type, fluid gutters. Not for the app shell. */
+.ui-page {
+  max-inline-size: 71.25rem; /* 1140px at a 16px root */
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 3.25rem); /* 16px to 52px */
+  padding-block: var(--ui-space-7);
+  font-size: var(--ui-fs-lg);
+  line-height: var(--ui-lh-prose);
+}
+
+/* Prose measure and vertical rhythm. */
+.ui-prose {
+  max-inline-size: 64ch;
+  line-height: var(--ui-lh-prose);
+}
+
+.ui-prose > * + * {
+  margin-block-start: var(--ui-space-4);
+}
+
+.ui-prose > :is(h2, h3, h4):not(:first-child) {
+  margin-block-start: var(--ui-space-7);
+}
+
+.ui-prose > :is(ul, ol) {
+  padding-inline-start: var(--ui-space-6);
+}
+
+.ui-prose li + li {
+  margin-block-start: var(--ui-space-2);
+}

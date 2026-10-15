@@ -1,0 +1,156 @@
+/*
+  Surface states. Classes: .ui-state (data-state="empty|loading|error|missing|not-recorded"),
+  .ui-state__title __body __action; .ui-skeleton; .ui-spinner.
+
+  empty         what goes here, plus one primary action. Dashed frame.
+  loading       role="status"; a spinner with visible text, or skeletons for a known shape.
+  error         role="alert"; what failed, why, and Retry. Error colours.
+  missing       the capability is off. Neutral, never styled as an error.
+  not-recorded  the data is absent. Small and inline-sized; never a made-up zero.
+
+  .ui-skeleton shimmers, and is static under prefers-reduced-motion. .ui-spinner is a 1em ring that
+  always sits beside visible text.
+*/
+
+.ui-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-2);
+  box-sizing: border-box;
+  min-inline-size: 0;
+  padding: var(--ui-space-7) var(--ui-space-5);
+  border: 1px dashed var(--ui-color-line-strong);
+  border-radius: var(--ui-radius-lg);
+  background: transparent;
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-sm);
+  line-height: var(--ui-lh-ui);
+  text-align: center;
+}
+
+.ui-state__title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-3);
+  margin: 0;
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-md);
+  font-weight: var(--ui-fw-semibold);
+  line-height: var(--ui-lh-tight);
+}
+
+.ui-state__body {
+  max-inline-size: 52ch;
+  margin: 0;
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-sm);
+}
+
+.ui-state__action {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--ui-space-2);
+  margin-block-start: var(--ui-space-2);
+}
+
+.ui-state[data-state="loading"] {
+  border-style: solid;
+  border-color: var(--ui-color-line);
+}
+
+.ui-state[data-state="error"] {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--ui-color-err) 40%, var(--ui-color-line));
+  background: var(--ui-color-err-bg);
+}
+
+.ui-state[data-state="error"] .ui-state__title {
+  color: var(--ui-color-err);
+}
+
+.ui-state[data-state="error"] .ui-state__body {
+  color: var(--ui-color-text);
+}
+
+.ui-state[data-state="missing"] {
+  border-style: solid;
+  border-color: var(--ui-color-line);
+  background: var(--ui-color-surface-2);
+}
+
+.ui-state[data-state="not-recorded"] {
+  display: inline-flex;
+  flex-direction: row;
+  gap: var(--ui-space-2);
+  padding: var(--ui-space-1) var(--ui-space-3);
+  border-radius: var(--ui-radius-sm);
+  font-size: var(--ui-fs-sm);
+  font-style: italic;
+  text-align: start;
+}
+
+.ui-state[data-state="not-recorded"] .ui-state__title {
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-regular);
+}
+
+/* ---- skeleton ---- */
+
+.ui-skeleton {
+  display: block;
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: var(--ui-space-4);
+  border-radius: var(--ui-radius-sm);
+  background:
+    linear-gradient(
+      90deg,
+      var(--ui-color-surface-2) 0%,
+      color-mix(in srgb, var(--ui-color-surface-2) 40%, var(--ui-color-bg)) 50%,
+      var(--ui-color-surface-2) 100%
+    );
+  background-size: 200% 100%;
+  animation: ui-skeleton-shimmer calc(var(--ui-dur-slow) * 5) linear infinite;
+}
+
+@keyframes ui-skeleton-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
+/* ---- spinner ---- */
+
+.ui-spinner {
+  display: inline-block;
+  flex: none;
+  box-sizing: border-box;
+  inline-size: 1em;
+  block-size: 1em;
+  border: var(--ui-space-1) solid color-mix(in srgb, currentColor 25%, transparent);
+  border-block-start-color: currentColor;
+  border-radius: var(--ui-radius-pill);
+  vertical-align: -0.125em;
+  animation: ui-spinner-spin calc(var(--ui-dur-slow) * 3) linear infinite;
+}
+
+@keyframes ui-spinner-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-skeleton,
+  .ui-spinner {
+    animation: none;
+  }
+}

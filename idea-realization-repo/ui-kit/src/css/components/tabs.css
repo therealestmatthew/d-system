@@ -1,0 +1,168 @@
+/*
+  Tabs. Classes: .ui-tabs, .ui-tabs__list (role="tablist"), .ui-tabs__tab (role="tab",
+  aria-selected / RAC data-selected), .ui-tabs__panel (role="tabpanel"), and the script-free
+  variant .ui-tabs--static.
+
+  Scripted form: arrows move focus within the tablist (roving tabindex); unselected panels carry
+  the hidden attribute. The selected tab is marked by an accent underline, since it is the active
+  navigation item.
+
+  .ui-tabs--static is the radio technique for reports with no script. Markup order matters:
+    <div class="ui-tabs ui-tabs--static">
+      <input type="radio" name="g" id="g-1" checked>   one radio per tab, first, as siblings
+      <input type="radio" name="g" id="g-2">
+      <div class="ui-tabs__list"><label class="ui-tabs__tab" for="g-1">One</label> ...</div>
+      <div class="ui-tabs__panel">...</div>             one panel per tab, in the same order
+    </div>
+  The radios are visually hidden but stay focusable, so arrow keys switch tabs. The n-th radio
+  shows the n-th panel and marks the n-th label, for up to seven tabs.
+*/
+
+.ui-tabs {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.ui-tabs__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ui-space-1);
+  padding-inline: var(--ui-space-1);
+  border-block-end: 1px solid var(--ui-color-line);
+}
+
+.ui-tabs__tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  box-sizing: border-box;
+  block-size: var(--ui-ctl-md);
+  margin: 0;
+  padding: 0 var(--ui-space-3);
+  border: 0;
+  border-radius: var(--ui-radius-sm) var(--ui-radius-sm) 0 0;
+  background: transparent;
+  color: var(--ui-color-muted);
+  font-family: inherit;
+  font-size: var(--ui-fs-md);
+  font-weight: var(--ui-fw-semibold);
+  line-height: var(--ui-lh-tight);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--ui-dur-fast) var(--ui-ease-standard),
+    color var(--ui-dur-fast) var(--ui-ease-standard),
+    box-shadow var(--ui-dur-fast) var(--ui-ease-standard);
+}
+
+.ui-tabs__tab:is(:hover, [data-hovered]):not(:disabled, [aria-disabled="true"], [data-disabled]) {
+  background: color-mix(in srgb, var(--ui-color-text) 6%, transparent);
+  color: var(--ui-color-text);
+}
+
+.ui-tabs__tab:is(:active, [data-pressed]):not(:disabled, [aria-disabled="true"], [data-disabled]) {
+  background: color-mix(in srgb, var(--ui-color-text) 10%, transparent);
+}
+
+.ui-tabs__tab:is([aria-selected="true"], [data-selected]) {
+  box-shadow: inset 0 calc(var(--ui-space-1) * -1) 0 var(--ui-color-accent);
+  color: var(--ui-color-text);
+}
+
+.ui-tabs__tab:is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-tabs__tab:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.ui-tabs__tab:is(:disabled, [aria-disabled="true"], [data-disabled]) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ui-tabs__panel {
+  padding-block: var(--ui-space-4) 0;
+  min-inline-size: 0;
+}
+
+.ui-tabs__panel[hidden] {
+  display: none;
+}
+
+.ui-tabs__panel:is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+  border-radius: var(--ui-radius-sm);
+}
+
+.ui-tabs__panel:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ---- script-free variant (radio technique) ---- */
+
+.ui-tabs--static > input[type="radio"] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  opacity: 0;
+}
+
+.ui-tabs--static > .ui-tabs__panel {
+  display: none;
+}
+
+.ui-tabs--static > input[type="radio"]:nth-of-type(1):checked ~ .ui-tabs__panel:nth-child(1 of .ui-tabs__panel),
+.ui-tabs--static > input[type="radio"]:nth-of-type(2):checked ~ .ui-tabs__panel:nth-child(2 of .ui-tabs__panel),
+.ui-tabs--static > input[type="radio"]:nth-of-type(3):checked ~ .ui-tabs__panel:nth-child(3 of .ui-tabs__panel),
+.ui-tabs--static > input[type="radio"]:nth-of-type(4):checked ~ .ui-tabs__panel:nth-child(4 of .ui-tabs__panel),
+.ui-tabs--static > input[type="radio"]:nth-of-type(5):checked ~ .ui-tabs__panel:nth-child(5 of .ui-tabs__panel),
+.ui-tabs--static > input[type="radio"]:nth-of-type(6):checked ~ .ui-tabs__panel:nth-child(6 of .ui-tabs__panel),
+.ui-tabs--static > input[type="radio"]:nth-of-type(7):checked ~ .ui-tabs__panel:nth-child(7 of .ui-tabs__panel) {
+  display: block;
+}
+
+.ui-tabs--static > input[type="radio"]:nth-of-type(1):checked ~ .ui-tabs__list > .ui-tabs__tab:nth-child(1 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(2):checked ~ .ui-tabs__list > .ui-tabs__tab:nth-child(2 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(3):checked ~ .ui-tabs__list > .ui-tabs__tab:nth-child(3 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(4):checked ~ .ui-tabs__list > .ui-tabs__tab:nth-child(4 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(5):checked ~ .ui-tabs__list > .ui-tabs__tab:nth-child(5 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(6):checked ~ .ui-tabs__list > .ui-tabs__tab:nth-child(6 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(7):checked ~ .ui-tabs__list > .ui-tabs__tab:nth-child(7 of .ui-tabs__tab) {
+  box-shadow: inset 0 calc(var(--ui-space-1) * -1) 0 var(--ui-color-accent);
+  color: var(--ui-color-text);
+}
+
+.ui-tabs--static > input[type="radio"]:nth-of-type(1):focus-visible ~ .ui-tabs__list > .ui-tabs__tab:nth-child(1 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(2):focus-visible ~ .ui-tabs__list > .ui-tabs__tab:nth-child(2 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(3):focus-visible ~ .ui-tabs__list > .ui-tabs__tab:nth-child(3 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(4):focus-visible ~ .ui-tabs__list > .ui-tabs__tab:nth-child(4 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(5):focus-visible ~ .ui-tabs__list > .ui-tabs__tab:nth-child(5 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(6):focus-visible ~ .ui-tabs__list > .ui-tabs__tab:nth-child(6 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(7):focus-visible ~ .ui-tabs__list > .ui-tabs__tab:nth-child(7 of .ui-tabs__tab) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-tabs--static > input[type="radio"]:nth-of-type(1):disabled ~ .ui-tabs__list > .ui-tabs__tab:nth-child(1 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(2):disabled ~ .ui-tabs__list > .ui-tabs__tab:nth-child(2 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(3):disabled ~ .ui-tabs__list > .ui-tabs__tab:nth-child(3 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(4):disabled ~ .ui-tabs__list > .ui-tabs__tab:nth-child(4 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(5):disabled ~ .ui-tabs__list > .ui-tabs__tab:nth-child(5 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(6):disabled ~ .ui-tabs__list > .ui-tabs__tab:nth-child(6 of .ui-tabs__tab),
+.ui-tabs--static > input[type="radio"]:nth-of-type(7):disabled ~ .ui-tabs__list > .ui-tabs__tab:nth-child(7 of .ui-tabs__tab) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

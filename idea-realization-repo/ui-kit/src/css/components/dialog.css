@@ -1,0 +1,173 @@
+/*
+  Dialog. Classes: .ui-dialog (native <dialog> or RAC Dialog), data-variant="info|confirm|form";
+  parts .ui-dialog__header __title __body __footer; .ui-overlay (scrim: RAC ModalOverlay; the
+  native form is dialog::backdrop); .ui-modal (RAC Modal box).
+
+  Native: <dialog class="ui-dialog"> opened with showModal(). React Aria:
+    <ModalOverlay className="ui-overlay"><Modal className="ui-modal">
+      <Dialog className="ui-dialog"> ...
+  In a confirm dialog the danger button is the last (rightmost) child of the footer.
+  Motion: fade and scale in on open; RAC data-entering / data-exiting drive the same keyframes.
+*/
+
+.ui-dialog {
+  box-sizing: border-box;
+  inline-size: min(30rem, calc(100vw - var(--ui-space-6) * 2));
+  max-inline-size: 100%;
+  max-block-size: min(85vh, calc(100vh - var(--ui-space-6) * 2));
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--ui-color-line);
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-color-surface-e3);
+  box-shadow: var(--ui-shadow-e3);
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-md);
+  line-height: var(--ui-lh-ui);
+}
+
+/* Only an open native dialog, or the RAC element (not a <dialog>), is laid out; a closed
+   native dialog keeps the UA's display: none. */
+.ui-dialog:is([open], :not(dialog)) {
+  display: flex;
+  flex-direction: column;
+}
+
+dialog.ui-dialog[open] {
+  animation: ui-dialog-in var(--ui-dur-base) var(--ui-ease-standard);
+}
+
+.ui-dialog:is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-dialog:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.ui-dialog[data-variant="form"] {
+  inline-size: min(36rem, calc(100vw - var(--ui-space-6) * 2));
+}
+
+.ui-dialog[data-variant="info"],
+.ui-dialog[data-variant="confirm"] {
+  inline-size: min(28rem, calc(100vw - var(--ui-space-6) * 2));
+}
+
+.ui-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-5) var(--ui-space-5) var(--ui-space-2);
+}
+
+.ui-dialog__title {
+  margin: 0;
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-lg);
+  font-weight: var(--ui-fw-semibold);
+  line-height: var(--ui-lh-tight);
+}
+
+.ui-dialog__body {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  overflow: auto;
+  padding: var(--ui-space-2) var(--ui-space-5) var(--ui-space-4);
+  color: var(--ui-color-text);
+}
+
+.ui-dialog__body > :first-child {
+  margin-block-start: 0;
+}
+
+.ui-dialog__body > :last-child {
+  margin-block-end: 0;
+}
+
+.ui-dialog__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ui-space-2);
+  padding: var(--ui-space-3) var(--ui-space-5);
+  border-block-start: 1px solid var(--ui-color-line);
+  background: var(--ui-color-surface);
+}
+
+/* ---- scrim ---- */
+
+.ui-dialog::backdrop {
+  background: var(--ui-color-overlay);
+  animation: ui-overlay-in var(--ui-dur-base) var(--ui-ease-standard);
+}
+
+.ui-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ui-z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: var(--ui-space-6);
+  background: var(--ui-color-overlay);
+}
+
+.ui-overlay[data-entering] {
+  animation: ui-overlay-in var(--ui-dur-base) var(--ui-ease-standard);
+}
+
+.ui-overlay[data-exiting] {
+  animation: ui-overlay-in var(--ui-dur-fast) var(--ui-ease-exit) reverse;
+}
+
+/* ---- RAC Modal box ---- */
+
+.ui-modal {
+  position: relative;
+  z-index: var(--ui-z-modal);
+  display: flex;
+  justify-content: center;
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  outline: none;
+}
+
+.ui-modal > .ui-dialog {
+  max-block-size: 100%;
+}
+
+.ui-modal[data-entering] {
+  animation: ui-dialog-in var(--ui-dur-base) var(--ui-ease-standard);
+}
+
+.ui-modal[data-exiting] {
+  animation: ui-dialog-in var(--ui-dur-fast) var(--ui-ease-exit) reverse;
+}
+
+@keyframes ui-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ui-overlay-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

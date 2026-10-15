@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://idea-realization.local/ui-kit/layouts/layout.schema.json",
+  "title": "ui-kit shell layout",
+  "description": "One fixed app-shell layout: the regions it uses and the grid that places them. build_layouts.py checks the rules JSON Schema cannot express: every name in areas is a listed region and every listed region appears in areas, areas is rectangular with one column per track, and each region covers one rectangle.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "label", "regions", "grid"],
+  "properties": {
+    "id": {
+      "description": "The layout id; equals the file name without .json and is the value of data-layout on .ui-shell.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "label": {
+      "description": "A short human name for the layout.",
+      "type": "string",
+      "minLength": 1
+    },
+    "regions": {
+      "description": "The regions this layout uses, in the order they are emitted.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/region"}
+    },
+    "grid": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["columns", "rows", "areas"],
+      "properties": {
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/track"}
+        },
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/track"}
+        },
+        "areas": {
+          "description": "One string per row; region names separated by single spaces.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]+( [a-z]+)*$"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "region": {
+      "enum": ["header", "nav", "main", "inspector", "dock", "strip"]
+    },
+    "track": {
+      "description": "auto, Nfr or minmax(0, Nfr). Fractions only, never pixels.",
+      "type": "string",
+      "pattern": "^(auto|[0-9]+(\\.[0-9]+)?fr|minmax\\(0, [0-9]+(\\.[0-9]+)?fr\\))$"
+    }
+  }
+}

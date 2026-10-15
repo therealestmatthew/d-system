@@ -1,0 +1,233 @@
+/*
+  Panel frame: the container for any content in a shell region.
+
+  section.ui-panel[aria-labelledby]       data-variant="standard|compact" (absent = standard)
+                                          data-state="maximized|collapsed" (absent = normal)
+    .ui-panel__header                     exactly one
+      .ui-panel__identity > h2.ui-panel__title
+      .ui-panel__help
+      .ui-panel__controls[role=toolbar]   at most five bar elements
+      .ui-panel__frame-actions            maximize, collapse
+    .ui-panel__body[data-body="document|tree|table|stream|form|terminal|ticker|chart"]
+
+  The body scrolls (or, for terminal, ticker and chart, clips and lets its content manage
+  itself); the page never does. Collapsed hides the body with display:none and maximized
+  repositions the panel, so neither state remounts the panel's content.
+*/
+
+.ui-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-inline-size: 0;
+  min-block-size: 0;
+  background: transparent;
+  color: var(--ui-color-text);
+}
+
+/* Panels stacked in one region are divided by a hairline. */
+.ui-panel + .ui-panel {
+  border-block-start: 1px solid var(--ui-color-line);
+}
+
+.ui-shell__region[data-region="header"] > .ui-panel + .ui-panel,
+.ui-shell__region[data-region="strip"] > .ui-panel + .ui-panel {
+  border-block-start: 0;
+  border-inline-start: 1px solid var(--ui-color-line);
+}
+
+/* ---- header ---- */
+
+.ui-panel__header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--ui-space-2);
+  min-block-size: calc(var(--ui-ctl-sm) + 2 * var(--ui-space-2));
+  padding-block: var(--ui-space-1);
+  padding-inline: var(--ui-space-3) var(--ui-space-2);
+  border-block-end: 1px solid var(--ui-color-line);
+}
+
+.ui-panel__identity {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--ui-space-2);
+  min-inline-size: 0;
+}
+
+.ui-panel__title {
+  overflow: hidden;
+  font-size: var(--ui-fs-md);
+  font-weight: var(--ui-fw-semibold);
+  line-height: var(--ui-lh-tight);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-wrap: nowrap;
+}
+
+.ui-panel__help,
+.ui-panel__controls,
+.ui-panel__frame-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--ui-space-1);
+}
+
+.ui-panel__controls {
+  flex-shrink: 1;
+  min-inline-size: 0;
+}
+
+.ui-panel__frame-actions {
+  margin-inline-start: var(--ui-space-1);
+  padding-inline-start: var(--ui-space-2);
+  border-inline-start: 1px solid var(--ui-color-line);
+}
+
+/* Every header control meets the 24x24 target floor (WCAG 2.5.8). */
+.ui-panel__help > :is(button, a, select, input, [role="button"], [tabindex]),
+.ui-panel__controls > :is(button, a, select, input, [role="button"], [tabindex]),
+.ui-panel__frame-actions > :is(button, a, select, input, [role="button"], [tabindex]) {
+  min-inline-size: var(--ui-ctl-sm);
+  min-block-size: var(--ui-ctl-sm);
+}
+
+/* ---- body ---- */
+
+.ui-panel__body {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  min-block-size: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+/* Minimum sizes per body kind, in content units, so a small track still shows something. */
+.ui-panel__body:is([data-body="document"], [data-body="form"]) {
+  min-block-size: 4em;
+  padding: var(--ui-space-4);
+}
+
+.ui-panel__body:is([data-body="tree"], [data-body="stream"]) {
+  min-block-size: 4em;
+  padding: var(--ui-space-2);
+}
+
+.ui-panel__body[data-body="table"] {
+  min-block-size: 4em;
+}
+
+.ui-panel__body[data-body="stream"] {
+  overflow-anchor: auto;
+}
+
+.ui-panel__body[data-body="terminal"] {
+  min-block-size: 6em;
+  overflow: hidden;
+  padding: var(--ui-space-2);
+  background: var(--ui-color-sunken);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-fs-sm);
+}
+
+.ui-panel__body[data-body="chart"] {
+  min-block-size: 6em;
+  overflow: hidden;
+  padding: var(--ui-space-3);
+}
+
+.ui-panel__body[data-body="ticker"] {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding-inline: var(--ui-space-3);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---- compact variant: header and body on one row ---- */
+
+.ui-panel[data-variant="compact"] {
+  flex-direction: row;
+  align-items: center;
+}
+
+.ui-panel[data-variant="compact"] > .ui-panel__header {
+  min-block-size: 0;
+  padding-block: 0;
+  border-block-end: 0;
+}
+
+.ui-panel[data-variant="compact"] > .ui-panel__body {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  min-block-size: 0;
+}
+
+/* ---- states ---- */
+
+.ui-panel[data-state="collapsed"] {
+  flex: 0 0 auto;
+}
+
+.ui-panel[data-state="collapsed"] > .ui-panel__header {
+  border-block-end: 0;
+}
+
+.ui-panel[data-state="collapsed"] > .ui-panel__body {
+  display: none;
+}
+
+/* Maximized fills the viewport, which the shell already fills; no top layer is needed. Menus
+   and dialogs (z dropdown and above) still open over it. */
+.ui-panel[data-state="maximized"] {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ui-z-dock);
+  background: var(--ui-color-bg);
+}
+
+.ui-panel[data-state="maximized"] > .ui-panel__header {
+  background: var(--ui-color-surface);
+}
+
+/* Compact shell below 1100x800: the frame steps down to the next token. */
+@media (width < 68.75em), (height < 50em) {
+  .ui-panel__header {
+    min-block-size: calc(var(--ui-ctl-sm) + 2 * var(--ui-space-1));
+    padding-inline: var(--ui-space-2) var(--ui-space-1);
+  }
+
+  .ui-panel__title {
+    font-size: var(--ui-fs-sm);
+  }
+
+  .ui-panel__body:is([data-body="document"], [data-body="form"]) {
+    padding: var(--ui-space-3);
+  }
+
+  .ui-panel__body[data-body="chart"] {
+    padding: var(--ui-space-2);
+  }
+}
+
+/* Stacked shell below 1024px wide: panels take their content height and the page scrolls; a
+   long body still scrolls inside its panel. Main keeps filling its region. */
+@media (width < 64em) {
+  .ui-shell__region:not([data-region="header"], [data-region="strip"]) > .ui-panel {
+    flex: none;
+  }
+
+  .ui-shell__region[data-region="main"] > .ui-panel {
+    flex: 1 0 auto;
+  }
+
+  .ui-panel__body {
+    max-block-size: 70vh;
+    max-block-size: 70dvh;
+  }
+}

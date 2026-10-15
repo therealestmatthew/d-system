@@ -1,0 +1,163 @@
+/*
+  Pill, badge and chip. Classes: .ui-pill (+ .ui-pill__dot), .ui-badge, .ui-chip (+ .ui-chip__remove).
+
+  .ui-pill   status, data-status="ok|warn|info|err|neutral|ai" (absent = neutral). Status colour on
+             its pale fill, and the status is always in words: the colour never stands alone.
+  .ui-badge  a count. Neutral; inside a primary button it switches to the on-accent colour.
+  .ui-chip   a filter chip. Its one action is .ui-chip__remove, a real <button> labelled
+             "Remove filter: X", 24x24 so it meets the target-size floor.
+*/
+
+.ui-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  padding: var(--ui-space-1) var(--ui-space-3);
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: var(--ui-radius-pill);
+  background: var(--ui-color-surface-2);
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-semibold);
+  line-height: var(--ui-lh-tight);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.ui-pill__dot {
+  flex: none;
+  inline-size: 0.5em;
+  block-size: 0.5em;
+  border-radius: var(--ui-radius-pill);
+  background: currentColor;
+}
+
+.ui-pill[data-status="ok"] {
+  background: var(--ui-color-ok-bg);
+  color: var(--ui-color-ok);
+}
+
+.ui-pill[data-status="warn"] {
+  background: var(--ui-color-warn-bg);
+  color: var(--ui-color-warn);
+}
+
+.ui-pill[data-status="info"] {
+  background: var(--ui-color-info-bg);
+  color: var(--ui-color-info);
+}
+
+.ui-pill[data-status="err"] {
+  background: var(--ui-color-err-bg);
+  color: var(--ui-color-err);
+}
+
+.ui-pill[data-status="neutral"] {
+  background: var(--ui-color-surface-2);
+  color: var(--ui-color-muted);
+}
+
+.ui-pill[data-status="ai"] {
+  background: color-mix(in srgb, var(--ui-color-ai) 10%, var(--ui-color-bg));
+  color: var(--ui-color-ai);
+}
+
+/* ---- count badge ---- */
+
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-inline-size: calc(var(--ui-space-5) + var(--ui-space-1));
+  block-size: calc(var(--ui-space-5) + var(--ui-space-1));
+  padding: 0 var(--ui-space-2);
+  border-radius: var(--ui-radius-pill);
+  background: color-mix(in srgb, var(--ui-color-text) 9%, transparent);
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-semibold);
+  line-height: var(--ui-lh-tight);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.ui-button--primary .ui-badge {
+  background: color-mix(in srgb, var(--ui-color-on-accent) 22%, transparent);
+  color: var(--ui-color-on-accent);
+}
+
+/* ---- filter chip ---- */
+
+.ui-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  block-size: var(--ui-ctl-sm);
+  padding-inline: var(--ui-space-3) 0;
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--ui-color-line);
+  border-radius: var(--ui-radius-pill);
+  background: var(--ui-color-surface-2);
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-sm);
+  line-height: var(--ui-lh-tight);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.ui-chip__remove {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  inline-size: var(--ui-ctl-sm);
+  block-size: var(--ui-ctl-sm);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ui-radius-pill);
+  background: transparent;
+  color: var(--ui-color-muted);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color var(--ui-dur-fast) var(--ui-ease-standard),
+    color var(--ui-dur-fast) var(--ui-ease-standard);
+}
+
+.ui-chip__remove > svg {
+  inline-size: 0.9em;
+  block-size: 0.9em;
+}
+
+.ui-chip__remove:is(:hover, [data-hovered]) {
+  background: color-mix(in srgb, var(--ui-color-text) 10%, transparent);
+  color: var(--ui-color-text);
+}
+
+.ui-chip__remove:is(:active, [data-pressed]) {
+  background: color-mix(in srgb, var(--ui-color-text) 16%, transparent);
+}
+
+.ui-chip__remove:is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-chip__remove:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.ui-chip__remove:is(:disabled, [aria-disabled="true"], [data-disabled]) {
+  color: var(--ui-color-muted);
+  background: transparent;
+  cursor: not-allowed;
+  opacity: 0.6;
+}

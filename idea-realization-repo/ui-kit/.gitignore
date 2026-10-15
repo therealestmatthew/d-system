@@ -2,3 +2,4 @@
 # root ignores every dist/, so re-include this one.
 !dist/
 node_modules/
+playground-dist/

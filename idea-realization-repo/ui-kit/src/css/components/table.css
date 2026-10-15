@@ -1,0 +1,230 @@
+/*
+  Table. Classes: .ui-table-wrap (scroll container, sticky header), table.ui-table,
+  button.ui-table__sort inside th[aria-sort], .ui-table__num (right, tabular numerals),
+  .ui-table__id (monospace), .ui-table__toolbar, .ui-table__count ("42 of 310").
+
+  Selected row: tr[aria-selected="true"] or [data-selected]. Sort state: aria-sort on the header
+  cell, "ascending" | "descending" | "none" (the server order); the indicator is drawn by the
+  sort button from that attribute. React Aria renders role="grid"/"row"/"columnheader"/"gridcell"
+  on the same elements; the selectors below cover both forms.
+*/
+
+.ui-table-wrap {
+  position: relative;
+  overflow: auto;
+  max-inline-size: 100%;
+  border: 1px solid var(--ui-color-line);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-color-bg);
+  overscroll-behavior: contain;
+}
+
+.ui-table {
+  inline-size: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-sm);
+  line-height: var(--ui-lh-ui);
+}
+
+.ui-table caption {
+  padding: var(--ui-space-3) var(--ui-space-4);
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-xs);
+  text-align: start;
+  caption-side: bottom;
+}
+
+/* ---- header ---- */
+
+.ui-table :is(th, [role="columnheader"]) {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--ui-z-sticky);
+  block-size: var(--ui-ctl-md);
+  padding: 0 var(--ui-space-4);
+  border-block-end: 1px solid var(--ui-color-line-strong);
+  background: var(--ui-color-surface);
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-semibold);
+  text-align: start;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.ui-table :is(th, [role="columnheader"]):is([aria-sort="ascending"], [aria-sort="descending"]) {
+  color: var(--ui-color-text);
+}
+
+.ui-table__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  box-sizing: border-box;
+  min-block-size: var(--ui-ctl-sm);
+  margin: 0 calc(var(--ui-space-2) * -1);
+  padding: 0 var(--ui-space-2);
+  border: 0;
+  border-radius: var(--ui-radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--ui-dur-fast) var(--ui-ease-standard),
+    color var(--ui-dur-fast) var(--ui-ease-standard);
+}
+
+.ui-table__sort::after {
+  content: "\2195";
+  inline-size: 1em;
+  color: var(--ui-color-muted);
+  font-size: 1.05em;
+  line-height: var(--ui-lh-tight);
+  text-align: center;
+  opacity: 0.55;
+}
+
+:is(th, [role="columnheader"])[aria-sort="ascending"] > .ui-table__sort::after {
+  content: "\2191";
+  color: var(--ui-color-text);
+  opacity: 1;
+}
+
+:is(th, [role="columnheader"])[aria-sort="descending"] > .ui-table__sort::after {
+  content: "\2193";
+  color: var(--ui-color-text);
+  opacity: 1;
+}
+
+.ui-table__sort:is(:hover, [data-hovered]) {
+  background: color-mix(in srgb, var(--ui-color-text) 7%, transparent);
+  color: var(--ui-color-text);
+}
+
+.ui-table__sort:is(:hover, [data-hovered])::after {
+  opacity: 1;
+}
+
+.ui-table__sort:is(:active, [data-pressed]) {
+  background: color-mix(in srgb, var(--ui-color-text) 12%, transparent);
+}
+
+.ui-table__sort:is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-table__sort:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.ui-table__sort:is(:disabled, [aria-disabled="true"], [data-disabled]) {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ---- body ---- */
+
+.ui-table :is(td, [role="gridcell"], [role="rowheader"]) {
+  block-size: var(--ui-ctl-md);
+  padding: var(--ui-space-1) var(--ui-space-4);
+  border-block-end: 1px solid var(--ui-color-line);
+  vertical-align: middle;
+}
+
+.ui-table tbody tr:last-child > :is(td, th, [role="gridcell"], [role="rowheader"]) {
+  border-block-end: 0;
+}
+
+.ui-table tbody th,
+.ui-table tbody [role="rowheader"] {
+  position: static;
+  background: transparent;
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-semibold);
+  white-space: normal;
+  border-block-end-color: var(--ui-color-line);
+}
+
+.ui-table tbody :is(tr, [role="row"]) {
+  transition: background-color var(--ui-dur-fast) var(--ui-ease-standard);
+}
+
+.ui-table tbody :is(tr, [role="row"]):is(:hover, [data-hovered]) {
+  background: color-mix(in srgb, var(--ui-color-text) 4%, transparent);
+}
+
+.ui-table :is(tr, [role="row"]):is([aria-selected="true"], [data-selected]) {
+  background: var(--ui-color-selection);
+}
+
+.ui-table :is(tr, [role="row"]):is([aria-selected="true"], [data-selected]) > :first-child {
+  box-shadow: inset calc(var(--ui-space-1) * 1.5) 0 0 var(--ui-color-accent);
+}
+
+.ui-table :is(tr, [role="row"]):is([aria-selected="true"], [data-selected]):is(:hover, [data-hovered]) {
+  background: color-mix(in srgb, var(--ui-color-selection) 88%, var(--ui-color-text));
+}
+
+/* A focused grid row (React Aria) draws its ring inside the row: the scroll container would clip
+   a ring drawn outside it. */
+.ui-table :is(tr, [role="row"]):is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: calc(var(--ui-focus-width) * -1);
+}
+
+.ui-table :is(tr, [role="row"]):is([aria-disabled="true"], [data-disabled]) {
+  color: var(--ui-color-muted);
+}
+
+.ui-table input[type="checkbox"] {
+  inline-size: var(--ui-space-5);
+  block-size: var(--ui-space-5);
+  margin: 0;
+  accent-color: var(--ui-color-accent);
+  vertical-align: middle;
+}
+
+.ui-table__num {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+:is(th, [role="columnheader"]).ui-table__num {
+  text-align: end;
+}
+
+:is(th, [role="columnheader"]).ui-table__num > .ui-table__sort {
+  flex-direction: row-reverse;
+}
+
+.ui-table__id {
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-fs-xs);
+  white-space: nowrap;
+}
+
+/* ---- toolbar and count ---- */
+
+.ui-table__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-space-2);
+  padding-block: 0 var(--ui-space-3);
+}
+
+.ui-table__count {
+  margin-inline-start: auto;
+  color: var(--ui-color-muted);
+  font-size: var(--ui-fs-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

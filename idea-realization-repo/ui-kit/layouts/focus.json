@@ -1,0 +1,10 @@
+{
+  "id": "focus",
+  "label": "Focus: header and main",
+  "regions": ["header", "main"],
+  "grid": {
+    "columns": ["minmax(0, 1fr)"],
+    "rows": ["auto", "minmax(0, 1fr)"],
+    "areas": ["header", "main"]
+  }
+}

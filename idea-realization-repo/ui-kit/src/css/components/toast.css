@@ -1,0 +1,129 @@
+/*
+  Toast. Classes: .ui-toast-region (bottom-right stack), .ui-toast data-status="ok|info|err",
+  parts .ui-toast__title __body __actions __close.
+
+  The region is a polite status region (role="region" with an aria-label holding the live
+  toasts); an error toast uses role="alert". Toasts never take focus. At most three are visible:
+  the newest is last in the DOM, and every toast older than the last three is hidden.
+  Status is a coloured inline-start rule plus the words of the title, never colour alone.
+  Motion: each toast slides up and fades in; RAC data-exiting fades it out.
+*/
+
+.ui-toast-region {
+  position: fixed;
+  inset-block-end: var(--ui-space-5);
+  inset-inline-end: var(--ui-space-5);
+  z-index: var(--ui-z-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--ui-space-2);
+  box-sizing: border-box;
+  inline-size: min(24rem, calc(100vw - var(--ui-space-5) * 2));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+
+.ui-toast-region > :nth-last-child(n + 4) {
+  display: none;
+}
+
+.ui-toast {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: var(--ui-space-3);
+  row-gap: var(--ui-space-1);
+  box-sizing: border-box;
+  padding: var(--ui-space-3) var(--ui-space-3) var(--ui-space-3) var(--ui-space-4);
+  border: 1px solid var(--ui-color-line);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-color-surface-e2);
+  box-shadow: inset calc(var(--ui-space-1) * 1.5) 0 0 var(--ui-color-line-strong), var(--ui-shadow-e2);
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-sm);
+  line-height: var(--ui-lh-ui);
+  pointer-events: auto;
+  animation: ui-toast-in var(--ui-dur-slow) var(--ui-ease-standard);
+}
+
+.ui-toast[data-status="ok"] {
+  box-shadow: inset calc(var(--ui-space-1) * 1.5) 0 0 var(--ui-color-ok), var(--ui-shadow-e2);
+}
+
+.ui-toast[data-status="info"] {
+  box-shadow: inset calc(var(--ui-space-1) * 1.5) 0 0 var(--ui-color-info), var(--ui-shadow-e2);
+}
+
+.ui-toast[data-status="err"] {
+  border-color: color-mix(in srgb, var(--ui-color-err) 40%, var(--ui-color-line));
+  box-shadow: inset calc(var(--ui-space-1) * 1.5) 0 0 var(--ui-color-err), var(--ui-shadow-e2);
+}
+
+.ui-toast[data-exiting] {
+  animation: ui-toast-out var(--ui-dur-fast) var(--ui-ease-exit) forwards;
+}
+
+.ui-toast:is(:focus-visible, [data-focus-visible]) {
+  outline: var(--ui-focus-width) solid var(--ui-color-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-toast__title {
+  grid-column: 1;
+  margin: 0;
+  padding-block-start: var(--ui-space-1);
+  color: var(--ui-color-text);
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-semibold);
+  line-height: var(--ui-lh-tight);
+}
+
+.ui-toast[data-status="ok"] .ui-toast__title {
+  color: var(--ui-color-ok);
+}
+
+.ui-toast[data-status="err"] .ui-toast__title {
+  color: var(--ui-color-err);
+}
+
+.ui-toast__body {
+  grid-column: 1;
+  margin: 0;
+  color: var(--ui-color-muted);
+}
+
+.ui-toast__actions {
+  grid-column: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-2);
+  margin-block-start: var(--ui-space-1);
+}
+
+.ui-toast__close {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  align-self: start;
+}
+
+@keyframes ui-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--ui-space-4));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ui-toast-out {
+  to {
+    opacity: 0;
+    transform: translateX(var(--ui-space-5));
+  }
+}

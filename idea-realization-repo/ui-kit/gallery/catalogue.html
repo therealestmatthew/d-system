@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ui-kit component catalogue</title>
+<!--
+  Static reference page for the Kit v0 display components. It loads only ../dist/ui.css.
+  Every component appears in every variant and state; each section names the classes it uses.
+  The gallery-* classes below are page furniture for this sheet, not kit classes.
+  The one inline script drives the gallery controls only (theme, accent, density). Every
+  component on the page works, or is shown in its state, without it.
+-->
+<link rel="stylesheet" href="../dist/ui.css">
+<style>
+  body {
+    margin: 0;
+    background: var(--ui-color-bg);
+    color: var(--ui-color-text);
+    font-family: var(--ui-font-sans);
+    font-size: var(--ui-fs-md);
+    line-height: var(--ui-lh-ui);
+  }
+  .gallery {
+    max-inline-size: 72rem;
+    margin-inline: auto;
+    padding: var(--ui-space-6) clamp(var(--ui-space-5), 4vw, var(--ui-space-8)) var(--ui-space-9);
+    display: grid;
+    gap: var(--ui-space-8);
+  }
+  .gallery-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--ui-space-4);
+    padding-block-end: var(--ui-space-5);
+    border-block-end: 1px solid var(--ui-color-line);
+  }
+  .gallery-head h1 { margin: 0; font-size: var(--ui-fs-xl); line-height: var(--ui-lh-tight); }
+  .gallery-head p { margin: var(--ui-space-2) 0 0; color: var(--ui-color-muted); font-size: var(--ui-fs-sm); max-inline-size: 64ch; }
+  .gallery-controls { display: flex; flex-wrap: wrap; gap: var(--ui-space-4); align-items: end; font-size: var(--ui-fs-sm); }
+  .gallery-controls label { display: grid; gap: var(--ui-space-1); color: var(--ui-color-muted); font-size: var(--ui-fs-xs); }
+  .gallery-controls select {
+    block-size: var(--ui-ctl-md);
+    padding-inline: var(--ui-space-2);
+    border: 1px solid var(--ui-color-line-strong);
+    border-radius: var(--ui-radius-md);
+    background: var(--ui-color-surface-e1);
+    color: var(--ui-color-text);
+    font: inherit;
+    font-size: var(--ui-fs-sm);
+  }
+  .gallery-controls select:focus-visible { outline: var(--ui-focus-width) solid var(--ui-color-focus); outline-offset: var(--ui-focus-offset); }
+  .gallery-section { display: grid; gap: var(--ui-space-4); }
+  .gallery-section > h2 { margin: 0; font-size: var(--ui-fs-lg); line-height: var(--ui-lh-tight); }
+  .gallery-classes { margin: 0; color: var(--ui-color-muted); font-size: var(--ui-fs-xs); }
+  .gallery-classes code, .gallery-note code { font-family: var(--ui-font-mono); color: var(--ui-color-text); }
+  .gallery-sub { margin: var(--ui-space-2) 0 0; color: var(--ui-color-muted); font-size: var(--ui-fs-xs); font-weight: var(--ui-fw-semibold); text-transform: uppercase; letter-spacing: 0.06em; }
+  .gallery-row { display: flex; flex-wrap: wrap; gap: var(--ui-space-3); align-items: center; }
+  .gallery-col { display: grid; gap: var(--ui-space-2); justify-items: start; }
+  .gallery-note { color: var(--ui-color-muted); font-size: var(--ui-fs-xs); }
+  .gallery-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr)); gap: var(--ui-space-4); align-items: start; }
+  .gallery-stage {
+    position: relative;
+    transform: translateZ(0);
+    overflow: hidden;
+    min-block-size: 22rem;
+    border: 1px dashed var(--ui-color-line);
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-color-surface);
+  }
+  .gallery-stage-copy { padding: var(--ui-space-5); color: var(--ui-color-muted); font-size: var(--ui-fs-sm); max-inline-size: 40ch; }
+  .gallery-dialog-frame { display: grid; gap: var(--ui-space-2); }
+  .gallery-dialog-frame > dialog { position: static; margin: 0; }
+  .gallery-skeleton-stack { display: grid; gap: var(--ui-space-3); inline-size: 100%; }
+  .gallery-hidden-label { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .gallery-icons { position: absolute; inline-size: 0; block-size: 0; overflow: hidden; }
+</style>
+</head>
+<body>
+<svg class="gallery-icons" aria-hidden="true">
+  <symbol id="i-plus" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-download" viewBox="0 0 16 16"><path d="M8 2.5v8m0 0L4.8 7.3M8 10.5l3.2-3.2M3 13.5h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 16 16"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v3h-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 16 16"><path d="M8 2l1.4 3.6L13 7l-3.6 1.4L8 12l-1.4-3.6L3 7l3.6-1.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 16 16"><path d="M2.5 3.5h11L9.5 8.5v4l-3 1.5v-5.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+</svg>
+
+<main class="gallery">
+  <header class="gallery-head">
+    <div>
+      <h1>Component catalogue</h1>
+      <p>Kit v0 display components, every variant and state, from <code>dist/ui.css</code> only. State is shown through ARIA, native and <code>data-*</code> attributes, never through a class.</p>
+    </div>
+    <div class="gallery-controls" aria-label="Gallery controls">
+      <label>Theme
+        <select id="gallery-theme">
+          <option value="">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+      <label>Accent
+        <select id="gallery-accent">
+          <option value="indigo">Indigo (default)</option>
+          <option value="blue">Blue</option>
+          <option value="teal">Teal</option>
+          <option value="green">Green</option>
+          <option value="violet">Violet</option>
+          <option value="magenta">Magenta</option>
+          <option value="orange">Orange</option>
+          <option value="slate">Slate</option>
+        </select>
+      </label>
+      <label>Density
+        <select id="gallery-density">
+          <option value="">Default</option>
+          <option value="compact">Compact</option>
+          <option value="comfortable">Comfortable</option>
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <!-- ==================== BUTTON ==================== -->
+  <section class="gallery-section" aria-labelledby="sec-button">
+    <h2 id="sec-button">Button</h2>
+    <p class="gallery-classes"><code>.ui-button</code> <code>.ui-button--primary</code> <code>.ui-button--secondary</code> <code>.ui-button--ghost</code> <code>.ui-button--danger</code> <code>.ui-button--icon</code> <code>.ui-button--sm</code> <code>.ui-button--lg</code> <code>.ui-button__label</code> <code>.ui-button__icon</code> <code>.ui-button__spinner</code>. States: <code>:hover</code>/<code>[data-hovered]</code>, <code>:active</code>/<code>[data-pressed]</code>, <code>:focus-visible</code>/<code>[data-focus-visible]</code>, <code>:disabled</code>/<code>[aria-disabled="true"]</code>/<code>[data-disabled]</code>, <code>[aria-pressed="true"]</code>/<code>[data-selected]</code>, <code>[aria-busy="true"]</code>.</p>
+
+    <p class="gallery-sub">Variants</p>
+    <div class="gallery-row">
+      <button type="button" class="ui-button ui-button--primary"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-plus"/></svg></span><span class="ui-button__label">Generate report</span></button>
+      <button type="button" class="ui-button ui-button--secondary"><span class="ui-button__label">Export CSV</span></button>
+      <button type="button" class="ui-button ui-button--ghost"><span class="ui-button__label">Cancel</span></button>
+      <button type="button" class="ui-button ui-button--danger"><span class="ui-button__label">Delete session</span></button>
+      <button type="button" class="ui-button"><span class="ui-button__label">No modifier (secondary look)</span></button>
+    </div>
+
+    <p class="gallery-sub">States, shown with the React Aria data attributes</p>
+    <div class="gallery-row">
+      <button type="button" class="ui-button ui-button--primary" data-hovered><span class="ui-button__label">Hover</span></button>
+      <button type="button" class="ui-button ui-button--primary" data-pressed><span class="ui-button__label">Pressed</span></button>
+      <button type="button" class="ui-button ui-button--primary" data-focus-visible><span class="ui-button__label">Focus visible</span></button>
+      <button type="button" class="ui-button ui-button--secondary" data-hovered><span class="ui-button__label">Hover</span></button>
+      <button type="button" class="ui-button ui-button--secondary" data-pressed><span class="ui-button__label">Pressed</span></button>
+      <button type="button" class="ui-button ui-button--ghost" data-hovered><span class="ui-button__label">Ghost hover</span></button>
+      <button type="button" class="ui-button ui-button--danger" data-hovered><span class="ui-button__label">Danger hover</span></button>
+      <button type="button" class="ui-button ui-button--danger" data-focus-visible><span class="ui-button__label">Danger focus</span></button>
+    </div>
+
+    <p class="gallery-sub">Disabled, with the reason shown</p>
+    <div class="gallery-row">
+      <span class="gallery-col">
+        <button type="button" class="ui-button ui-button--primary" disabled aria-describedby="reason-1"><span class="ui-button__label">Publish</span></button>
+        <span class="gallery-note" id="reason-1">Publishing needs a reviewer. None is assigned.</span>
+      </span>
+      <span class="gallery-col">
+        <button type="button" class="ui-button ui-button--secondary" aria-disabled="true" aria-describedby="reason-2"><span class="ui-button__label">Retry upload</span></button>
+        <span class="gallery-note" id="reason-2"><code>aria-disabled</code> keeps it focusable: offline since 10:42.</span>
+      </span>
+      <span class="gallery-col">
+        <button type="button" class="ui-button ui-button--danger" data-disabled aria-disabled="true" aria-describedby="reason-3"><span class="ui-button__label">Close session</span></button>
+        <span class="gallery-note" id="reason-3">A command is still running.</span>
+      </span>
+      <span class="gallery-col">
+        <button type="button" class="ui-button ui-button--ghost" disabled aria-describedby="reason-4"><span class="ui-button__label">Undo</span></button>
+        <span class="gallery-note" id="reason-4">Nothing to undo yet.</span>
+      </span>
+    </div>
+
+    <p class="gallery-sub">Loading (<code>aria-busy</code>; the spinner takes the icon slot)</p>
+    <div class="gallery-row">
+      <button type="button" class="ui-button ui-button--primary"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-download"/></svg></span><span class="ui-button__spinner" aria-hidden="true"></span><span class="ui-button__label">Download</span></button>
+      <button type="button" class="ui-button ui-button--primary" aria-busy="true"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-download"/></svg></span><span class="ui-button__spinner" aria-hidden="true"></span><span class="ui-button__label">Download</span></button>
+      <button type="button" class="ui-button ui-button--secondary" aria-busy="true"><span class="ui-button__spinner" aria-hidden="true"></span><span class="ui-button__label">Generating…</span></button>
+    </div>
+
+    <p class="gallery-sub">Toggle (<code>aria-pressed</code>, RAC <code>data-selected</code>)</p>
+    <div class="gallery-row">
+      <button type="button" class="ui-button ui-button--secondary" aria-pressed="false"><span class="ui-button__label">Wrap lines</span></button>
+      <button type="button" class="ui-button ui-button--secondary" aria-pressed="true"><span class="ui-button__label">Wrap lines</span></button>
+      <button type="button" class="ui-button ui-button--ghost" data-selected aria-pressed="true"><span class="ui-button__label">Show AI notes</span></button>
+      <button type="button" class="ui-button ui-button--secondary ui-button--icon" aria-pressed="true" aria-label="Filter"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-filter"/></svg></span></button>
+    </div>
+
+    <p class="gallery-sub">Sizes sm 24, md 32, lg 40; icon-only (needs <code>aria-label</code>)</p>
+    <div class="gallery-row">
+      <button type="button" class="ui-button ui-button--secondary ui-button--sm"><span class="ui-button__label">Small</span></button>
+      <button type="button" class="ui-button ui-button--secondary"><span class="ui-button__label">Medium</span></button>
+      <button type="button" class="ui-button ui-button--secondary ui-button--lg"><span class="ui-button__label">Large</span></button>
+      <button type="button" class="ui-button ui-button--ghost ui-button--icon ui-button--sm" aria-label="Refresh"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-refresh"/></svg></span></button>
+      <button type="button" class="ui-button ui-button--secondary ui-button--icon" aria-label="Refresh"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-refresh"/></svg></span></button>
+      <button type="button" class="ui-button ui-button--primary ui-button--icon ui-button--lg" aria-label="New session"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-plus"/></svg></span></button>
+      <button type="button" class="ui-button ui-button--primary"><span class="ui-button__label">Review queue</span><span class="ui-badge">12</span></button>
+    </div>
+  </section>
+
+  <!-- ==================== CARD ==================== -->
+  <section class="gallery-section" aria-labelledby="sec-card">
+    <h2 id="sec-card">Card</h2>
+    <p class="gallery-classes"><code>.ui-card</code> <code>.ui-card--accent</code> <code>.ui-card--ai</code> <code>.ui-card--stat</code> <code>.ui-card__kicker</code> <code>.ui-card__title</code> <code>.ui-card__body</code> <code>.ui-card__meta</code> <code>.ui-card__actions</code> <code>.ui-card__value</code> <code>.ui-card__delta</code> <code>.ui-card-grid</code></p>
+
+    <p class="gallery-sub">Stat cards (figures are placeholders)</p>
+    <div class="ui-card-grid">
+      <article class="ui-card ui-card--stat" aria-label="Ideas logged">
+        <p class="ui-card__kicker">Ideas logged</p>
+        <p class="ui-card__value">521</p>
+        <p class="ui-card__delta" data-status="ok">+14 since Monday</p>
+      </article>
+      <article class="ui-card ui-card--stat" aria-label="Open findings">
+        <p class="ui-card__kicker">Open findings</p>
+        <p class="ui-card__value">38</p>
+        <p class="ui-card__delta" data-status="warn">+6 this week</p>
+      </article>
+      <article class="ui-card ui-card--stat" aria-label="Failed runs">
+        <p class="ui-card__kicker">Failed runs</p>
+        <p class="ui-card__value">3</p>
+        <p class="ui-card__delta" data-status="err">2 more than yesterday</p>
+      </article>
+      <article class="ui-card ui-card--stat" aria-label="Median review time">
+        <p class="ui-card__kicker">Median review time</p>
+        <p class="ui-card__value"><span class="ui-state" data-state="not-recorded"><span class="ui-state__title">not recorded</span></span></p>
+        <p class="ui-card__delta">No reviews closed yet</p>
+      </article>
+    </div>
+
+    <p class="gallery-sub">Neutral, accent and AI result</p>
+    <div class="ui-card-grid">
+      <article class="ui-card" aria-labelledby="card-1">
+        <p class="ui-card__kicker">Plan</p>
+        <h3 class="ui-card__title" id="card-1">Capture routing</h3>
+        <div class="ui-card__body"><p>Where a captured note lands, and which rules keep it out of version control.</p></div>
+        <p class="ui-card__meta"><span>Updated 2026-10-12 09:40</span><span class="ui-pill" data-status="info"><span class="ui-pill__dot" aria-hidden="true"></span>ready</span></p>
+        <div class="ui-card__actions">
+          <button type="button" class="ui-button ui-button--secondary ui-button--sm"><span class="ui-button__label">Open plan</span></button>
+          <button type="button" class="ui-button ui-button--ghost ui-button--sm"><span class="ui-button__label">Copy link</span></button>
+        </div>
+      </article>
+      <article class="ui-card ui-card--accent" aria-labelledby="card-2">
+        <p class="ui-card__kicker">Needs your decision</p>
+        <h3 class="ui-card__title" id="card-2">Gate G3: approve the plan</h3>
+        <div class="ui-card__body"><p>The adversarial review closed with two accepted findings. The plan is waiting for owner approval.</p></div>
+        <p class="ui-card__meta"><span>Waiting 2 days</span><span>Owner gate</span></p>
+        <div class="ui-card__actions">
+          <button type="button" class="ui-button ui-button--primary ui-button--sm"><span class="ui-button__label">Review plan</span></button>
+        </div>
+      </article>
+      <article class="ui-card ui-card--ai" aria-labelledby="card-3">
+        <p class="ui-card__kicker">Generated by Claude</p>
+        <h3 class="ui-card__title" id="card-3">Summary of 12 findings</h3>
+        <div class="ui-card__body"><p>Nine findings concern the capture path; three concern naming. None blocks the build.</p></div>
+        <p class="ui-card__meta"><span class="ui-pill" data-status="ai"><span class="ui-pill__dot" aria-hidden="true"></span>AI draft</span><span>Claude via Amazon Bedrock</span><span>2026-10-14 08:15</span></p>
+        <div class="ui-card__actions">
+          <button type="button" class="ui-button ui-button--secondary ui-button--sm"><span class="ui-button__label">View sources</span></button>
+          <button type="button" class="ui-button ui-button--ghost ui-button--sm"><span class="ui-button__label">Regenerate</span></button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ==================== PILL / BADGE / CHIP ==================== -->
+  <section class="gallery-section" aria-labelledby="sec-pill">
+    <h2 id="sec-pill">Pill, badge and chip</h2>
+    <p class="gallery-classes"><code>.ui-pill</code> <code>[data-status="ok|warn|info|err|neutral|ai"]</code> <code>.ui-pill__dot</code> <code>.ui-badge</code> <code>.ui-chip</code> <code>.ui-chip__remove</code></p>
+
+    <p class="gallery-sub">Status pills: the status is always in words</p>
+    <div class="gallery-row">
+      <span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>complete</span>
+      <span class="ui-pill" data-status="info"><span class="ui-pill__dot" aria-hidden="true"></span>ready</span>
+      <span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>waiting</span>
+      <span class="ui-pill" data-status="err"><span class="ui-pill__dot" aria-hidden="true"></span>blocked</span>
+      <span class="ui-pill" data-status="neutral"><span class="ui-pill__dot" aria-hidden="true"></span>parked</span>
+      <span class="ui-pill" data-status="ai"><span class="ui-pill__dot" aria-hidden="true"></span>AI draft</span>
+      <span class="ui-pill">no dot, neutral</span>
+    </div>
+
+    <p class="gallery-sub">Count badges</p>
+    <div class="gallery-row">
+      <span>Inbox <span class="ui-badge">3</span></span>
+      <span>Findings <span class="ui-badge">128</span></span>
+      <button type="button" class="ui-button ui-button--secondary"><span class="ui-button__label">Drafts</span><span class="ui-badge">7</span></button>
+    </div>
+
+    <p class="gallery-sub">Filter chip row with result count</p>
+    <div class="ui-table__toolbar" role="group" aria-label="Active filters">
+      <span class="ui-chip">Status: ready<button type="button" class="ui-chip__remove" aria-label="Remove filter: Status: ready"><svg viewBox="0 0 16 16" aria-hidden="true"><use href="#i-x"/></svg></button></span>
+      <span class="ui-chip">Owner: Builder A<button type="button" class="ui-chip__remove" aria-label="Remove filter: Owner: Builder A" data-hovered><svg viewBox="0 0 16 16" aria-hidden="true"><use href="#i-x"/></svg></button></span>
+      <span class="ui-chip">Track: capture<button type="button" class="ui-chip__remove" aria-label="Remove filter: Track: capture" data-focus-visible><svg viewBox="0 0 16 16" aria-hidden="true"><use href="#i-x"/></svg></button></span>
+      <button type="button" class="ui-button ui-button--ghost ui-button--sm"><span class="ui-button__label">Clear all</span></button>
+      <span class="ui-table__count" role="status">42 of 310</span>
+    </div>
+    <p class="gallery-note">The second chip's remove button shows hover, the third shows the focus ring.</p>
+  </section>
+
+  <!-- ==================== TABLE ==================== -->
+  <section class="gallery-section" aria-labelledby="sec-table">
+    <h2 id="sec-table">Table</h2>
+    <p class="gallery-classes"><code>.ui-table__toolbar</code> <code>.ui-table__count</code> <code>.ui-table-wrap</code> <code>table.ui-table</code> <code>th[aria-sort]</code> <code>button.ui-table__sort</code> <code>td.ui-table__num</code> <code>td.ui-table__id</code> <code>tr[aria-selected="true"]</code> / <code>[data-selected]</code></p>
+
+    <div>
+      <div class="ui-table__toolbar">
+        <span class="ui-chip">State: any open<button type="button" class="ui-chip__remove" aria-label="Remove filter: State: any open"><svg viewBox="0 0 16 16" aria-hidden="true"><use href="#i-x"/></svg></button></span>
+        <button type="button" class="ui-button ui-button--ghost ui-button--sm"><span class="ui-button__label">Clear all</span></button>
+        <span class="ui-table__count" role="status">6 of 347</span>
+      </div>
+      <div class="ui-table-wrap" style="max-block-size: 14rem" tabindex="0" role="region" aria-label="Phases, scrollable">
+        <table class="ui-table" aria-label="Phases">
+          <thead>
+            <tr>
+              <th scope="col"><span class="gallery-hidden-label">Select</span></th>
+              <th scope="col" aria-sort="ascending"><button type="button" class="ui-table__sort">Phase</button></th>
+              <th scope="col" aria-sort="none"><button type="button" class="ui-table__sort">Title</button></th>
+              <th scope="col">State</th>
+              <th scope="col" class="ui-table__num" aria-sort="descending"><button type="button" class="ui-table__sort">Depends on</button></th>
+              <th scope="col" class="ui-table__num">Tokens</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" aria-label="Select phase-cap-01"></td>
+              <td class="ui-table__id">phase-cap-01</td>
+              <td>Capture inbox</td>
+              <td><span class="ui-pill" data-status="ok"><span class="ui-pill__dot" aria-hidden="true"></span>complete</span></td>
+              <td class="ui-table__num">0</td>
+              <td class="ui-table__num">12,480</td>
+            </tr>
+            <tr aria-selected="true">
+              <td><input type="checkbox" checked aria-label="Select phase-cap-02"></td>
+              <td class="ui-table__id">phase-cap-02</td>
+              <td>Raw capture contracts</td>
+              <td><span class="ui-pill" data-status="info"><span class="ui-pill__dot" aria-hidden="true"></span>ready</span></td>
+              <td class="ui-table__num">1</td>
+              <td class="ui-table__num">3,905</td>
+            </tr>
+            <tr data-hovered>
+              <td><input type="checkbox" aria-label="Select phase-cap-03"></td>
+              <td class="ui-table__id">phase-cap-03</td>
+              <td>Routing rules (row shows hover)</td>
+              <td><span class="ui-pill" data-status="warn"><span class="ui-pill__dot" aria-hidden="true"></span>waiting</span></td>
+              <td class="ui-table__num">2</td>
+              <td class="ui-table__num">880</td>
+            </tr>
+            <tr data-selected>
+              <td><input type="checkbox" checked aria-label="Select phase-ux-01"></td>
+              <td class="ui-table__id">phase-ux-01</td>
+              <td>Design tokens (RAC data-selected)</td>
+              <td><span class="ui-pill" data-status="err"><span class="ui-pill__dot" aria-hidden="true"></span>blocked</span></td>
+              <td class="ui-table__num">0</td>
+              <td class="ui-table__num"><span class="ui-state" data-state="not-recorded"><span class="ui-state__title">not recorded</span></span></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select phase-ux-02"></td>
+              <td class="ui-table__id">phase-ux-02</td>
+              <td>Component CSS</td>
+              <td><span class="ui-pill" data-status="neutral"><span class="ui-pill__dot" aria-hidden="true"></span>parked</span></td>
+              <td class="ui-table__num">1</td>
+              <td class="ui-table__num">640</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Select phase-ux-03"></td>
+              <td class="ui-table__id">phase-ux-03</td>
+              <td>Catalogue page</td>
+              <td><span class="ui-pill" data-status="info"><span class="ui-pill__dot" aria-hidden="true"></span>ready</span></td>
+              <td class="ui-table__num">2</td>
+              <td class="ui-table__num">1,215</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="gallery-note">Header sort states: Phase is <code>ascending</code>, Depends on is <code>descending</code>, Title is <code>none</code> (the server order). The wrap scrolls under a sticky header.</p>
+
+    <p class="gallery-sub">Sort button states (React Aria data attributes)</p>
+    <div class="ui-table-wrap">
+      <table class="ui-table">
+        <thead>
+          <tr>
+            <th scope="col" aria-sort="none"><button type="button" class="ui-table__sort" data-hovered>Hover</button></th>
+            <th scope="col" aria-sort="none"><button type="button" class="ui-table__sort" data-focus-visible>Focus visible</button></th>
+            <th scope="col" aria-sort="ascending"><button type="button" class="ui-table__sort" data-pressed>Pressed</button></th>
+            <th scope="col" aria-sort="none"><button type="button" class="ui-table__sort" disabled>Disabled</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Row</td><td>Row</td><td>Row</td><td>Row</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="gallery-sub">Loading rows (skeleton) and no rows match</p>
+    <div class="gallery-grid-2">
+      <div class="ui-table-wrap">
+        <table class="ui-table" aria-busy="true">
+          <thead><tr><th scope="col">Phase</th><th scope="col">Title</th><th scope="col" class="ui-table__num">Tokens</th></tr></thead>
+          <tbody>
+            <tr><td><span class="ui-skeleton" style="inline-size: 6rem"></span></td><td><span class="ui-skeleton"></span></td><td class="ui-table__num"><span class="ui-skeleton" style="inline-size: 3rem; margin-inline-start: auto"></span></td></tr>
+            <tr><td><span class="ui-skeleton" style="inline-size: 5rem"></span></td><td><span class="ui-skeleton" style="inline-size: 70%"></span></td><td class="ui-table__num"><span class="ui-skeleton" style="inline-size: 3rem; margin-inline-start: auto"></span></td></tr>
+            <tr><td><span class="ui-skeleton" style="inline-size: 6rem"></span></td><td><span class="ui-skeleton" style="inline-size: 85%"></span></td><td class="ui-table__num"><span class="ui-skeleton" style="inline-size: 3rem; margin-inline-start: auto"></span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ui-table-wrap">
+        <table class="ui-table">
+          <thead><tr><th scope="col">Phase</th><th scope="col">Title</th><th scope="col" class="ui-table__num">Tokens</th></tr></thead>
+          <tbody>
+            <tr><td colspan="3">
+              <div class="ui-state" data-state="empty" style="border: 0">
+                <p class="ui-state__title">No rows match</p>
+                <p class="ui-state__body">Three filters are active. Clear them to see all 347 phases.</p>
+                <div class="ui-state__action"><button type="button" class="ui-button ui-button--secondary ui-button--sm"><span class="ui-button__label">Clear filters</span></button></div>
+              </div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== STATES ==================== -->
+  <section class="gallery-section" aria-labelledby="sec-state">
+    <h2 id="sec-state">Empty, loading, error, missing and not-recorded states</h2>
+    <p class="gallery-classes"><code>.ui-state</code> <code>[data-state="empty|loading|error|missing|not-recorded"]</code> <code>.ui-state__title</code> <code>.ui-state__body</code> <code>.ui-state__action</code> <code>.ui-skeleton</code> <code>.ui-spinner</code></p>
+    <div class="gallery-grid-2">
+      <div class="ui-state" data-state="empty">
+        <p class="ui-state__title">No findings yet</p>
+        <p class="ui-state__body">Findings appear here after a review runs. Upload a file to start.</p>
+        <div class="ui-state__action"><button type="button" class="ui-button ui-button--primary"><span class="ui-button__label">Upload file</span></button></div>
+      </div>
+      <div class="ui-state" data-state="loading" role="status">
+        <p class="ui-state__title"><span class="ui-spinner" aria-hidden="true"></span>Searching ideas…</p>
+        <p class="ui-state__body">Claude is drafting (step 2 of 4).</p>
+      </div>
+      <div class="ui-state" data-state="error" role="alert">
+        <p class="ui-state__title">Could not load findings</p>
+        <p class="ui-state__body">The review service returned 503: Claude is busy. Retrying in 4s.</p>
+        <div class="ui-state__action"><button type="button" class="ui-button ui-button--secondary"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-refresh"/></svg></span><span class="ui-button__label">Retry now</span></button></div>
+      </div>
+      <div class="ui-state" data-state="missing">
+        <p class="ui-state__title">Agent service not configured</p>
+        <p class="ui-state__body">This environment has no agent endpoint. Set one in settings to run reviews here.</p>
+      </div>
+    </div>
+    <div class="gallery-row">
+      <span>Median review time:</span>
+      <span class="ui-state" data-state="not-recorded"><span class="ui-state__title">not recorded</span></span>
+    </div>
+    <p class="gallery-sub">Skeleton for a known shape, and an inline spinner with its text</p>
+    <div class="gallery-grid-2">
+      <div class="ui-card" aria-busy="true" aria-label="Loading card">
+        <div class="gallery-skeleton-stack">
+          <span class="ui-skeleton" style="inline-size: 30%"></span>
+          <span class="ui-skeleton" style="inline-size: 60%; block-size: var(--ui-space-5)"></span>
+          <span class="ui-skeleton"></span>
+          <span class="ui-skeleton" style="inline-size: 80%"></span>
+        </div>
+      </div>
+      <p role="status" class="gallery-row"><span class="ui-spinner" aria-hidden="true"></span>Saving changes…</p>
+    </div>
+  </section>
+
+  <!-- ==================== DIALOG ==================== -->
+  <section class="gallery-section" aria-labelledby="sec-dialog">
+    <h2 id="sec-dialog">Dialog</h2>
+    <p class="gallery-classes"><code>.ui-dialog</code> <code>[data-variant="info|confirm|form"]</code> <code>.ui-dialog__header</code> <code>.ui-dialog__title</code> <code>.ui-dialog__body</code> <code>.ui-dialog__footer</code> <code>.ui-overlay</code> <code>.ui-modal</code>; native <code>dialog::backdrop</code></p>
+    <p class="gallery-note">Rendered inline with <code>&lt;dialog open&gt;</code> for reference; in use it opens with <code>showModal()</code>, which adds the <code>::backdrop</code> scrim.</p>
+    <div class="gallery-grid-2">
+      <div class="gallery-dialog-frame">
+        <p class="gallery-sub">Info</p>
+        <dialog open class="ui-dialog" data-variant="info" aria-labelledby="dlg-info-t" aria-describedby="dlg-info-b">
+          <div class="ui-dialog__header"><h3 class="ui-dialog__title" id="dlg-info-t">Report generated</h3></div>
+          <div class="ui-dialog__body" id="dlg-info-b"><p>The weekly report is saved to the shared reports folder. It covers 42 phases and 310 ideas.</p></div>
+          <div class="ui-dialog__footer"><button type="button" class="ui-button ui-button--primary"><span class="ui-button__label">Got it</span></button></div>
+        </dialog>
+      </div>
+      <div class="gallery-dialog-frame">
+        <p class="gallery-sub">Confirm (destructive; danger button rightmost)</p>
+        <dialog open class="ui-dialog" data-variant="confirm" aria-labelledby="dlg-confirm-t" aria-describedby="dlg-confirm-b">
+          <div class="ui-dialog__header"><h3 class="ui-dialog__title" id="dlg-confirm-t">Close session “Builder A”?</h3></div>
+          <div class="ui-dialog__body" id="dlg-confirm-b"><p>This ends the shell and stops its running command. Unsaved terminal output is lost.</p></div>
+          <div class="ui-dialog__footer">
+            <button type="button" class="ui-button ui-button--secondary"><span class="ui-button__label">Cancel</span></button>
+            <button type="button" class="ui-button ui-button--danger"><span class="ui-button__label">Close session</span></button>
+          </div>
+        </dialog>
+      </div>
+    </div>
+    <p class="gallery-sub">React Aria form: <code>.ui-overlay</code> &gt; <code>.ui-modal</code> &gt; <code>.ui-dialog[data-variant="form"]</code> (contained in this frame)</p>
+    <div class="gallery-stage">
+      <p class="gallery-stage-copy">Page content under the scrim.</p>
+      <div class="ui-overlay">
+        <div class="ui-modal">
+          <section class="ui-dialog" data-variant="form" role="dialog" aria-labelledby="dlg-form-t">
+            <div class="ui-dialog__header">
+              <h3 class="ui-dialog__title" id="dlg-form-t">Rename layout</h3>
+              <button type="button" class="ui-button ui-button--ghost ui-button--icon ui-button--sm" aria-label="Close dialog"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-x"/></svg></span></button>
+            </div>
+            <div class="ui-dialog__body"><p>Form fields go here (forms are a later kit unit). The name is shown in the layout picker.</p></div>
+            <div class="ui-dialog__footer">
+              <button type="button" class="ui-button ui-button--ghost"><span class="ui-button__label">Cancel</span></button>
+              <button type="button" class="ui-button ui-button--primary"><span class="ui-button__label">Save name</span></button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TABS ==================== -->
+  <section class="gallery-section" aria-labelledby="sec-tabs">
+    <h2 id="sec-tabs">Tabs</h2>
+    <p class="gallery-classes"><code>.ui-tabs</code> <code>.ui-tabs__list</code> <code>.ui-tabs__tab</code> <code>.ui-tabs__panel</code> <code>.ui-tabs--static</code></p>
+
+    <p class="gallery-sub">Script-free (radio technique): click or use the arrow keys</p>
+    <div class="ui-tabs ui-tabs--static">
+      <input type="radio" name="gallery-static-tabs" id="gst-1" checked>
+      <input type="radio" name="gallery-static-tabs" id="gst-2">
+      <input type="radio" name="gallery-static-tabs" id="gst-3">
+      <input type="radio" name="gallery-static-tabs" id="gst-4" disabled>
+      <div class="ui-tabs__list">
+        <label class="ui-tabs__tab" for="gst-1">Metrics</label>
+        <label class="ui-tabs__tab" for="gst-2">Concepts <span class="ui-badge">8</span></label>
+        <label class="ui-tabs__tab" for="gst-3">Systems</label>
+        <label class="ui-tabs__tab" for="gst-4">Archive (not built)</label>
+      </div>
+      <div class="ui-tabs__panel"><p>Metrics panel. The first radio is checked, so this panel shows without script.</p></div>
+      <div class="ui-tabs__panel"><p>Concepts panel. Eight concepts are recorded.</p></div>
+      <div class="ui-tabs__panel"><p>Systems panel. Three systems are registered.</p></div>
+      <div class="ui-tabs__panel"><p>Archive panel.</p></div>
+    </div>
+
+    <p class="gallery-sub">Scripted (ARIA tabs), states shown: selected, hover, focus visible, disabled</p>
+    <div class="ui-tabs">
+      <div class="ui-tabs__list" role="tablist" aria-label="Session views">
+        <button type="button" class="ui-tabs__tab" role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">Terminal</button>
+        <button type="button" class="ui-tabs__tab" role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b" tabindex="-1" data-hovered>Files</button>
+        <button type="button" class="ui-tabs__tab" role="tab" id="tab-c" aria-selected="false" aria-controls="panel-c" tabindex="-1" data-focus-visible>History</button>
+        <button type="button" class="ui-tabs__tab" role="tab" id="tab-d" aria-selected="false" aria-controls="panel-d" tabindex="-1" aria-disabled="true">Logs (agent offline)</button>
+      </div>
+      <div class="ui-tabs__panel" role="tabpanel" id="panel-a" aria-labelledby="tab-a" tabindex="0"><p>Terminal panel content.</p></div>
+      <div class="ui-tabs__panel" role="tabpanel" id="panel-b" aria-labelledby="tab-b" tabindex="0" hidden><p>Files.</p></div>
+      <div class="ui-tabs__panel" role="tabpanel" id="panel-c" aria-labelledby="tab-c" tabindex="0" hidden><p>History.</p></div>
+      <div class="ui-tabs__panel" role="tabpanel" id="panel-d" aria-labelledby="tab-d" tabindex="0" hidden><p>Logs.</p></div>
+    </div>
+  </section>
+
+  <!-- ==================== TOAST ==================== -->
+  <section class="gallery-section" aria-labelledby="sec-toast">
+    <h2 id="sec-toast">Toast</h2>
+    <p class="gallery-classes"><code>.ui-toast-region</code> <code>.ui-toast</code> <code>[data-status="ok|info|err"]</code> <code>.ui-toast__title</code> <code>.ui-toast__body</code> <code>.ui-toast__actions</code> <code>.ui-toast__close</code></p>
+    <p class="gallery-note">The region is fixed to the bottom right of the viewport; this frame contains it. Four toasts are in the DOM; only the newest three show.</p>
+    <div class="gallery-stage">
+      <p class="gallery-stage-copy">Page content. Toasts never take focus.</p>
+      <div class="ui-toast-region" role="region" aria-label="Notifications">
+        <div class="ui-toast" data-status="info" role="status">
+          <p class="ui-toast__title">Oldest toast</p>
+          <p class="ui-toast__body">Hidden: a fourth toast is over the limit of three.</p>
+        </div>
+        <div class="ui-toast" data-status="ok" role="status">
+          <p class="ui-toast__title">Report saved</p>
+          <p class="ui-toast__body">weekly-2026-10-14.html is in the reports folder.</p>
+          <button type="button" class="ui-button ui-button--ghost ui-button--icon ui-button--sm ui-toast__close" aria-label="Dismiss notification"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-x"/></svg></span></button>
+        </div>
+        <div class="ui-toast" data-status="info" role="status">
+          <p class="ui-toast__title">Review started</p>
+          <p class="ui-toast__body">Claude is reviewing 12 findings (step 1 of 4).</p>
+          <div class="ui-toast__actions"><button type="button" class="ui-button ui-button--secondary ui-button--sm"><span class="ui-button__label">View run</span></button></div>
+          <button type="button" class="ui-button ui-button--ghost ui-button--icon ui-button--sm ui-toast__close" aria-label="Dismiss notification"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-x"/></svg></span></button>
+        </div>
+        <div class="ui-toast" data-status="err" role="alert">
+          <p class="ui-toast__title">Upload failed</p>
+          <p class="ui-toast__body">notes.pdf is over the 20 MB limit.</p>
+          <div class="ui-toast__actions"><button type="button" class="ui-button ui-button--secondary ui-button--sm"><span class="ui-button__label">Retry</span></button><button type="button" class="ui-button ui-button--ghost ui-button--sm"><span class="ui-button__label">View details</span></button></div>
+          <button type="button" class="ui-button ui-button--ghost ui-button--icon ui-button--sm ui-toast__close" aria-label="Dismiss notification"><span class="ui-button__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-x"/></svg></span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  // Gallery controls only: theme on <html>, accent on <html>, density on <html>.
+  (function () {
+    var root = document.documentElement;
+    function bind(id, attr) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var current = root.getAttribute(attr);
+      if (current) el.value = current;
+      el.addEventListener('change', function () {
+        if (el.value) root.setAttribute(attr, el.value);
+        else root.removeAttribute(attr);
+      });
+    }
+    bind('gallery-theme', 'data-theme');
+    bind('gallery-accent', 'data-accent');
+    bind('gallery-density', 'data-density');
+  })();
+</script>
+</body>
+</html>
