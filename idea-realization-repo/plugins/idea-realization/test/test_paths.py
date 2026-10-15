@@ -474,9 +474,11 @@ def test_git_env_drops_every_location_variable() -> None:
     assert paths.git_env(env) == {"HOME": "/home/ana", "GIT_CONFIG_GLOBAL": "/home/ana/.gitconfig"}
 
 
-def test_every_git_dash_c_call_drops_the_location_variables() -> None:
-    """A ``git -C <path>`` that inherits GIT_DIR reads the hook's repository, not ``<path>``. Every
-    such call in the plugin's scripts and the control repository's tools passes ``git_env``."""
+def test_every_git_call_drops_the_location_variables() -> None:
+    """A git command that inherits a hook's GIT_DIR reads the hook's repository, whatever its
+    ``-C`` or ``cwd`` says. Every git call in the plugin's scripts and the tools passes
+    ``git_env``, except in check_confidential.py, which must read the index the hook hands it
+    (GIT_INDEX_FILE) and only ever reads the repository the hook runs in."""
     import ast
 
     control = paths.PLUGIN_ROOT.parent.parent
@@ -489,9 +491,9 @@ def test_every_git_dash_c_call_drops_the_location_variables() -> None:
             if not (isinstance(node, ast.Call) and node.args
                     and isinstance(node.args[0], ast.List) and len(node.args[0].elts) >= 2):
                 continue
-            first, second = node.args[0].elts[:2]
-            if not (isinstance(first, ast.Constant) and first.value == "git"
-                    and isinstance(second, ast.Constant) and second.value == "-C"):
+            first = node.args[0].elts[0]
+            if source.name == "check_confidential.py" or not (
+                    isinstance(first, ast.Constant) and first.value == "git"):
                 continue
             env = next((kw.value for kw in node.keywords if kw.arg == "env"), None)
             if not (isinstance(env, ast.Call) and ast.unparse(env.func).endswith("git_env")):

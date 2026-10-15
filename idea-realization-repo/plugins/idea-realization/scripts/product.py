@@ -168,8 +168,9 @@ def is_local_remote(url: str) -> bool:
 
 def run_gh(command: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
     try:
-        return subprocess.run(command, cwd=cwd, capture_output=True, text=True, check=False,
-                              timeout=60)
+        # gh resolves its repository through git, so a hook's GIT_DIR must not reach it either.
+        return subprocess.run(command, cwd=cwd, env=paths.git_env(), capture_output=True,
+                              text=True, check=False, timeout=60)
     except (OSError, subprocess.TimeoutExpired) as error:
         return subprocess.CompletedProcess(command, 127, "", str(error))
 

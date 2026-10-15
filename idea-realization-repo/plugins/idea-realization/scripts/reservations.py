@@ -66,7 +66,7 @@ def _common_dir(root: Path) -> Path:
     """The ``.git`` directory shared by the primary checkout and every linked worktree."""
     completed = subprocess.run(
         ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
-        cwd=root, capture_output=True, text=True, check=True,
+        cwd=root, env=paths.git_env(), capture_output=True, text=True, check=True,
     )
     return Path(completed.stdout.strip())
 
@@ -178,7 +178,7 @@ def _holder(root: Path) -> str:
     try:
         branch = subprocess.run(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-            cwd=root, capture_output=True, text=True, check=True,
+            cwd=root, env=paths.git_env(), capture_output=True, text=True, check=True,
         ).stdout.strip()
     except (subprocess.CalledProcessError, OSError):
         branch = "unknown"

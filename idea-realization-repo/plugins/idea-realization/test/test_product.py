@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -396,3 +397,22 @@ def test_verify_in_a_control_worktree_hook_reads_the_product_origin(
     monkeypatch.setenv("GIT_PREFIX", "")
     assert product.origin(checkout) == REMOTE
     assert product.verify(config(control, checkout)).root == checkout.resolve()
+
+
+def test_gh_resolves_the_checkout_not_the_hooks_repository(
+        repos: tuple[Path, Path], tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """gh resolves its repository through git, so a GIT_DIR left by a hook must not reach it
+    either: a fake gh that reads the origin with git must see the product checkout's."""
+    control, checkout = repos
+    git(control, "remote", "add", "origin", "git@forge.example.com:team/hack-control.git")
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    fake = bin_dir / "gh"
+    fake.write_text('#!/bin/sh\ncase "$(git remote get-url origin)" in\n'
+                    '  *hack-product*) exit 0 ;;\n  *) echo "gh: wrong repository" >&2; exit 1 ;;\n'
+                    'esac\n')
+    fake.chmod(0o755)
+    monkeypatch.setenv("PATH", f"{bin_dir}:{os.environ['PATH']}")
+    monkeypatch.setenv("GIT_DIR", str(control / ".git"))
+    monkeypatch.setenv("GIT_INDEX_FILE", str(control / ".git" / "index"))
+    assert product.merge_route(checkout) == "pull-request"

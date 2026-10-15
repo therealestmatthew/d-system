@@ -232,7 +232,8 @@ GIT_LOCATION_VARIABLES = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_PRE
 
 def git_env(env: Mapping[str, str] | None = None) -> dict[str, str]:
     """``env`` (default: this process's environment) without git's location variables. Pass it
-    to every ``git -C <path>`` call, so ``<path>`` alone decides which repository is read."""
+    to every git call (and to ``gh``, which resolves its repository through git), so ``-C`` or
+    the working directory alone decides which repository is read."""
     source = os.environ if env is None else env
     return {name: value for name, value in source.items() if name not in GIT_LOCATION_VARIABLES}
 
@@ -251,7 +252,8 @@ def repository_root(flag: str | None = None, env: Mapping[str, str] | None = Non
     here = cwd.resolve()
     try:
         top_text = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd=cwd,
-                                  capture_output=True, text=True, check=True).stdout.strip()
+                                  env=git_env(), capture_output=True, text=True,
+                                  check=True).stdout.strip()
     except (OSError, subprocess.CalledProcessError):
         return project or here
     top = Path(top_text).resolve()
@@ -382,7 +384,7 @@ def _branch(name: str, value: str) -> str:
     if value.startswith("-"):
         raise PathError(name, value, "a branch name must not start with '-'")
     checked = subprocess.run(["git", "check-ref-format", "--branch", value],
-                             capture_output=True, text=True, check=False)
+                             env=git_env(), capture_output=True, text=True, check=False)
     if checked.returncode != 0:
         raise PathError(name, value, "is not a valid branch name (git check-ref-format --branch)")
     return value

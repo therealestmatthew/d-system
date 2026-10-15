@@ -206,7 +206,8 @@ def claim_evidence(root: Path, phase_ids: list[str], today: date) -> dict[str, d
     """
     try:
         listing = subprocess.run(["git", "worktree", "list", "--porcelain"], cwd=root,
-                                 capture_output=True, text=True, check=True).stdout
+                                 env=paths.git_env(), capture_output=True, text=True,
+                                 check=True).stdout
         listing_available = True
     except (OSError, subprocess.CalledProcessError):
         listing, listing_available = "", False
@@ -219,7 +220,7 @@ def claim_evidence(root: Path, phase_ids: list[str], today: date) -> dict[str, d
             committed = subprocess.run(
                 ["git", "log", "-1", "--format=%ad", "--date=short", "--end-of-options", branch],
                 cwd=root,
-                capture_output=True, text=True, check=True).stdout.strip()
+                env=paths.git_env(), capture_output=True, text=True, check=True).stdout.strip()
         except (OSError, subprocess.CalledProcessError):
             committed = ""
         if not committed:

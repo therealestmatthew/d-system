@@ -39,6 +39,7 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
+import paths
 import yaml
 
 #: The fields that record a phase is finished. Losing any of them from a phase that stays
@@ -63,7 +64,7 @@ def read_text_at(root: Path, ref: str, path: str) -> str | None:
         completed = subprocess.run(
             ["git", "show", "--end-of-options", f"{ref}:{path}"],
             cwd=root,
-            capture_output=True,
+            env=paths.git_env(), capture_output=True,
             text=True,
             check=True,
         )

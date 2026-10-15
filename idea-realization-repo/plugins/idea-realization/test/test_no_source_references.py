@@ -12,6 +12,11 @@ fails the suite for whoever happens to share a word with the plugin's prose. Peo
 the organization's names are the deny-list's job: ``tools/check_confidential.py`` matches every
 identifier on it against every tracked file, the plugin included, in the pre-commit hook and in
 CI.
+
+Residual risk, accepted: a slug written directly after a different host
+(``git@forge.example.com:<owner>/<repo>``) is read as another repository and not reported, so the
+plugin's own test fixtures can use placeholder URLs. The real repository named that way, on a host
+it does not live on, would be missed here; the deny-list check would still catch its names.
 """
 
 from __future__ import annotations
