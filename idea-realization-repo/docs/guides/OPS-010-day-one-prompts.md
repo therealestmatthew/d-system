@@ -21,8 +21,8 @@ one-page command list per mode is in the mode cheat sheets (`OPS-009`).
 
 ## How to use these prompts
 
-- Start Claude Code in the **control repository's primary checkout** with the plugin loaded:
-  `claude --plugin-dir plugins/idea-realization` (ONBOARDING §3 step 10). Then paste one prompt.
+- Start Claude Code in the **control repository's primary checkout** with `claude`, and trust the
+  folder so the project settings load the plugin (ONBOARDING §3 step 10). Then paste one prompt.
 - Text in `<angle brackets>` is yours to fill in before you paste. Each prompt fits one session.
 - Where a prompt runs the product's tests, it runs them in the product worktree, as the
   `session-start` skill §5 and the implementing guide (`OPS-003`, step 3.6) state.

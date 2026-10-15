@@ -18,10 +18,11 @@ New here: read `ONBOARDING.md` first.
 
 ## Pick your mode
 
-Start every session with **`/start`** (under `--plugin-dir` it may be named
-`/idea-realization:start`). It asks which mode you are in and points you to that mode's guide and
-first step. The one-page list of steps per mode is the mode cheat sheets (`OPS-009`); where a cheat
-sheet and a guide differ, the guide wins.
+Start every session with **`/start`** (long form `/idea-realization:start`). The project settings
+load the plugin, so a plain `claude` started in this repository has it once you trust the folder.
+It asks which mode you are in and points you to that mode's guide and first step. The one-page
+list of steps per mode is the mode cheat sheets (`OPS-009`); where a cheat sheet and a guide
+differ, the guide wins.
 
 | Mode | Use it to | Main steps | Guide |
 |---|---|---|---|
@@ -120,10 +121,11 @@ passage, propose exact replacement wording, and let the owner decide.
 - **Always pull first**: `git pull --rebase origin <integration branch>` before any work, in both
   repositories. **Push right after** a claim commit or any other bookkeeping commit. An unpushed
   claim is invisible to the team and lets two people claim the same phase.
-- **Bookkeeping goes directly on control `dev`**: claim, completion and idea commits and workstream
-  claims. Everything else, in both repositories, reaches `dev` through a pull request merged with a
-  merge commit. Squash and rebase merges are off. The product merge commit's second parent must be
-  the reviewed commit.
+- **Bookkeeping goes directly on control `dev`**: claim, completion and idea commits, workstream
+  claims, and a developer's own entry in `docs/systems.yaml`. Everything else, in both
+  repositories, reaches `dev` through a pull request merged with a merge commit. The owner merges
+  planning pull requests (plans, requirements, new phases). Squash and rebase merges are off. The
+  product merge commit's second parent must be the reviewed commit.
 - Feature branches are cut from `origin/dev`: `agent/<phase-id>` (same name in both repositories),
   `agent/<handle>-<slug>` (owner-directed work with no phase), `spike/<handle>-<slug>` (never
   merged).
@@ -148,7 +150,9 @@ CI guide (`docs/guides/OPS-001-branching-and-ci.md`).
 Several developers share this repository, each on their own machine. Each developer owns one
 workstream: a set of paths declared in `docs/workstreams.yaml`. A phase you claim must keep its
 deliverables inside your own workstream or in shared ground. Your agent id on a claim is
-`<handle>/<agent>`, where the handle is your key in `docs/systems.yaml`'s `owners`. The protocol is
+`<handle>/agent-<name>` (for example `ana/agent-builder`), where the handle is your key in
+`docs/systems.yaml`'s `owners`. The `agent-` prefix is required: the backlog schema refuses
+`ana/claude`. The protocol is
 `plugins/idea-realization/docs/workstreams.md`; how the team works day to day is the team workflow
 guide (`OPS-005`).
 
@@ -291,8 +295,9 @@ into. `backlog/backlog.yaml` on it is the lock table, and the repository check i
   of your systems or paths: pick something else; do not wait, and do not edit a peer's claim.
 - Claim it in one small commit that changes nothing else: `status: active`, your `agent` id, and
   the regenerated catalog. Run the repository check before committing; it rejects a claim that
-  overlaps a peer's systems, deliverables or dependency chain, a claim outside your workstream, or
-  one past `max_active`, and warns when the phase's `owner` is someone else. Push it at once.
+  overlaps a peer's systems, deliverables or dependency chain, a claim whose deliverables fall
+  inside another developer's workstream without their recorded approval, or one past
+  `max_active`, and warns when the phase's `owner` is someone else. Push it at once.
 - If the push is rejected as non-fast-forward, pull with rebase, re-run the check, and confirm the
   claim is still safe: a peer claimed between your check and your push.
 
@@ -307,8 +312,8 @@ holds whatever the work touches; a documentation-only change is not an exception
 
 The only work done in the primary checkout is the bookkeeping committed directly on
 `<integration branch>`: the claim commit and the catalog regeneration it forces, the completion
-commit, idea commits and workstream claims. Everything else happens in worktrees and reaches the
-trunk through a pull request.
+commit, idea commits, workstream claims and a developer's own `docs/systems.yaml` entry.
+Everything else happens in worktrees and reaches the trunk through a pull request.
 
 - In the control repository, the branch is `agent/<phase-id>` and the worktree is
   `<worktree dir>/<phase-id>`, outside the repository.
@@ -338,8 +343,10 @@ in `OPS-001`, section 4.
    `queued` with an exact `next_action`, releasing your claim.
 4. Rebase both branches onto `origin/<integration branch>` and re-run the verification, the
    repository check and the product's tests. Never merge a red rebase.
-5. Run the gating review (`phase-adversary`, with `review-judge` in shadow); the verdicts are
-   recorded under `docs/reviews/`. Fix or explicitly accept every finding, and re-review after a fix.
+5. Run the gating review (`phase-adversary`); the verdicts are recorded under `docs/reviews/`.
+   `review-judge` is optional: it runs in shadow only when another session dispatches it
+   (`OPS-004`); `session-close` does not. Fix or explicitly accept every finding, and re-review
+   after a fix.
 6. Confirm both primary checkouts are clean. **Never stash or overwrite a peer's uncommitted work.**
 7. **Merge, on a passing verdict only**: a pull request to `dev` in each repository, control first,
    then product after `verify` passes, each with a merge commit pinned to the reviewed head. The

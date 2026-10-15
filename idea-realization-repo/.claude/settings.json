@@ -151,5 +151,16 @@
         ]
       }
     ]
+  },
+  "extraKnownMarketplaces": {
+    "idea-realization-team": {
+      "source": {
+        "source": "directory",
+        "path": "./"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "idea-realization@idea-realization-team": true
   }
 }

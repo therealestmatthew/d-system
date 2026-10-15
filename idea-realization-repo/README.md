@@ -62,10 +62,11 @@ Per machine, never committed:
   `uv run plugins/idea-realization/scripts/paths.py show` prints each value and where it came
   from; `aws/README.md` sets up the two roles behind the AWS profiles.
 
-Start a Claude Code session in this repository with the plugin loaded:
+Start a Claude Code session in this repository and accept the folder trust prompt; the project
+settings load the plugin from this repository's marketplace (`.claude-plugin/marketplace.json`):
 
 ```bash
-claude --plugin-dir plugins/idea-realization
+claude
 ```
 
 When `session-start` has created a product worktree for your phase, add it to the session with

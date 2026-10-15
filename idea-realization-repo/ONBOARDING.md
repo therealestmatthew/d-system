@@ -172,11 +172,15 @@ that one command only (`OPS-008`, "check.py reports files from the wrong reposit
    uv run plugins/idea-realization/scripts/product.py verify   # prints "origin: matches"
    ```
 
-10. **Start Claude Code** in the control repository with the plugin loaded:
+10. **Start Claude Code** in the control repository's primary checkout:
 
     ```bash
-    claude --plugin-dir plugins/idea-realization
+    claude
     ```
+
+    The first time, Claude Code asks whether you trust the folder. Accept: the project settings
+    (`.claude/settings.json`) load the plugin only in a trusted folder. `/start` then exists; if
+    it does not, run `/plugin` and check that `idea-realization@idea-realization-team` is enabled.
 
     There is no product worktree yet, so nothing else is added at launch. `session-start` creates
     one when you claim a phase, and you add it then with `/add-dir` (section 6, step 4).

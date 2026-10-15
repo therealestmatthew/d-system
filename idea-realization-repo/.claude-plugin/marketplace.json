@@ -1,0 +1,13 @@
+{
+  "name": "idea-realization-team",
+  "owner": {
+    "name": "The team's repository owner"
+  },
+  "description": "The idea-realization plugin, loaded from this repository for everyone who opens it.",
+  "plugins": [
+    {
+      "name": "idea-realization",
+      "source": "./plugins/idea-realization"
+    }
+  ]
+}
