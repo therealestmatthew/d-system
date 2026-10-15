@@ -1,0 +1,91 @@
+# Control repository CI. Guide: docs/guides/OPS-001-branching-and-ci.md.
+#
+# One job, `verify`. It never deploys, never calls AWS or Bedrock, and never commits.
+# A red run on dev or main is an alarm: fix it forward with a new commit.
+name: control-ci
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main, "agent/**"]
+
+concurrency:
+  group: control-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.3.0
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install dependencies
+        run: uv sync --locked --extra dev
+
+      - name: Lint (ruff)
+        run: uv run ruff check tools/ test/
+
+      # The scaffold recreates the gitignored .idea-realization/staging/ directory that doctor
+      # otherwise reports missing. It never overwrites an existing file. IDEA_REALIZATION_ROOT is
+      # set on these three steps only: the plugin tests create their own temporary repositories
+      # and fail if it points them at this checkout.
+      - name: Scaffold
+        env:
+          IDEA_REALIZATION_ROOT: ${{ github.workspace }}
+        run: uv run plugins/idea-realization/scripts/scaffold.py --feature all
+
+      - name: Doctor
+        env:
+          IDEA_REALIZATION_ROOT: ${{ github.workspace }}
+        run: uv run plugins/idea-realization/scripts/doctor.py
+
+      # No product root is configured in CI, so the product checks are skipped by design.
+      - name: Repository check
+        env:
+          IDEA_REALIZATION_ROOT: ${{ github.workspace }}
+        run: uv run plugins/idea-realization/scripts/check.py
+
+      - name: Folder tests
+        run: uv run pytest -q test
+
+      - name: Plugin tests
+        working-directory: plugins/idea-realization
+        run: uv run pytest -q
+
+      # The deny-list is the repository secret DENY_LIST, one identifier per line. It is written
+      # to the runner's temporary directory, never to the workspace, and removed afterwards.
+      # check_confidential.py reads its path from PRIVATE_DENY_LIST (tools/check_confidential.py).
+      # Without the secret (for example on a pull request from a fork) only the path check runs,
+      # and the run carries a warning.
+      - name: Private-content check
+        env:
+          DENY_LIST: ${{ secrets.DENY_LIST }}
+        run: |
+          if [ -n "$DENY_LIST" ]; then
+            deny_file="$RUNNER_TEMP/deny-list.txt"
+            printf '%s\n' "$DENY_LIST" > "$deny_file"
+            # A violation line names the identifier it matched; mask every entry so the log
+            # never shows one.
+            while IFS= read -r entry; do
+              case "$entry" in ''|'#'*) ;; *) echo "::add-mask::$entry" ;; esac
+            done < "$deny_file"
+            export PRIVATE_DENY_LIST="$deny_file"
+          else
+            echo "::warning::secret DENY_LIST is not available; only the path check runs"
+            export PRIVATE_DENY_LIST="$RUNNER_TEMP/no-deny-list.txt"
+          fi
+          status=0
+          uv run python tools/check_confidential.py || status=$?
+          rm -f "$RUNNER_TEMP/deny-list.txt"
+          exit "$status"
