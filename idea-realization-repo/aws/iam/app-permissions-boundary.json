@@ -120,6 +120,20 @@
       }
     },
     {
+      "Sid": "DenyDirectFoundationModelInvocation",
+      "Effect": "Deny",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": "arn:aws:bedrock:*::foundation-model/*",
+      "Condition": {
+        "Null": {
+          "bedrock:InferenceProfileArn": "true"
+        }
+      }
+    },
+    {
       "Sid": "DenyOtherRegionsExceptUSInferenceProfileRouting",
       "Effect": "Deny",
       "NotAction": [

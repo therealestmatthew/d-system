@@ -165,8 +165,8 @@ def profile_arn(region: str, profile: str) -> str:
 
 @pytest.mark.parametrize("name", ["deploy-policy.json", "app-permissions-boundary.json"])
 @pytest.mark.parametrize(("region", "profile_key", "denied"), [
-    # The originating call in the sandbox region, no profile key: allowed.
-    (SANDBOX, None, False),
+    # A direct call to a foundation model, with no profile, is denied even in the sandbox region.
+    (SANDBOX, None, True),
     # Any call outside the sandbox region without a profile key: denied.
     ("eu-west-1", None, True),
     # A US profile routing to another US region: allowed.
@@ -286,3 +286,11 @@ def test_read_role_decrypts_only_the_sandbox_tenant_keys() -> None:
         "kms:ResourceAliases": "alias/REPLACE_WITH_PRODUCT_NAME-tenant-*"}
     assert condition["StringLike"] == {
         "kms:ViaService": ["s3.*.amazonaws.com", "dynamodb.*.amazonaws.com"]}
+
+
+def test_foundation_models_are_invoked_only_through_a_profile() -> None:
+    for name in ("deploy-policy.json", "app-permissions-boundary.json"):
+        statement = policy(name)["DenyDirectFoundationModelInvocation"]
+        assert statement["Effect"] == "Deny"
+        assert statement["Resource"] == "arn:aws:bedrock:*::foundation-model/*"
+        assert statement["Condition"] == {"Null": {"bedrock:InferenceProfileArn": "true"}}

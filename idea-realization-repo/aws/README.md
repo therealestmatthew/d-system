@@ -166,7 +166,9 @@ us-east-2 and us-west-2:
 Only US profiles are allowed, by both the deploy policy and the boundary: the statement
 `DenyInferenceProfilesOutsideTheUS` denies a model invocation whose `bedrock:InferenceProfileArn`
 is not `arn:aws:bedrock:*:*:inference-profile/us.*`. It is an allow-list, so `global.`, `eu.`,
-`apac.` and any profile prefix AWS adds later are denied without being named. Quotas for the
+`apac.` and any profile prefix AWS adds later are denied without being named. A second statement,
+`DenyDirectFoundationModelInvocation`, denies invoking a foundation model without a profile, so
+every model call goes through a US profile, in the sandbox region as elsewhere. Quotas for the
 profiles are the "Cross-region model inference ... for <model>" service quotas, requested in the
 sandbox region, one pair per model.
 
