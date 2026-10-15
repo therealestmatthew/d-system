@@ -29507,3 +29507,13 @@ From Session 3 - Standby Builder (track C group 1), 2026-10-15.
 Claude Code warns that d-system's .claude/settings.json deny rules written as Write(...) are "not matched by file permission checks — only Edit(path) rules are": Write(_private/**), Write(.agents/**), Write(.codex/**), Write(_data/ideas.jsonl) and the Write(//code/d-system-worktrees/*/{AGENTS.md,CLAUDE.md,_private/**,.agents/**,.codex/**,_data/ideas.jsonl}) rules. They protect nothing as written; the fix is Edit(...) equivalents (the owner edits settings). Seen 2026-10-15 when a claude CLI call printed the warnings.
 
 From Session Manager, 2026-10-15.
+
+---
+
+## 000710 · test_stale_lock_recovers_after_forced_kill leaves its spawned daemon running when it fails, and its 5s deadline is tight under load
+
+**Created 2026-10-15T11:27:06-04:00 · Status: `open`**
+
+test/test_daemon.py::test_stale_lock_recovers_after_forced_kill leaves its spawned daemon process running when it fails (it timed out under load: "condition not met within 5.0s"; the daemon was still alive 38 minutes later). Kill the spawned process in a finally/fixture teardown. The 5s wait is also tight on a loaded machine; consider a longer deadline.
+
+From Session 3 - Standby Builder, 2026-10-15.
