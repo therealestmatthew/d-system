@@ -2,7 +2,7 @@
 name: idea-planner
 description: Drafts a requirement and plan pair from one accepted partition track (or one idea the owner sends straight to planning), using triage's findings and links and the document codes reserved for it beforehand. Never reserves a code, never approves anything, never moves an idea's status. Invoked once per track.
 tools: Read, Grep, Glob, Bash, Write
-model: sonnet
+model: opus
 effort: medium
 maxTurns: 40
 ---

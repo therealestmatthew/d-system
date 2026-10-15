@@ -5,8 +5,9 @@ in ``backlog.py`` against the documents, systems and owners the document scan
 (``documents.scan``) reports, then the status-regression check (``regression.py``) when the
 catalog names a ``decision_record``. A repository without a backlog file has nothing to check.
 
-Regression warnings, and the note that the regression check did not run, go to standard error:
-they never change the exit code.
+Regression warnings, the note that the regression check did not run, and the warning that an
+active phase assigned to one developer (``owner: <handle>``) is claimed by another
+(``backlog.owner_claim_warnings``) go to standard error: they never change the exit code.
 
 ``ready`` prints the phase queue — ``next_up`` first, then priority and id — with each phase's
 readiness, prerequisites and the active phases it would collide with, and a stale-claim signal
@@ -25,6 +26,7 @@ from pathlib import Path
 from typing import Any
 
 import documents
+import identity
 import paths
 import product
 import regression
@@ -127,6 +129,9 @@ def audit(config: paths.Config, today: date | None = None,
     root = config.root
     errors = inspect(root, catalog, scanned.documents, set(scanned.systems),
                      set(scanned.owners), today or date.today(), product_root)
+    items = {item["id"]: item for item in catalog["items"]}
+    for warning in backlog.owner_claim_warnings(items, set(identity.developers(docs_root))):
+        note(warning)
     record = catalog.get("decision_record")
     if record is None:
         note("status-regression not run: the backlog names no decision_record, so a reopened "

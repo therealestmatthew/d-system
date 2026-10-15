@@ -149,6 +149,28 @@ def concurrency_errors(items: dict[str, Any], active: list[str], max_active: int
     return errors
 
 
+def owner_claim_warnings(items: dict[str, Any], developers: set[str]) -> list[str]:
+    """Active phases assigned to one developer and claimed by another; warnings, never errors.
+
+    Assignment is ``owner: <handle>`` on a phase. Only an owner that is a developer handle (an
+    owners key with emails in ``systems.yaml``) assigns anyone; a role owner such as
+    ``repository-owner`` does not. The claimant's handle is the part of ``agent`` before ``/``;
+    an agent without a handle names nobody, so it does not match the owner either. Someone else
+    may still take the phase: this names the mismatch for a person to read and refuses nothing.
+    """
+    warnings = []
+    for key, item in sorted(items.items()):
+        owner, agent = item.get("owner"), item.get("agent")
+        if item.get("status") != "active" or owner not in developers or not agent:
+            continue
+        handle = agent.split("/", 1)[0] if "/" in agent else None
+        if handle != owner:
+            claimant = f"developer {handle}" if handle else "an agent with no developer handle"
+            warnings.append(f"warning: {key} is assigned to {owner} but claimed by {claimant} "
+                            f"({agent})")
+    return warnings
+
+
 def claim_conflicts(item: dict[str, Any], items: dict[str, Any]) -> list[str]:
     """Active phases that a candidate phase would collide with if claimed now."""
     return sorted(

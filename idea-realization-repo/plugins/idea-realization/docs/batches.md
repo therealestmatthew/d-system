@@ -1,9 +1,9 @@
 # Batches
 
 A batch is an owner-approved, ordered set of queued phases, grouped into stages, that a coordinator
-builds (`coordinator.md`). The plugin ships no batch schema, no batch directory and no batch check:
-a batch table is a record the repository keeps where it chooses, and the rules below govern what it
-says and how it is used.
+builds (`coordinator.md`). Batches are recorded in `batches.yaml` beside the backlog, in the shape
+`schemas/batches.schema.json` gives, and checked by `scripts/batch_check.py`. The rules below govern
+what a batch says and how it is used.
 
 ## 1. What a batch table records
 
@@ -23,8 +23,9 @@ says and how it is used.
 
 ## 3. Checking a composition
 
-A batch runs only after its composition has been checked against the backlog by script, and the
-check is recorded with the batch. The check confirms that:
+A batch runs only after its composition has been checked against the backlog by script
+(`batch_check.py <batch-id>`), and the check is recorded with the batch (its `checks` list). The
+check confirms that:
 
 - every phase id resolves in the backlog;
 - every phase is queued and unclaimed;
@@ -54,5 +55,7 @@ run.
 
 - Once a run opens against a composition it is frozen. Changed membership is a new composition
   that supersedes the old one; the old one is kept and names its successor.
-- No check validates a batch table. The composing session runs the checks in section 3 and records
-  them.
+- The repository check (`check.py`) applies the structural rules of section 3 to every batch that
+  is not closed or superseded; it does not require members to be queued, because a running batch's
+  members are active or complete. The composing session runs the composition check in section 3
+  and records it.

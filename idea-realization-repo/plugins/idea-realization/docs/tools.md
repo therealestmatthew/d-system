@@ -13,8 +13,21 @@ Every key is resolved with one precedence:
 
 1. a command-line flag (``--ideas-path``),
 2. the environment variable ``IDEA_REALIZATION_<KEY>``,
-3. the plugin option ``CLAUDE_PLUGIN_OPTION_<KEY>``,
-4. the default declared in ``.claude-plugin/plugin.json``.
+3. this machine's ``.idea-realization/local.yaml`` (untracked),
+4. the plugin option ``CLAUDE_PLUGIN_OPTION_<KEY>``,
+5. the team's ``.idea-realization/project.yaml`` (tracked), for the keys it carries,
+6. the default declared in ``.claude-plugin/plugin.json``.
+
+``local.yaml`` is gitignored and holds what differs per machine: a flat map of key to value for
+the keys ``schemas/local.schema.json`` allows. It is read from the primary checkout, the first
+entry of ``git worktree list``, at the same place relative to the git top level as the root, so
+every session worktree sees the one file. ``local.example.yaml`` is its tracked template.
+
+``project.yaml`` is tracked and holds what the whole team shares (``schemas/project.schema.json``):
+``control.integration_branch`` supplies ``integration_branch`` and ``aws.region`` supplies
+``aws_region``. Its other values (the control remote, the demo dates, the team URLs) are read by
+``project.py``. A value in either file that starts with ``REPLACE-WITH-`` is a placeholder and
+counts as unset. A file that fails its schema raises ``PathError`` naming the file.
 
 Claude Code exports ``CLAUDE_PLUGIN_OPTION_<KEY>`` to hooks only. A skill passes the saved option
 to a script by prefixing the command with ``CLAUDE_PLUGIN_OPTION_<KEY>='${user_config.<key>}'``,
@@ -45,6 +58,12 @@ control repository. ``product_worktree_dir`` resolves against the product checko
 ``aws_deploy_profile`` and ``aws_region`` are plain text, may be unset, and are read by the cloud
 agents, which refuse to run without them.
 
+``handle`` asserts this machine's developer handle (``identity.py`` still requires the git email
+to match it) and ``dev_port_range`` names the local ports a developer server may use, as
+``<first>-<last>``. Both are plain text and may be unset.
+
+``paths.py`` prints every resolved value; ``paths.py show`` also prints where each one came from.
+
 ## `backlog.py`
 
 ```bash
@@ -57,6 +76,57 @@ Pure rules: every function takes dicts and returns errors or text, with no file 
 ``checks/backlog.py`` reads the files, runs the document scan and calls these.
 
 No command-line arguments.
+
+## `batch_check.py`
+
+```bash
+uv run "${CLAUDE_PLUGIN_ROOT}/scripts/batch_check.py"
+```
+
+Check batch compositions in the batches file against the backlog. Changes nothing.
+
+A batch (``docs/batches.md``) is an owner-approved, ordered set of phases grouped into stages. The
+batches file sits beside the backlog (``batches.yaml`` in the backlog's directory) and its shape is
+``schemas/batches.schema.json``::
+
+    schema_version: 1
+    batches:
+      - id: batch-login
+        title: Login flow
+        status: proposed          # proposed | approved | running | closed | superseded
+        external_dependencies: [] # complete phases outside the batch that a member depends on
+        stages:
+          - phases: [<phase-id>, <phase-id>]
+          - phases: [<phase-id>]
+
+Structural rules, applied to every batch that is not ``closed`` or ``superseded``:
+
+- batch ids are unique, and a ``superseded_by`` names a batch in the file;
+- every phase id resolves in the backlog and appears once in the batch;
+- the batch is dependency-closed: every ``depends_on`` edge of a member points to a member in an
+  earlier stage, or to a complete phase outside the batch that ``external_dependencies`` lists;
+- ``external_dependencies`` lists nothing that no member depends on;
+- two phases in one stage do not collide: no shared system and no deliverable path that equals or
+  contains the other's (``backlog.collisions``, the same function the claim check uses);
+- every stage boundary follows from a real dependency edge (``backlog.dependency_closure``) or a
+  real collision between a phase of the later stage and a phase of the stage before it.
+
+Naming batch ids on the command line runs the composition check (``docs/batches.md`` section 3) on
+those batches: the structural rules plus every member queued and unclaimed. Without ids, every
+live batch gets the structural rules only, which is what ``check.py`` runs, because a running
+batch's members are legitimately active or complete.
+
+Exit codes: 0 when every checked batch is clean; 1 when any problem is found, one line each; 2 when
+the batches file or the backlog cannot be read or is not valid, or a named batch does not exist.
+
+| Flag | Help | Choices | Default | Required |
+|---|---|---|---|---|
+| `batch` | batch id to run the composition check on; repeatable |  |  |  |
+| `--batches` | batches file (default: batches.yaml beside the backlog) |  |  |  |
+
+Shared configuration flags: `--root`, `--backlog-path`, resolved by the shared configuration precedence rule.
+
+Exit codes found in source: 0, 2.
 
 ## `brain.py`
 
@@ -175,12 +245,20 @@ Compare every path the install-state record names against the disk. Changes noth
 Each recorded file is reported as unchanged, drifted (its SHA-256 differs from the record) or
 missing; each recorded directory as unchanged or missing. A file changed under recorded consent,
 such as ``.gitignore``, is reported the same way but marked as consented, since people edit it.
+A configuration file recorded with ``edit`` consent (``scaffold.py --consent edit``: the tracked
+``product.yaml`` and ``project.yaml``, which people fill in) is reported as edited, not drifted,
+when its content changed; it is still reported missing when it is gone.
+
+When ``project.yaml`` names a real ``control.remote``, the control checkout's ``origin`` must be
+that repository (``project.py``); while the value is a ``REPLACE-WITH-`` placeholder the comparison
+is skipped with a note.
 
 It first checks every configured key the way the scripts do (``paths``) and names each one it
 would refuse, with the reason, rather than stopping at the first.
 
-Exit codes: 0 when every recorded file and directory is unchanged, 1 when any has drifted or is
-missing or any configured key is invalid, 2 when there is no install-state record.
+Exit codes: 0 when every recorded file and directory is unchanged or edited under consent, 1 when
+any has drifted or is missing, any configured key is invalid or the control origin differs, 2 when
+there is no install-state record or a configuration file is refused.
 
 Shared configuration flags: every configured path and value, resolved by the shared configuration precedence rule.
 
@@ -553,7 +631,9 @@ object with ``emails``::
 The handle is the owner whose ``emails`` contain ``git config user.email`` in the repository root.
 The git email is the identity; nothing else can name a developer. The environment variable
 ``IDEA_REALIZATION_HANDLE`` may state the expected handle, and is refused unless the git email
-belongs to that same developer, so it can assert an identity but never assume another one.
+belongs to that same developer, so it can assert an identity but never assume another one. The
+``handle`` key (``local.yaml``, the plugin option) asserts it the same way when the variable is
+unset.
 
 A handle is lower-case letters and digits, starting with a letter, at most 16 characters, so it can
 sit inside an identifier without ambiguity.
@@ -633,6 +713,7 @@ tracked in ``.idea-realization/product.yaml``::
     remote: <git URL of the product repository>
     integration_branch: main
     ci_workflow: none
+    github: <org>/<repo>        # optional
 
 Where the product checkout sits differs per machine, so it is configured, never tracked: the
 ``product_root`` key (``--product-root``, ``IDEA_REALIZATION_PRODUCT_ROOT``, then the plugin
@@ -650,6 +731,49 @@ repository.
 | `command` |  |  |  |  |
 
 Shared configuration flags: `--root`, `--product-root`, `--product-worktree-dir`, resolved by the shared configuration precedence rule.
+
+Exit codes found in source: 0, 1.
+
+## `project.py`
+
+```bash
+uv run "${CLAUDE_PLUGIN_ROOT}/scripts/project.py"
+```
+
+What the whole team shares about this control repository, and the check that the checkout is it.
+
+``.idea-realization/project.yaml`` is tracked (``schemas/project.schema.json``)::
+
+    schema_version: 1
+    control:
+      remote: <git URL of this control repository>
+      github: <org>/<repo>
+      integration_branch: dev
+    demo:
+      date: 'YYYY-MM-DD'
+      freeze: 'YYYY-MM-DD'
+      tag_prefix: demo-
+    urls:
+      hackathon_portal: <URL>
+      demo_app: <URL>
+      team_chat: <URL>
+    aws:
+      region: <region>
+
+``control.integration_branch`` and ``aws.region`` feed the ``integration_branch`` and
+``aws_region`` keys through ``paths.py``; ``show`` prints every value here. A value that starts
+with ``REPLACE-WITH-`` is a placeholder and counts as unset.
+
+``show`` and ``verify`` both compare the control checkout's ``origin`` with ``control.remote`` and
+exit 1 when they differ, so a session cannot record work in the wrong repository. While
+``control.remote`` is a placeholder the comparison is skipped with a note. ``check.py`` and
+``doctor.py`` run the same comparison.
+
+| Flag | Help | Choices | Default | Required |
+|---|---|---|---|---|
+| `command` |  |  |  |  |
+
+Shared configuration flags: `--root`, resolved by the shared configuration precedence rule.
 
 Exit codes found in source: 0, 1.
 
@@ -806,13 +930,17 @@ byte-identical. Every file written is recorded, with its SHA-256, in
 The target's ``.gitignore`` is changed only with ``--consent gitignore``, and that consent is
 recorded. The scaffold never writes ``.claude/settings.json`` or a hook.
 
+``--consent edit`` records that the configuration files people are expected to fill in
+(``product.yaml`` and ``project.yaml``, for the selected features) will change after the scaffold
+wrote them, so ``doctor.py`` reports them as edited rather than drifted.
+
 Exit codes: 0 on success, 2 on a usage error.
 
 | Flag | Help | Choices | Default | Required |
 |---|---|---|---|---|
 | `--feature` | feature to scaffold; repeatable |  |  |  |
 | `--dry-run` | report the plan; write nothing |  |  |  |
-| `--consent` | allow the scaffold to change this file; recorded in the state | gitignore | [] |  |
+| `--consent` | gitignore: allow the scaffold to change .gitignore; edit: record that product.yaml and project.yaml will be filled in; recorded in the state |  | [] |  |
 
 Shared configuration flags: every configured path and value, resolved by the shared configuration precedence rule.
 

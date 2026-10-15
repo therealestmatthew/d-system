@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Batch compositions",
+  "description": "Owner-approved, ordered sets of backlog phases grouped into stages (docs/batches.md). Records grouping, sequencing and parallelism only; scope, acceptance, systems, deliverables and depends_on stay in the backlog. Checked by scripts/batch_check.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "batches"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Batches contract version."
+    },
+    "batches": {
+      "type": "array",
+      "description": "One entry per composition, kept after it closes or is superseded; empty until the first batch is composed.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "status",
+          "stages"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Permanent batch id, chosen by hand.",
+            "pattern": "^batch-[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What the batch delivers, in a few words."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "proposed",
+              "approved",
+              "running",
+              "closed",
+              "superseded"
+            ],
+            "description": "proposed: waiting for the owner. approved: the owner said yes; not yet run. running: a stage has been claimed; the composition is frozen. closed: every member complete or the owner ended it. superseded: replaced by superseded_by."
+          },
+          "stages": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Stages in run order. A stage opens only when every phase of the one before is complete and integrated.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "phases"
+              ],
+              "properties": {
+                "phases": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "description": "Phases that the check admits together: no shared dependency edge, system or deliverable path.",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^phase-[a-z]+-[0-9]{2}$"
+                  }
+                }
+              }
+            }
+          },
+          "external_dependencies": {
+            "type": "array",
+            "uniqueItems": true,
+            "description": "Complete phases outside the batch that a member depends on.",
+            "items": {
+              "type": "string",
+              "pattern": "^phase-[a-z]+-[0-9]{2}$"
+            }
+          },
+          "supersedes": {
+            "type": "string",
+            "description": "The batch this composition replaces.",
+            "pattern": "^batch-[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "superseded_by": {
+            "type": "string",
+            "description": "The batch that replaces this one; required when status is superseded.",
+            "pattern": "^batch-[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "checks": {
+            "type": "array",
+            "description": "Recorded runs of the composition check (batch_check.py <batch-id>): evidence of their moment, not a licence.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "date",
+                "result"
+              ],
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "result": {
+                  "type": "string",
+                  "enum": [
+                    "pass",
+                    "fail"
+                  ]
+                },
+                "backlog_commit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{7,40}$",
+                  "description": "Control commit whose backlog the check read."
+                },
+                "output": {
+                  "type": "string",
+                  "description": "The check's output, verbatim."
+                }
+              }
+            }
+          }
+        },
+        "if": {
+          "properties": {
+            "status": {
+              "const": "superseded"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "superseded_by"
+          ]
+        }
+      }
+    }
+  }
+}

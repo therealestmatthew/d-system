@@ -1,0 +1,4 @@
+# Batch compositions: owner-approved, ordered sets of phases grouped into stages.
+# Rules: plugins/idea-realization/docs/batches.md. Check: scripts/batch_check.py.
+schema_version: 1
+batches: []
