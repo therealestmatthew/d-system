@@ -35,7 +35,8 @@ State this to the person before the menu, in these words or close to them:
 
 > Before any work, update the integration branch in the **primary checkout** of the control
 > repository (the first entry of `git worktree list`), and in the product checkout if this
-> repository drives one: `git pull origin <integration branch>` (the branch the banner printed).
+> repository drives one: `git pull --rebase origin <integration branch>` (the branch the banner
+> printed). `--rebase` keeps an unpushed bookkeeping commit on top instead of merging.
 > Push right after any claim or other bookkeeping commit.
 
 Do not run the pull yourself. It can merge into a checkout someone else's session is using; the
@@ -84,6 +85,6 @@ guide is missing or names none, use these:
 |---|---|---|
 | Planning | `/idea-realization:idea` to record each new idea as given | `/idea-realization:idea-triage`, then `/idea-realization:partition-ideas` |
 | Implementing | `/idea-realization:backlog` to check the repository and see the ready queue | `/idea-realization:session-start` on the phase the person chooses |
-| Validating | `/idea-realization:backlog` to see the active phases and the branches ready for review | dispatch the `phase-adversary` agent on the chosen branch, by name |
+| Validating | `/idea-realization:backlog` to see the active phases | follow the validating guide's procedure for the chosen review; a review of a peer's branch is advice and never replaces the gating review, which belongs to the session that holds the phase |
 
 Say the command, say in one sentence what it does, and ask whether to run it now. Stop there.

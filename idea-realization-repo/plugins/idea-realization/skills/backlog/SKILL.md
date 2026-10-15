@@ -24,7 +24,7 @@ uv run "${CLAUDE_PLUGIN_ROOT}/scripts/check.py"
 ```
 
 Then the repository's own test command, if it has one; while sessions run under the plugin's
-`docs/multi-session.md`, run it in the session's worktree once that exists, never here; run on
+`${CLAUDE_PLUGIN_ROOT}/docs/multi-session.md`, run it in the session's worktree once that exists, never here; run on
 its own with no worktree, this skill then skips the tests and says so. Report
 the real output. **If either fails,
 stop**: report the failure and nothing else. Do not orient and do not offer to continue past it. A

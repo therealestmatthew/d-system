@@ -14,7 +14,7 @@ when the work is done.
 **Two repositories.** This repository is the **control repository**: ideas, plans, the backlog,
 session and review records, agents and rules. The code is built in the **product repository** that
 `.idea-realization/product.yaml` names. Start Claude Code in the control repository; the product
-worktree is added to the session in step 4. `docs/two-repositories.md` explains the split. A
+worktree is added to the session in step 4. `${CLAUDE_PLUGIN_ROOT}/docs/two-repositories.md` explains the split. A
 repository with no `product.yaml` works on one repository: skip every product step below.
 
 ## The values this procedure uses
@@ -120,7 +120,7 @@ claim the phase, recommendation first, and report alongside the question:
 Stop until the answer comes back. An unanswered question is not a yes.
 
 **Work with no backlog phase** — a one-off document, a fix asked for directly — has nothing to
-claim. Skip steps 2 and 3, name the branches and worktrees after the work (`agent/<slug>`), and say
+claim. Skip steps 2 and 3, name the branches and worktrees after the work (`agent/<handle>-<slug>`), and say
 plainly in the first report that the session is unclaimed and peers hold no lock against it. Never
 invent a phase to have something to claim.
 
@@ -135,7 +135,7 @@ git pull --rebase origin <control integration branch>
 ```
 
 In the backlog, edit **only this phase's lines**: `status: active` and
-`agent: <your handle>/agent-<name>`, and set the catalog's `updated` to today. Choose the agent name
+`agent: <your handle>/agent-<name>`, and set the backlog's top-level `updated` to today. Choose the agent name
 once, lowercase, and reuse it; one agent holds at most one active phase.
 
 Then regenerate the document catalog, which lists the phases, and run the check:
@@ -214,7 +214,7 @@ worktree must be copied out by hand before the worktree is removed.
   at the end: `git fetch origin`, then `git rebase origin/<integration branch>` in each worktree.
 - Pushing either `agent/<phase-id>` needs no approval; backing up your own work is not publishing.
   After a rebase, push it with `git push --force-with-lease`; never force-push the integration
-  branch or the release branch (`protocol.md`, section 10).
+  branch or the release branch (`${CLAUDE_PLUGIN_ROOT}/docs/protocol.md`, section 10).
 - Record progress with the `checkpoint` skill as often as useful. It writes in the control worktree
   and never marks a phase complete.
 

@@ -7,7 +7,7 @@ kind: operation
 status: draft
 owner: repository-owner
 created: '2026-10-14'
-updated: '2026-10-14'
+updated: '2026-10-15'
 systems: []
 depends_on: []
 ---
@@ -40,7 +40,8 @@ Neither primary checkout ever leaves `dev`.
 
 ### 1. Start
 
-Run `/start` and choose Implementing. In the control primary checkout, `git pull` origin `dev`
+Run `/idea-realization:start` and choose Implementing. In the control primary checkout,
+`git pull --rebase origin dev`
 before anything else, and load the context the phase needs with the `brain` skill.
 
 ### 2. Choose a phase: `backlog` skill
@@ -158,8 +159,9 @@ A repository with no GitHub remote uses a local `git merge --no-ff` instead; the
 path applied. Commands for each step and the failure cases are in `OPS-001`, section 4, and
 `OPS-008`.
 
-Finally, record what the next session should know with the `brain` skill, as a `lesson` or a
-`decision`.
+Before you run `session-close`, record what the next session should know with the `brain` skill,
+as a `lesson` or a `decision`, in the control worktree. The entry and `brain/index.md` are committed
+on `agent/<phase-id>` and reach `dev` in the control pull request.
 
 ## How implementing mode ends
 

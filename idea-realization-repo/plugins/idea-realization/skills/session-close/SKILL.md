@@ -10,7 +10,7 @@ pass, and is the **only** procedure that may mark a phase complete.
 
 **Two repositories.** The code is in the product worktree, on `agent/<phase-id>` in the product
 repository; the session record and review records are in the control worktree, on
-`agent/<phase-id>` in the control repository (see `session-start` and `docs/two-repositories.md`).
+`agent/<phase-id>` in the control repository (see `session-start` and `${CLAUDE_PLUGIN_ROOT}/docs/two-repositories.md`).
 A repository with no `.idea-realization/product.yaml` has only the control branch: skip every
 product step below.
 
@@ -66,7 +66,9 @@ conditions, and completes nothing. Never invent or retroactively claim a phase, 
 this against a phase that already closed earlier in the conversation.
 
 Run every step of the `checkpoint` skill now, against the current state, so `## Phase` through
-`## Unresolved` reflect both repositories as they stand at close.
+`## Unresolved` reflect the work as it stands at close. The `checkpoint` skill records the control
+repository only: add the product branch's tip and the product verification output to the record
+yourself.
 
 ## 2. Rebase both branches and run the verification
 
@@ -155,7 +157,7 @@ git -C <product worktree> push --force-with-lease -u origin agent/<phase-id>
 
 `--force-with-lease` is needed only because step 2 rebased a branch you may have pushed before; it
 applies to your own `agent/<phase-id>` branch and never to the integration branch or the release branch, which
-are never force-pushed (`protocol.md`, section 10).
+are never force-pushed (`${CLAUDE_PLUGIN_ROOT}/docs/protocol.md`, section 10).
 
 In each worktree, reuse the open pull request for `agent/<phase-id>` if there is one
 (`gh pr view agent/<phase-id> --json number,state,headRefOid`), and otherwise open one against
@@ -284,7 +286,7 @@ the rebase is resolved as `session-start` describes: keep both sides.
 
 **The product merge has already landed, so it is never reverted.** Until the completion commit
 lands, the phase stays `active` with its code merged; follow *A merged phase without its completion
-record* in `docs/two-repositories.md` if the push keeps failing.
+record* in `${CLAUDE_PLUGIN_ROOT}/docs/two-repositories.md` if the push keeps failing.
 
 An unclaimed session completes nothing, however clean its review: there is no phase line to write.
 If any condition does not hold, the phase stays open with a `next_action` that names exactly what
@@ -293,7 +295,7 @@ remains, including anything the review surfaced. Closing honestly incomplete is 
 ## 8. Clean up
 
 Run the check once more, with the product checkout configured: it must not report the phase as
-stranded. If it does, follow *A stranded phase* in `docs/two-repositories.md` before doing
+stranded. If it does, follow *A stranded phase* in `${CLAUDE_PLUGIN_ROOT}/docs/two-repositories.md` before doing
 anything else.
 
 Remove both worktrees and both local `agent/<phase-id>` branches, copying any ignored content out

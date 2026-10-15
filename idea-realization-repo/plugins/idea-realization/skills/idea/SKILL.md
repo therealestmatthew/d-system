@@ -116,5 +116,10 @@ CLAUDE_PLUGIN_OPTION_PRIORITY_PATH='${user_config.priority_path}' \
 uv run "${CLAUDE_PLUGIN_ROOT}/scripts/check.py" --feature ideas
 ```
 
+Then commit the idea files the writer changed, and nothing else, directly on the integration branch
+in the primary checkout, and push at once: an idea commit is bookkeeping. If the push is rejected,
+`git pull --rebase origin <integration branch>` and push again. From a session working in a
+worktree, record and commit the idea in the primary checkout, never on the worktree's branch.
+
 Then tell the person the identifier and title of what was recorded or changed, and the writer's
 output line. A bare "done" makes them open a file to find out what was written.

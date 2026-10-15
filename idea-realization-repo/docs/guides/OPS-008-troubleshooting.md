@@ -7,7 +7,7 @@ kind: operation
 status: draft
 owner: repository-owner
 created: '2026-10-14'
-updated: '2026-10-14'
+updated: '2026-10-15'
 systems: []
 depends_on: []
 ---
@@ -38,9 +38,10 @@ Two rules apply to every entry:
      `uv run plugins/idea-realization/scripts/check.py`.
   3. If the check now rejects your claim (overlap with an active peer's systems, deliverables or
      dependency chain, `max_active` reached, or another developer's workstream), the claim is not
-     safe: confirm `git status --short` shows nothing else, drop your claim commit
-     (`git reset --hard origin/dev`, which then discards only your local claim) and choose another
-     phase.
+     safe: confirm `git status --short` shows nothing and `git log --oneline origin/dev..HEAD`
+     shows only your claim commit, then drop it (`git reset --hard origin/dev`, which then
+     discards only your local claim) and choose another phase. If the log shows another unpushed
+     commit, such as an idea, drop only the claim with `git revert` or ask for help instead.
   4. If the check passes, `git push`.
 
   Source: the `session-start` skill, step 3.
@@ -130,16 +131,36 @@ Two rules apply to every entry:
   `CLAUDE_PROJECT_DIR`, then `git rev-parse --show-toplevel`. When this repository sits inside
   another git repository's working tree, or Claude Code was started in another directory, the
   later sources resolve to the wrong place.
-- **Fix.** Set the root explicitly, from this repository's root:
+- **Fix.** Set the root on the one command, from this repository's root:
 
   ```bash
-  export IDEA_REALIZATION_ROOT=$PWD
-  uv run plugins/idea-realization/scripts/paths.py    # the first line, root:, must be this repository
+  IDEA_REALIZATION_ROOT=$PWD uv run plugins/idea-realization/scripts/paths.py   # root: must be this repository
   ```
 
-  or pass `--root <path>` to the one command.
+  or pass `--root <path>` to the one command. Do not `export` the variable: with it set in the
+  shell, `uv run pytest` fails, because the plugin tests build their own temporary repositories
+  (`OPS-001`, section 7). If you exported it, `unset IDEA_REALIZATION_ROOT` before running tests.
 
 ## Pull requests and CI
+
+### `gh` cannot reach the repository
+
+- **Symptom.** `gh repo view --json nameWithOwner`, run in a worktree, fails: `gh` is not logged in,
+  its token expired, the organization's single sign-on is not authorized for it, or you have no
+  access to the repository.
+- **Cause.** `session-close` merges through a pull request only when that command succeeds. When it
+  fails, the skill takes the local fallback meant for repositories with no GitHub remote: a
+  `git merge --no-ff` in the primary checkout and a push. Control `dev` has no pull-request rule,
+  so that push would land a merge with no pull request; product `dev` refuses it.
+- **Fix.**
+  1. Before `session-close`, run `gh auth status` and `gh repo view --json nameWithOwner` in both
+     worktrees. Fix the login (`gh auth login`, or authorize the token for the organization's
+     single sign-on) until both succeed.
+  2. If `gh` fails partway through `session-close` and the repository's `origin` is on GitHub,
+     stop the close and fix `gh` first. Do not let it take the local fallback.
+  3. If you lack write access to either repository, ask the owner for it.
+
+  Source: the `session-close` skill, step 6, "Which path applies".
 
 ### A pull request merge is refused by `--match-head-commit`
 
@@ -217,7 +238,7 @@ Two rules apply to every entry:
      `@aws-cdk/core:permissionsBoundary` context key and the aspect that sets the path. Import a
      person-created role with `Role.fromRoleArn(this, id, arn, { mutable: false })`.
   3. A service-linked role (for example OpenSearch Serverless's) is created once by the sandbox
-     administrator (`aws/README.md`, setup step 5).
+     administrator (`aws/README.md`, "Setup (the owner, once per sandbox account)", step 5).
   4. Deploy again with `aws-deploy`.
 
   Source: `aws/README.md`, "What the deploy role can and cannot deploy".
@@ -244,7 +265,8 @@ Two rules apply to every entry:
   deploy profile's own credentials. The account is bootstrapped once by an administrator; if it is
   not, ask the owner.
 
-  Source: `aws/README.md`, "CDK".
+  Source: `aws/README.md`, "What the deploy role can and cannot deploy", "CDK settings every
+  product stack uses", item 1.
 
 ### Bedrock model access is denied
 

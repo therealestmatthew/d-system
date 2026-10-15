@@ -313,11 +313,13 @@ in CI; commit `cdk.context.json`.
 
    Never use the `default` profile for either; the wrapper refuses it, and refuses one profile used
    for both roles.
-2. Tell the repository which profiles to use, outside version control: set
-   `IDEA_REALIZATION_AWS_READ_PROFILE`, `IDEA_REALIZATION_AWS_DEPLOY_PROFILE` and
-   `IDEA_REALIZATION_AWS_REGION` in your shell, or the plugin options `aws_read_profile`,
-   `aws_deploy_profile` and `aws_region`. `uv run plugins/idea-realization/scripts/paths.py`
-   prints what this machine resolves.
+2. Tell the repository which profiles to use, outside version control: set `aws_read_profile`,
+   `aws_deploy_profile` and, if the team's region in `.idea-realization/project.yaml` does not
+   apply, `aws_region` in `.idea-realization/local.yaml` (gitignored; `ONBOARDING.md`, section 3,
+   step 6). The environment variables `IDEA_REALIZATION_AWS_READ_PROFILE`,
+   `IDEA_REALIZATION_AWS_DEPLOY_PROFILE` and `IDEA_REALIZATION_AWS_REGION` override it for one
+   shell. `uv run plugins/idea-realization/scripts/paths.py show` prints what this machine resolves
+   and where each value came from.
 3. Remove any default or ambient credentials (the machine rule above), then check:
    `uv run python tools/check_aws_machine.py --probe` must print OK.
 4. Check the profiles: `tools/aws-sandbox whoami` prints both profile names and the read role's

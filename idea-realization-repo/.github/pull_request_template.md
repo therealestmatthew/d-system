@@ -9,7 +9,7 @@ phase section below.
 
 - Phase id and title:
 - Plan (code and title):
-- Idea ids (six digits), if any:
+- Idea ids (`<handle>-NNNNNN`), if any:
 - Unclaimed work (no phase): yes / no. If yes, say what was asked and by whom.
 
 ## What changed

@@ -7,7 +7,7 @@ kind: operation
 status: draft
 owner: repository-owner
 created: '2026-10-14'
-updated: '2026-10-14'
+updated: '2026-10-15'
 systems: []
 depends_on: []
 ---
@@ -49,7 +49,8 @@ has been rebased onto `origin/dev`; session-close does this before it opens the 
 
 ## 2. Before any work, and after any bookkeeping
 
-- Always `git pull` origin `dev` before starting any work, in both repositories.
+- Always `git pull --rebase origin dev` before starting any work, in both repositories. `--rebase`
+  keeps an unpushed bookkeeping commit on top instead of making a merge commit on `dev`.
 - Push right after a claim commit or any other bookkeeping commit. An unpushed claim is invisible
   to the rest of the team and lets two people claim the same phase.
 
@@ -112,7 +113,8 @@ A repository with no GitHub remote (tests, local-only use) uses a local fallback
 
 For each demo release:
 
-1. The owner opens a pull request from `dev` to `main` and merges it with a merge commit. In the
+1. The release developer (`OPS-006`, "Roles") opens a pull request from `dev` to `main`; the
+   owner merges it with a merge commit. In the
    product repository the `verify` check must pass first. Only the owner can merge into `main`;
    GitHub refuses the merge for anyone else (section 9, "Who merges to `main`").
 2. Tag the merge on `main` with an annotated tag: `demo-rc-<n>`, counting up from 1.

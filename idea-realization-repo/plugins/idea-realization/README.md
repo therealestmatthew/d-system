@@ -148,7 +148,9 @@ Every path a script reads is resolved by `scripts/paths.py`, in this order:
    `.idea-realization/product.yaml`, which supplies `product_remote` (`remote`) and
    `product_github` (`github`) when the team tracks them. `scripts/project.py show` prints the
    rest of `project.yaml`;
-6. the default in `.claude-plugin/plugin.json`.
+6. the default in `.claude-plugin/plugin.json`. `integration_branch` declares an empty default,
+   so a saved option nobody changed does not outrank `project.yaml`; with nothing set, it is
+   `main`.
 
 A value that starts with `REPLACE-WITH-` is a placeholder and counts as unset.
 
@@ -163,7 +165,7 @@ Relative paths resolve against the repository root: `--root`, then `IDEA_REALIZA
 | `priority_path` | `ideas/priority.yaml` |
 | `backlog_path` | `backlog/backlog.yaml` |
 | `docs_root` | `docs` |
-| `integration_branch` | `main` |
+| `integration_branch` | empty; `main` when nothing else sets it |
 | `worktree_dir` | `../<repository>-worktrees`, with `<repository>` replaced by the primary checkout's directory name; resolved against the primary checkout from any worktree |
 | `triage_search` | `docs` |
 | `exempt_files` | none |

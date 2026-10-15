@@ -64,9 +64,20 @@ GitHub name.
 6. **Wait for `verify` to pass** on both pushes (`gh run list --repo <org>/<product>`). A ruleset
    can only require a check GitHub has already seen report.
 
-7. **Apply the rulesets** with the control repository's `tools/github/apply_rulesets.sh`, using the
-   product repository and the product rulesets it describes in its usage line. The result, as the
-   branching guide (`docs/guides/OPS-001-branching-and-ci.md`) states it:
+7. **Apply the rulesets** with the control repository's `tools/github/apply_rulesets.sh`. The script
+   refuses unless your own `.idea-realization/local.yaml`, in the control repository's primary
+   checkout, names this repository: set `product_github` to `<org>/<product>` and `product_remote`
+   to its git URL there first, as step 10 describes for every developer. Then, from the control
+   repository's root:
+
+   ```bash
+   tools/github/apply_rulesets.sh <org>/<product> product user:<owner-login>
+   ```
+
+   The third argument is required: it names the only account (`user:<login>`) or team
+   (`team:<org>/<team-slug>`) allowed to merge into `main`. Use the same value as for the control
+   repository (the branching guide, `docs/guides/OPS-001-branching-and-ci.md`, section 9). The
+   result, as that guide states it:
    - `dev`: no force-push or deletion; pull request required with 0 approvals (the gating review
      is the approval); required status check `verify`; merge commits only.
    - `main`: the same, restricted to the repository owner.

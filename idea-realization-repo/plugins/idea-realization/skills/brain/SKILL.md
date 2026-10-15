@@ -57,7 +57,10 @@ uv run "${CLAUDE_PLUGIN_ROOT}/scripts/brain.py" new <kind> --title "<one line>" 
 ```
 
 Write the body as a reader in a month would need it: what, why, and what it rules out. Commit the
-entry and `index.md` together.
+entry and `index.md` together, on the branch of the work it came from: in a phase, the control
+worktree's `agent/<phase-id>` before `session-close`, so the entry reaches the integration branch
+in the control pull request; outside a phase, an `agent/<handle>-<slug>` branch through a pull
+request.
 
 ## What this skill never does
 

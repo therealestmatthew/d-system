@@ -21,7 +21,7 @@ An idea moves through nine stages. Each gate marked *owner* is a decision only t
 | 5. Review | The plan is reviewed adversarially (`plugins/idea-realization/docs/plan-review.md`) | owner approves the plan |
 | 6. Phase | The plan's phases enter `backlog/backlog.yaml`, one session each | owner orders `next_up` |
 | 7. Build | A developer claims a phase and builds it in a product worktree (`session-start`) | |
-| 8. Gating review | `phase-adversary` reviews the diff; `review-judge` runs in shadow (`session-close`) | a passing gating verdict |
+| 8. Gating review | `phase-adversary` reviews the diff in `session-close`; `review-judge` runs in shadow only when another session dispatches it (`OPS-004`) | a passing gating verdict |
 | 9. Merge and record | The product branch merges, the control records merge, the phase is completed | |
 
 The protocol behind each stage is in `plugins/idea-realization/docs/`. How the control and product
@@ -30,45 +30,55 @@ developers share it is in `plugins/idea-realization/docs/workstreams.md`.
 
 ## Quickstart
 
+The full first-day order, with the reasons for it, is `ONBOARDING.md` section 3. In short, from
+the repository's root:
+
 ```bash
 uv sync --extra dev
 git config core.hooksPath tools/git-hooks             # pre-commit: private-content check + repository check
-uv run pytest                                         # repository and plugin tests
-uv run plugins/idea-realization/scripts/check.py      # ideas, backlog, documents, catalog
+uv run plugins/idea-realization/scripts/scaffold.py --feature all   # never overwrites a file
 uv run plugins/idea-realization/scripts/doctor.py     # every scaffolded file unchanged
+uv run plugins/idea-realization/scripts/check.py      # ideas, backlog, documents, catalog
+uv run pytest                                         # repository and plugin tests
 ```
 
-After cloning, run the plugin's scaffold once. It recreates the gitignored
-`.idea-realization/staging/` directory, which `doctor.py` otherwise reports missing; it never
-overwrites a file that exists:
+The scaffold recreates the gitignored `.idea-realization/staging/` directory. Without it,
+`doctor.py` reports the directory as `absent`, which is not a failure.
 
-```bash
-uv run plugins/idea-realization/scripts/scaffold.py --feature all
-```
+None of these commands needs `IDEA_REALIZATION_ROOT`; the scripts find the root from git. Do not
+`export` it: with it set, `uv run pytest` fails, because the plugin tests build their own temporary
+repositories (`OPS-001`, section 7).
 
 Per machine, never committed:
 
 - **The private-content deny-list**, `.private/deny-list.txt`: one identifier per line (client
   names, account ids, anything that must never reach a tracked file). The pre-commit hook fails any
   commit that contains one. Ask the owner for the team's list.
-- **The product repository's local path**, and **the AWS sandbox read profile, deploy profile and
-  region**: plugin options or environment variables, listed by
-  `uv run plugins/idea-realization/scripts/paths.py`. The AWS values are
-  `IDEA_REALIZATION_AWS_READ_PROFILE`, `IDEA_REALIZATION_AWS_DEPLOY_PROFILE` and
-  `IDEA_REALIZATION_AWS_REGION`; `aws/README.md` sets up the two roles behind them.
+- **The machine's configuration**, `.idea-realization/local.yaml` (copied from
+  `local.example.yaml`): your handle, the repository URLs, the product repository's local path
+  (`product_root`), and the AWS sandbox read profile, deploy profile and region
+  (`aws_read_profile`, `aws_deploy_profile`, `aws_region`). An `IDEA_REALIZATION_<KEY>`
+  environment variable overrides a value there. Do not set plugin options for this team.
+  `uv run plugins/idea-realization/scripts/paths.py show` prints each value and where it came
+  from; `aws/README.md` sets up the two roles behind the AWS profiles.
 
-Start a Claude Code session in this repository, with the plugin loaded and the product worktree
-reachable:
+Start a Claude Code session in this repository with the plugin loaded:
 
 ```bash
-claude --plugin-dir plugins/idea-realization --add-dir <path to your product worktree>
+claude --plugin-dir plugins/idea-realization
 ```
+
+When `session-start` has created a product worktree for your phase, add it to the session with
+`/add-dir <path to the product worktree>`.
 
 ## Agents
 
 | Agent | Role |
 |---|---|
 | `idea-planner` | Drafts a requirement and plan pair from an accepted track |
+| `plan-adversary` | Adversarial reviewer of a plan and its requirement |
+| `phase-splitter` | Turns an approved plan into a proposal of backlog phases and batch stages |
+| `batch-validator` | Checks a proposed batch before it runs |
 | `phase-adversary` | Gating reviewer of a phase's diff |
 | `validator-code` | Judges a diff against its requirement and runs the verification commands |
 | `validator-check` | Runs the mechanical gates and reports each result |

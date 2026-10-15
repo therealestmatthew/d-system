@@ -21,7 +21,7 @@ every machine:
 schema_version: 1
 name: <product name>
 integration_branch: dev
-ci_workflow: none
+ci_workflow: product-ci.yml   # none only for a product with no CI
 ```
 
 What differs per machine, or must not be tracked, is configured in each machine's untracked

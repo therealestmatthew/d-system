@@ -7,7 +7,7 @@ kind: operation
 status: draft
 owner: repository-owner
 created: '2026-10-14'
-updated: '2026-10-14'
+updated: '2026-10-15'
 systems: []
 depends_on: []
 ---
@@ -31,15 +31,25 @@ day is organised around it is in the team workflow (`OPS-005`).
 
 ## Starting
 
-Run `/start` and choose Planning. Then, in the control repository's primary checkout on `dev`:
+Run `/idea-realization:start` and choose Planning. Then, in the control repository's primary checkout on `dev`:
 
-1. `git pull` origin `dev`, before any work (`OPS-001`, section 2).
+1. `git pull --rebase origin dev`, before any work (`OPS-001`, section 2).
 2. Load what is already decided: the `brain` skill, or
    `uv run plugins/idea-realization/scripts/brain.py load --kind decision`.
 
 Plugin skills are invoked as `/idea-realization:<skill>`. Agents are dispatched by name as their own
-agent type, never as a general-purpose agent. Scripts run from the control repository's root with
-`IDEA_REALIZATION_ROOT` set to it (`OPS-008`, "check.py reports files from the wrong repository").
+agent type, never as a general-purpose agent. Run scripts from the control repository's root; they find it from git and need no
+`IDEA_REALIZATION_ROOT`. If a script resolves the wrong root, set the variable on that one
+command (`IDEA_REALIZATION_ROOT=$PWD uv run ...`) and never `export` it: an exported value makes
+`uv run pytest` fail (`OPS-001`, section 7; `OPS-008`, "check.py reports files from the wrong
+repository").
+
+Terms used below. A **gate** is a stop where the owner decides before the work goes on; the
+partition step has four (the **open-set gate**, when open ideas exist, then gates 1, 2 and 3). A
+**disposition** is a recorded answer: for a track, whether it becomes a new plan or amends a named
+one; for a review finding, how it was settled. An **altitude** is the level a plan review looks at:
+the plan, each phase, or each later-added phase (step 7). `<staging_dir>` is the gitignored
+working directory that `paths.py` prints.
 
 ## Where the work is committed
 
@@ -139,7 +149,7 @@ developer. Phases it split go back to `plan-adversary` at the phase altitude bef
 ### 9. Batch validation
 
 Dispatch the `batch-validator` agent with the root, the batch id and, for a proposal, the
-candidate files from step 8. It runs, from the root with `IDEA_REALIZATION_ROOT` set to it:
+candidate files from step 8. It runs, from the control repository's root:
 
 ```bash
 uv run plugins/idea-realization/scripts/batch_check.py --backlog-path <candidate backlog> \

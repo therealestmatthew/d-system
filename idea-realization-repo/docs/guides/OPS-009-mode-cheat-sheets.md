@@ -7,7 +7,7 @@ kind: operation
 status: draft
 owner: repository-owner
 created: '2026-10-14'
-updated: '2026-10-14'
+updated: '2026-10-15'
 systems: []
 depends_on: []
 ---
@@ -18,18 +18,21 @@ One page per mode: the skills, agents and commands in the order they are used, o
 full procedure for each mode is in its guide: planning (`OPS-002`), implementing (`OPS-003`),
 validating (`OPS-004`). Where this page and a guide differ, the guide wins.
 
-**Entry point for every mode: `/start`.** It asks which mode you are in and points to that mode's
+**Entry point for every mode: `/idea-realization:start`.** It asks which mode you are in and points to that mode's
 first step.
 
 Plugin skills are invoked as `/idea-realization:<skill>`. Agents are dispatched by name, never as a
-general-purpose agent. Run every script from the control repository's root with
-`IDEA_REALIZATION_ROOT` set to it (`OPS-008`, "check.py reports files from the wrong repository").
+general-purpose agent. Run scripts from the control repository's root; they find it from git and need no
+`IDEA_REALIZATION_ROOT`. If a script resolves the wrong root, set the variable on that one
+command (`IDEA_REALIZATION_ROOT=$PWD uv run ...`) and never `export` it: an exported value makes
+`uv run pytest` fail (`OPS-001`, section 7; `OPS-008`, "check.py reports files from the wrong
+repository").
 
 ## Planning
 
 From a captured idea to approved plans, registered phases and validated, assigned batches.
 
-1. `/start`, choose Planning.
+1. `/idea-realization:start`, choose Planning.
 2. `uv run plugins/idea-realization/scripts/brain.py load --kind decision` — read what is already decided.
 3. `/idea-realization:idea` — record each new idea as given.
 4. `/idea-realization:idea-triage <id>` — scout one open idea for related material; moves it to triaged.
@@ -50,8 +53,8 @@ validated and assigned.
 
 From a claimed phase to merged code and a completion record.
 
-1. `/start`, choose Implementing.
-2. `git pull` on control `dev` — always, before any work.
+1. `/idea-realization:start`, choose Implementing.
+2. `git pull --rebase origin dev` on control `dev` — always, before any work.
 3. `/idea-realization:brain` — load the context the phase needs.
 4. `/idea-realization:backlog` — run the check, see the ready queue and its Conflicts column, orient on one phase.
 5. `/idea-realization:session-start` — claim the phase (push the claim at once), cut both `agent/<phase-id>` branches and worktrees.
@@ -59,10 +62,11 @@ From a claimed phase to merged code and a completion record.
 7. Build and test in the product worktree; commit narrow diffs; rebase onto `origin/dev`, never merge it in.
 8. `/idea-realization:checkpoint` — record progress as often as useful; it never completes a phase.
 9. `bedrock-claude-advisor` agent — model ids, quotas and request shapes for Bedrock calls; read-only.
-10. `aws-deploy` agent — deploy the change to the sandbox; the only agent that creates or updates AWS resources.
-11. `aws-ops-inspector` agent — read the deployed resources' state and errors.
-12. `/idea-realization:session-close` — verification, gating review, pull requests merged with merge commits, completion record on control `dev`.
-13. `/idea-realization:brain` — record what the next session should know, as a `lesson` or `decision`.
+10. `aws-infra-reviewer` agent — review any infrastructure diff before it is deployed (`OPS-004`).
+11. `aws-deploy` agent — deploy the change to the sandbox; the only agent that creates or updates AWS resources.
+12. `aws-ops-inspector` agent — read the deployed resources' state and errors.
+13. `/idea-realization:brain` — record what the next session should know, as a `lesson` or `decision`, in the control worktree before closing.
+14. `/idea-realization:session-close` — verification, gating review, pull requests merged with merge commits, completion record on control `dev`.
 
 Done when: the phase is complete and merged in both repositories, or handed back with an exact
 `next_action`.
@@ -71,10 +75,10 @@ Done when: the phase is complete and merged in both repositories, or handed back
 
 Reviewing plans, branches, infrastructure and spend. Reviewers change nothing.
 
-1. `/start`, choose Validating.
+1. `/idea-realization:start`, choose Validating.
 2. `phase-adversary` agent — the gating review of a phase's product diff; `session-close` dispatches it with the phase's acceptance.
 3. `validator-code` agent — gating review instead, for a narrow code change judged against one requirement.
-4. `review-judge` agent — shadow judge of the same diff; its verdict is recorded and decides nothing.
+4. `review-judge` agent — shadow judge of the same diff, dispatched by a session other than the one that built the phase (`session-close` does not run it); its verdict is recorded and decides nothing.
 5. `validator-check` agent — runs the mechanical checks on a branch.
 6. `aws-infra-reviewer` agent — reviews every infrastructure diff for security, reliability, cost and fit.
 7. `aws-cost-optimizer` agent — daily spend and idle-resource review (`OPS-007`).

@@ -7,7 +7,7 @@ kind: operation
 status: draft
 owner: repository-owner
 created: '2026-10-14'
-updated: '2026-10-14'
+updated: '2026-10-15'
 systems: []
 depends_on: []
 ---
@@ -23,8 +23,17 @@ Branching and CI rules are in the branching and CI guide (`OPS-001`). The AWS bo
 
 ## Roles
 
-Roles, not names. The owner assigns a person to each role before the freeze and records the
-assignment where the team agrees (ask the owner where).
+Roles, not names. The owner assigns a person to each role before the freeze. Until the owner fills
+it in, the assignment is open:
+
+| Role | Assigned to |
+|---|---|
+| Release developer | *not yet assigned: the owner decides* |
+| Validator | *not yet assigned: the owner decides* |
+| Sandbox administrator | *not yet assigned: the owner decides* |
+| Presenter | *not yet assigned: the owner decides* |
+
+The owner records the handles here, or names the place the team uses instead.
 
 | Role | Does |
 |---|---|
@@ -66,9 +75,8 @@ After the freeze, only fixes reach `dev`, and each fix is a backlog phase:
 3. A developer claims it, builds it and closes it with `session-close` as usual. The gating review
    is never skipped.
 
-The team kit plan also proposes a demo-day shortcut (an `agent/<handle>-hotfix-<slug>` branch that
-skips the claim but not the review). That shortcut is not a ruling yet: ask the owner before using
-it.
+A demo-day shortcut has been proposed (an `agent/<handle>-hotfix-<slug>` branch that skips the
+claim but not the review). It is not a ruling yet: ask the owner before using it.
 
 ## Release candidate
 

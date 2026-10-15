@@ -18,9 +18,28 @@ under `docs/guides/`; where this page and those differ, they win.
   with `session-close`. A passing **gating review** by an agent is the approval to merge.
 - Both repositories have `dev` (where work integrates) and `main` (one merge per demo release).
   Phase branches reach `dev` through a pull request merged with a merge commit.
-- Every session starts with `/start`, which asks for the mode: **Planning**, **Implementing** or
-  **Validating**.
+- Every session starts with the `start` skill, which asks for the mode: **Planning**,
+  **Implementing** or **Validating**.
 - Demo: 2026-11-05. Code freeze: 2026-11-03.
+
+**Skill names.** The plugin's skills are invoked as `/idea-realization:<skill>`, for example
+`/idea-realization:start`. Some setups also list them by the short name (`/start`); both run the
+same skill. The guides use the full form.
+
+**Terms used on this page.**
+
+- **Bookkeeping**: the small commits that go directly on control `dev` with no pull request: claims,
+  completions, ideas and workstream claims (`OPS-001`, section 3), and your own entry in
+  `docs/systems.yaml` (step 5 below).
+- **Lock table**: `backlog/backlog.yaml` on control `dev`. A phase marked `active` there is locked
+  by whoever claimed it.
+- **Gating review**: the agent review in `session-close` whose passing verdict is the approval to
+  merge. A **shadow** review runs alongside it and is recorded, but decides nothing.
+- **Owner** has several meanings. *The owner* is the person who runs the team's repositories,
+  assigns work and approves plans and merges to `main`. `owner:` on a backlog phase is the developer
+  it is assigned to; `repository-owner` there means it is not assigned to anyone yet. A workstream's
+  owner is the developer who claimed it. `owner:` on a document or system names the key in
+  `docs/systems.yaml`'s `owners` map that is responsible for it.
 
 ## 2. The two repositories
 
@@ -58,11 +77,20 @@ request rules are the branching and CI guide (`OPS-001`).
 Do these once per machine, in order. Run `uv run python tools/onboard_check.py` at any point: it
 prints `OK` or `FIX` for each item it can check, and the commands it cannot run for you.
 
+Run every command below from the control repository's root. The scripts find the root from git, so
+none of them needs `IDEA_REALIZATION_ROOT`. Do not `export` that variable: with it set,
+`uv run pytest` fails (`OPS-001`, section 7). When a script does resolve the wrong root, set it on
+that one command only (`OPS-008`, "check.py reports files from the wrong repository").
+
 1. **Install the tools.**
    - `uv` (Python runs through it).
    - Claude Code (the `claude` command).
    - The GitHub CLI `gh`, then `gh auth login` to the team's GitHub organization.
-     `session-close` opens and merges pull requests with `gh`, so it must be authenticated.
+     `session-close` opens and merges pull requests with `gh`, so it must be authenticated, and you
+     need write access to both repositories. Ask the owner if you were not invited to both.
+   - The AWS CLI v2 (the `aws` command). `tools/aws-sandbox` runs it; you never run `aws` yourself.
+   - Node.js and npm, for product work: each product worktree runs `npm install`, and
+     `tools/aws-sandbox synth` runs the CDK CLI from the product's `node_modules`.
 2. **Clone the control repository** and enter it. Ask the owner for its URL.
 
    ```bash
@@ -72,7 +100,13 @@ prints `OK` or `FIX` for each item it can check, and the commands it cannot run 
    uv sync --extra dev
    ```
 
-3. **Set your git identity and register it.**
+3. **Install the git hooks**: `git config core.hooksPath tools/git-hooks`. The pre-commit hook
+   runs the private-content check and the repository check. Install it before your first commit.
+4. **Get the deny-list from the owner** and save it as `.private/deny-list.txt` in the primary
+   checkout. `.private/` is gitignored. The pre-commit hook refuses any commit that contains a
+   listed identifier; without the list it skips that part of the check. Never copy anything from
+   it into a tracked file.
+5. **Set your git identity and register it.**
    - `git config user.email <your work email>`.
    - Add yourself to the `owners` map in `docs/systems.yaml`: the key is your handle (lower-case
      letters and digits, starting with a letter, at most 16 characters), the value lists your git
@@ -86,23 +120,24 @@ prints `OK` or `FIX` for each item it can check, and the commands it cannot run 
      ```
 
    - Check it: `uv run plugins/idea-realization/scripts/identity.py` prints your handle.
-   - Commit only `docs/systems.yaml` directly on control `dev` and push at once (it is
-     bookkeeping; `OPS-001`, section 3).
-4. **Install the git hooks**: `git config core.hooksPath tools/git-hooks`. The pre-commit hook
-   runs the private-content check and the repository check.
-5. **Get the deny-list from the owner** and save it as `.private/deny-list.txt` in the primary
-   checkout. `.private/` is gitignored. The pre-commit hook refuses any commit that contains a
-   listed identifier. Never copy anything from it into a tracked file.
+   - Commit only `docs/systems.yaml` directly on control `dev` and push at once (the team workflow
+     guide, `OPS-005`, section 1, treats it as bookkeeping). The hook from step 3 checks this
+     commit. If the push is rejected, someone pushed first: `git pull --rebase origin dev`, then
+     push again.
 6. **Write your machine's configuration**: copy `.idea-realization/local.example.yaml` to
-   `.idea-realization/local.yaml` (gitignored) and fill it in.
-   - `product_root`: the absolute path of your product checkout (step 9).
+   `.idea-realization/local.yaml` (gitignored) and fill in what you know now. Delete a key you do
+   not set; a value left as `REPLACE-WITH-...` counts as unset, and `onboard_check` reports it.
+   - `handle`: your handle from step 5.
    - `control_remote` and `product_remote`: the git URLs of the two repositories, from the owner.
      They are not tracked, because a URL can name a confidential organization.
      `control_github` and `product_github` (`<org>/<repo>`) are optional and used by `gh`.
-   - `aws_read_profile`, `aws_deploy_profile` and, if the team's default does not apply,
-     `aws_region` (step 8).
-   - `handle`: your handle from step 3.
+   - `product_root` comes in step 9, and `aws_read_profile`, `aws_deploy_profile` and, if the
+     team's default does not apply, `aws_region` in step 8. Leave them until then.
 
+   `local.yaml` is where this team keeps every per-machine value. A value is taken from, in order:
+   a command-line flag, an `IDEA_REALIZATION_<KEY>` environment variable, `local.yaml`, a saved
+   plugin option, the tracked `.idea-realization/project.yaml` or `product.yaml`, and the plugin's
+   default. Do not set plugin options for this team: `local.yaml` covers every key.
    `uv run plugins/idea-realization/scripts/paths.py show` prints every value and where it came
    from.
 7. **Scaffold and check the repository.**
@@ -113,17 +148,22 @@ prints `OK` or `FIX` for each item it can check, and the commands it cannot run 
    uv run plugins/idea-realization/scripts/check.py                    # must exit 0
    ```
 
-8. **Set up AWS** as `aws/README.md`, "Setup (each developer)", describes: two named profiles in
-   `~/.aws/config`, one for the read role and one for the deploy role, and no `default` profile or
-   `AWS_` credential variables. Then:
+8. **Set up AWS** as `aws/README.md`, "Setup (each developer, once per machine)", describes: two
+   named profiles in `~/.aws/config`, one for the read role and one for the deploy role, and no
+   `default` profile or `AWS_` credential variables. Ask the owner what your sandbox login profile
+   is (the `source_profile` the two profiles use). Put the two profile names, and the region if it
+   differs from the team's, in `local.yaml`. Then:
 
    ```bash
    uv run python tools/check_aws_machine.py --probe   # must print OK
    tools/aws-sandbox whoami                           # both profile names and the read identity
    ```
 
-9. **Clone the product repository** beside the control repository, set `product_root` to it, and
-   check that it is the right repository:
+   If your sandbox access is not ready yet, skip this step and come back to it before your first
+   phase that touches AWS. Until then `onboard_check` keeps reporting `FIX` for the AWS lines; that
+   is expected, and the rest of the checklist does not depend on it.
+9. **Clone the product repository** beside the control repository, set `product_root` in
+   `local.yaml` to it, and check that it is the right repository:
 
    ```bash
    git clone <product repository URL> ../<product>
@@ -137,10 +177,15 @@ prints `OK` or `FIX` for each item it can check, and the commands it cannot run 
     claude --plugin-dir plugins/idea-realization
     ```
 
-    The session banner prints your handle, the product checkout and the days to the demo. A line
-    marked `(unavailable: ...)` is a setup step above that is not done yet.
+    There is no product worktree yet, so nothing else is added at launch. `session-start` creates
+    one when you claim a phase, and you add it then with `/add-dir` (section 6, step 4).
 
-Finish by running `uv run python tools/onboard_check.py` until it exits 0.
+    The session banner prints your handle, the product checkout and the days to the demo. A line
+    that reads `not set on this machine` or `(unavailable: ...)` is a setup step above that is not
+    done yet.
+
+Finish by running `uv run python tools/onboard_check.py` until it exits 0, or until only the AWS
+lines of step 8 remain while your sandbox access is pending.
 
 ## 4. Claim your workstream
 
@@ -152,18 +197,24 @@ uv run plugins/idea-realization/scripts/workstreams.py show
 uv run plugins/idea-realization/scripts/workstreams.py claim <id>
 ```
 
-`claim` only edits the file. Commit `docs/workstreams.yaml` directly on control `dev` and push at
-once. If the push is rejected, someone pushed first: `git pull --rebase`, run
+If `show` prints nothing, the owner has not defined any workstreams yet; there is nothing to claim,
+and you can come back to this section when they have.
+
+`claim` only edits the file. It rewrites the whole file, so a comment in it is dropped; that line
+in your diff is expected. Commit `docs/workstreams.yaml` directly on control `dev` and push at
+once. If the push is rejected, someone pushed first: `git pull --rebase origin dev`, run
 `workstreams.py check`, and push again if the workstream is still yours.
 
 In the first two days each workstream writes the interface documents the others build against.
 The team workflow guide (`OPS-005`, sections 1 and 2) has the details.
 
-## 5. Pick a mode with `/start`
+## 5. Pick a mode with `/idea-realization:start`
 
-Before every session, in the primary checkout of each repository: `git pull origin dev`.
+Before every session, in the primary checkout of each repository: `git pull --rebase origin dev`.
+The `--rebase` keeps an unpushed bookkeeping commit on top instead of making a merge commit on
+`dev`.
 
-Then run `/start` and choose a mode:
+Then run `/idea-realization:start` and choose a mode:
 
 | Mode | What you do | Guide |
 |---|---|---|
@@ -177,7 +228,7 @@ The one-page versions are in `docs/guides/OPS-009-mode-cheat-sheets.md`.
 
 The implementing-mode guide (`OPS-003`) is the full procedure. In short:
 
-1. `/start`, choose Implementing. Pull `dev` first.
+1. `/idea-realization:start`, choose Implementing. Pull `dev` first.
 2. `/idea-realization:backlog`: see the ready queue. Take the first ready phase in `next_up` order,
    preferring one assigned to you (`owner: <your handle>`).
 3. `/idea-realization:session-start`: it asks before claiming, then commits the claim directly on
@@ -190,20 +241,21 @@ The implementing-mode guide (`OPS-003`) is the full procedure. In short:
 6. `/idea-realization:checkpoint` whenever you stop: it records progress and never marks the phase
    complete.
 7. Run every command in the phase's `verification` list and keep the real output.
-8. `/idea-realization:session-close`: rebases both branches, runs the gating review, opens and
+8. Record what the next session should know in the brain (`/idea-realization:brain`), in the
+   control worktree, so the entry reaches `dev` in the phase's control pull request.
+9. `/idea-realization:session-close`: rebases both branches, runs the gating review, opens and
    merges both pull requests with merge commits, and writes the completion commit on control
    `dev`.
-9. Record what the next session should know in the brain (`/idea-realization:brain`).
 
 ## 7. Daily cadence
 
-Morning sync (pull `dev`, the owner ranks and assigns, agents claim), midday integration (rebase
+Morning sync (pull `dev` with `--rebase`, the owner ranks and assigns, agents claim), midday integration (rebase
 open branches onto `origin/dev`, merge what passed review), end of day (close or checkpoint every
 phase, record learnings in the brain, push every branch). The table is in `OPS-005`, section 5.
 
 ## 8. Rules that bite
 
-- **Pull `origin dev` before any work, and push right after any claim or bookkeeping commit.** An
+- **Pull `origin dev` with `--rebase` before any work, and push right after any claim or bookkeeping commit.** An
   unpushed claim lets two people claim the same phase.
 - **Every session works in its own worktree.** The primary checkout's branch is never switched.
 - **Never write a confidential identifier into a tracked file**: no organization or client name,

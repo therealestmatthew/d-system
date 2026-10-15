@@ -7,7 +7,7 @@ kind: operation
 status: draft
 owner: repository-owner
 created: '2026-10-14'
-updated: '2026-10-14'
+updated: '2026-10-15'
 systems: []
 depends_on: []
 ---
@@ -86,9 +86,10 @@ A phase is claimed on control `dev`, which holds the backlog (`backlog/backlog.y
 table every developer reads. The `session-start` skill carries these steps; this is what it does
 and why.
 
-1. **Pull first.** In the primary checkout, `git pull` origin `dev` before any work. A claim made
+1. **Pull first.** In the primary checkout, `git pull --rebase origin dev` before any work. A claim made
    against a stale backlog is checked against stale claims.
-2. **One phase per agent.** An agent id is `<handle>/<agent>`. Each agent holds at most one active
+2. **One phase per agent.** An agent id is `<handle>/agent-<name>`, for example
+   `ana/agent-builder`; the backlog schema requires the `agent-` prefix. Each agent holds at most one active
    phase. One developer may run several agents, each with its own phase.
 3. **The active-claim limit is `max_active: 15`** across the whole team. The check refuses a claim
    past it; a refusal means choosing other work, never waiting.
@@ -116,9 +117,10 @@ The `session-close` skill carries this sequence; `OPS-001` has the git and GitHu
 
 1. Run the phase's verification. Rebase both feature branches onto `origin/dev` and re-run the
    check and the product's tests.
-2. The **gating review** (`phase-adversary`, with `review-judge` in shadow) judges the product diff
+2. The **gating review** (`phase-adversary`) judges the product diff
    against the phase's control documents. Every finding is fixed or explicitly accepted; a fix is
-   re-reviewed.
+   re-reviewed. `session-close` does not run the shadow `review-judge`; another session may
+   (`OPS-004`, "The shadow judge").
 3. **A passing gating review is the approval** to merge both the product branch and the control
    branch. There is no separate per-merge approval.
 4. The session pushes both feature branches and opens a pull request to `dev` in each repository.
@@ -130,7 +132,8 @@ The `session-close` skill carries this sequence; `OPS-001` has the git and GitHu
 
 If the completion push fails after the product merged, retry the pull, rebase and push. Never revert
 the product merge. Until the completion commit lands, the phase stays `active`
-(`two-repositories.md`, "A stranded phase").
+(`plugins/idea-realization/docs/two-repositories.md`, "A merged phase without its completion
+record").
 
 ## 5. Daily cadence
 
@@ -138,7 +141,7 @@ the product merge. Until the completion commit lands, the phase stays `active`
 |---|---|
 | Morning, 15 minutes | Sync: everyone pulls `dev` in both repositories. Render the backlog; the owner ranks `next_up` and assigns phases (`owner: <handle>`); each developer's agents claim. Name any interface that is about to change. |
 | Midday | Integrate: rebase every open feature branch onto `origin/dev` in both repositories and re-run the check and tests, so conflicts surface while they are small. Merge whatever has passed its gating review. |
-| End of day | Each phase is either closed through `session-close` or checkpointed with the `checkpoint` skill, so the next session can resume from the record. Record what the day decided or learned in the brain (`brain.py new <kind>`, committed with `brain/index.md`). Push every feature branch, so no work exists only on one machine. The owner reviews the day's ideas. |
+| End of day | Each phase is either closed through `session-close` or checkpointed with the `checkpoint` skill, so the next session can resume from the record. Record what the day decided or learned in the brain (`brain.py new <kind>`, committed with `brain/index.md` on the phase's control branch before `session-close`, or on an `agent/<handle>-<slug>` branch through a pull request). Push every feature branch, so no work exists only on one machine. The owner reviews the day's ideas. |
 
 Ideas raised during the day are recorded with the `idea` skill, not folded into the phase in
 progress.
