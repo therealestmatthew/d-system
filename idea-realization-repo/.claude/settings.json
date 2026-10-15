@@ -118,6 +118,18 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --quiet --script \"${CLAUDE_PROJECT_DIR}/plugins/idea-realization/scripts/session_banner.py\" --hook",
+            "timeout": 60
+          }
+        ]
+      }
     ]
   }
 }
