@@ -21,6 +21,7 @@ import {
   symlinkSync,
   writeFileSync,
 } from 'node:fs'
+import { createServer as createNetServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { extname, join } from 'node:path'
 import { build, createServer, type Connect, type Plugin, type ViteDevServer } from 'vite'
@@ -74,6 +75,34 @@ function naiveRoute(prefix: string, directory: string): Plugin {
   }
 }
 
+// Every port a dev server in this file has listened on. Each server gets a port no earlier one used:
+// `fetch` keeps a closed server's connection pooled under its origin for a moment, and the next
+// server's first request on the same origin can be sent down it and fail with "other side closed".
+const usedPorts = new Set<number>()
+
+// A loopback port the system reports free and no earlier server here has used. Vite reads port 0 as
+// unset and starts from 5173, so the port is found here and passed to it with `strictPort`.
+async function freshPort(): Promise<number> {
+  for (;;) {
+    const port = await new Promise<number>((resolve, reject) => {
+      const probe = createNetServer()
+      probe.once('error', reject)
+      probe.listen(0, '127.0.0.1', () => {
+        const address = probe.address()
+        probe.close(() =>
+          address !== null && typeof address === 'object'
+            ? resolve(address.port)
+            : reject(new Error('no probe address')),
+        )
+      })
+    })
+    if (!usedPorts.has(port)) {
+      usedPorts.add(port)
+      return port
+    }
+  }
+}
+
 afterEach(async () => {
   await Promise.all(servers.splice(0).map((server) => server.close()))
   rmSync(base, { recursive: true, force: true })
@@ -89,7 +118,15 @@ async function serve(
     logLevel: 'silent',
     plugins,
     optimizeDeps: { noDiscovery: true },
-    server: { port: 0, hmr: false, fs: { allow: [root] } },
+    // Bound to the address the request goes to: Vite's default host is `localhost`, which a CI
+    // runner resolves to `::1`, leaving nothing listening on 127.0.0.1.
+    server: {
+      host: '127.0.0.1',
+      port: await freshPort(),
+      strictPort: true,
+      hmr: false,
+      fs: { allow: [root] },
+    },
   })
   servers.push(server)
   await server.listen()
