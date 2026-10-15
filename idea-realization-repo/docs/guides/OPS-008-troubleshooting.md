@@ -154,8 +154,9 @@ Two rules apply to every entry:
 - **Cause.** `session-close` merges a repository whose `origin` is on GitHub only through a pull
   request. When `gh` cannot reach it, the skill stops and reports; it never falls back to a local
   merge for a GitHub origin, because control `dev` has no pull-request rule and would accept a
-  merge with no pull request. The local `git merge --no-ff` fallback is only for a repository
-  whose `origin` is not on GitHub.
+  merge with no pull request. The local `git merge --no-ff` is only for a repository with no
+  `origin`, or whose `origin` is a path on this machine: `product.py merge-route --checkout
+  <worktree>` prints `local` for those, and treats every other `origin` as hosted.
 - **Fix.**
   1. Fix the login: `gh auth login`, or authorize the token for the organization's single sign-on.
      Check with `gh auth status` and `gh repo view --json nameWithOwner` in both worktrees.
