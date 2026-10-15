@@ -1,0 +1,116 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyOutsideTheProductFunctionChanges",
+      "Effect": "Deny",
+      "Action": [
+        "lambda:CreateFunction",
+        "lambda:UpdateFunctionCode",
+        "lambda:UpdateFunctionConfiguration",
+        "lambda:PublishVersion",
+        "lambda:CreateAlias",
+        "lambda:UpdateAlias",
+        "lambda:DeleteAlias",
+        "lambda:DeleteFunction",
+        "lambda:InvokeFunction",
+        "lambda:AddPermission",
+        "lambda:RemovePermission",
+        "lambda:CreateFunctionUrlConfig",
+        "lambda:UpdateFunctionUrlConfig",
+        "lambda:PutFunctionEventInvokeConfig",
+        "lambda:UpdateFunctionEventInvokeConfig"
+      ],
+      "NotResource": "arn:aws:lambda:*:*:function:REPLACE_WITH_PRODUCT_NAME-*"
+    },
+    {
+      "Sid": "DenyOutsideTheProductStateMachineChanges",
+      "Effect": "Deny",
+      "Action": [
+        "states:CreateStateMachine",
+        "states:UpdateStateMachine",
+        "states:DeleteStateMachine",
+        "states:PublishStateMachineVersion",
+        "states:CreateStateMachineAlias",
+        "states:UpdateStateMachineAlias",
+        "states:StartExecution",
+        "states:StartSyncExecution"
+      ],
+      "NotResource": "arn:aws:states:*:*:stateMachine:REPLACE_WITH_PRODUCT_NAME-*"
+    },
+    {
+      "Sid": "DenyOutsideTheProductStackChanges",
+      "Effect": "Deny",
+      "Action": [
+        "cloudformation:CreateStack",
+        "cloudformation:UpdateStack",
+        "cloudformation:DeleteStack",
+        "cloudformation:CreateChangeSet",
+        "cloudformation:ExecuteChangeSet",
+        "cloudformation:CancelUpdateStack",
+        "cloudformation:ContinueUpdateRollback",
+        "cloudformation:RollbackStack",
+        "cloudformation:SetStackPolicy",
+        "cloudformation:UpdateTerminationProtection"
+      ],
+      "NotResource": "arn:aws:cloudformation:*:*:stack/REPLACE_WITH_PRODUCT_NAME-*/*"
+    },
+    {
+      "Sid": "DenyOutsideTheProductBuildProjectChanges",
+      "Effect": "Deny",
+      "Action": [
+        "codebuild:CreateProject",
+        "codebuild:UpdateProject",
+        "codebuild:DeleteProject",
+        "codebuild:StartBuild",
+        "codebuild:StartBuildBatch",
+        "codebuild:RetryBuild",
+        "codebuild:RetryBuildBatch"
+      ],
+      "NotResource": "arn:aws:codebuild:*:*:project/REPLACE_WITH_PRODUCT_NAME-*"
+    },
+    {
+      "Sid": "DenyOutsideTheProductAmplifyChanges",
+      "Effect": "Deny",
+      "Action": [
+        "amplify:UpdateApp",
+        "amplify:DeleteApp",
+        "amplify:UpdateBranch",
+        "amplify:DeleteBranch",
+        "amplify:CreateDeployment",
+        "amplify:StartDeployment"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:ResourceTag/project": "REPLACE_WITH_PRODUCT_NAME"
+        }
+      }
+    },
+    {
+      "Sid": "DenyOutsideTheProductAmplifyProjectTag",
+      "Effect": "Deny",
+      "Action": [
+        "amplify:TagResource",
+        "amplify:UntagResource"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "ForAnyValue:StringEquals": {
+          "aws:TagKeys": [
+            "project"
+          ]
+        },
+        "StringNotEquals": {
+          "aws:ResourceTag/project": "REPLACE_WITH_PRODUCT_NAME"
+        }
+      }
+    },
+    {
+      "Sid": "DenyOutsideTheProductAmplifyBuildJobs",
+      "Effect": "Deny",
+      "Action": "amplify:StartJob",
+      "Resource": "*"
+    }
+  ]
+}

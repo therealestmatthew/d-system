@@ -94,9 +94,9 @@ that date (and of any renamed or transferred one), in the form
 unless opted in. Read the repository's OIDC settings (or GitHub's subject-claim preview API) and use
 the value it shows. The policy below uses the immutable form.
 
-**3. Create the `ci-deploy` role (administrator).** Attach a customer-managed policy made from
-`aws/iam/deploy-policy.json` (region already replaced). Maximum session duration one hour. Trust
-policy:
+**3. Create the `ci-deploy` role (administrator).** Attach two customer-managed policies made from
+`aws/iam/deploy-policy.json` and `aws/iam/deploy-scope-policy.json` (placeholders already replaced),
+the same pair the deploy role carries. Maximum session duration one hour. Trust policy:
 
 ```json
 {

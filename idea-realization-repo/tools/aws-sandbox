@@ -8,7 +8,8 @@ Every AWS command an agent runs goes through this wrapper. A PreToolUse hook
 **The IAM roles are the boundary.** The sandbox has two roles (`aws/README.md`): a read-only role
 and a deploy role whose IAM rights are limited to `/app/` roles (create, change and delete them
 when they carry the permission boundary, pass them to the product's services, read them) plus
-listing roles and reading the boundary and AWS managed policies,
+listing roles and reading the boundary and AWS managed policies, which changes only the
+product's own functions, state machines, stacks, build projects and Amplify apps,
 and which has no Organizations, account or billing permissions. Each machine has one
 named profile for each. The wrapper picks the profile by mode, so a `read` command runs with the
 read-only role and cannot change anything, whatever it asks for:
@@ -29,8 +30,10 @@ The wrapper:
   two profiles are the same;
 - refuses a command that passes its own `--profile`, `--region` or `--endpoint-url`, and removes
   credential environment variables, so the configured profile is the only source of credentials;
-- in `read` mode, runs only read operations (describe, list, get and the like) and refuses the
-  read operations that reveal a secret.
+- in `read` mode, runs only read operations (describe, list, get and the like);
+- in every mode, refuses the read operations whose response carries a secret or environment
+  variables (SECRET_OPERATIONS; `aws/README.md`, "Reads the guard refuses", says what to read
+  instead).
 
 Usage:
 
@@ -85,15 +88,33 @@ SECRET_OPERATIONS = {
     ("ssm", "get-parameter"),
     ("ssm", "get-parameters"),
     ("ssm", "get-parameters-by-path"),
+    ("ssm", "get-parameter-history"),
     ("ecr", "get-login-password"),
     ("ecr", "get-authorization-token"),
     ("sts", "get-session-token"),
     ("sts", "get-federation-token"),
     ("iam", "get-credential-report"),
     ("kms", "decrypt"),
+    ("ec2", "get-password-data"),
+    # Responses that carry environment variables (and, for Amplify, basic-auth credentials and
+    # build-trigger URLs; for Cognito, client secrets). aws/README.md says what to read instead.
     ("lambda", "get-function-configuration"),
     ("lambda", "get-function"),
-    ("ec2", "get-password-data"),
+    ("lambda", "list-functions"),
+    ("lambda", "list-versions-by-function"),
+    ("amplify", "get-app"),
+    ("amplify", "list-apps"),
+    ("amplify", "get-branch"),
+    ("amplify", "list-branches"),
+    ("amplify", "get-webhook"),
+    ("amplify", "list-webhooks"),
+    ("ecs", "describe-task-definition"),
+    ("ecs", "describe-tasks"),
+    ("codebuild", "batch-get-projects"),
+    ("codebuild", "batch-get-builds"),
+    ("codebuild", "batch-get-build-batches"),
+    ("cognito-idp", "describe-user-pool-client"),
+    ("cognito-idp", "describe-identity-provider"),
 }
 FORBIDDEN_OPTIONS = ("--profile", "--region", "--endpoint-url")
 # cdk options that would name a credential source; refused in synth mode.

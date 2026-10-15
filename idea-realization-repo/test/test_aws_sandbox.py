@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+import re
 from importlib.machinery import SourceFileLoader
 from importlib.util import module_from_spec, spec_from_loader
 from pathlib import Path
@@ -98,12 +100,43 @@ def test_caller_cannot_choose_profile_region_or_endpoint(option: str) -> None:
     assert "set by the wrapper" in refused("read", "s3", "ls", option)
 
 
-@pytest.mark.parametrize("service,operation", [("secretsmanager", "get-secret-value"),
-                                               ("ssm", "get-parameter"),
-                                               ("lambda", "get-function")])
+@pytest.mark.parametrize("service,operation", [
+    ("secretsmanager", "get-secret-value"), ("ssm", "get-parameter"),
+    ("ssm", "get-parameter-history"), ("lambda", "get-function"),
+    ("lambda", "list-functions"), ("lambda", "list-versions-by-function"),
+    ("amplify", "get-app"), ("amplify", "list-apps"), ("amplify", "get-branch"),
+    ("amplify", "list-branches"), ("amplify", "get-webhook"), ("amplify", "list-webhooks"),
+    ("ecs", "describe-task-definition"), ("ecs", "describe-tasks"),
+    ("codebuild", "batch-get-projects"), ("codebuild", "batch-get-builds"),
+    ("codebuild", "batch-get-build-batches"), ("cognito-idp", "describe-user-pool-client"),
+    ("cognito-idp", "describe-identity-provider")])
 def test_secret_reads_refused(service: str, operation: str) -> None:
     assert "reveals a secret" in refused("read", service, operation)
     assert "reveals a secret" in refused("write", service, operation)
+
+
+#: AWS CLI operation names that do not follow the IAM action's words split at capitals.
+CLI_NAMES = {"amplify:GetWebHook": "get-webhook", "amplify:ListWebHooks": "list-webhooks"}
+#: Guard actions the wrapper refuses some other way: not a read operation in read mode, and
+#: denied to the deploy role (DenyEveryIamChangeOutsideAppRoles) in write mode.
+NOT_A_READ = {"iam:GenerateCredentialReport"}
+
+
+def test_the_wrapper_refuses_every_read_the_guard_policy_denies() -> None:
+    """Each action in the read guard's secret deny has a SECRET_OPERATIONS entry, so the wrapper
+    refuses it before the role does (and in write mode, where no guard policy applies)."""
+    guard = json.loads((WRAPPER.parent.parent / "aws" / "iam" / "read-only-guard-policy.json")
+                       .read_text(encoding="utf-8"))
+    statement = next(s for s in guard["Statement"] if s["Sid"] == "DenySecretAndCredentialReads")
+    missing = []
+    for action in statement["Action"]:
+        if action in NOT_A_READ:
+            continue
+        service, name = action.split(":")
+        operation = CLI_NAMES.get(action, re.sub(r"(?<!^)(?=[A-Z])", "-", name).lower())
+        if (service, operation) not in sandbox.SECRET_OPERATIONS:
+            missing.append((service, operation))
+    assert not missing, missing
 
 
 def test_configure_refused() -> None:

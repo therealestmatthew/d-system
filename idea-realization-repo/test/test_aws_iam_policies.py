@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import fnmatch
 import json
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +32,63 @@ CONDITION_KEY_ACTIONS: dict[str, set[str]] = {
     "bedrock:InferenceProfileArn": {"bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"},
     "kms:ViaService": {"kms:Decrypt"},
     "kms:ResourceAliases": {"kms:Decrypt"},
+    # The tag keys are global names, but each action sets them only where the reference lists
+    # them (list_amplify.html, read 2026-10-15). amplify:StartJob and amplify:CreateApp do not
+    # carry aws:ResourceTag, so the scope policy names neither under a tag condition.
+    "aws:ResourceTag/${TagKey}": {
+        "amplify:UpdateApp", "amplify:DeleteApp", "amplify:UpdateBranch", "amplify:DeleteBranch",
+        "amplify:CreateDeployment", "amplify:StartDeployment", "amplify:TagResource",
+        "amplify:UntagResource"},
+    "aws:TagKeys": {"amplify:TagResource", "amplify:UntagResource"},
+}
+#: Condition keys under the aws: prefix that every request carries; the others above are checked.
+GLOBAL_KEYS = {"aws:RequestedRegion", "aws:ResourceAccount"}
+
+PRODUCT = "REPLACE_WITH_PRODUCT_NAME"
+SCOPE_POLICY = "deploy-scope-policy.json"
+
+#: Write actions whose only resource type, per the Service Authorization Reference
+#: (list_lambda.html, list_stepfunctions.html, list_cloudformation.html, list_codebuild.html,
+#: read 2026-10-15), is the one the name prefix names: a Lambda function (with its versions and
+#: aliases), a state machine (with its versions and aliases), a CloudFormation stack, a CodeBuild
+#: project. A NotResource deny on any other action would also refuse that action's other
+#: resource types (event source mappings, layers, activities, stack sets, fleets).
+NAME_SCOPED_ACTIONS: dict[str, set[str]] = {
+    f"arn:aws:lambda:*:*:function:{PRODUCT}-*": {
+        "lambda:AddPermission", "lambda:CreateAlias", "lambda:CreateFunction",
+        "lambda:CreateFunctionUrlConfig", "lambda:DeleteAlias", "lambda:DeleteFunction",
+        "lambda:InvokeFunction", "lambda:PublishVersion", "lambda:PutFunctionEventInvokeConfig",
+        "lambda:RemovePermission", "lambda:UpdateAlias", "lambda:UpdateFunctionCode",
+        "lambda:UpdateFunctionConfiguration", "lambda:UpdateFunctionEventInvokeConfig",
+        "lambda:UpdateFunctionUrlConfig"},
+    f"arn:aws:states:*:*:stateMachine:{PRODUCT}-*": {
+        "states:CreateStateMachine", "states:CreateStateMachineAlias",
+        "states:DeleteStateMachine", "states:PublishStateMachineVersion",
+        "states:StartExecution", "states:StartSyncExecution", "states:UpdateStateMachine",
+        "states:UpdateStateMachineAlias"},
+    f"arn:aws:cloudformation:*:*:stack/{PRODUCT}-*/*": {
+        "cloudformation:CancelUpdateStack", "cloudformation:ContinueUpdateRollback",
+        "cloudformation:CreateChangeSet", "cloudformation:CreateStack",
+        "cloudformation:DeleteStack", "cloudformation:ExecuteChangeSet",
+        "cloudformation:RollbackStack", "cloudformation:SetStackPolicy",
+        "cloudformation:UpdateStack", "cloudformation:UpdateTerminationProtection"},
+    f"arn:aws:codebuild:*:*:project/{PRODUCT}-*": {
+        "codebuild:CreateProject", "codebuild:DeleteProject", "codebuild:RetryBuild",
+        "codebuild:RetryBuildBatch", "codebuild:StartBuild", "codebuild:StartBuildBatch",
+        "codebuild:UpdateProject"},
+}
+
+#: Reads that return environment variables, a client secret, a build-trigger URL or a parameter
+#: value in their response (AWS API references, read 2026-10-15; see aws/README.md).
+SECRET_BEARING_READS = {
+    "lambda:GetFunction", "lambda:GetFunctionConfiguration", "lambda:ListFunctions",
+    "lambda:ListVersionsByFunction",
+    "amplify:GetApp", "amplify:ListApps", "amplify:GetBranch", "amplify:ListBranches",
+    "amplify:GetWebHook", "amplify:ListWebHooks",
+    "ecs:DescribeTaskDefinition", "ecs:DescribeTasks",
+    "codebuild:BatchGetProjects", "codebuild:BatchGetBuilds", "codebuild:BatchGetBuildBatches",
+    "cognito-idp:DescribeUserPoolClient", "cognito-idp:DescribeIdentityProvider",
+    "ssm:GetParameterHistory",
 }
 
 
@@ -54,11 +112,15 @@ def arn_like(value: str, pattern: str) -> bool:
         fnmatch.fnmatchcase(v, p) for v, p in zip(value_parts, pattern_parts, strict=True))
 
 
-def conditions_match(condition: dict[str, dict[str, Any]], context: dict[str, str]) -> bool:
-    """Evaluate a Condition block against a request context of single-valued keys, with the
-    missing-key rules of the IAM user guide ("Condition operators"): a missing key does not
-    match a positive operator, matches a negated one, and Null tests presence."""
-    for operator, keys in condition.items():
+def conditions_match(condition: dict[str, dict[str, Any]],
+                     context: Mapping[str, str | list[str]]) -> bool:
+    """Evaluate a Condition block against a request context, with the missing-key rules of the
+    IAM user guide ("Condition operators"): a missing key does not match a positive operator,
+    matches a negated one, and Null tests presence. A list value is a multivalued key (such as
+    aws:TagKeys); a ForAnyValue operator matches it when any one value matches."""
+    for qualified, keys in condition.items():
+        for_any = qualified.startswith("ForAnyValue:")
+        operator = qualified.removeprefix("ForAnyValue:")
         for key, wanted in keys.items():
             values = [wanted] if isinstance(wanted, str) else list(wanted)
             present = key in context
@@ -68,10 +130,17 @@ def conditions_match(condition: dict[str, dict[str, Any]], context: dict[str, st
                 continue
             negated = "Not" in operator
             if not present:
-                if not negated:
+                if not negated or for_any:
                     return False
                 continue
-            actual = context[key]
+            value = context[key]
+            if isinstance(value, list):
+                assert for_any and not negated, f"{key} is multivalued; model ForAnyValue only"
+                if not any(conditions_match({operator: {key: wanted}}, {key: one})
+                           for one in value):
+                    return False
+                continue
+            actual = value
             if operator in ("StringEquals", "StringNotEquals"):
                 hit = actual in values
             elif operator in ("StringLike", "StringNotLike"):
@@ -229,8 +298,11 @@ def test_condition_keys_are_used_only_on_actions_that_support_them(name: str) ->
             continue
         for operator, keys in statement.get("Condition", {}).items():
             for key in keys:
-                if key.startswith("aws:"):
-                    continue  # global keys
+                if key in GLOBAL_KEYS:
+                    continue
+                for tag_key in ("aws:ResourceTag/", "aws:RequestTag/"):
+                    if key.startswith(tag_key):
+                        key = tag_key + "${TagKey}"
                 supported = CONDITION_KEY_ACTIONS.get(key)
                 assert supported is not None, f"{name} {sid}: add {key} to CONDITION_KEY_ACTIONS"
                 unsupported = set(actions(statement)) - supported
@@ -294,3 +366,108 @@ def test_foundation_models_are_invoked_only_through_a_profile() -> None:
         assert statement["Effect"] == "Deny"
         assert statement["Resource"] == "arn:aws:bedrock:*::foundation-model/*"
         assert statement["Condition"] == {"Null": {"bedrock:InferenceProfileArn": "true"}}
+
+
+# m5: reads that put an environment variable or a secret in the transcript.
+
+def test_read_guard_denies_reads_that_return_environment_variables_or_secrets() -> None:
+    denied = set(actions(policy("read-only-guard-policy.json")["DenySecretAndCredentialReads"]))
+    assert not SECRET_BEARING_READS - denied, SECRET_BEARING_READS - denied
+
+
+# m6: the deploy role, and every role it creates, changes only the product's own resources.
+
+def scope_statements(name: str) -> dict[str, dict[str, Any]]:
+    return {sid: s for sid, s in policy(name).items() if sid.startswith("DenyOutsideTheProduct")}
+
+
+def test_scope_denies_are_in_the_deploy_scope_policy_and_the_boundary() -> None:
+    """The boundary carries the same denies, or the deploy role could create an /app/ role
+    without them, pass it to a function and change other resources through that function."""
+    scope = scope_statements(SCOPE_POLICY)
+    assert scope, "the deploy scope policy has no DenyOutsideTheProduct statements"
+    assert set(policy(SCOPE_POLICY)) == set(scope), "the scope policy holds only scope denies"
+    assert scope_statements("app-permissions-boundary.json") == scope
+
+
+def test_name_prefix_denies_name_only_the_resource_type_their_actions_take() -> None:
+    for sid, statement in scope_statements(SCOPE_POLICY).items():
+        assert statement["Effect"] == "Deny"
+        if "NotResource" not in statement:
+            continue
+        assert "Condition" not in statement, sid
+        prefix = statement["NotResource"]
+        assert prefix in NAME_SCOPED_ACTIONS, f"{sid}: {prefix} is not a verified name prefix"
+        unverified = set(actions(statement)) - NAME_SCOPED_ACTIONS[prefix]
+        assert not unverified, f"{sid}: {unverified} may take another resource type"
+
+
+def test_the_escalation_paths_named_in_the_review_are_scoped() -> None:
+    scoped = {a for s in scope_statements(SCOPE_POLICY).values() for a in actions(s)}
+    assert {"lambda:UpdateFunctionCode", "lambda:UpdateFunctionConfiguration",
+            "lambda:PublishVersion", "lambda:UpdateAlias", "states:UpdateStateMachine",
+            "cloudformation:UpdateStack", "cloudformation:ExecuteChangeSet",
+            "codebuild:StartBuild", "codebuild:UpdateProject", "amplify:UpdateApp",
+            "amplify:StartJob"} <= scoped
+
+
+ACCOUNT = "111122223333"
+TAGGED = {"aws:ResourceTag/project": PRODUCT}
+
+
+def function(name: str) -> str:
+    return f"arn:aws:lambda:us-east-1:{ACCOUNT}:function:{name}"
+
+
+def app(app_id: str = "d1a2b3c4") -> str:
+    return f"arn:aws:amplify:us-east-1:{ACCOUNT}:apps/{app_id}"
+
+
+@pytest.mark.parametrize("name", [SCOPE_POLICY, "app-permissions-boundary.json"])
+@pytest.mark.parametrize(("action", "resource", "context", "denied"), [
+    ("lambda:UpdateFunctionCode", function(f"{PRODUCT}-ingest"), {}, False),
+    ("lambda:UpdateFunctionCode", function("billing-export"), {}, True),
+    # A tag does not let the deploy role into a function outside the prefix.
+    ("lambda:UpdateFunctionConfiguration", function("billing-export"), TAGGED, True),
+    ("lambda:UpdateAlias", function(f"{PRODUCT}-ingest:live"), {}, False),
+    ("lambda:PublishVersion", function("billing-export"), {}, True),
+    ("lambda:CreateFunction", function("unprefixed-handler"), {}, True),
+    ("lambda:InvokeFunction", function(f"{PRODUCT}-ingest"), {}, False),
+    ("states:UpdateStateMachine",
+     f"arn:aws:states:us-east-1:{ACCOUNT}:stateMachine:{PRODUCT}-claims", {}, False),
+    ("states:UpdateStateMachine",
+     f"arn:aws:states:us-east-1:{ACCOUNT}:stateMachine:nightly-reports", {}, True),
+    ("states:StartExecution",
+     f"arn:aws:states:us-east-1:{ACCOUNT}:stateMachine:nightly-reports", {}, True),
+    ("cloudformation:UpdateStack",
+     f"arn:aws:cloudformation:us-east-1:{ACCOUNT}:stack/{PRODUCT}-claims/1a2b", {}, False),
+    ("cloudformation:ExecuteChangeSet",
+     f"arn:aws:cloudformation:us-east-1:{ACCOUNT}:stack/CDKToolkit/1a2b", {}, True),
+    ("codebuild:StartBuild",
+     f"arn:aws:codebuild:us-east-1:{ACCOUNT}:project/{PRODUCT}-web", {}, False),
+    ("codebuild:StartBuild", f"arn:aws:codebuild:us-east-1:{ACCOUNT}:project/legacy", {}, True),
+    # Amplify app ids are random, so Amplify is scoped by the project tag.
+    ("amplify:UpdateApp", app(), TAGGED, False),
+    ("amplify:UpdateApp", app(), {}, True),
+    ("amplify:UpdateApp", app(), {"aws:ResourceTag/project": "other"}, True),
+    ("amplify:StartDeployment", f"{app()}/branches/main", TAGGED, False),
+    ("amplify:StartDeployment", f"{app()}/branches/main", {}, True),
+    # The project tag cannot be put on, or taken off, another app.
+    ("amplify:TagResource", app(), {"aws:TagKeys": ["project"]}, True),
+    ("amplify:TagResource", app(), {**TAGGED, "aws:TagKeys": ["project", "owner"]}, False),
+    ("amplify:TagResource", app(), {"aws:TagKeys": ["owner"]}, False),
+    ("amplify:UntagResource", app(), {"aws:ResourceTag/project": "other",
+                                      "aws:TagKeys": ["project"]}, True),
+    # The product's app has no repository connection, so no build job is started at all.
+    ("amplify:StartJob", f"{app()}/branches/main/jobs/1", TAGGED, True),
+])
+def test_changes_outside_the_product_are_denied(
+        name: str, action: str, resource: str, context: dict[str, str | list[str]],
+        denied: bool) -> None:
+    """Every Deny in the scope policy and the boundary, for a call in the sandbox region."""
+    context = {"aws:RequestedRegion": SANDBOX, **context}
+    denies = [sid for sid, s in policy(name).items()
+              if s["Effect"] == "Deny" and statement_covers(s, action)
+              and statement_names(s, resource)
+              and conditions_match(s.get("Condition", {}), context)]
+    assert bool(denies) is denied, denies

@@ -18,7 +18,12 @@ what is deployed, whether it is healthy, and what its logs and metrics say — w
 2. Inventory what the question concerns: stacks and their status, functions, services, tasks,
    endpoints, queues, tables, buckets, Step Functions state machines, Bedrock Knowledge Bases and
    guardrails, Cognito user pools, the Amplify app and its deployments — with
-   `tools/aws-sandbox read ...`.
+   `tools/aws-sandbox read ...`. The reads that return environment variables or secrets are
+   refused (`lambda get-function`, `list-functions`, `amplify get-app`, `get-branch`,
+   `list-apps`, `list-branches` and the others in `aws/README.md`, "Reads the guard refuses"):
+   find functions and the Amplify app with `read cloudformation describe-stack-resources`, read
+   their configuration from `read cloudformation get-template`, and their health from metrics
+   and logs.
 3. Check health: stack events, alarm states, recent errors in the logs
    (`tools/aws-sandbox read logs filter-log-events ...`, `read logs tail ...`, or a Logs Insights
    query with `read logs start-query ...` and `read logs get-query-results ...`), throttles and

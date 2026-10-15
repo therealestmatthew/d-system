@@ -5073,14 +5073,17 @@ warnings.</p>
 <div class="ui-table-wrap"><table class="ui-table"><thead><tr><th scope="col">Role</th><th scope="col">Used by</th><th scope="col">Policies</th></tr></thead>
 <tbody>
 <tr><td><strong>Read</strong></td><td><code>tools/aws-sandbox read</code> and <code>whoami</code>; the agents <code>aws-infra-reviewer</code>, <code>aws-ops-inspector</code>, <code>bedrock-claude-advisor</code>, <code>aws-cost-optimizer</code></td><td>AWS managed <code>ReadOnlyAccess</code>, plus <code>iam/read-only-guard-policy.json</code>, plus (sandbox only) <code>iam/read-sandbox-data-policy.json</code></td></tr>
-<tr><td><strong>Deploy</strong></td><td><code>tools/aws-sandbox write</code> and <code>exec</code>; the agent <code>aws-deploy</code> only</td><td><code>iam/deploy-policy.json</code></td></tr>
+<tr><td><strong>Deploy</strong></td><td><code>tools/aws-sandbox write</code> and <code>exec</code>; the agent <code>aws-deploy</code> only</td><td><code>iam/deploy-policy.json</code>, plus <code>iam/deploy-scope-policy.json</code></td></tr>
 <tr><td><strong>Application roles</strong> under <code>/app/</code></td><td>The product&#x27;s own services at run time (Step Functions, Lambda, the Knowledge Base, Textract notifications, Cognito, CloudTrail, flow logs, Amplify)</td><td>Whatever the stack grants, capped by the permission boundary <code>iam/app-permissions-boundary.json</code></td></tr>
 </tbody></table></div>
 <p><code>tools/aws-sandbox synth</code> uses no role at all (see &quot;Synthesizing without credentials&quot;).</p>
 <ul>
 <li><code>read-only-guard-policy.json</code> is a deny list added on top of <code>ReadOnlyAccess</code>: it refuses the
-reads that reveal a secret or a credential (secret values, decrypted parameters, login tokens,
-function environments), decrypting with KMS other than through S3 or DynamoDB, and the calls
+reads that reveal a secret or a credential (secret values, parameter values and their history,
+login tokens, the environment variables of functions, Amplify apps and branches, CodeBuild
+projects and builds and ECS task definitions and tasks, Amplify basic-auth credentials and
+webhook URLs, Cognito app-client and identity-provider secrets; see &quot;Reads the guard refuses&quot;
+below), decrypting with KMS other than through S3 or DynamoDB, and the calls
 that cost money or run code (model invocation, agent and flow invocation, Knowledge Base
 retrieval, guardrail application, Textract analysis, Lambda invocation, assuming another role).</li>
 <li><code>read-sandbox-data-policy.json</code> lets the read role decrypt tenant data through S3 and DynamoDB
@@ -5108,12 +5111,61 @@ account&#x27;s <strong>baseline</strong> CloudTrail trail; turning off Config or
 Lock governance retention; reading secret values; invoking a model through any inference
 profile other than a US geographic one (<code>us.*</code>); and any regional action outside the sandbox
 region, except the cross-region model routing of a US inference profile.</li>
+<li><code>deploy-scope-policy.json</code> limits the deploy role&#x27;s changes to the product&#x27;s own resources. It
+is a separate policy because <code>deploy-policy.json</code> is close to the 6,144-character limit for a
+managed policy. It denies creating, changing, publishing, invoking and deleting a Lambda
+function, a Step Functions state machine, a CloudFormation stack or a CodeBuild project whose
+name does not start with <code>&lt;product&gt;-</code>; changing, deploying to or deleting an Amplify app or
+branch that does not carry the tag <code>project=&lt;product&gt;</code>; adding or removing the <code>project</code> tag on
+any other Amplify resource; and starting an Amplify build job at all. <code>&lt;product&gt;</code> is the value
+that replaces <code>REPLACE_WITH_PRODUCT_NAME</code>. See &quot;The deploy role changes only the product&#x27;s own
+resources&quot; below.</li>
 <li><code>app-permissions-boundary.json</code> caps every <code>/app/</code> role at what the deploy role itself may do,
 minus secret reads, key policy changes and key deletion, Object Lock changes, turning off the
-audit trail, and assuming roles. A role the deploy role creates therefore never has more power
+audit trail, and assuming roles. It repeats every statement of <code>deploy-scope-policy.json</code>, so a
+role the stack creates cannot change another function, state machine, stack, build project or
+Amplify app either. A role the deploy role creates therefore never has more power
 than the deploy role. The boundary lets an application role pass <code>/app/</code> roles to Textract and
 Bedrock (asynchronous Textract jobs and Bedrock jobs need it), and nothing else in IAM.</li>
 </ul>
+<h5 id="aws-reads-the-guard-refuses-and-what-to-read-instead">Reads the guard refuses, and what to read instead</h5>
+<p>The guard policy and the wrapper&#x27;s <code>SECRET_OPERATIONS</code> refuse these reads, because their response
+carries a secret or a value that may be one (checked against the AWS API references, 2026-10-15):</p>
+<div class="ui-table-wrap"><table class="ui-table"><thead><tr><th scope="col">Read (<code>tools/aws-sandbox read ...</code>)</th><th scope="col">What the response carries</th></tr></thead>
+<tbody>
+<tr><td><code>lambda get-function</code>, <code>get-function-configuration</code>, <code>list-functions</code>, <code>list-versions-by-function</code></td><td>The function&#x27;s environment variables (<code>ListFunctions</code> omits only the state fields)</td></tr>
+<tr><td><code>amplify get-app</code>, <code>list-apps</code>, <code>get-branch</code>, <code>list-branches</code></td><td>Environment variables and basic-auth credentials of the app, its branches and its auto-branch settings</td></tr>
+<tr><td><code>amplify get-webhook</code>, <code>list-webhooks</code></td><td>The webhook URL, which starts a build when called</td></tr>
+<tr><td><code>codebuild batch-get-projects</code>, <code>batch-get-builds</code>, <code>batch-get-build-batches</code></td><td>Build environment variables, including <code>PLAINTEXT</code> values</td></tr>
+<tr><td><code>ecs describe-task-definition</code>, <code>describe-tasks</code></td><td>Container environment variables, and a task&#x27;s environment overrides</td></tr>
+<tr><td><code>cognito-idp describe-user-pool-client</code></td><td>The app client secret</td></tr>
+<tr><td><code>cognito-idp describe-identity-provider</code></td><td>The external provider&#x27;s details, including its <code>client_secret</code></td></tr>
+<tr><td><code>ssm get-parameter-history</code></td><td>Each version&#x27;s parameter value</td></tr>
+</tbody></table></div>
+<p>Reviewers and <code>aws-ops-inspector</code> lose these reads. Use instead:</p>
+<ul>
+<li><strong>What is deployed:</strong> <code>read cloudformation describe-stack-resources --stack-name &lt;stack&gt;</code> (or
+<code>list-stack-resources</code>) for each function, state machine, Amplify app and branch and its
+physical id; <code>read resourcegroupstaggingapi get-resources --tag-filters Key=project,Values=&lt;product&gt;</code>
+for everything tagged.</li>
+<li><strong>How it is configured:</strong> the synthesized template (<code>tools/aws-sandbox synth</code>) or the deployed
+one (<code>read cloudformation get-template</code>), which hold runtime, memory, timeout, role and the
+environment variables as the stack wrote them; dynamic references stay unresolved there.</li>
+<li><strong>Lambda health:</strong> <code>read lambda list-aliases</code>, <code>get-alias</code>, <code>get-function-concurrency</code>,
+<code>get-policy</code>, <code>list-event-source-mappings</code>, the CloudWatch metrics (<code>Errors</code>, <code>Throttles</code>,
+<code>Duration</code>) and the function&#x27;s log group.</li>
+<li><strong>Amplify deployments:</strong> <code>read amplify list-jobs --app-id &lt;id&gt; --branch-name &lt;branch&gt;</code> and
+<code>get-job</code>, with the app id from the stack resources; <code>list-domain-associations</code>.</li>
+<li><strong>CodeBuild and ECS</strong>, if the product ever uses them: <code>read codebuild list-projects</code> and
+<code>list-builds-for-project</code>; <code>read ecs describe-services</code> and <code>list-tasks</code>; and their logs.</li>
+<li><strong>Cognito:</strong> <code>read cognito-idp list-user-pool-clients</code> (ids and names) and
+<code>describe-user-pool</code>.</li>
+</ul>
+<p>Kept, after checking: <code>cloudformation describe-stacks</code> and <code>get-template</code> (parameters marked
+<code>NoEcho</code> are masked in describe calls; a template holds what the repository holds, with dynamic
+references unresolved; a secret in <code>Outputs</code> or <code>Metadata</code> would show, which <code>aws-infra-reviewer</code>
+checks for); <code>stepfunctions describe-state-machine</code> (the definition, as in the repository);
+<code>bedrock-agent get-knowledge-base</code> and <code>get-data-source</code> (a Secrets Manager ARN, not the secret).</p>
 <blockquote class="gb-quote">
 <p><strong>Revisit before real claimant data.</strong> The read role can decrypt tenant data and read Textract
 results because the sandbox holds synthetic data only (owner ruling, 2026-10-14). Before any
@@ -5165,6 +5217,67 @@ and boundary, or a resource type the deploy role cannot create
 inline policy to it, which the deploy role is refused for a role without the boundary; with
 <code>mutable: false</code> CDK grants are no-ops, so the person gives that role its permissions.</p></li>
 </ol>
+<p><strong>The deploy role changes only the product&#x27;s own resources.</strong> The deploy role&#x27;s main allow
+covers every service, so without <code>deploy-scope-policy.json</code> it could rewrite the code of any
+Lambda function in the account, or the definition of any state machine, and so run code with that
+resource&#x27;s existing role; no <code>iam:PassRole</code> check applies, because the role is not changing. The
+scope policy limits those changes to resources whose name, or for Amplify whose tag, marks them as
+the product&#x27;s. Two choices follow from the AWS Service Authorization Reference:</p>
+<ul>
+<li><strong>Name prefix, for Lambda, Step Functions, CloudFormation and CodeBuild.</strong> The resource name is
+in the ARN, so a <code>NotResource</code> deny works whether or not an action supports tag conditions, and
+a name cannot be changed after creation. A tag condition would not be enough here: Lambda needs
+<code>lambda:TagResource</code> to tag a function at creation, so the deploy role must keep that action,
+and it could then tag another function <code>project=&lt;product&gt;</code> and change it.</li>
+<li><strong>Tag, for Amplify.</strong> An Amplify app&#x27;s ARN holds a generated app id, not its name, so the
+prefix cannot be written in advance. <code>UpdateApp</code>, <code>DeleteApp</code>, <code>UpdateBranch</code>, <code>DeleteBranch</code>,
+<code>CreateDeployment</code> and <code>StartDeployment</code> support <code>aws:ResourceTag</code>, so they are denied on an app
+or branch without <code>project=&lt;product&gt;</code>. Adding or removing the <code>project</code> tag is denied on any
+Amplify resource that does not already carry <code>project=&lt;product&gt;</code>, so the deploy role cannot tag
+another app into scope. <code>StartJob</code> supports no resource tag, and the product&#x27;s app has no
+repository connection and needs no build job, so it is denied everywhere.</li>
+</ul>
+<p>What every product stack does for this:</p>
+<ol>
+<li><p>Name each stack <code>&lt;product&gt;-&lt;name&gt;</code> (<code>new Stack(app, &#x27;Claims&#x27;, { stackName: &#x27;&lt;product&gt;-claims&#x27; })</code>).</p></li>
+<li><p>Tag everything: <code>Tags.of(app).add(&#x27;project&#x27;, &#x27;&lt;product&gt;&#x27;)</code>. CDK adds the tag to every
+resource in the app whose type takes tags, including <code>AWS::Amplify::App</code> and
+<code>AWS::Amplify::Branch</code>; the Amplify rule depends on it.</p></li>
+<li><p>Give every function, state machine and build project a <code>&lt;product&gt;-</code> name, including the ones
+CDK creates for itself (custom-resource providers, <code>autoDeleteObjects</code>, <code>BucketDeployment</code>).
+An aspect does it for all of them:</p>
+<pre data-lang="ts"><code>import { Aspects, CfnResource, IAspect, Names } from &#x27;aws-cdk-lib&#x27;;
+import { IConstruct } from &#x27;constructs&#x27;;
+
+const PRODUCT = &#x27;&lt;product&gt;&#x27;;
+const NAME_PROPERTY: Record&lt;string, [string, number]&gt; = {
+  &#x27;AWS::Lambda::Function&#x27;: [&#x27;FunctionName&#x27;, 64],
+  &#x27;AWS::StepFunctions::StateMachine&#x27;: [&#x27;StateMachineName&#x27;, 80],
+  &#x27;AWS::CodeBuild::Project&#x27;: [&#x27;Name&#x27;, 150],
+};
+
+class ProductNames implements IAspect {
+  visit(node: IConstruct): void {
+    if (!(node instanceof CfnResource)) return;
+    const entry = NAME_PROPERTY[node.cfnResourceType];
+    if (!entry) return;
+    const [property, maxLength] = entry;
+    node.addPropertyOverride(property, `${PRODUCT}-${Names.uniqueResourceName(node,
+      { maxLength: maxLength - PRODUCT.length - 1 })}`);
+  }
+}
+Aspects.of(app).add(new ProductNames());</code></pre>
+<p>A function or state machine created without the prefix fails with an access-denied error
+naming <code>lambda:CreateFunction</code> or <code>states:CreateStateMachine</code>; fix the CDK app, not the
+policy. A named resource cannot be replaced in place, so a change that needs replacement (for
+example a new name) needs the old resource removed first.</p></li>
+</ol>
+<p><strong>The sandbox account holds the product stack and nothing else.</strong> The scope policy covers the
+services above. The deploy role can still change resources of every other service in the account,
+and some of those run code with an existing role (an EC2 instance&#x27;s user data, an ECS task, an SSM
+document, a Glue job). Do not create other workloads, other teams&#x27; stacks or hand-made functions
+in the sandbox account; an administrator&#x27;s own resources (the baseline trail, the CDK bootstrap
+stack) are the only exceptions.</p>
 <p><strong>Service-linked roles</strong> are created by a person (setup step 5). OpenSearch Serverless needs one
 before the first collection.</p>
 <p><strong>Secrets.</strong> CloudFormation dynamic references to Secrets Manager
@@ -5224,9 +5337,11 @@ inference profile resource with the source region and without that key (AWS Bedr
 Amplify app and branch (<code>AWS::Amplify::App</code>, <code>AWS::Amplify::Branch</code>) without a repository
 connection, so no source-control token is stored in AWS. <code>aws-deploy</code> publishes a build with
 <code>tools/aws-sandbox write amplify create-deployment ...</code>, uploads the zip to the URL it returns, then
-runs <code>write amplify start-deployment ...</code>. The deploy role allows <code>amplify:*</code> and may pass an
-<code>/app/</code> role to <code>amplify.amazonaws.com</code> if the app ever needs a service role; the read role reads
-apps, branches, jobs and domain associations through <code>ReadOnlyAccess</code>.</p>
+runs <code>write amplify start-deployment ...</code>. The deploy role may change, deploy to and delete only
+an app and branch tagged <code>project=&lt;product&gt;</code>, may not start a build job, and may pass an <code>/app/</code>
+role to <code>amplify.amazonaws.com</code> if the app ever needs a service role. The read role reads jobs,
+artifacts and domain associations through <code>ReadOnlyAccess</code>; it may not read the app or branch
+itself, because those responses carry environment variables and basic-auth credentials.</p>
 <p><strong>Config point: custom domain and WAF (not set up now).</strong> The app uses its default
 <code>*.amplifyapp.com</code> domain and no web application firewall. To add either later:</p>
 <ul>
@@ -5278,13 +5393,17 @@ in CI; commit <code>cdk.context.json</code>.</p>
 <li><p>In local copies of the policy files (never commit the values), replace
 <code>REPLACE_WITH_SANDBOX_REGION</code> (a US region where the US profiles are offered),
 <code>REPLACE_WITH_SANDBOX_ACCOUNT_ID</code>, <code>REPLACE_WITH_BASELINE_TRAIL_NAME</code> and (in
-<code>read-sandbox-data-policy.json</code>) <code>REPLACE_WITH_PRODUCT_NAME</code>, the prefix of the tenant key
-aliases.</p></li>
+<code>read-sandbox-data-policy.json</code>, <code>deploy-scope-policy.json</code> and
+<code>app-permissions-boundary.json</code>) <code>REPLACE_WITH_PRODUCT_NAME</code>: the product&#x27;s short name, which
+prefixes the tenant key aliases, the stack names and the function, state machine and build
+project names, and is the value of the <code>project</code> tag. Use lowercase letters, digits and
+hyphens, starting with a letter.</p></li>
 <li><p>Create the customer managed policy <code>app-permissions-boundary</code> at the path <code>/</code> from
 <code>iam/app-permissions-boundary.json</code>. The name must match the ARN in <code>deploy-policy.json</code>.</p></li>
 <li><p>Create the read role: attach <code>ReadOnlyAccess</code> and customer managed policies from
 <code>iam/read-only-guard-policy.json</code> and, in this sandbox only, <code>iam/read-sandbox-data-policy.json</code>.</p></li>
-<li><p>Create the deploy role with a customer managed policy from <code>iam/deploy-policy.json</code>.</p></li>
+<li><p>Create the deploy role with two customer managed policies, from <code>iam/deploy-policy.json</code> and
+<code>iam/deploy-scope-policy.json</code>.</p></li>
 <li><p>Create the OpenSearch Serverless service-linked role, once per account, as an administrator
 (the deploy role cannot create service-linked roles):</p>
 <pre data-lang="bash"><code>aws iam create-service-linked-role --aws-service-name observability.aoss.amazonaws.com</code></pre>
@@ -5343,6 +5462,15 @@ but a deploy script run with <code>tools/aws-sandbox exec</code>, or a stack upd
 resource, runs under the deploy role without a prompt. That includes deleting a tenant&#x27;s table,
 scheduling a tenant key&#x27;s deletion and replacing a key policy. Keep nothing in the sandbox that
 cannot be recreated.</li>
+<li><strong>The deploy role can change any resource outside the scope policy&#x27;s services.</strong> The scope
+policy covers Lambda, Step Functions, CloudFormation, CodeBuild and Amplify. Every other
+service&#x27;s resources in the account are open to the deploy role, including resources that run
+code with an existing role. This is safe only while the sandbox account holds the product stack
+and nothing else (see &quot;The deploy role changes only the product&#x27;s own resources&quot;).</li>
+<li><strong>The Amplify tag rule is not tested against AWS.</strong> It assumes CloudFormation tags a new
+Amplify app and branch through <code>CreateApp</code> and <code>CreateBranch</code> and calls <code>TagResource</code> only on
+resources that already carry the tag. If the first deploy fails on <code>amplify:TagResource</code>, tell
+the owner; the fix is a change to <code>DenyOutsideTheProductAmplifyProjectTag</code>, not removing it.</li>
 <li><strong>The deploy role can create roles.</strong> Each <code>/app/</code> role is capped by the boundary at about what
 the deploy role itself may do, so no role it creates gains IAM, account or billing power. Neither
 the boundary nor any condition key limits a role&#x27;s <strong>trust policy</strong>, though: a stack could create
@@ -6133,7 +6261,7 @@ the person who deployed it.
 <tr><td><code>plugins/idea-realization/docs/two-repositories.md</code></td><td>Branching and pull-request flow, Bookkeeping</td><td class="ui-table__id gb-hash">20864d65c56224237eafe50552e8f5bddd965241b79db10d5e3b342dee31bd0a</td></tr>
 <tr><td><code>plugins/idea-realization/docs/workstreams.md</code></td><td>Bookkeeping</td><td class="ui-table__id gb-hash">732dac8aaad45339e5ebc5a0ce3f880d851d16bce9fc57a110ee21542afabe77</td></tr>
 <tr><td><code>docs/guides/OPS-006-demo-day-runbook.md</code></td><td>Release and demo day</td><td class="ui-table__id gb-hash">b6e3874804a7b0c0f912542f772dc6209253abb9367b14ead6fe732fc77bfc57</td></tr>
-<tr><td><code>aws/README.md</code></td><td>AWS safety and cost guardrails</td><td class="ui-table__id gb-hash">280a2a3f3c203dc3c57cccc3c3d32cbaaa8cbc602ba30cb17df6432b0f64407a</td></tr>
+<tr><td><code>aws/README.md</code></td><td>AWS safety and cost guardrails</td><td class="ui-table__id gb-hash">b210fc67f698f2d28d2393f65d132c2de10716ea3db95c7e48e26a9d580c18e3</td></tr>
 <tr><td><code>docs/guides/OPS-007-cost-guardrails.md</code></td><td>AWS safety and cost guardrails</td><td class="ui-table__id gb-hash">c89c83e1e110c2ca7cc5b4099b4f6770b702d0cddcb1de3f58f05165264e09c7</td></tr>
 <tr><td><code>docs/guides/OPS-008-troubleshooting.md</code></td><td>Troubleshooting</td><td class="ui-table__id gb-hash">d73754432a47f5377175089c21697677f66982f0c89674dbbf6b752cec0a2c03</td></tr>
 <tr><td><code>docs/guides/OPS-010-day-one-prompts.md</code></td><td>Day-one checklist</td><td class="ui-table__id gb-hash">ff1becaa534b47377958684ee4904a34ea2ff696562f81dc4248e1fa9ff0b527</td></tr>
