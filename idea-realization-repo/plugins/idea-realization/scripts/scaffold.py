@@ -117,7 +117,7 @@ SEEDS: tuple[Seed, ...] = (
     _schema("partition", "idea-partition-record.schema.json"),
     Seed("backlog", _key("backlog_path"),
          lambda: f"schema_version: 1\nupdated: '{today()}'\nmax_active: 1\nnext_up: []\n"
-                 "items: []\n"),
+                 "legacy_phase_ids: []\nitems: []\n"),
     _schema("backlog", "backlog.schema.json"),
     Seed("documents", _key("docs_root")),
     Seed("documents", _under("docs_root", "codes.yaml"), source="templates/codes.yaml"),

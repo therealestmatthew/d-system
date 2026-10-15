@@ -4,6 +4,43 @@ updated: '2026-10-15'
 decision_record: doc-team-decisions
 max_active: 15
 next_up: []
+# Phase ids written before ids carried a developer handle. Only these stay valid without one;
+# nothing new joins the list. A new phase takes phase-<track>-<handle>-NN (backlog-protocol.md).
+legacy_phase_ids:
+- phase-boot-01
+- phase-boot-02
+- phase-boot-03
+- phase-boot-04
+- phase-boot-05
+- phase-boot-06
+- phase-boot-07
+- phase-boot-08
+- phase-boot-09
+- phase-boot-10
+- phase-boot-11
+- phase-boot-12
+- phase-boot-13
+- phase-boot-14
+- phase-boot-15
+- phase-boot-16
+- phase-boot-17
+- phase-ux-01
+- phase-ux-02
+- phase-ux-03
+- phase-ux-04
+- phase-ux-05
+- phase-ux-06
+- phase-ux-07
+- phase-ux-08
+- phase-ux-09
+- phase-ux-10
+- phase-ux-11
+- phase-ux-12
+- phase-ux-13
+- phase-ux-14
+- phase-ux-15
+- phase-deploy-01
+- phase-boot-18
 items:
 - id: phase-boot-01
   title: Author-scoped document codes, session codes and phase ids
@@ -24,6 +61,7 @@ items:
   - Two developers allocating a plan code offline receive different codes.
   - The documents check accepts the author-scoped forms and rejects a new code without a handle
     (codes in the register's legacy list and unscoped governance codes excepted).
+  - The backlog check rejects a new phase id without a handle (ids in legacy_phase_ids excepted).
   verification:
   - 'control: cd plugins/idea-realization && uv run --with pytest pytest -q'
   - 'control: uv run plugins/idea-realization/scripts/check.py'
@@ -39,6 +77,7 @@ items:
   - plugins/idea-realization/scripts/plan_check.py
   - plugins/idea-realization/docs/document-codes.md
   - plugins/idea-realization/skills/next-code/SKILL.md
+  - plugins/idea-realization/scripts/scaffold.py
   next_action: Built on branch agent/hackathon-owner-rulings-code (owner chose handle-scoped codes and a
     legacy list, 2026-10-15); once merged, close this phase through the review gate.
 - id: phase-boot-02

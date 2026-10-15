@@ -12,6 +12,9 @@ hold that commit at all, nothing can be read: the check prints a ``cannot tell``
 fetch and run the check again, and reports no error. Other ``product:`` paths, and a phase without
 ``product_merge``, are read in the working tree.
 
+Every phase id carries its developer's handle or is in the backlog's ``legacy_phase_ids`` list
+(``backlog.phase_id_errors``).
+
 Regression warnings, the note that the regression check did not run, the ``cannot tell`` evidence
 note, and the warning that an active phase assigned to one developer (``owner: <handle>``) is
 claimed by another (``backlog.owner_claim_warnings``) go to standard error: they never change the
@@ -173,10 +176,9 @@ def audit(config: paths.Config, today: date | None = None,
     errors = inspect(root, catalog, scanned.documents, set(scanned.systems),
                      set(scanned.owners), today or date.today(), product_root, note)
     items = {item["id"]: item for item in catalog["items"]}
-    registry = (docs_root / identity.REGISTRY).is_file()
-    errors += backlog.phase_id_errors(items,
-                                      set(identity.developers(docs_root)) if registry else None)
-    for warning in backlog.owner_claim_warnings(items, set(identity.developers(docs_root))):
+    developers = set(identity.developers(docs_root))
+    errors += backlog.phase_id_errors(catalog, developers)
+    for warning in backlog.owner_claim_warnings(items, developers):
         note(warning)
     record = catalog.get("decision_record")
     if record is None:

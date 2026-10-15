@@ -20,11 +20,16 @@ covers worktrees and integration; this document covers everything that touches t
 ## 2. The phase schema
 
 Top level: `schema_version` (1), `updated` (never in the future), `decision_record` (optional: a
-governance or adr document), `max_active` (1 to 15, default 1), `next_up` and `items`.
+governance or adr document), `max_active` (1 to 15, default 1), `next_up`, `legacy_phase_ids` and
+`items`.
+
+`legacy_phase_ids` lists the ids written before phase ids carried a handle (`phase-<track>-<NN>`).
+A freshly scaffolded backlog starts with an empty list. Nothing new joins it: an id without a
+handle that the list does not name fails the check.
 
 | Field | Rule |
 |---|---|
-| `id` | `phase-<track>-<handle>-<NN>`, with the handle of the developer who adds the phase (`workstreams.md`). Permanent and never renumbered. A new phase takes the next unused number for that handle in its track, chosen by hand. A handle must be a developer in `systems.yaml`. Ids written before handles, `phase-<track>-<NN>`, stay valid. |
+| `id` | `phase-<track>-<handle>-<NN>`, with the handle of the developer who adds the phase (`workstreams.md`). Permanent and never renumbered. A new phase takes the next unused number for that handle in its track, chosen by hand. A handle must be a developer in `systems.yaml`; without a `systems.yaml` no handle resolves. An id without a handle, `phase-<track>-<NN>`, is valid only when `legacy_phase_ids` lists it; any other is refused. |
 | `title` | One observable outcome. |
 | `plan` | One primary plan document. |
 | `sources` | Every other governed source the phase covers. |

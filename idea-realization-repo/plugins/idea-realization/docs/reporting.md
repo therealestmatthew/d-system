@@ -8,7 +8,7 @@ the work. This document governs how the work is reported to the owner.
 Lead with what a thing is. Its id or code goes in parentheses as the lookup handle, never as the
 noun.
 
-> **Raw capture contracts** (`phase-<track>-<NN>`): what a captured note looks like on disk, and
+> **Raw capture contracts** (`phase-<track>-<handle>-<NN>`): what a captured note looks like on disk, and
 > the ignore rules that keep it untracked.
 
 Never make a bare phase id or document code the subject of a sentence. A code is a filename, and

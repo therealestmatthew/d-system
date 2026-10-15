@@ -531,6 +531,7 @@ class TargetRepo:
         self.catalog: dict[str, Any] = {
             "schema_version": 1, "updated": stamp, "decision_record": "doc-choices",
             "max_active": 2, "next_up": [],
+            "legacy_phase_ids": [f"{PH}-demo-01"],
             "items": [phase(plan="doc-plan", sources=[], systems=["sys-core"])],
         }
         subprocess.run(["git", "init", "-q", "-b", "main"], cwd=root, check=True)
@@ -764,9 +765,75 @@ def test_a_duplicate_handle_scoped_phase_id_is_refused(backlog_repo: Any) -> Non
 def test_a_phase_id_handle_must_be_a_developer() -> None:
     from backlog import phase_id_errors
 
-    items = {key: {"id": key} for key in
-             (f"{PH}-demo-01", scoped_phase("demo", "ana", 1), scoped_phase("demo", "zed", 1))}
-    assert phase_id_errors(items, {"ana"}) == [
+    catalog = {"legacy_phase_ids": [f"{PH}-demo-01"], "items": [
+        {"id": key} for key in
+        (f"{PH}-demo-01", scoped_phase("demo", "ana", 1), scoped_phase("demo", "zed", 1))]}
+    assert phase_id_errors(catalog, {"ana"}) == [
         f"{scoped_phase('demo', 'zed', 1)}: handle zed is not a developer (an owner with "
         "emails) in systems.yaml"]
-    assert phase_id_errors(items, None) == []
+    # Without a registry no handle resolves, as for document codes.
+    assert phase_id_errors(catalog, set()) == [
+        f"{scoped_phase('demo', key, 1)}: handle {key} is not a developer (an owner with "
+        "emails) in systems.yaml" for key in ("ana", "zed")]
+
+
+# --- Legacy phase ids: no new phase id without a handle ---------------------------------------
+#
+# Ids written before handles are listed in the backlog's ``legacy_phase_ids``; any other id
+# without a handle is a new one written by hand, and could collide with a peer's.
+
+
+def test_a_new_unscoped_phase_id_is_refused() -> None:
+    from backlog import phase_id_errors
+
+    catalog = {"legacy_phase_ids": [f"{PH}-demo-01"],
+               "items": [{"id": f"{PH}-demo-01"}, {"id": f"{PH}-demo-02"}]}
+    assert phase_id_errors(catalog, {"ana"}) == [
+        f"{PH}-demo-02: phase id carries no developer handle and is not in the backlog's "
+        f"legacy_phase_ids list; name a new phase {PH}-<track>-<handle>-<NN>"]
+    # A backlog with no list at all has no legacy ids.
+    assert phase_id_errors({"items": [{"id": f"{PH}-demo-01"}]}, {"ana"}) != []
+
+
+def test_a_listed_legacy_phase_id_passes() -> None:
+    from backlog import phase_id_errors
+
+    catalog = {"legacy_phase_ids": [f"{PH}-demo-01", f"{PH}-demo-02"],
+               "items": [{"id": f"{PH}-demo-01"}, {"id": f"{PH}-demo-02"}]}
+    assert phase_id_errors(catalog, {"ana"}) == []
+
+
+def test_a_handle_scoped_phase_id_with_a_registered_handle_passes() -> None:
+    from backlog import phase_id_errors
+
+    catalog = {"legacy_phase_ids": [], "items": [{"id": scoped_phase("demo", "ana", 1)}]}
+    assert phase_id_errors(catalog, {"ana"}) == []
+
+
+@pytest.mark.parametrize("value", [scoped_phase("demo", "ana", 1), f"{PH}-demo-1", "PH-demo-01",
+                                   f"{PH}-demo-01-x"])
+def test_the_schema_refuses_a_legacy_entry_that_is_not_a_bare_phase_id(
+        backlog_repo: Any, value: str) -> None:
+    backlog_repo[1]["legacy_phase_ids"] = [f"{PH}-demo-01", value]
+    errors = check(backlog_repo)
+    assert any("legacy_phase_ids" in error and "does not match" in error
+               for error in errors), errors
+
+
+def test_a_new_unscoped_phase_id_fails_the_real_check(target: TargetRepo) -> None:
+    target.catalog["items"].append(phase(id=f"{PH}-demo-02", plan="doc-plan", sources=[],
+                                         systems=["sys-core"]))
+    result = target.check()
+    assert result.returncode == 1
+    assert f"{PH}-demo-02: phase id carries no developer handle" in result.stdout
+    assert f"{PH}-demo-01:" not in result.stdout  # listed as legacy in the fixture
+
+
+def test_the_scaffolded_backlog_starts_with_an_empty_legacy_list(tmp_path: Path) -> None:
+    import scaffold
+    import yaml
+
+    fresh = paths.resolve({"root": str(tmp_path)}, env={})
+    scaffold.scaffold(fresh, ["backlog"])
+    seeded = yaml.safe_load((tmp_path / "backlog" / "backlog.yaml").read_text())
+    assert seeded["legacy_phase_ids"] == []

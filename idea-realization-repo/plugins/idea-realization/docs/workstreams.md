@@ -53,7 +53,8 @@ developers working offline never allocate the same one:
 - an idea id is `<handle>-NNNNNN`, counting that developer's own ideas;
 - a document code in a scoped series is `<SERIES>-<handle>-NNN` or
   `<SERIES>-<handle>-YYYY-MM-DD-NN` (`document-codes.md`);
-- a phase id is `phase-<track>-<handle>-<NN>` (`backlog-protocol.md`);
+- a phase id is `phase-<track>-<handle>-<NN>`; an id without a handle passes only when the
+  backlog's `legacy_phase_ids` lists it (`backlog-protocol.md`);
 - a phase claim's agent is `<handle>/agent-<name>`.
 
 Codes and phase ids carry the handle permanently, so a developer who leaves keeps their `owners`

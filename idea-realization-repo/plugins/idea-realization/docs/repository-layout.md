@@ -86,7 +86,8 @@ document receive different codes before either merges.
 A phase id is `phase-<track>-<handle>-<NN>`: a short lowercase track prefix naming the stream of
 work, the handle of the developer who adds the phase, and a two-digit sequence counting that
 developer's phases in the track, allocated by hand as the next unused number. The handle keeps two
-developers adding phases to one track offline from choosing the same id. Ids without a handle,
-written before handles, stay valid. Keep a table
+developers adding phases to one track offline from choosing the same id. An id without a handle,
+written before handles, stays valid only when the backlog's `legacy_phase_ids` lists it; a new
+id without a handle fails the check. Keep a table
 of tracks, each with a one-line description, in a README beside the backlog, so a reader can tell
 what a track prefix means without opening a plan.

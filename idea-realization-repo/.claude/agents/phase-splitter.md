@@ -48,7 +48,9 @@ governs. Everything you produce is a proposal waiting for the owner's gate.
    - Ids follow `phase-<track>-<handle>-<NN>`, with the handle that
      `uv run plugins/idea-realization/scripts/identity.py` prints, taking the next unused number
      for that handle in the track. They are proposed ids; the owner may renumber. If no handle
-     resolves, stop and say so.
+     resolves, stop and say so. Never propose an id without a handle, and never add an id to the
+     backlog's `legacy_phase_ids`: that list holds only ids written before handles, and the check
+     refuses any other id without one.
    - `owner` is the plan's owner. Assigning a developer (`owner: <handle>`) is the owner's
      decision at the daily sync; do not make it.
    - Product-repository paths take the `product:` prefix

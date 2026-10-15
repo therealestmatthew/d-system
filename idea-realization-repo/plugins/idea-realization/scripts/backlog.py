@@ -149,20 +149,29 @@ def concurrency_errors(items: dict[str, Any], active: list[str], max_active: int
     return errors
 
 
-def phase_id_errors(items: dict[str, Any], developers: set[str] | None) -> list[str]:
-    """A handle-scoped phase id (``phase-<track>-<handle>-NN``) must name a developer.
+def phase_id_errors(catalog: dict[str, Any], developers: set[str]) -> list[str]:
+    """Every phase id names its developer, or is a listed legacy id.
 
-    ``developers`` is the set of owners with emails in ``systems.yaml``, or None when there is no
-    registry to check against. A phase id without a handle, ``phase-<track>-NN``, names nobody and
-    is not checked here. The schema has already fixed the id's shape, so the handle is the third
-    hyphen-separated part whenever there are four.
+    A new phase id is ``phase-<track>-<handle>-NN``, and its handle must be in ``developers``: the
+    owners with emails in ``systems.yaml`` (empty without a registry, so then no handle
+    resolves, as for document codes). An id without a handle, ``phase-<track>-NN``, was written
+    before handles and passes only when the catalog's ``legacy_phase_ids`` lists it; any other is
+    refused, because a hand-chosen number in a shared track can collide with a peer's offline.
+    The schema has already fixed the id's shape, so the handle is the third hyphen-separated part
+    whenever there are four.
     """
+    legacy = set(catalog.get("legacy_phase_ids", []))
     errors = []
-    for key in sorted(items):
+    for key in sorted(item["id"] for item in catalog["items"]):
         parts = key.split("-")
-        if developers is not None and len(parts) == 4 and parts[2] not in developers:
-            errors.append(f"{key}: handle {parts[2]} is not a developer (an owner with emails) "
-                          "in systems.yaml")
+        if len(parts) == 4:
+            if parts[2] not in developers:
+                errors.append(f"{key}: handle {parts[2]} is not a developer (an owner with "
+                              "emails) in systems.yaml")
+        elif key not in legacy:
+            errors.append(f"{key}: phase id carries no developer handle and is not in the "
+                          "backlog's legacy_phase_ids list; name a new phase "
+                          "phase-<track>-<handle>-<NN>")
     return errors
 
 
