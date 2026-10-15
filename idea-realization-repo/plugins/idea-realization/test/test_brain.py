@@ -20,7 +20,8 @@ def config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> paths.Config:
     for key in ("IDEA_REALIZATION_ROOT", "CLAUDE_PROJECT_DIR"):
         monkeypatch.delenv(key, raising=False)
     team = {"repository-owner": "Owner.",
-            "ana": {"description": "Ana.", "emails": ["ana@example.com"]},
+            "ana": {"description": "Ana.", "emails": ["ana@example.com"],
+                    "approves": ["procedures"]},
             "ben": {"description": "Ben.", "emails": ["ben@example.com"]}}
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "systems.yaml").write_text(yaml.safe_dump({"owners": team}))
@@ -57,7 +58,7 @@ def test_each_kind_lands_in_its_folder(config: paths.Config) -> None:
 
 def test_a_second_entry_with_the_same_title_is_refused(config: paths.Config) -> None:
     record(config)
-    with pytest.raises(ValueError, match="exists"):
+    with pytest.raises(ValueError, match="is taken by"):
         record(config)
 
 
@@ -141,3 +142,57 @@ def test_the_cli_records_loads_and_checks(config: paths.Config,
 
 def test_no_brain_is_clean(tmp_path: Path) -> None:
     assert feature.check(paths.resolve({"root": str(tmp_path)}, env={})) == []
+
+
+def write(root: Path, folder: str, name: str, **meta: object) -> None:
+    day = date(2030, 1, 5).isoformat()
+    front = {"id": name, "title": "T", "author": "ana", "created": day, "updated": day,
+             "status": "active", **meta}
+    (root / folder / f"{name}.md").write_text(f"---\n{yaml.safe_dump(front)}---\nBody.\n")
+    brain.write_index(root)
+
+
+def test_only_an_approver_records_a_procedure(config: paths.Config,
+                                              monkeypatch: pytest.MonkeyPatch) -> None:
+    as_developer(monkeypatch, "ben")
+    with pytest.raises(ValueError, match="approving procedures"):
+        record(config, "procedure", "Rebase before review")
+    as_developer(monkeypatch, "ana")
+    entry, _ = brain.parse(record(config, "procedure", "Rebase before review"))
+    assert entry is not None and entry.meta["approved_by"] == "ana"
+    assert feature.check(config) == []
+
+
+def test_a_hand_written_procedure_needs_an_approvers_approval(config: paths.Config) -> None:
+    root = config.path("brain_root")
+    write(root, "learnings", "unapproved", kind="procedure")
+    day = date(2030, 1, 5).isoformat()
+    write(root, "learnings", "approved-by-ben", kind="procedure", approved_by="ben",
+          approved_on=day)
+    problems = feature.check(config)
+    assert any("unapproved.md" in line and "approved_by" in line for line in problems)
+    assert any("approved-by-ben.md" in line and "not listed" in line for line in problems)
+
+
+def test_an_id_taken_in_another_folder_is_refused(config: paths.Config) -> None:
+    record(config, "concept", "Sandbox profile")
+    with pytest.raises(ValueError, match="taken by concepts/sandbox-profile.md"):
+        record(config, "decision", "Sandbox profile")
+
+
+def test_an_overlong_title_is_bounded(config: paths.Config) -> None:
+    path = record(config, "note", "x" * 400)
+    assert len(path.stem) <= brain.MAX_SLUG
+    assert feature.check(config) == []
+
+
+def test_a_title_with_no_ascii_words_gets_a_hashed_id(config: paths.Config) -> None:
+    first = record(config, "concept", "\u30c7\u30e2")
+    second = record(config, "concept", "\u4f8b")
+    assert first.stem.startswith("entry-") and first.stem != second.stem
+
+
+def test_a_role_key_is_not_an_author(config: paths.Config) -> None:
+    write(config.path("brain_root"), "concepts", "by-a-role", kind="concept",
+          author="repository-owner")
+    assert any("not a developer" in line for line in feature.check(config))

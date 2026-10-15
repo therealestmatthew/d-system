@@ -49,6 +49,16 @@
                   "minLength": 3
                 },
                 "description": "Git author emails that identify this developer."
+              },
+              "approves": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "procedures"
+                  ]
+                },
+                "description": "What this developer may approve. procedures=anti-pattern procedures in the brain, which enter only with this approval."
               }
             }
           }

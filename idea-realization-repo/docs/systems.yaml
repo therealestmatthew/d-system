@@ -5,6 +5,7 @@ schema_version: 1
 #   ana:
 #     description: Ana, user interface workstream.
 #     emails: [ana@example.com]
+#     approves: [procedures]   # only for whoever approves anti-pattern procedures
 owners:
   repository-owner: The person accountable for this repository.
 # One entry per independently changeable capability, with the paths that locate it. A path with

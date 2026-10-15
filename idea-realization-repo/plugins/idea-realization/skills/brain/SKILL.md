@@ -44,7 +44,7 @@ Choose the kind:
 | A term or how something works | `concept` |
 | A person, stakeholder, sponsor, service or cloud resource | `entity` |
 | Something this session learned that the next should know | `lesson` |
-| How to do something | `procedure` |
+| How to do something, and you are marked as approving procedures | `procedure` |
 | Meeting or demo notes | `note` |
 
 Then write it, with the body passed on standard input so no quoting gets in the way:
@@ -62,7 +62,7 @@ entry and `index.md` together.
 ## What this skill never does
 
 - It never records confidential content: customer names, credentials, account ids or keys.
-- It never adds an anti-pattern `procedure` without the owner's approval of that procedure; it
-  proposes one instead.
+- It never records a `procedure` unless the current developer is marked `approves: [procedures]`
+  in `docs/systems.yaml`; anyone else records a `lesson` and proposes it.
 - It never edits another developer's entry to change its meaning; it writes a new entry that links
   to it.

@@ -65,6 +65,17 @@ def developers(docs_root: Path) -> dict[str, list[str]]:
     return found
 
 
+def approvers(docs_root: Path, what: str) -> set[str]:
+    """The developers whose ``approves`` list in the owners map names ``what``."""
+    registry = docs_root / REGISTRY
+    if not registry.exists():
+        return set()
+    loaded: Any = yaml.safe_load(registry.read_text(encoding="utf-8")) or {}
+    return {str(key) for key, value in (loaded.get("owners") or {}).items()
+            if isinstance(value, dict) and value.get("emails") and what in (value.get("approves")
+                                                                         or [])}
+
+
 def git_email(root: Path) -> str:
     """``git config user.email`` in ``root``, lower-cased; empty when unset."""
     result = subprocess.run(["git", "-C", str(root), "config", "user.email"],

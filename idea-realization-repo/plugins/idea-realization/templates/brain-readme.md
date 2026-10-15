@@ -13,7 +13,7 @@ agent and model reads the same thing, and every entry says who wrote it.
 | `concepts/` | `concept` | Domain terms, cloud and model concepts, product vocabulary: the glossary |
 | `entities/` | `entity` | Teammates, stakeholders, sponsors, external services, cloud resources |
 | `learnings/` | `lesson` | What a session learned that the next one should know |
-| `learnings/` | `procedure` | How to do something. An anti-pattern procedure enters only after the owner approves it |
+| `learnings/` | `procedure` | How to do something. Only a developer marked `approves: [procedures]` in `docs/systems.yaml` records one; it carries `approved_by` and `approved_on` |
 | `learnings/` | `note` | Meeting and demo notes |
 
 `index.md` lists every entry and is generated; never edit it by hand.
@@ -49,5 +49,7 @@ left out unless `--include-superseded` is given.
   a new entry that links to it and setting the old one's `status` to `superseded`.
 - No confidential content: no customer names, credentials, account ids or keys. The
   confidentiality check runs on every commit.
+- Anyone else with a procedure in mind records it as a `lesson` and proposes it.
 - `brain.py check` (also part of `check.py`) fails on bad front matter, an entry in the wrong
-  folder, an unknown author, a broken link or a stale index.
+  folder, an author who is not a developer, a procedure without an approver's approval, a broken
+  link or a stale index.

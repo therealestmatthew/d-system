@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import re
 import sys
@@ -49,6 +50,8 @@ FOLDERS = {
 }
 FRONT = re.compile(r"\A---\n(.*?)\n---\n?(.*)\Z", re.DOTALL)
 DEFAULT_LIMIT = 20
+#: Longest id a title becomes, so the file name stays well inside every filesystem's limit.
+MAX_SLUG = 60
 
 
 @dataclass(frozen=True)
@@ -131,7 +134,8 @@ def problems(config: paths.Config) -> list[str]:
     entries, errors = load_entries(root)
     schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
     validator = Draft7Validator(schema, format_checker=FormatChecker())
-    owners = known_owners(config)
+    developers = known_developers(config)
+    approving = identity.approvers(config.path("docs_root"), "procedures")
     seen: dict[str, str] = {}
     for entry in entries:
         where = relative(root, entry.path)
@@ -145,8 +149,13 @@ def problems(config: paths.Config) -> list[str]:
         if entry.path.parent.name != FOLDERS[entry.meta["kind"]]:
             errors.append(f"{where}: kind {entry.meta['kind']} belongs in "
                           f"{FOLDERS[entry.meta['kind']]}/")
-        if owners is not None and entry.meta["author"] not in owners:
-            errors.append(f"{where}: author {entry.meta['author']!r} is not in systems.yaml owners")
+        if developers is not None and entry.meta["author"] not in developers:
+            errors.append(f"{where}: author {entry.meta['author']!r} is not a developer (an owner "
+                          "with emails) in systems.yaml")
+        if entry.meta["kind"] == "procedure" and entry.meta["approved_by"] not in approving:
+            errors.append(f"{where}: procedure approved_by {entry.meta['approved_by']!r}, who is "
+                          "not listed in systems.yaml as approving procedures; record it as a "
+                          "lesson until it is approved")
         if entry.id in seen:
             errors.append(f"{where}: duplicate id {entry.id} (also {seen[entry.id]})")
         seen[entry.id] = where
@@ -160,18 +169,21 @@ def problems(config: paths.Config) -> list[str]:
     return sorted(errors)
 
 
-def known_owners(config: paths.Config) -> set[str] | None:
-    """The owner keys in systems.yaml, or None when there is no registry to check against."""
-    registry = config.path("docs_root") / identity.REGISTRY
-    if not registry.is_file():
+def known_developers(config: paths.Config) -> set[str] | None:
+    """The developer handles in systems.yaml, or None when there is no registry to check
+    against. A role key with no emails is not a developer and cannot author an entry."""
+    if not (config.path("docs_root") / identity.REGISTRY).is_file():
         return None
-    loaded = yaml.safe_load(registry.read_text(encoding="utf-8")) or {}
-    return set((loaded.get("owners") or {}).keys())
+    return set(identity.developers(config.path("docs_root")))
 
 
 def slug(title: str) -> str:
+    """A short id from a title: its first words in ASCII, or a hash of it when none survive."""
     words = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
-    return "-".join(words.split("-")[:8]) or "entry"
+    short = "-".join(words.split("-")[:8])[:MAX_SLUG].strip("-")
+    if short:
+        return short
+    return "entry-" + hashlib.sha256(title.encode("utf-8")).hexdigest()[:10]
 
 
 def write_index(root: Path) -> Path:
@@ -185,14 +197,22 @@ def new(config: paths.Config, kind: str, title: str, body: str, tags: list[str],
         links: list[str], sources: list[str], status: str = "active") -> Path:
     """Record one entry as the current developer and regenerate the index. Returns its path."""
     author = identity.handle(config)
+    if kind == "procedure" and author not in identity.approvers(config.path("docs_root"),
+                                                                 "procedures"):
+        raise ValueError("only a developer listed in systems.yaml as approving procedures "
+                         "records a procedure; record it as a lesson and propose it instead")
     root = config.path("brain_root")
     entry_id = slug(title)
     path = root / FOLDERS[kind] / f"{entry_id}.md"
-    if path.exists():
-        raise ValueError(f"{relative(root, path)} exists; choose a more specific title")
+    existing = {entry.id: entry.path for entry in load_entries(root)[0]}
+    if path.exists() or entry_id in existing:
+        taken = relative(root, existing.get(entry_id, path))
+        raise ValueError(f"id {entry_id} is taken by {taken}; choose a more specific title")
     today = dt.date.today().isoformat()
     meta: dict[str, Any] = {"id": entry_id, "kind": kind, "title": title, "author": author,
                             "created": today, "updated": today, "status": status}
+    if kind == "procedure":
+        meta.update(approved_by=author, approved_on=today)
     for key, values in (("tags", tags), ("links", links), ("sources", sources)):
         if values:
             meta[key] = values
@@ -200,8 +220,7 @@ def new(config: paths.Config, kind: str, title: str, body: str, tags: list[str],
         meta))
     if issues:
         raise ValueError("; ".join(issue.message for issue in issues))
-    known = {entry.id for entry in load_entries(root)[0]}
-    unknown = [link for link in links if link not in known]
+    unknown = [link for link in links if link not in existing]
     if unknown:
         raise ValueError(f"links to unknown entries: {', '.join(unknown)}")
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -290,7 +309,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             path = new(config, args.kind, args.title, body, _list(args.tags), _list(args.links),
                        _list(args.sources), args.status)
-        except (identity.IdentityError, ValueError) as error:
+        except (identity.IdentityError, ValueError, OSError) as error:
             print(f"error: {error}", file=sys.stderr)
             return 1
         print(f"recorded {relative(root, path)}; commit it with {INDEX}")

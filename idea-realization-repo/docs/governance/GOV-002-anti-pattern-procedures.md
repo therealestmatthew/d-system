@@ -25,7 +25,9 @@ a procedure; it does not add one itself.
 ## Where procedures live
 
 An approved procedure is recorded as a brain entry of kind `procedure` under `brain/learnings/`,
-with the `brain` skill or `brain.py new procedure`, tagged `anti-pattern`. This document is the
+with the `brain` skill or `brain.py new procedure`, tagged `anti-pattern`. Only a developer marked
+`approves: [procedures]` in `docs/systems.yaml` can record one; the entry carries their
+`approved_by` and `approved_on`, and the check refuses a procedure without them. This document is the
 rule; the brain holds the procedures, and `brain.py load --kind procedure --tag anti-pattern`
 lists them. A lesson a session learned, before the owner has approved it as a procedure, is
 recorded as kind `lesson` instead.
