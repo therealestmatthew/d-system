@@ -28,22 +28,15 @@ known_issues:
         A commit made inside a control-repository worktree fails the pre-commit hook with "product
         checkout refused". Never commit with `--no-verify`; stop and tell the owner until the hook
         fix merges.
-    - id: M1
-      severity: major
-      text: >-
-        Product CI's lint step fails on the first pull request that adds a `pyproject.toml`, on the
-        template's own `tools/check_confidential.py`. Expect it until the template fix merges.
     - id: M3
       severity: major
       text: >-
-        With no product checkout configured, as in control CI, the repository check does not check
-        a phase's product merge or `product:` evidence, and says nothing. Configure your product
-        checkout before you run the check for a completion.
-    - id: M4
-      severity: major
-      text: >-
-        If your product checkout is behind, the check can report a peer's completed phase as
-        "stranded". Pull the product checkout and run the check again before you reopen anything.
+        With no product checkout configured, as in control CI, the check cannot read a merge
+        commit's parents. It prints a "not checked" note for a completion whose `product_merge` is
+        not the reviewed commit, and checks only the shape of `product:` evidence paths, not that
+        the files exist. Treat that note as
+        unchecked, and run the check with your product checkout configured before you record a
+        completion. Whether control CI gets a product checkout is an owner decision.
     - id: M6
       severity: major
       text: >-
