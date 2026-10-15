@@ -48,6 +48,9 @@ this guide differs from that source, this guide is the authority.
 | Type | The system sans-serif stack everywhere. No webfonts. |
 | Generators | Python. |
 | Layout | A fixed layout-as-data shell. No runtime panel reassignment and no layout persistence. |
+| Hosting | The app is hosted on AWS Amplify Hosting. The custom domain and AWS WAF are not yet decided. |
+| Table sort control | The column header cell itself is the pressable sort control, with `aria-sort` on it (the React Aria form), not a button inside the header (2026-10-14). |
+| Toast announcements | React Aria's toast announces every toast assertively. Accepted for now as a known gap; revisit when React Aria's toast is stable (2026-10-14). |
 
 ## Principles
 
@@ -432,8 +435,9 @@ Each entry gives purpose, anatomy, variants, states, keyboard and ARIA, and what
     - Keyboard and ARIA: `role="alert"` only when it appears in response to an action.
 17. **Table and DataTable**
     - Anatomy: a toolbar (search, filter chips, column menu, view toggle, count "42 of 310"); a
-      table with a sticky header; sortable headers (a button in each `th`, `aria-sort`, cycling
-      ascending, descending, then the server order); row selection (checkbox column,
+      table with a sticky header; sortable headers (the header cell itself is the pressable
+      control, with `aria-sort` on it, cycling ascending, descending, then the server order; the
+      static form styles the same header); row selection (checkbox column,
       `aria-selected`); a footer.
     - States: skeleton rows while loading; empty, and with filters "No rows match" plus clear
       filters; error; virtualized above 500 rows.
@@ -467,6 +471,9 @@ Each entry gives purpose, anatomy, variants, states, keyboard and ARIA, and what
     - Anatomy: a stack at the bottom right, at most three visible.
     - Keyboard and ARIA: a polite `status` region (`alert` for errors); never takes focus; reachable
       with a shortcut (F8).
+    - Known gap: the React toast is built on React Aria's toast, which gives every toast
+      `role="alertdialog"` and so announces success and info assertively. The owner accepted this on
+      2026-10-14 until React Aria's toast is stable; then success and info move to a polite region.
     - Not for: errors that block the current task (show them inline) or confirmations (use a
       dialog).
 22. **Empty, loading, error, missing and not-recorded states**
