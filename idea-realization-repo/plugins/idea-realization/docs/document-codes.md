@@ -25,7 +25,7 @@ The default register (`templates/codes.yaml`), with locations relative to the do
 | `ADR` | `adr` | `decisions/` | counter |
 | `ARCH` | `architecture` | `architecture/` | counter |
 | `PROMPT` | `prompt` | `prompts/` | counter |
-| `OPS` | `operation` | `governance/` | counter |
+| `OPS` | `operation` | `governance/` (a repository's `codes.yaml` may add more, such as `guides/`) | counter |
 | `GOV` | `governance` | `governance/` | counter |
 | `SESS` | `session` | `sessions/` | dated |
 | `WALK` | `walkthrough` | `sessions/` | dated |

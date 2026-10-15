@@ -203,7 +203,10 @@ and you can come back to this section when they have.
 `claim` only edits the file. It rewrites the whole file, so a comment in it is dropped; that line
 in your diff is expected. Commit `docs/workstreams.yaml` directly on control `dev` and push at
 once. If the push is rejected, someone pushed first: `git pull --rebase origin dev`, run
-`workstreams.py check`, and push again if the workstream is still yours.
+`workstreams.py check`, and push again if the workstream is still yours. Two claims of different
+workstreams can still conflict, because `claim` rewrites the whole file. If the rebase stops on a conflict in `docs/workstreams.yaml`, keep both sides: each
+workstream keeps the lines its own claim wrote, whichever side they came from. Never resolve it
+with `--ours` or `--theirs`.
 
 In the first two days each workstream writes the interface documents the others build against.
 The team workflow guide (`OPS-005`, sections 1 and 2) has the details.

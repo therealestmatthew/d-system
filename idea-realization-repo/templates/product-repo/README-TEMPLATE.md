@@ -39,7 +39,8 @@ GitHub name.
    git commit -m "Start the product repository from the control repository's template"
    ```
 
-3. **Fill the placeholders** that are known now (every `REPLACE-WITH` in `README.md`), and remove
+3. **Fill the placeholders** that are known now (every `REPLACE-WITH` in `README.md`; never put
+   the repository's URL or `<org>/<product>` name in it, step 9), and remove
    the stack sections of `.github/workflows/product-ci.yml` that will never apply, or leave them:
    a stack's steps are skipped while its manifest file is absent. Commit.
 

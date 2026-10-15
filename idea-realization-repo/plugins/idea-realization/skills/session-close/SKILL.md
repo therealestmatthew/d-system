@@ -272,8 +272,8 @@ CLAUDE_PLUGIN_OPTION_PRODUCT_ROOT='${user_config.product_root}' \
 uv run "${CLAUDE_PLUGIN_ROOT}/scripts/check.py"
 ```
 
-Commit the completion edit and the catalog together in one commit that changes nothing else, then
-push it at once:
+Commit the completion edit, the session record's `## Backlog` update and the catalog together in
+one commit that changes nothing else, then push it at once:
 
 ```bash
 git pull --rebase

@@ -22,8 +22,8 @@ part lives in a subdirectory, update the manifest paths and `working-directory` 
 ## First-time setup
 
 ```bash
-git clone REPLACE-WITH-THE-PRODUCT-REPOSITORY-GIT-URL
-cd REPLACE-WITH-REPOSITORY-DIRECTORY
+git clone <product repository URL>     # from the owner; never written into a tracked file
+cd <product repository directory>
 git switch dev
 tools/install-hooks.sh          # pre-commit hook: the confidential check
 ```

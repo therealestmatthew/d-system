@@ -68,7 +68,9 @@ Then, in the control repository's primary checkout on its integration branch:
 2. push;
 3. if the push is rejected, someone else pushed first: `git pull --rebase`, then
    `workstreams.py check`. If the workstream is still yours and the check is clean, push again;
-   if someone else claimed it, choose another.
+   if someone else claimed it, choose another. `claim` rewrites the whole file, so claims of two
+   different workstreams can conflict in the rebase: keep both sides, each workstream keeping the
+   lines its own claim wrote, and never resolve it with `--ours` or `--theirs`.
 
 Only a workstream's owner releases it.
 

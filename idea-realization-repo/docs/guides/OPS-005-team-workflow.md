@@ -58,7 +58,9 @@ Each developer, once:
    `claim` edits the file and never commits. Commit only `docs/workstreams.yaml` on control `dev`
    in the primary checkout and push at once. If the push is rejected, someone pushed first:
    `git pull --rebase`, run `workstreams.py check`, and push again if the workstream is still
-   yours; if a peer took it, choose another.
+   yours; if a peer took it, choose another. If the rebase stops on a conflict in
+   `docs/workstreams.yaml`, keep both sides: each workstream keeps the lines its own claim wrote.
+   Never resolve it with `--ours` or `--theirs`.
 
 The developer entry and the workstream claim are bookkeeping, so they go directly to control
 `dev`, not through a pull request.

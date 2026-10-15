@@ -120,8 +120,8 @@ For each demo release:
 2. Tag the merge on `main` with an annotated tag: `demo-rc-<n>`, counting up from 1.
 
    ```bash
-   git fetch origin && git checkout main && git pull origin main
-   git tag -a demo-rc-3 -m "Demo release candidate 3"
+   git fetch origin
+   git tag -a demo-rc-3 origin/main -m "Demo release candidate 3"
    git push origin demo-rc-3
    ```
 

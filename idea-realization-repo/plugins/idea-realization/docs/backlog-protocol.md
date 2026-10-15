@@ -38,7 +38,7 @@ governance or adr document), `max_active` (1 to 15, default 1), `next_up` and `i
 | `verification` | At least one command or specific check, run and recorded during execution. |
 | `deliverables` | Expected repository paths, which need not exist yet; refined during execution. |
 | `next_action` | The first useful action, or an exact resume instruction. |
-| `agent` | `agent-<name>`, naming the branch `agent/<phase-id>`. Required on every active phase while `max_active` exceeds 1. |
+| `agent` | `agent-<name>`, or `<handle>/agent-<name>` in a repository whose developers have handles (`workstreams.md`); the branch is `agent/<phase-id>`. Required on every active phase while `max_active` exceeds 1. |
 | `blocked_reason` | Required on blocked, deferred and cancelled phases. |
 | `resume_when` | Required on blocked and deferred phases. |
 | `session`, `completion_evidence`, `result` | Required together on a complete phase; may be recorded while a phase is active or blocked. A released phase (queued, deferred, cancelled) carries none of them. `session` names a session or walkthrough document. |
