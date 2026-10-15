@@ -14,7 +14,14 @@ only network call. It never prints the deny-list's contents, an AWS credential o
 part of ``tools/check_aws_machine.py``; the instance-metadata probe and ``--probe`` need the
 network, so they are listed as manual steps.
 
-Exit codes: 0 when every line is OK; 1 when any line is FIX.
+AWS lines wait for the owner. Until this machine names an AWS read or deploy profile, nobody
+can have finished the AWS steps (the owner creates the roles first, ``aws/README.md``), so the AWS
+CLI, profile and region lines print as ``NOTE`` (pending) and do not fail the check. Once either
+profile is named, they are checked like every other line, and a real problem is a ``FIX``. The
+machine rule (no default profile, no ``AWS_`` credentials) is checked either way: ambient
+credentials are unsafe whether or not the sandbox roles exist yet.
+
+Exit codes: 0 when every line is OK or a pending note; 1 when any line is FIX.
 """
 
 from __future__ import annotations
@@ -56,9 +63,15 @@ class Line:
     ok: bool
     item: str
     detail: str
+    pending: bool = False  # waiting for the owner's AWS setup: shown, never a failure
 
     def __str__(self) -> str:
-        return f"{'OK ' if self.ok else 'FIX'}  {self.item}: {self.detail}"
+        label = "NOTE" if self.pending else "OK  " if self.ok else "FIX "
+        return f"{label} {self.item}: {self.detail}"
+
+    @property
+    def failed(self) -> bool:
+        return not self.ok and not self.pending
 
 
 Which = Callable[[str], str | None]
@@ -93,9 +106,6 @@ def check_tools(which: Which, run: Runner) -> list[Line]:
                                        "(session-close merges pull requests with gh)"))
     else:
         lines.append(Line(True, "gh", "installed and authenticated (gh auth status)"))
-    lines.append(Line(bool(which("aws")), "AWS CLI", "installed" if which("aws") else
-                      "the aws command is not on PATH; install AWS CLI v2 (tools/aws-sandbox and "
-                      "check_aws_machine.py --probe need it)"))
     return lines
 
 
@@ -222,12 +232,19 @@ def aws_profile_names(env: Mapping[str, str]) -> set[str]:
     return names
 
 
-def check_aws(config: paths.Config, env: Mapping[str, str]) -> list[Line]:
+PENDING = ("pending: no AWS profile is configured on this machine yet, so the AWS steps wait for "
+           "the owner's setup (aws/README.md); then ")
+
+
+def check_aws(config: paths.Config, env: Mapping[str, str], which: Which = shutil.which,
+              ) -> list[Line]:
     read = config.text("aws_read_profile")
     deploy = config.text("aws_deploy_profile")
     region = config.text("aws_region")
     known = aws_profile_names(env)
-    lines = []
+    lines = [Line(bool(which("aws")), "AWS CLI", "installed" if which("aws") else
+                  "the aws command is not on PATH; install AWS CLI v2 (tools/aws-sandbox and "
+                  "check_aws_machine.py --probe need it)")]
     for item, name in (("AWS read profile", read), ("AWS deploy profile", deploy)):
         if not name:
             lines.append(Line(False, item, "not set; set it in .idea-realization/local.yaml "
@@ -244,6 +261,9 @@ def check_aws(config: paths.Config, env: Mapping[str, str]) -> list[Line]:
                                                  "use one profile per role"))
     lines.append(Line(bool(region), "AWS region", region or "not set; set aws_region in "
                       "local.yaml, or aws.region in project.yaml"))
+    if not read and not deploy:
+        lines = [line if line.ok else Line(False, line.item, PENDING + line.detail, pending=True)
+                 for line in lines]
     findings = check_aws_machine.static_findings(dict(env))
     if findings:
         lines += [Line(False, "AWS machine rule", finding) for finding in findings]
@@ -270,7 +290,7 @@ def run_checks(root: Path, env: Mapping[str, str], which: Which = shutil.which,
     lines.append(check_doctor(config))
     lines.append(check_control(config))
     lines.append(check_product(config))
-    lines += check_aws(config, env)
+    lines += check_aws(config, env, which)
     return lines
 
 
@@ -286,8 +306,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     print("\nRun by hand (they need the network or a person):")
     for step in MANUAL:
         print(f"  {step}")
-    failed = sum(not line.ok for line in lines)
-    print(f"\n{failed} to fix" if failed else "\nAll checks OK")
+    failed = sum(line.failed for line in lines)
+    pending = sum(line.pending for line in lines)
+    waiting = f" ({pending} pending the owner's AWS setup)" if pending else ""
+    print(f"\n{failed} to fix{waiting}" if failed else f"\nAll checks OK{waiting}")
     return 1 if failed else 0
 
 

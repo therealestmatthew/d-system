@@ -76,7 +76,8 @@ def authenticated(command: Sequence[str]) -> int:
 
 
 def fixes(lines: list[onboard.Line]) -> dict[str, str]:
-    return {line.item: line.detail for line in lines if not line.ok}
+    return {line.item: line.detail for line in lines
+            if not line.ok and not getattr(line, "pending", False)}
 
 
 def test_a_complete_machine_is_all_ok(tmp_path: Path) -> None:
@@ -133,9 +134,12 @@ def test_deny_list_missing_or_empty_is_a_fix_and_its_content_is_never_printed(
 def test_missing_local_yaml_is_a_fix(tmp_path: Path) -> None:
     root, env = machine(tmp_path)
     (root / ".idea-realization" / "local.yaml").unlink()
-    found = fixes(onboard.run_checks(root, env, every_tool, authenticated))
+    lines = onboard.run_checks(root, env, every_tool, authenticated)
+    found = fixes(lines)
     assert "is missing" in found["local.yaml"]
-    assert "product checkout" in found and "AWS read profile" in found
+    assert "product checkout" in found
+    # No profile is configured without local.yaml, so the AWS lines wait for the owner's setup.
+    assert "AWS read profile" in {line.item for line in lines if line.pending}
 
 
 def test_invalid_local_yaml_stops_the_dependent_checks(tmp_path: Path) -> None:
@@ -230,3 +234,51 @@ def test_main_exits_one_and_lists_manual_steps(tmp_path: Path,
     assert "FIX  deny-list" in out
     assert "check_aws_machine.py --probe" in out and "aws-sandbox whoami" in out
     assert "doctor.py" not in out.split("Run by hand")[1]
+
+
+
+def without_aws_profiles(root: Path) -> None:
+    """local.yaml as it is before the owner's AWS setup: no profile, no region."""
+    local = root / ".idea-realization" / "local.yaml"
+    local.write_text("".join(line + "\n" for line in local.read_text().splitlines()
+                             if not line.startswith("aws_")), encoding="utf-8")
+
+
+def test_aws_lines_are_pending_notes_until_a_profile_is_configured(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str]) -> None:
+    """Owner ruling: before the AWS setup exists, onboarding must not fail on AWS."""
+    root, env = machine(tmp_path)
+    without_aws_profiles(root)
+    no_aws = lambda name: None if name == "aws" else every_tool(name)  # noqa: E731
+    lines = onboard.run_checks(root, env, no_aws, authenticated)
+    assert fixes(lines) == {}
+    pending = {line.item for line in lines if line.pending}
+    assert pending == {"AWS CLI", "AWS read profile", "AWS deploy profile", "AWS region"}
+    assert all(str(line).startswith("NOTE") for line in lines if line.pending)
+    monkeypatch.setenv("HOME", env["HOME"])
+    monkeypatch.setattr(onboard, "run_quietly", authenticated)
+    monkeypatch.setattr(onboard.shutil, "which", no_aws)
+    for name in list(os.environ):
+        if name.startswith(("AWS_", "IDEA_REALIZATION_AWS_")):
+            monkeypatch.delenv(name)
+    assert onboard.main(["--root", str(root)]) == 0
+    assert "All checks OK (4 pending the owner's AWS setup)" in capsys.readouterr().out
+
+
+def test_once_a_profile_is_configured_aws_problems_fail_again(tmp_path: Path) -> None:
+    root, env = machine(tmp_path)
+    without_aws_profiles(root)
+    local = root / ".idea-realization" / "local.yaml"
+    local.write_text(local.read_text() + "aws_read_profile: sandbox-read\n", encoding="utf-8")
+    found = fixes(onboard.run_checks(root, env, lambda n: None if n == "aws" else every_tool(n),
+                                     authenticated))
+    assert {"AWS CLI", "AWS deploy profile", "AWS region"} <= set(found)
+
+
+def test_the_machine_rule_fails_even_before_the_aws_setup(tmp_path: Path) -> None:
+    root, env = machine(tmp_path)
+    without_aws_profiles(root)
+    write(Path(env["HOME"]) / ".aws" / "config", "[default]\nregion = eu-west-1\n")
+    assert "default profile" in fixes(onboard.run_checks(root, env, every_tool,
+                                                         authenticated))["AWS machine rule"]
