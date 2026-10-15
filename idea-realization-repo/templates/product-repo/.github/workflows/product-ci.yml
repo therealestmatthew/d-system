@@ -86,7 +86,10 @@ jobs:
 
       # ---- Node (package.json at the root) --------------------------------------------------
       # REPLACE: move to the web app's directory if it is not the root (set working-directory and
-      # the hashFiles paths), and keep only the scripts the project defines.
+      # the hashFiles paths), and keep only the scripts the project defines. The React examiner
+      # workbench is hosted on Amplify Hosting: CI only builds it here; the aws-deploy agent
+      # uploads the build to Amplify. If the workbench lives in web/, repeat these two steps
+      # with `working-directory: web` and hashFiles('web/package.json').
       - name: Set up Node
         if: hashFiles('package.json') != ''
         uses: actions/setup-node@v7
@@ -118,10 +121,14 @@ jobs:
           uv run --with pytest pytest -q || [ $? -eq 5 ]
 
       # ---- Infrastructure (AWS CDK app in infra/) -------------------------------------------
-      # `cdk synth` only, with no AWS credentials. The CDK app must use
-      # CliCredentialsStackSynthesizer (the sandbox deploy role cannot assume the default
-      # synthesizer's bootstrap roles) and reference execution roles with Role.fromRoleArn under
-      # the IAM path /app/; see the control repository's aws/README.md. Context lookups
+      # `cdk synth` only, with no AWS credentials. On a developer machine, any agent runs the
+      # same synth with the control repository's `tools/aws-sandbox synth --dir infra`, which
+      # strips every AWS credential source. The CDK app must use CliCredentialsStackSynthesizer
+      # (the sandbox deploy role cannot assume the default synthesizer's bootstrap roles), and
+      # every IAM role it creates must have the path /app/ and the permission boundary
+      # app-permissions-boundary (the cdk.json context key @aws-cdk/core:permissionsBoundary plus
+      # an aspect that sets the path); see the control repository's aws/README.md, "CDK settings
+      # every product stack uses". The template check below enforces it. Context lookups
       # (for example Vpc.fromLookup) need a committed infra/cdk.context.json, because synth here
       # cannot reach AWS to fill it.
       # This assumes a TypeScript or JavaScript CDK app (infra/package.json). For a Python CDK
@@ -140,3 +147,34 @@ jobs:
         run: |
           if [ -f package-lock.json ]; then npm ci; else npm install; fi
           npx cdk synth --quiet --no-notices
+      # The sandbox deploy role may create IAM roles only under /app/ with the permission
+      # boundary, and no customer managed policy, user, group, instance profile or service-linked
+      # role. A template that breaks this would fail at deploy time; this step fails it here.
+      - name: CDK template check (IAM roles under /app/ with the boundary)
+        if: hashFiles('infra/cdk.json') != ''
+        working-directory: infra
+        run: |
+          python3 - <<'EOF'
+          import glob, json, sys
+          BOUNDARY = "app-permissions-boundary"
+          REFUSED = {"AWS::IAM::ManagedPolicy", "AWS::IAM::User", "AWS::IAM::Group",
+                     "AWS::IAM::InstanceProfile", "AWS::IAM::ServiceLinkedRole",
+                     "AWS::IAM::OIDCProvider", "AWS::IAM::SAMLProvider"}
+          errors = []
+          templates = glob.glob("cdk.out/**/*.template.json", recursive=True)
+          for path in templates:
+              resources = json.load(open(path, encoding="utf-8")).get("Resources", {})
+              for name, resource in resources.items():
+                  kind, props = resource.get("Type"), resource.get("Properties", {})
+                  if kind in REFUSED:
+                      errors.append(f"{path}: {name} is {kind}, which the deploy role cannot create")
+                  if kind == "AWS::IAM::Role":
+                      if props.get("Path") != "/app/":
+                          errors.append(f"{path}: role {name} has no Path /app/")
+                      if BOUNDARY not in json.dumps(props.get("PermissionsBoundary", "")):
+                          errors.append(f"{path}: role {name} lacks the boundary {BOUNDARY}")
+          for error in errors:
+              print(f"::error::{error}")
+          print(f"checked {len(templates)} template(s), {len(errors)} problem(s)")
+          sys.exit(1 if errors else 0)
+          EOF

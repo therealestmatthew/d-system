@@ -35,7 +35,13 @@ Non-goals:
 ## Decisions
 
 - **A third role, `ci-deploy`, separate from the two sandbox roles.** Its permissions are the same
-  `aws/iam/deploy-policy.json`, so CI can do exactly what `aws-deploy` can and nothing more. The
+  `aws/iam/deploy-policy.json`, so CI can do exactly what `aws-deploy` can and nothing more. That
+  is the policy as the owner settled it on 2026-10-14: it may create IAM roles under `/app/` only
+  with the permission boundary `app-permissions-boundary` attached, may pass `/app/` roles only to
+  the product's services, may not touch the account's baseline CloudTrail trail or bypass Object
+  Lock governance retention, and its region deny exempts the cross-region routing of the US
+  Bedrock inference profiles (`aws/README.md`). Whatever the owner changes in that policy later,
+  `ci-deploy` takes too. The
   alternative, letting the existing deploy role also trust GitHub, would mix developer and CI
   principals in one trust policy and make an audit of either harder. Proposed by the plan author;
   the owner decides.
@@ -44,9 +50,10 @@ Non-goals:
   tag rule is enforced by the environment's deployment rules (only `demo-*` tags and manual runs
   from `dev`), not by the trust policy. A ref-based trust statement for `demo-*` tags without the
   environment would skip the required reviewer, so this plan does not include one.
-- **The existing deploy role cannot set any of this up.** Its policy denies every IAM change,
-  budgets and billing, so creating the OIDC provider, the `ci-deploy` role and the budget needs an
-  administrator in the sandbox account.
+- **The existing deploy role cannot set any of this up.** Its policy denies every IAM change
+  except to `/app/` roles under the permission boundary, and denies budgets and billing, so
+  creating the OIDC provider, the `ci-deploy` role (outside `/app/`, without the boundary) and the
+  budget needs an administrator in the sandbox account.
 - **The workflow is a sketch in this plan, not a file in the product repository,** until the owner
   approves the plan.
 
@@ -56,7 +63,8 @@ Non-goals:
 |---|---|
 | Access in the sandbox account | Administrator, or permissions to create an IAM OIDC provider, IAM roles and policies, and budgets |
 | Sandbox account id | `<sandbox-account-id>` |
-| Region | `REPLACE-WITH-SANDBOX-REGION` (the same value as in `deploy-policy.json`) |
+| Region | `REPLACE-WITH-SANDBOX-REGION` (the same value as in `deploy-policy.json`; a US region where the US Bedrock inference profiles are offered) |
+| Baseline trail name | `REPLACE-WITH-BASELINE-TRAIL-NAME` (the same value as in `deploy-policy.json`) |
 | Product repository | `<org>/<product>`, plus its numeric owner and repository ids (see step 2) |
 | GitHub access | Admin on the product repository (environments, variables, OIDC settings) |
 | Required reviewers | The GitHub handles who approve sandbox deployments |
@@ -124,7 +132,23 @@ matches.
   `<alert-address>`.
 - Tags on every stack: `project=<product>`, `environment=sandbox`, `deployed-by=ci` (set in the
   workflow with `--tags`), and the `project` tag activated as a cost-allocation tag.
-- Any execution role the stacks need already exists under `/app/`, as for local deploys.
+- The permission boundary policy `app-permissions-boundary` exists, created from
+  `aws/iam/app-permissions-boundary.json`; the stacks create their own `/app/` roles under it, as
+  for local deploys. The product's CI `verify` job already fails a template whose roles lack the
+  path or the boundary.
+- The OpenSearch Serverless service-linked role exists (`aws iam create-service-linked-role
+  --aws-service-name observability.aoss.amazonaws.com`, once, by an administrator); neither
+  deploy role can create it.
+- Bedrock model access is enabled for Claude Sonnet 5 and Claude Opus 5.5, and the quotas
+  "Cross-region model inference requests per minute" and "tokens per minute" for each model's US
+  profile (`us.anthropic.claude-sonnet-5`, `us.anthropic.claude-opus-5-5`) cover the demo load.
+  The runtime roles the stack creates carry the three-part grant in `aws/README.md`, "Bedrock: US
+  inference profiles". The US profiles route to us-east-1, us-east-2 and us-west-2; the owner has
+  accepted that routing for the sandbox.
+- The examiner workbench is hosted on Amplify Hosting. The stack creates the Amplify app with no
+  repository connection; CI publishes the web build to it after `cdk deploy` (step 6). No custom
+  domain or WAF: adding either needs us-east-1 resources the region deny refuses
+  (`aws/README.md`, "Workbench hosting").
 
 **5. GitHub configuration (repository admin).**
 - Environment `sandbox`: required reviewers set, "prevent self-review" on, deployment branches and
@@ -164,10 +188,16 @@ jobs:
           role-to-assume: ${{ vars.AWS_CI_DEPLOY_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
           role-session-name: deploy-sandbox-${{ github.run_id }}
+      - run: npm ci && npm run build      # the workbench build for Amplify Hosting
+        working-directory: web
       - run: npm ci
         working-directory: infra
-      - run: npx cdk deploy --all --require-approval never --tags deployed-by=ci
+      - run: npx cdk deploy --all --require-approval never --tags deployed-by=ci --outputs-file cdk-outputs.json
         working-directory: infra
+      # Publish the workbench build to Amplify Hosting: zip web/dist, then
+      # `aws amplify create-deployment --app-id <from cdk-outputs.json> --branch-name <branch>`,
+      # upload the zip to the returned zipUploadUrl, and `aws amplify start-deployment` with the
+      # returned jobId. The app id and branch come from the stack's outputs.
 ```
 
 Step order: 1 before 3; 2 before 3; 3 and 4 before 6; 5 before 6. The `infra` directory and Node
@@ -181,7 +211,8 @@ setup follow the product's stack, which is not chosen yet; adjust them then.
 - `cdk deploy` completes; CloudTrail shows the stack changes made by that session name.
 - **Cases that must fail:** a run from a branch other than `dev` is refused by the environment's
   deployment rule; a job without `environment: sandbox` fails at `AssumeRoleWithWebIdentity`
-  (access denied); a step in the job that calls `iam:CreateRole` is denied by the deploy policy.
+  (access denied); a step in the job that calls `iam:CreateRole` for a role outside `/app/`, or
+  without the permission boundary, is denied by the deploy policy.
 - No GitHub secret holds an AWS key; `tools/check_aws_machine.py --probe` still passes on every
   developer machine (nothing in this plan changes them).
 

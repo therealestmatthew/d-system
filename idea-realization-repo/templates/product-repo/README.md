@@ -14,6 +14,7 @@ Delete the rows that do not apply.
 | Web front end | `web/` | REPLACE-WITH (for example TypeScript, React, Vite) | `package.json` |
 | API / back end | `api/` | REPLACE-WITH (for example Python, FastAPI) | `pyproject.toml` |
 | Infrastructure | `infra/` | AWS CDK (REPLACE-WITH language) | `infra/cdk.json` |
+| Workbench hosting | `web/` build output | Amplify Hosting (static build, no repository connection; default `*.amplifyapp.com` domain, no custom domain or WAF yet) | the CDK stack's `AWS::Amplify::App` |
 
 CI runs a stack's steps only when its manifest exists (`.github/workflows/product-ci.yml`). If a
 part lives in a subdirectory, update the manifest paths and `working-directory` in that workflow.
@@ -57,7 +58,14 @@ uv run pytest                   # Python
 python3 tools/check_confidential.py
 ```
 
+On a machine that runs agents, synthesize through the control repository's wrapper instead, which
+strips every AWS credential source first and is open to every agent:
+`<control repository>/tools/aws-sandbox synth --dir infra --quiet`. CI also fails when a
+synthesized IAM role lacks the path `/app/` or the permission boundary `app-permissions-boundary`
+(the control repository's `aws/README.md`, "CDK settings every product stack uses").
+
 ## Deploy
 
 Deploying is done from a developer machine by the control repository's `aws-deploy` agent,
-through `tools/aws-sandbox` there. CI never deploys and never calls AWS.
+through `tools/aws-sandbox` there: `cdk deploy` for the stack, then an Amplify deployment of the
+workbench build. CI never deploys and never calls AWS.

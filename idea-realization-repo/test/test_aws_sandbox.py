@@ -38,6 +38,7 @@ def test_read_runs_with_the_configured_profile_and_region() -> None:
 
 
 @pytest.mark.parametrize("operation", ["list-buckets", "get-caller-identity", "ls", "tail",
+                                       "start-query",
                                        "filter-log-events", "describe-stacks"])
 def test_read_operations_pass(operation: str) -> None:
     build("read", "svc", operation)
@@ -127,3 +128,86 @@ def test_exec_refuses_a_caller_profile() -> None:
 
 def test_unknown_mode_refused() -> None:
     assert "usage" in refused("delete", "s3", "rb")
+
+
+# ---- synth: `cdk synth` with no AWS credential source -------------------------------------------
+
+AMBIENT = {"AWS_ACCESS_KEY_ID": "AKIAEXAMPLE", "AWS_SECRET_ACCESS_KEY": "secret",
+           "AWS_SESSION_TOKEN": "token", "AWS_PROFILE": "sandbox-deploy",
+           "AWS_DEFAULT_PROFILE": "sandbox-deploy", "AWS_ROLE_ARN": "arn:aws:iam::0:role/x",
+           "AWS_WEB_IDENTITY_TOKEN_FILE": "/tmp/token", "AWS_CONFIG_FILE": "/home/x/.aws/config",
+           "AWS_SHARED_CREDENTIALS_FILE": "/home/x/.aws/credentials",
+           "AWS_CONTAINER_CREDENTIALS_RELATIVE_URI": "/v2/credentials",
+           "AWS_CONTAINER_CREDENTIALS_FULL_URI": "http://169.254.170.2/creds",
+           "AWS_EC2_METADATA_DISABLED": "false", "BOTO_CONFIG": "/home/x/.boto",
+           "CDK_DEFAULT_ACCOUNT": "000000000000"}
+
+
+def assert_no_credential_source(env: dict[str, str]) -> None:
+    aws = {k: v for k, v in env.items() if k.startswith(("AWS_", "BOTO_"))}
+    assert aws == {"AWS_EC2_METADATA_DISABLED": "true", "AWS_CONFIG_FILE": "/dev/null",
+                   "AWS_SHARED_CREDENTIALS_FILE": "/dev/null"}
+    assert "CDK_DEFAULT_ACCOUNT" not in env
+    assert "sandbox-read" not in env.values() and "sandbox-deploy" not in env.values()
+
+
+def test_synth_strips_every_credential_source() -> None:
+    command, env = build("synth", env={**ENV, **AMBIENT})
+    assert command[-1] == "synth"
+    assert_no_credential_source(env)
+
+
+def test_synth_needs_no_profile_configuration() -> None:
+    command, env = build("synth", "--quiet", env={"PATH": "", **AMBIENT})
+    assert command[-2:] == ["synth", "--quiet"]
+    assert_no_credential_source(env)
+
+
+@pytest.mark.parametrize("option", ["--profile", "--profile=x", "--role-arn", "-r"])
+def test_synth_refuses_a_credential_option(option: str) -> None:
+    assert "names a credential source" in refused("synth", option, "x")
+
+
+def test_synth_dir_must_exist(tmp_path: Path) -> None:
+    assert "not a directory" in refused("synth", "--dir", str(tmp_path / "missing"))
+
+
+FAKE = """#!/usr/bin/env python3
+import json, os, subprocess, sys
+name = os.path.basename(sys.argv[0])
+with open(os.path.join(os.environ["RECORD_DIR"], name + ".json"), "w") as out:
+    json.dump({"argv": sys.argv[1:], "env": dict(os.environ), "cwd": os.getcwd()}, out)
+if name == "cdk":
+    # The CDK app asking AWS who it is, as a lookup would: it reaches the fake aws CLI below.
+    subprocess.run(["aws", "sts", "get-caller-identity"], check=False)
+"""
+
+
+def test_synth_runs_cdk_and_cannot_reach_aws(tmp_path: Path) -> None:
+    """A fake cdk and a fake aws on PATH record the environment they were given."""
+    import json
+    import os
+    import subprocess
+    import sys
+
+    bin_dir, record, app = tmp_path / "bin", tmp_path / "record", tmp_path / "infra"
+    for directory in (bin_dir, record, app):
+        directory.mkdir()
+    for name in ("cdk", "aws"):
+        fake = bin_dir / name
+        fake.write_text(FAKE, encoding="utf-8")
+        fake.chmod(0o755)
+    env = {**ENV, **AMBIENT, "RECORD_DIR": str(record),
+           "PATH": os.pathsep.join([str(bin_dir), os.path.dirname(sys.executable),
+                                    "/usr/bin", "/bin"]),
+           "HOME": str(tmp_path)}
+    result = subprocess.run([sys.executable, str(WRAPPER), "synth", "--dir", str(app), "--quiet"],
+                            env=env, capture_output=True, text=True, check=False)
+    assert result.returncode == 0, result.stderr
+    cdk = json.loads((record / "cdk.json").read_text(encoding="utf-8"))
+    aws = json.loads((record / "aws.json").read_text(encoding="utf-8"))
+    assert cdk["argv"] == ["synth", "--quiet"]
+    assert os.path.realpath(cdk["cwd"]) == os.path.realpath(app)
+    for seen in (cdk["env"], aws["env"]):
+        assert_no_credential_source(seen)
+    assert "--profile" not in aws["argv"]

@@ -28,11 +28,36 @@
       "Resource": "*"
     },
     {
-      "Sid": "AllowAttachingAppRolesCreatedByAPerson",
+      "Sid": "AllowPassingAppRolesToTheProductsServices",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::*:role/app/*",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": [
+            "states.amazonaws.com",
+            "lambda.amazonaws.com",
+            "bedrock.amazonaws.com",
+            "textract.amazonaws.com",
+            "cognito-idp.amazonaws.com",
+            "cloudtrail.amazonaws.com",
+            "vpc-flow-logs.amazonaws.com",
+            "amplify.amazonaws.com",
+            "events.amazonaws.com"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "AllowReadingAppRoles",
       "Effect": "Allow",
       "Action": [
-        "iam:PassRole",
-        "iam:GetRole"
+        "iam:GetRole",
+        "iam:GetRolePolicy",
+        "iam:ListRolePolicies",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListRoleTags",
+        "iam:ListInstanceProfilesForRole"
       ],
       "Resource": "arn:aws:iam::*:role/app/*"
     },
@@ -41,6 +66,49 @@
       "Effect": "Allow",
       "Action": "iam:ListRoles",
       "Resource": "*"
+    },
+    {
+      "Sid": "AllowReadingTheBoundaryAndAwsManagedPolicies",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetPolicy",
+        "iam:GetPolicyVersion"
+      ],
+      "Resource": [
+        "arn:aws:iam::REPLACE_WITH_SANDBOX_ACCOUNT_ID:policy/app-permissions-boundary",
+        "arn:aws:iam::aws:policy/*"
+      ]
+    },
+    {
+      "Sid": "AllowChangingAppRolesOnlyUnderTheBoundary",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy",
+        "iam:PutRolePermissionsBoundary"
+      ],
+      "Resource": "arn:aws:iam::*:role/app/*",
+      "Condition": {
+        "StringEquals": {
+          "iam:PermissionsBoundary": "arn:aws:iam::REPLACE_WITH_SANDBOX_ACCOUNT_ID:policy/app-permissions-boundary"
+        }
+      }
+    },
+    {
+      "Sid": "AllowMaintainingAppRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:DeleteRole",
+        "iam:TagRole",
+        "iam:UntagRole",
+        "iam:UpdateRole",
+        "iam:UpdateRoleDescription",
+        "iam:UpdateAssumeRolePolicy"
+      ],
+      "Resource": "arn:aws:iam::*:role/app/*"
     },
     {
       "Sid": "DenyPassingOrReadingRolesOutsideApp",
@@ -52,7 +120,40 @@
       "NotResource": "arn:aws:iam::*:role/app/*"
     },
     {
-      "Sid": "DenyEveryIamChange",
+      "Sid": "DenyAppRoleChangesWithoutTheBoundary",
+      "Effect": "Deny",
+      "Action": [
+        "iam:CreateRole",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy",
+        "iam:PutRolePermissionsBoundary"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "iam:PermissionsBoundary": "arn:aws:iam::REPLACE_WITH_SANDBOX_ACCOUNT_ID:policy/app-permissions-boundary"
+        }
+      }
+    },
+    {
+      "Sid": "DenyRemovingOrChangingTheBoundary",
+      "Effect": "Deny",
+      "Action": [
+        "iam:DeleteRolePermissionsBoundary",
+        "iam:DeleteUserPermissionsBoundary",
+        "iam:CreatePolicyVersion",
+        "iam:DeletePolicy",
+        "iam:DeletePolicyVersion",
+        "iam:SetDefaultPolicyVersion",
+        "iam:TagPolicy",
+        "iam:UntagPolicy"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyEveryIamChangeOutsideAppRoles",
       "Effect": "Deny",
       "Action": [
         "iam:Add*",
@@ -74,7 +175,7 @@
         "iam:Update*",
         "iam:Upload*"
       ],
-      "Resource": "*"
+      "NotResource": "arn:aws:iam::*:role/app/*"
     },
     {
       "Sid": "DenyOrganizationAccountAndBilling",
@@ -102,17 +203,30 @@
       "Resource": "*"
     },
     {
-      "Sid": "DenyTurningOffTheAuditTrail",
+      "Sid": "DenyTurningOffTheBaselineTrail",
       "Effect": "Deny",
       "Action": [
         "cloudtrail:StopLogging",
         "cloudtrail:DeleteTrail",
-        "cloudtrail:UpdateTrail",
+        "cloudtrail:UpdateTrail"
+      ],
+      "Resource": "arn:aws:cloudtrail:*:*:trail/REPLACE_WITH_BASELINE_TRAIL_NAME"
+    },
+    {
+      "Sid": "DenyTurningOffConfigAndGuardDuty",
+      "Effect": "Deny",
+      "Action": [
         "config:StopConfigurationRecorder",
         "config:DeleteConfigurationRecorder",
         "guardduty:DeleteDetector",
         "guardduty:UpdateDetector"
       ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyBypassingObjectLockRetention",
+      "Effect": "Deny",
+      "Action": "s3:BypassGovernanceRetention",
       "Resource": "*"
     },
     {
@@ -125,7 +239,16 @@
       "Resource": "*"
     },
     {
-      "Sid": "DenyOtherRegions",
+      "Sid": "DenyGlobalInferenceProfiles",
+      "Effect": "Deny",
+      "Action": "bedrock:*",
+      "Resource": [
+        "arn:aws:bedrock:*:*:inference-profile/global.*",
+        "arn:aws:bedrock:::foundation-model/*"
+      ]
+    },
+    {
+      "Sid": "DenyOtherRegionsExceptInferenceProfileRouting",
       "Effect": "Deny",
       "NotAction": [
         "iam:*",
@@ -142,6 +265,9 @@
       "Condition": {
         "StringNotEquals": {
           "aws:RequestedRegion": "REPLACE_WITH_SANDBOX_REGION"
+        },
+        "Null": {
+          "bedrock:InferenceProfileArn": "true"
         }
       }
     }

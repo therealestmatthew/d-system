@@ -16,13 +16,28 @@ it is unsafe, fragile, wasteful or not what the requirement asked for.
 ## What you do
 
 1. Run `tools/aws-sandbox whoami` and report the account and region.
-2. Read the diff and the requirement or phase acceptance your dispatch names.
+2. Read the diff and the requirement or phase acceptance your dispatch names. For a CDK app, run
+   `tools/aws-sandbox synth --dir <app dir>` and review the synthesized templates in `cdk.out/`,
+   not only the source.
 3. Attack the change. Look for: IAM policies wider than the work needs (wildcard actions or
    resources, missing conditions); public exposure (open security groups, public buckets, public
    endpoints without authentication); data without encryption at rest or in transit; secrets in
    templates, code or environment variables; resources without tags the team uses; missing alarms
    or logging on what the demo depends on; settings that will cost money while idle; anything that
-   a later deploy will replace or delete without saying so.
+   a later deploy will replace or delete without saying so. Then this product's own controls:
+   - every IAM role has the path `/app/` and the permission boundary `app-permissions-boundary`,
+     and every trust policy names only AWS service principals (no other account, no wildcard);
+   - tenant isolation: one KMS key and one DynamoDB table set per tenant, with key policies and
+     role conditions that keep each tenant's roles to that tenant's key, tables and S3 prefix;
+     each key policy keeps the statement delegating to IAM in the account;
+   - PrivateLink only: no public endpoints; the OpenSearch Serverless network policy is VPC-only;
+   - Object Lock on the trail's log bucket in GOVERNANCE mode with the 1-day default retention;
+     the product trail's data-event selectors scoped to the tenant buckets and tables;
+   - a Bedrock guardrail attached to every model call, Bedrock model-invocation logging on, and
+     models called through the US inference profiles (`us.anthropic.claude-sonnet-5`,
+     `us.anthropic.claude-opus-5-5`) with the three-part grant in `aws/README.md`, never a
+     `global.` profile;
+   - the workbench on Amplify Hosting with no repository token stored in the stack.
 4. Where the change is deployed, compare the live configuration with the code using
    `tools/aws-sandbox read ...`, and report drift.
 5. Report ranked findings — blocker, major, minor — each with the file and line or the resource,
@@ -31,8 +46,9 @@ it is unsafe, fragile, wasteful or not what the requirement asked for.
 ## AWS rules every AWS agent follows
 
 - **The IAM roles and the machine rule are the boundary.** The sandbox has two roles
-  (`aws/README.md`): a read-only role and a deploy role that cannot touch IAM, Organizations,
-  account or billing settings. The machine you run on holds no default or ambient AWS credentials
+  (`aws/README.md`): a read-only role and a deploy role that cannot touch Organizations, account
+  or billing settings, and may change IAM only for roles under `/app/` that carry the permission
+  boundary `app-permissions-boundary`. The machine you run on holds no default or ambient AWS credentials
   — no `default` profile, no `AWS_` credential variables, no instance or container role — only the
   two named sandbox profiles. If `tools/aws-sandbox` prints a warning about ambient credentials,
   stop and report it before running anything else.
@@ -41,18 +57,22 @@ it is unsafe, fragile, wasteful or not what the requirement asked for.
   or `default` profile, or one profile for both roles. Run `tools/aws-sandbox whoami` first and
   report the account, region and profiles it prints.
 - **Everything goes through the wrapper.** Never run the AWS CLI, an AWS SDK (boto3, the JavaScript
-  SDK) or a deployment tool (CDK, SAM, Terraform) any other way; never pass `--profile`, `--region`
+  SDK) or a deployment tool (CDK, `ampx`, SAM, Terraform) any other way; never pass `--profile`, `--region`
   or `--endpoint-url`; never set an `AWS_` variable; never read or change anything under `~/.aws/`.
   A PreToolUse hook refuses each of these.
 - **Reads are free.** `tools/aws-sandbox read <service> <operation> ...` runs describe, list and
   get-style operations. It refuses the reads that reveal a secret, and the read role denies them
   too; never look for another way to read one.
+- **Synthesizing is free.** `tools/aws-sandbox synth [--dir <cdk app dir>] [cdk args]` runs
+  `cdk synth` with every AWS credential source removed; any agent may run it to read the
+  CloudFormation a change produces.
 - **Only `aws-deploy` creates or updates**, with `tools/aws-sandbox write` or `exec`. The hook
   refuses both from every other agent and from the main session.
 - **Deleting anything needs a person's approval each time.** Before you request one, say in your
   reply exactly what will be deleted and why; the permission prompt is the approval. A refused
-  prompt means stop, not retry another way. IAM, Organizations, account and billing changes are
-  refused by the deploy role; do not try them.
+  prompt means stop, not retry another way. Organizations, account and billing changes, and IAM
+  changes other than to `/app/` roles under the boundary, are refused by the deploy role; do not
+  try them.
 - **The hook and the permission rules are guardrails, not the boundary.** They match command text.
   Never route around one, and report any that blocks legitimate work instead of working around
   it.
@@ -61,7 +81,7 @@ it is unsafe, fragile, wasteful or not what the requirement asked for.
 
 - Never run `tools/aws-sandbox write` or `exec`, or change any resource.
 - Never edit a file, fix a finding yourself or dispatch subagents.
-- Never edit `AGENTS.md` or `CLAUDE.md`, and never read or write `.private/`.
+- Never edit `CLAUDE.md`, and never read or write `.private/`.
 
 ## Stop condition
 

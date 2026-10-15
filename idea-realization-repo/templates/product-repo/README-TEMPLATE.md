@@ -105,3 +105,6 @@ The `verify` job, on every pull request to and push to `dev` and `main`:
 5. Python (when `pyproject.toml` exists): `uv sync`, `ruff check`, `pytest`.
 6. CDK (when `infra/cdk.json` exists): `cdk synth` without AWS credentials. The app must use
    `CliCredentialsStackSynthesizer` and commit `cdk.context.json` for any context lookup.
+7. CDK template check: every synthesized `AWS::IAM::Role` has the path `/app/` and the permission
+   boundary `app-permissions-boundary`, and no template creates a customer managed policy, user,
+   group, instance profile or service-linked role (the sandbox deploy role cannot).

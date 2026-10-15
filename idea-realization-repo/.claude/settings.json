@@ -4,7 +4,11 @@
       "Bash(tools/aws-sandbox read *)",
       "Bash(./tools/aws-sandbox read *)",
       "Bash(tools/aws-sandbox whoami)",
-      "Bash(./tools/aws-sandbox whoami)"
+      "Bash(./tools/aws-sandbox whoami)",
+      "Bash(tools/aws-sandbox synth)",
+      "Bash(./tools/aws-sandbox synth)",
+      "Bash(tools/aws-sandbox synth *)",
+      "Bash(./tools/aws-sandbox synth *)"
     ],
     "ask": [
       "Bash(tools/aws-sandbox write * delete*)",
@@ -67,14 +71,26 @@
       "Bash(./tools/aws-sandbox exec *delete*)",
       "Bash(tools/aws-sandbox exec *remove*)",
       "Bash(./tools/aws-sandbox exec *remove*)",
-      "Bash(tools/aws-sandbox exec *rm*)",
-      "Bash(./tools/aws-sandbox exec *rm*)",
       "Bash(tools/aws-sandbox exec *nuke*)",
       "Bash(./tools/aws-sandbox exec *nuke*)",
       "Bash(tools/aws-sandbox write * --delete*)",
       "Bash(tools/aws-sandbox exec * --delete*)",
       "Bash(./tools/aws-sandbox write * --delete*)",
-      "Bash(./tools/aws-sandbox exec * --delete*)"
+      "Bash(./tools/aws-sandbox exec * --delete*)",
+      "Bash(tools/aws-sandbox exec rm *)",
+      "Bash(./tools/aws-sandbox exec rm *)",
+      "Bash(tools/aws-sandbox exec * rm *)",
+      "Bash(./tools/aws-sandbox exec * rm *)",
+      "Bash(tools/aws-sandbox write *deletion*)",
+      "Bash(./tools/aws-sandbox write *deletion*)",
+      "Bash(tools/aws-sandbox write *-delete-*)",
+      "Bash(./tools/aws-sandbox write *-delete-*)",
+      "Bash(tools/aws-sandbox write kms schedule-key-deletion*)",
+      "Bash(./tools/aws-sandbox write kms schedule-key-deletion*)",
+      "Bash(tools/aws-sandbox write kms put-key-policy*)",
+      "Bash(./tools/aws-sandbox write kms put-key-policy*)",
+      "Bash(tools/aws-sandbox write s3api put-object-lock-configuration*)",
+      "Bash(./tools/aws-sandbox write s3api put-object-lock-configuration*)"
     ],
     "deny": [
       "Edit(/AGENTS.md)",
@@ -104,7 +120,11 @@
       "Bash(npx aws-cdk *)",
       "Bash(sam *)",
       "Bash(terraform *)",
-      "Bash(pulumi *)"
+      "Bash(pulumi *)",
+      "Bash(ampx *)",
+      "Bash(npx ampx *)",
+      "Bash(npx @aws-amplify/backend-cli *)",
+      "Bash(amplify *)"
     ]
   },
   "hooks": {

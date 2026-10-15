@@ -181,3 +181,29 @@ def test_package_scripts_are_checked(tmp_path: Path) -> None:
 ])
 def test_ordinary_commands_still_pass(command: str) -> None:
     assert allowed(command)
+
+
+@pytest.mark.parametrize("agent", [None, "aws-infra-reviewer", "aws-ops-inspector",
+                                   "bedrock-claude-advisor", "aws-cost-optimizer",
+                                   "phase-adversary", "validator-code", "aws-deploy"])
+def test_synth_is_open_to_every_caller(agent: str | None) -> None:
+    assert allowed("tools/aws-sandbox synth", agent=agent)
+    assert allowed("./tools/aws-sandbox synth --dir ../product/infra --quiet", agent=agent)
+
+
+@pytest.mark.parametrize("command", [
+    "npx ampx sandbox",
+    "ampx pipeline-deploy --branch dev",
+    "npx @aws-amplify/backend-cli sandbox",
+    "npx @aws-amplify/backend-cli@1 sandbox",
+    "amplify push",
+])
+def test_amplify_clis_are_guarded_like_cdk(command: str) -> None:
+    result = run(command, agent="aws-deploy")
+    assert result.returncode == 2, command
+    assert "runs" in result.stderr and "directly" in result.stderr
+
+
+def test_ampx_under_exec_from_aws_deploy() -> None:
+    assert allowed("tools/aws-sandbox exec npx ampx sandbox --once", agent="aws-deploy")
+    assert not allowed("tools/aws-sandbox exec npx ampx sandbox --once", agent="aws-ops-inspector")

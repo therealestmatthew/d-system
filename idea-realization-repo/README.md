@@ -83,8 +83,9 @@ The triage and partition agents ship with the plugin.
 
 ## AWS safety
 
-The sandbox has two IAM roles (`aws/README.md`): a read-only role, and a deploy role with no IAM,
-Organizations, account or billing permissions. They are the boundary together with the **machine
+The sandbox has two IAM roles (`aws/README.md`): a read-only role, and a deploy role with no
+Organizations, account or billing permissions, which may change IAM only for the stack's own roles
+under `/app/` that carry the permission boundary. They are the boundary together with the **machine
 rule**: a machine that runs agents holds no default or ambient AWS credentials, only the two named
 sandbox profiles (`uv run python tools/check_aws_machine.py --probe` checks it). Every AWS command goes
 through `tools/aws-sandbox`, which runs reads with the read profile and writes with the deploy

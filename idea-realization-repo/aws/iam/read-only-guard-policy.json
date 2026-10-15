@@ -10,7 +10,6 @@
         "ssm:GetParameter",
         "ssm:GetParameters",
         "ssm:GetParametersByPath",
-        "kms:Decrypt",
         "ecr:GetAuthorizationToken",
         "sts:GetSessionToken",
         "sts:GetFederationToken",
@@ -23,6 +22,20 @@
       "Resource": "*"
     },
     {
+      "Sid": "DenyDecryptExceptThroughS3AndDynamoDB",
+      "Effect": "Deny",
+      "Action": "kms:Decrypt",
+      "Resource": "*",
+      "Condition": {
+        "StringNotLike": {
+          "kms:ViaService": [
+            "s3.*.amazonaws.com",
+            "dynamodb.*.amazonaws.com"
+          ]
+        }
+      }
+    },
+    {
       "Sid": "DenyActionsThatCostOrChangeState",
       "Effect": "Deny",
       "Action": [
@@ -31,7 +44,17 @@
         "bedrock:Converse",
         "bedrock:ConverseStream",
         "lambda:InvokeFunction",
-        "sts:AssumeRole"
+        "sts:AssumeRole",
+        "bedrock:InvokeModelWithBidirectionalStream",
+        "bedrock:InvokeAgent",
+        "bedrock:InvokeFlow",
+        "bedrock:Retrieve",
+        "bedrock:RetrieveAndGenerate",
+        "bedrock:AgenticRetrieveStream",
+        "bedrock:ApplyGuardrail",
+        "textract:Analyze*",
+        "textract:Detect*",
+        "textract:Start*"
       ],
       "Resource": "*"
     }

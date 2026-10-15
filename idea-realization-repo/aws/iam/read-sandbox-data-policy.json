@@ -1,0 +1,28 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "SandboxOnlyDecryptTenantDataThroughS3AndDynamoDB",
+      "Effect": "Allow",
+      "Action": "kms:Decrypt",
+      "Resource": "*",
+      "Condition": {
+        "StringLike": {
+          "kms:ViaService": [
+            "s3.*.amazonaws.com",
+            "dynamodb.*.amazonaws.com"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "SandboxOnlyReadTextractResults",
+      "Effect": "Allow",
+      "Action": [
+        "textract:Get*",
+        "textract:List*"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

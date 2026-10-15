@@ -1,0 +1,139 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowAtMostWhatTheDeployRoleMayDo",
+      "Effect": "Allow",
+      "NotAction": [
+        "iam:*",
+        "organizations:*",
+        "account:*",
+        "billing:*",
+        "budgets:*",
+        "ce:*",
+        "cur:*",
+        "aws-portal:*",
+        "payments:*",
+        "tax:*",
+        "invoicing:*",
+        "purchase-orders:*",
+        "freetier:*",
+        "savingsplans:*",
+        "sso:*",
+        "sso-directory:*",
+        "identitystore:*",
+        "sts:AssumeRole",
+        "sts:GetFederationToken"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowPassingAppRolesToTextractAndBedrock",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::*:role/app/*",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": [
+            "textract.amazonaws.com",
+            "bedrock.amazonaws.com"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "DenyOrganizationAccountBillingAndRoleAssumption",
+      "Effect": "Deny",
+      "Action": [
+        "organizations:*",
+        "account:*",
+        "billing:*",
+        "budgets:*",
+        "ce:*",
+        "cur:*",
+        "aws-portal:*",
+        "payments:*",
+        "tax:*",
+        "invoicing:*",
+        "purchase-orders:*",
+        "freetier:*",
+        "savingsplans:*",
+        "sso:*",
+        "sso-directory:*",
+        "identitystore:*",
+        "sts:AssumeRole",
+        "sts:GetFederationToken",
+        "sts:GetSessionToken"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenySecretReads",
+      "Effect": "Deny",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:BatchGetSecretValue"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyTurningOffTheAuditTrailOrItsLocks",
+      "Effect": "Deny",
+      "Action": [
+        "cloudtrail:StopLogging",
+        "cloudtrail:DeleteTrail",
+        "cloudtrail:UpdateTrail",
+        "config:StopConfigurationRecorder",
+        "config:DeleteConfigurationRecorder",
+        "guardduty:DeleteDetector",
+        "guardduty:UpdateDetector",
+        "s3:BypassGovernanceRetention",
+        "s3:PutBucketObjectLockConfiguration"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyKeyPolicyAndKeyDeletion",
+      "Effect": "Deny",
+      "Action": [
+        "kms:PutKeyPolicy",
+        "kms:ScheduleKeyDeletion",
+        "kms:DisableKey"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyGlobalInferenceProfiles",
+      "Effect": "Deny",
+      "Action": "bedrock:*",
+      "Resource": [
+        "arn:aws:bedrock:*:*:inference-profile/global.*",
+        "arn:aws:bedrock:::foundation-model/*"
+      ]
+    },
+    {
+      "Sid": "DenyOtherRegionsExceptInferenceProfileRouting",
+      "Effect": "Deny",
+      "NotAction": [
+        "iam:*",
+        "sts:*",
+        "organizations:*",
+        "support:*",
+        "cloudfront:*",
+        "route53:*",
+        "waf:*",
+        "health:*",
+        "s3:ListAllMyBuckets"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:RequestedRegion": "REPLACE_WITH_SANDBOX_REGION"
+        },
+        "Null": {
+          "bedrock:InferenceProfileArn": "true"
+        }
+      }
+    }
+  ]
+}

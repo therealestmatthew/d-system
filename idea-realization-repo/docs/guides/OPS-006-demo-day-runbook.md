@@ -31,7 +31,7 @@ assignment where the team agrees (ask the owner where).
 | Owner | Approves each release pull request into `main`, creates the tags, chooses `demo-final`, decides on rollback. Only the owner merges into `main`. |
 | Release developer | Opens the release pull requests, runs the `aws-deploy` agent on their machine, keeps the deployment log. |
 | Validator | Runs the smoke test against each deployed release candidate and records the result. |
-| Sandbox administrator | The person with administrator access to the sandbox account. Creates execution roles under `/app/`, enables Bedrock model access, raises quotas. The deploy role cannot do any of these. |
+| Sandbox administrator | The person with administrator access to the sandbox account. Creates the permission boundary policy and service-linked roles, enables Bedrock model access, raises quotas. The deploy role cannot do any of these. |
 | Presenter | Runs the demo and decides on the day whether to switch to the recorded video. |
 
 One person may hold several roles. The release developer and the validator should be different
@@ -41,15 +41,18 @@ people, so the smoke test is not run by the person who deployed.
 
 1. **Bedrock quota check.** Dispatch the `bedrock-claude-advisor` agent with: "List the Anthropic
    models and inference profiles this account can call in its region, and the Bedrock service
-   quotas for the model the product uses (requests per minute, tokens per minute)." It reads them
+   quotas for both models the product uses, Claude Sonnet 5 and Claude Opus 5.5, through their US
+   inference profiles (cross-region requests per minute and tokens per minute, one pair per
+   model)." It reads them
    with `tools/aws-sandbox read bedrock list-foundation-models`, `list-inference-profiles` and
    `service-quotas list-service-quotas --service-code bedrock`. Compare the quota with the load of
    the demo (presenter plus audience). If it is too low, the sandbox administrator requests an
    increase; quota increases can take days, so do this at least a week before the demo.
 2. **Model access.** If the advisor reports a model the account lists but cannot call, the sandbox
    administrator enables access. No agent can do this.
-3. **Execution roles.** Every role the product's stacks reference exists under `/app/`
-   (`aws/README.md`, "What the deploy role can and cannot deploy").
+3. **Execution roles.** The stacks create their roles under `/app/` with the permission boundary,
+   and the product CI's template check passes; any person-created role a stack imports exists
+   under `/app/` (`aws/README.md`, "What the deploy role can and cannot deploy").
 4. **Smoke test written down.** The validator writes the smoke test as a numbered list of checks
    with the expected result of each (URL, action, what must appear). Keep it in the product
    repository next to the deployment instructions. Which flows the demo shows is the owner's call.

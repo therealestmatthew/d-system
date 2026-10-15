@@ -12,8 +12,12 @@ the reason on stderr, to refuse the command. It refuses:
   through `tools/aws-sandbox exec`, which gives it the deploy profile;
 - reading or changing `~/.aws/`, and setting AWS credential or profile variables;
 - `tools/aws-sandbox write` and `exec` from any caller but the `aws-deploy` agent. Read-only
-  agents, and the main session, use `read` and `whoami`; a person who wants to deploy dispatches
-  `aws-deploy`.
+  agents, and the main session, use `read`, `whoami` and `synth`; a person who wants to deploy
+  dispatches `aws-deploy`.
+
+`tools/aws-sandbox synth` is allowed to every caller: it runs `cdk synth` with every AWS credential
+source removed (no profile, no AWS_ variables, no config or credentials file, no instance
+metadata), so it cannot reach AWS.
 
 It inspects each command of a compound command line (`&&`, `||`, `;`, `|`, `&`, new lines), the
 command each one runs after environment assignments, `env`, `sudo` and package runners, the code
@@ -42,10 +46,11 @@ from pathlib import Path
 
 WRAPPER = "tools/aws-sandbox"
 DEPLOY_AGENT = "aws-deploy"
+DEPLOY_MODES = {"write", "exec"}  # every other mode (read, whoami, synth) is open to every caller
 
 AWS_TOOLS = {"aws", "awscurl", "cdk", "aws-cdk", "cdktf", "sam", "terraform", "tofu", "pulumi",
-             "aws-vault", "copilot", "eb", "sst", "serverless", "sls", "amplify", "chalice",
-             "zappa"}
+             "aws-vault", "copilot", "eb", "sst", "serverless", "sls", "amplify", "ampx",
+             "@aws-amplify/backend-cli", "chalice", "zappa"}
 SDK = re.compile(r"(?<![\w-])(boto3|botocore|aioboto3|aiobotocore|awscli|aws_cdk|aws-cdk-lib|"
                  r"@aws-sdk|aws-sdk|@aws-cdk|cdktf|aws_lambda_powertools)(?![\w-])")
 AWS_FILES = re.compile(r"(~|\$HOME|\$\{HOME\}|/home/[^/\s]+|/root|/Users/[^/\s]+)/\.aws(/|\b)")
@@ -53,7 +58,7 @@ AWS_VARIABLE = re.compile(r"^(AWS_[A-Z_]*|BOTO_[A-Z_]*)=")
 # The AWS CLI called from code in another language: subprocess(["aws", ...]), exec("aws s3 ...").
 AWS_CLI_CALL = re.compile(r"""["'`]aws["'`]\s*[,)\]]|["'`]aws\s+[a-z0-9-]+""")
 # An AWS SDK or AWS tool named anywhere in a command line, for the write-then-run check.
-AWS_NAMED = re.compile(r"(?<![\w./-])(aws|awscurl|cdk|aws-cdk|sam|terraform|pulumi|cdktf)"
+AWS_NAMED = re.compile(r"(?<![\w./-])(aws|awscurl|cdk|aws-cdk|ampx|sam|terraform|pulumi|cdktf)"
                        r"(?![\w.-])|" + SDK.pattern)
 SUBSTITUTION = re.compile(r"`([^`]*)`|\$\(([^()]*)\)|[<>]\(([^()]*)\)")
 CONTAINER_TOOLS = {"docker", "podman", "nerdctl", "finch"}
@@ -241,7 +246,8 @@ def check_segment(tokens: list[str], agent: str | None, cwd: Path, depth: int) -
         return
     word, rest = tokens[0], tokens[1:]
     name = word.rsplit("/", 1)[-1]
-    package = word if word.startswith("@") else word.split("@", 1)[0]  # npx aws-cdk@2
+    # npx aws-cdk@2, npx @aws-amplify/backend-cli@1: the package name without its version
+    package = "@" + word[1:].split("@", 1)[0] if word.startswith("@") else word.split("@", 1)[0]
 
     if name in {"export", "declare", "typeset", "readonly", "unset", "set"}:
         for token in rest:
@@ -252,7 +258,7 @@ def check_segment(tokens: list[str], agent: str | None, cwd: Path, depth: int) -
 
     if word.endswith(WRAPPER) or name == "aws-sandbox":
         mode = rest[0] if rest else ""
-        if mode in {"write", "exec"} and agent != DEPLOY_AGENT:
+        if mode in DEPLOY_MODES and agent != DEPLOY_AGENT:
             caller = f"the {agent} agent" if agent else "the main session"
             raise Refusal(f"`aws-sandbox {mode}` is for the aws-deploy agent only, not {caller}; "
                           "use `read`, or dispatch aws-deploy")

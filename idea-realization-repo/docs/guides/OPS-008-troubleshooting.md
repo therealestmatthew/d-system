@@ -201,18 +201,37 @@ Two rules apply to every entry:
 
 ### `AccessDenied` on `iam:CreateRole`
 
-- **Symptom.** A deployment fails with an access-denied error naming `iam:CreateRole` (or another
-  IAM change).
-- **Cause.** The deploy role cannot create or change any IAM role or policy
-  (`aws/iam/deploy-policy.json`, statement `DenyEveryIamChange`). The stack tries to create a role.
+- **Symptom.** A deployment fails with an access-denied error naming `iam:CreateRole`,
+  `iam:PutRolePolicy` or another IAM change.
+- **Cause.** The deploy role creates and changes IAM roles only under the path `/app/` and only
+  with the permission boundary `app-permissions-boundary` attached
+  (`aws/iam/deploy-policy.json`, statements `AllowChangingAppRolesOnlyUnderTheBoundary`,
+  `DenyAppRoleChangesWithoutTheBoundary` and `DenyEveryIamChangeOutsideAppRoles`). The stack
+  creates a role without the path or the boundary, or a resource the deploy role never creates (a
+  customer managed policy, user, group or service-linked role), or a CDK grant attaches a policy to
+  a person-created role imported as mutable.
 - **Fix.**
-  1. The sandbox administrator creates the role under the path `/app/`, with its service's trust
-     policy and only the permissions the function needs.
-  2. Change the stack to reference the role by ARN (in CDK, `Role.fromRoleArn(...)`, not
-     `new Role(...)`).
-  3. Deploy again with `aws-deploy`. The deploy role may pass and read roles under `/app/` only.
+  1. Synthesize with `tools/aws-sandbox synth --dir <app dir>` and find the role in `cdk.out/`
+     that lacks `"Path": "/app/"` or `PermissionsBoundary`.
+  2. Apply the CDK settings in `aws/README.md` ("CDK settings every product stack uses"): the
+     `@aws-cdk/core:permissionsBoundary` context key and the aspect that sets the path. Import a
+     person-created role with `Role.fromRoleArn(this, id, arn, { mutable: false })`.
+  3. A service-linked role (for example OpenSearch Serverless's) is created once by the sandbox
+     administrator (`aws/README.md`, setup step 5).
+  4. Deploy again with `aws-deploy`.
 
   Source: `aws/README.md`, "What the deploy role can and cannot deploy".
+
+### A script that imports an AWS SDK is refused
+
+- **Symptom.** `python lambdas/handler.py` or `node infra/bin/app.js` is refused with
+  `aws_guard: refused: the script ... uses boto3` (or `@aws-sdk`, `aws-cdk-lib`).
+- **Cause.** The hook refuses running any script by path that loads an AWS SDK, so product code
+  that calls Bedrock or Textract cannot be run directly.
+- **Fix.** Run tests through the test runner (`uv run pytest`, `npm test`, `npx vitest`), which the
+  hook does not inspect for SDK imports, with the AWS clients mocked. To see a CDK app's
+  CloudFormation, use `tools/aws-sandbox synth`. Only `aws-deploy` runs SDK code against AWS,
+  through `tools/aws-sandbox exec`.
 
 ### CDK cannot assume its bootstrap roles
 
@@ -232,13 +251,16 @@ Two rules apply to every entry:
 - **Symptom.** The deployed product's call to Bedrock fails with `AccessDeniedException`, or with a
   validation error saying the model id needs an inference profile.
 - **Cause.** One of: the account has no access to that model in the region; the model is called by
-  a model id where it must be called through an inference profile; the product's execution role
-  under `/app/` lacks permission to invoke the model.
+  its model id (`anthropic.claude-sonnet-5`) where it must be called through the US inference
+  profile (`us.anthropic.claude-sonnet-5`), since neither Claude Sonnet 5 nor Claude Opus 5.5 has
+  an in-region endpoint in a US region; the product's execution role under `/app/` lacks one of
+  the three parts of the inference-profile grant (`aws/README.md`, "Bedrock: US inference
+  profiles"); or the call uses a `global.` profile, which the boundary denies.
 - **Fix.**
   1. Dispatch `bedrock-claude-advisor` to list the models and inference profiles the account can
      call, and the right id for the product's call. It never invokes a model.
-  2. Enabling model access and changing the execution role's permissions are the sandbox
-     administrator's (the deploy role cannot change IAM).
+  2. Enabling model access is the sandbox administrator's. A missing grant is fixed in the stack
+     that creates the execution role, and deployed by `aws-deploy`.
   3. Agents cannot test a call: the read role denies `bedrock:InvokeModel` and `Converse`. The
      advisor gives the smallest test request for a person to run.
 
