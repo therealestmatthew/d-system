@@ -29447,3 +29447,13 @@ Owner, 2026-10-14; relayed by Session Manager.
 Dictation fix applied as relayed by Session Manager: "profession" -> "professional". For the hackathon control repository (000698).
 
 Owner, 2026-10-14; relayed by Session Manager.
+
+---
+
+## 000704 · The nested control repo shares d-system's code reservations, so next-code hands it d-system's next numbers
+
+**Created 2026-10-14T21:57:37-04:00 · Status: `open`**
+
+Nested control repo shares d-system's code reservations: idea-realization-repo/ lives inside d-system's git, so next-code reads d-system's reservation store under the shared git common dir and hands out REQ-040/ADR-029/PLAN-055 for a repo with only PLAN-001. Fix: key reservations by repository root, or move the control repo to its own git.
+
+From Session 1 - Builder A, 2026-10-14.
