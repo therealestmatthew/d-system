@@ -29457,3 +29457,13 @@ Owner, 2026-10-14; relayed by Session Manager.
 Nested control repo shares d-system's code reservations: idea-realization-repo/ lives inside d-system's git, so next-code reads d-system's reservation store under the shared git common dir and hands out REQ-040/ADR-029/PLAN-055 for a repo with only PLAN-001. Fix: key reservations by repository root, or move the control repo to its own git.
 
 From Session 1 - Builder A, 2026-10-14.
+
+---
+
+## 000705 · The idea-realization plugin's check.py resolves its root to the git top level, so inside d-system it checks the wrong tree
+
+**Created 2026-10-14T21:58:29-04:00 · Status: `open`**
+
+idea-realization plugin check.py resolves its root to the git top level, so run from idea-realization-repo/ inside d-system it checks d-system's tree and fails; it passes only with IDEA_REALIZATION_ROOT set. Detect the nearest .idea-realization/ marker before falling back to git top level.
+
+From Session 1 - Builder A, 2026-10-14.
