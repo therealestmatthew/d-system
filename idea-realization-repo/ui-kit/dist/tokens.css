@@ -1,0 +1,480 @@
+/*
+  ui-kit design tokens. GENERATED: do not edit by hand.
+
+  Source:     ui-kit/tokens/tokens.json (ui-kit design tokens 0.1.0)
+  sha256:     4be2bc8d0e1f32dea733b967b99f8f50849cfa2dc090f061c874b5be10d62216
+  Regenerate: uv run python ui-kit/tools/build_tokens.py
+  Check:      uv run python ui-kit/tools/build_tokens.py --check
+
+  Every property is --ui-<group>-<name>. Put data-theme="light|dark" on <html> to force a
+  theme; without it the page follows prefers-color-scheme. data-accent="<name>" and
+  data-density="compact|comfortable" work on any element.
+  Accent sets: blue, green, indigo, magenta, orange, slate, teal, violet (default indigo).
+*/
+
+:root {
+  --ui-color-accent: #4f46e5;
+  --ui-color-accent-2: #0f7b6c;
+  --ui-color-accent-hover: #4338ca;
+  --ui-color-ai: #a21caf;
+  --ui-color-bg: #ffffff;
+  --ui-color-err: #b3162f;
+  --ui-color-err-bg: #fbe5e8;
+  --ui-color-focus: #4f46e5;
+  --ui-color-info: #1d5fa8;
+  --ui-color-info-bg: #e4eefb;
+  --ui-color-line: #d8dce3;
+  --ui-color-line-strong: #7d8696;
+  --ui-color-muted: #555d6b;
+  --ui-color-ok: #17693a;
+  --ui-color-ok-bg: #e3f4e8;
+  --ui-color-on-accent: #ffffff;
+  --ui-color-overlay: #0f141c73;
+  --ui-color-selection: #e0e7ff;
+  --ui-color-shadow: #1018281a;
+  --ui-color-sunken: #f2f4f7;
+  --ui-color-surface: #f7f8fa;
+  --ui-color-surface-2: #eef0f4;
+  --ui-color-surface-e1: #ffffff;
+  --ui-color-surface-e2: #ffffff;
+  --ui-color-surface-e3: #ffffff;
+  --ui-color-text: #15181e;
+  --ui-color-warn: #8a5a00;
+  --ui-color-warn-bg: #fdf1d4;
+  --ui-ctl-lg: 40px;
+  --ui-ctl-md: 32px;
+  --ui-ctl-sm: 24px;
+  --ui-dur-base: 180ms;
+  --ui-dur-fast: 120ms;
+  --ui-dur-slow: 280ms;
+  --ui-ease-exit: cubic-bezier(.4, 0, 1, 1);
+  --ui-ease-standard: cubic-bezier(.2, 0, 0, 1);
+  --ui-focus-offset: 2px;
+  --ui-focus-width: 2px;
+  --ui-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --ui-font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  --ui-fs-2xl: 24px;
+  --ui-fs-3xl: 32px;
+  --ui-fs-lg: 16px;
+  --ui-fs-md: 14px;
+  --ui-fs-sm: 13px;
+  --ui-fs-xl: 20px;
+  --ui-fs-xs: 12px;
+  --ui-fw-bold: 700;
+  --ui-fw-regular: 400;
+  --ui-fw-semibold: 600;
+  --ui-lh-prose: 1.6;
+  --ui-lh-tight: 1.2;
+  --ui-lh-ui: 1.45;
+  --ui-radius-lg: 10px;
+  --ui-radius-md: 6px;
+  --ui-radius-none: 0px;
+  --ui-radius-pill: 999px;
+  --ui-radius-sm: 4px;
+  --ui-shadow-e0: none;
+  --ui-shadow-e1: 0 1px 2px var(--ui-color-shadow), 0 2px 8px var(--ui-color-shadow);
+  --ui-shadow-e2: 0 4px 12px var(--ui-color-shadow), 0 16px 40px var(--ui-color-shadow);
+  --ui-shadow-e3: 0 8px 20px var(--ui-color-shadow), 0 24px 56px var(--ui-color-shadow);
+  --ui-space-0: 0px;
+  --ui-space-1: 2px;
+  --ui-space-2: 4px;
+  --ui-space-3: 8px;
+  --ui-space-4: 12px;
+  --ui-space-5: 16px;
+  --ui-space-6: 24px;
+  --ui-space-7: 32px;
+  --ui-space-8: 48px;
+  --ui-space-9: 64px;
+  --ui-z-base: 0;
+  --ui-z-dock: 200;
+  --ui-z-dropdown: 1000;
+  --ui-z-modal: 1200;
+  --ui-z-overlay: 1100;
+  --ui-z-sticky: 100;
+  --ui-z-toast: 1300;
+  --ui-z-tooltip: 1400;
+  color-scheme: light;
+}
+
+:root[data-theme="light"] {
+  --ui-color-bg: #ffffff;
+  --ui-color-err: #b3162f;
+  --ui-color-err-bg: #fbe5e8;
+  --ui-color-info: #1d5fa8;
+  --ui-color-info-bg: #e4eefb;
+  --ui-color-line: #d8dce3;
+  --ui-color-line-strong: #7d8696;
+  --ui-color-muted: #555d6b;
+  --ui-color-ok: #17693a;
+  --ui-color-ok-bg: #e3f4e8;
+  --ui-color-overlay: #0f141c73;
+  --ui-color-shadow: #1018281a;
+  --ui-color-sunken: #f2f4f7;
+  --ui-color-surface: #f7f8fa;
+  --ui-color-surface-2: #eef0f4;
+  --ui-color-surface-e1: #ffffff;
+  --ui-color-surface-e2: #ffffff;
+  --ui-color-surface-e3: #ffffff;
+  --ui-color-text: #15181e;
+  --ui-color-warn: #8a5a00;
+  --ui-color-warn-bg: #fdf1d4;
+  color-scheme: light;
+}
+
+[data-accent="blue"] {
+  --ui-color-accent: #1d4ed8;
+  --ui-color-accent-2: #0f7b6c;
+  --ui-color-accent-hover: #1e40af;
+  --ui-color-ai: #7c3aed;
+  --ui-color-focus: #1d4ed8;
+  --ui-color-on-accent: #ffffff;
+  --ui-color-selection: #dbeafe;
+}
+
+[data-accent="green"] {
+  --ui-color-accent: #15803d;
+  --ui-color-accent-2: #1d5fa8;
+  --ui-color-accent-hover: #166534;
+  --ui-color-ai: #7c3aed;
+  --ui-color-focus: #15803d;
+  --ui-color-on-accent: #ffffff;
+  --ui-color-selection: #dcfce7;
+}
+
+[data-accent="indigo"] {
+  --ui-color-accent: #4f46e5;
+  --ui-color-accent-2: #0f7b6c;
+  --ui-color-accent-hover: #4338ca;
+  --ui-color-ai: #a21caf;
+  --ui-color-focus: #4f46e5;
+  --ui-color-on-accent: #ffffff;
+  --ui-color-selection: #e0e7ff;
+}
+
+[data-accent="magenta"] {
+  --ui-color-accent: #c8205f;
+  --ui-color-accent-2: #0f7b6c;
+  --ui-color-accent-hover: #a51a4e;
+  --ui-color-ai: #7c3aed;
+  --ui-color-focus: #c8205f;
+  --ui-color-on-accent: #ffffff;
+  --ui-color-selection: #fce7f0;
+}
+
+[data-accent="orange"] {
+  --ui-color-accent: #c2410c;
+  --ui-color-accent-2: #1d4ed8;
+  --ui-color-accent-hover: #9a3412;
+  --ui-color-ai: #7c3aed;
+  --ui-color-focus: #c2410c;
+  --ui-color-on-accent: #ffffff;
+  --ui-color-selection: #ffedd5;
+}
+
+[data-accent="slate"] {
+  --ui-color-accent: #334155;
+  --ui-color-accent-2: #0f7b6c;
+  --ui-color-accent-hover: #1e293b;
+  --ui-color-ai: #7c3aed;
+  --ui-color-focus: #334155;
+  --ui-color-on-accent: #ffffff;
+  --ui-color-selection: #e2e8f0;
+}
+
+[data-accent="teal"] {
+  --ui-color-accent: #0f766e;
+  --ui-color-accent-2: #4f46e5;
+  --ui-color-accent-hover: #115e59;
+  --ui-color-ai: #7c3aed;
+  --ui-color-focus: #0f766e;
+  --ui-color-on-accent: #ffffff;
+  --ui-color-selection: #ccfbf1;
+}
+
+[data-accent="violet"] {
+  --ui-color-accent: #6d28d9;
+  --ui-color-accent-2: #c2410c;
+  --ui-color-accent-hover: #5b21b6;
+  --ui-color-ai: #0a7a78;
+  --ui-color-focus: #6d28d9;
+  --ui-color-on-accent: #ffffff;
+  --ui-color-selection: #ede9fe;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ui-color-accent: #8b93ff;
+    --ui-color-accent-2: #3cc9b4;
+    --ui-color-accent-hover: #a5abff;
+    --ui-color-ai: #e879f9;
+    --ui-color-bg: #0f1115;
+    --ui-color-err: #ff7a8c;
+    --ui-color-err-bg: #341820;
+    --ui-color-focus: #8b93ff;
+    --ui-color-info: #7fb2f0;
+    --ui-color-info-bg: #172335;
+    --ui-color-line: #2c313b;
+    --ui-color-line-strong: #6b7486;
+    --ui-color-muted: #a3aab7;
+    --ui-color-ok: #5fd68d;
+    --ui-color-ok-bg: #14281c;
+    --ui-color-on-accent: #0f1115;
+    --ui-color-overlay: #000000a6;
+    --ui-color-selection: #2b2f63;
+    --ui-color-shadow: #0000004d;
+    --ui-color-sunken: #0b0d10;
+    --ui-color-surface: #161920;
+    --ui-color-surface-2: #1d2129;
+    --ui-color-surface-e1: #1f232c;
+    --ui-color-surface-e2: #262b35;
+    --ui-color-surface-e3: #2d333e;
+    --ui-color-text: #e8eaee;
+    --ui-color-warn: #f0b74a;
+    --ui-color-warn-bg: #2d2412;
+    color-scheme: dark;
+  }
+
+  :root:not([data-theme="light"])[data-accent="blue"],
+  :root:not([data-theme="light"]) [data-accent="blue"] {
+    --ui-color-accent: #60a5fa;
+    --ui-color-accent-2: #3cc9b4;
+    --ui-color-accent-hover: #93c5fd;
+    --ui-color-ai: #c4a1ff;
+    --ui-color-focus: #60a5fa;
+    --ui-color-on-accent: #0f1115;
+    --ui-color-selection: #1e3a5f;
+  }
+
+  :root:not([data-theme="light"])[data-accent="green"],
+  :root:not([data-theme="light"]) [data-accent="green"] {
+    --ui-color-accent: #4ade80;
+    --ui-color-accent-2: #7fb2f0;
+    --ui-color-accent-hover: #86efac;
+    --ui-color-ai: #c4a1ff;
+    --ui-color-focus: #4ade80;
+    --ui-color-on-accent: #0f1115;
+    --ui-color-selection: #173d26;
+  }
+
+  :root:not([data-theme="light"])[data-accent="indigo"],
+  :root:not([data-theme="light"]) [data-accent="indigo"] {
+    --ui-color-accent: #8b93ff;
+    --ui-color-accent-2: #3cc9b4;
+    --ui-color-accent-hover: #a5abff;
+    --ui-color-ai: #e879f9;
+    --ui-color-focus: #8b93ff;
+    --ui-color-on-accent: #0f1115;
+    --ui-color-selection: #2b2f63;
+  }
+
+  :root:not([data-theme="light"])[data-accent="magenta"],
+  :root:not([data-theme="light"]) [data-accent="magenta"] {
+    --ui-color-accent: #ff5c9a;
+    --ui-color-accent-2: #3cc9b4;
+    --ui-color-accent-hover: #ff85b3;
+    --ui-color-ai: #c4a1ff;
+    --ui-color-focus: #ff5c9a;
+    --ui-color-on-accent: #0f1115;
+    --ui-color-selection: #4a1a30;
+  }
+
+  :root:not([data-theme="light"])[data-accent="orange"],
+  :root:not([data-theme="light"]) [data-accent="orange"] {
+    --ui-color-accent: #fb923c;
+    --ui-color-accent-2: #60a5fa;
+    --ui-color-accent-hover: #fdba74;
+    --ui-color-ai: #c4a1ff;
+    --ui-color-focus: #fb923c;
+    --ui-color-on-accent: #0f1115;
+    --ui-color-selection: #4a2a14;
+  }
+
+  :root:not([data-theme="light"])[data-accent="slate"],
+  :root:not([data-theme="light"]) [data-accent="slate"] {
+    --ui-color-accent: #cbd5e1;
+    --ui-color-accent-2: #3cc9b4;
+    --ui-color-accent-hover: #e2e8f0;
+    --ui-color-ai: #c4a1ff;
+    --ui-color-focus: #cbd5e1;
+    --ui-color-on-accent: #0f1115;
+    --ui-color-selection: #334155;
+  }
+
+  :root:not([data-theme="light"])[data-accent="teal"],
+  :root:not([data-theme="light"]) [data-accent="teal"] {
+    --ui-color-accent: #2dd4bf;
+    --ui-color-accent-2: #8b93ff;
+    --ui-color-accent-hover: #5eead4;
+    --ui-color-ai: #c4a1ff;
+    --ui-color-focus: #2dd4bf;
+    --ui-color-on-accent: #0f1115;
+    --ui-color-selection: #133f3b;
+  }
+
+  :root:not([data-theme="light"])[data-accent="violet"],
+  :root:not([data-theme="light"]) [data-accent="violet"] {
+    --ui-color-accent: #a78bfa;
+    --ui-color-accent-2: #fb923c;
+    --ui-color-accent-hover: #c4b5fd;
+    --ui-color-ai: #2dd4d0;
+    --ui-color-focus: #a78bfa;
+    --ui-color-on-accent: #0f1115;
+    --ui-color-selection: #35275f;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ui-color-accent: #8b93ff;
+  --ui-color-accent-2: #3cc9b4;
+  --ui-color-accent-hover: #a5abff;
+  --ui-color-ai: #e879f9;
+  --ui-color-bg: #0f1115;
+  --ui-color-err: #ff7a8c;
+  --ui-color-err-bg: #341820;
+  --ui-color-focus: #8b93ff;
+  --ui-color-info: #7fb2f0;
+  --ui-color-info-bg: #172335;
+  --ui-color-line: #2c313b;
+  --ui-color-line-strong: #6b7486;
+  --ui-color-muted: #a3aab7;
+  --ui-color-ok: #5fd68d;
+  --ui-color-ok-bg: #14281c;
+  --ui-color-on-accent: #0f1115;
+  --ui-color-overlay: #000000a6;
+  --ui-color-selection: #2b2f63;
+  --ui-color-shadow: #0000004d;
+  --ui-color-sunken: #0b0d10;
+  --ui-color-surface: #161920;
+  --ui-color-surface-2: #1d2129;
+  --ui-color-surface-e1: #1f232c;
+  --ui-color-surface-e2: #262b35;
+  --ui-color-surface-e3: #2d333e;
+  --ui-color-text: #e8eaee;
+  --ui-color-warn: #f0b74a;
+  --ui-color-warn-bg: #2d2412;
+  color-scheme: dark;
+}
+
+:root[data-theme="dark"][data-accent="blue"],
+:root[data-theme="dark"] [data-accent="blue"] {
+  --ui-color-accent: #60a5fa;
+  --ui-color-accent-2: #3cc9b4;
+  --ui-color-accent-hover: #93c5fd;
+  --ui-color-ai: #c4a1ff;
+  --ui-color-focus: #60a5fa;
+  --ui-color-on-accent: #0f1115;
+  --ui-color-selection: #1e3a5f;
+}
+
+:root[data-theme="dark"][data-accent="green"],
+:root[data-theme="dark"] [data-accent="green"] {
+  --ui-color-accent: #4ade80;
+  --ui-color-accent-2: #7fb2f0;
+  --ui-color-accent-hover: #86efac;
+  --ui-color-ai: #c4a1ff;
+  --ui-color-focus: #4ade80;
+  --ui-color-on-accent: #0f1115;
+  --ui-color-selection: #173d26;
+}
+
+:root[data-theme="dark"][data-accent="indigo"],
+:root[data-theme="dark"] [data-accent="indigo"] {
+  --ui-color-accent: #8b93ff;
+  --ui-color-accent-2: #3cc9b4;
+  --ui-color-accent-hover: #a5abff;
+  --ui-color-ai: #e879f9;
+  --ui-color-focus: #8b93ff;
+  --ui-color-on-accent: #0f1115;
+  --ui-color-selection: #2b2f63;
+}
+
+:root[data-theme="dark"][data-accent="magenta"],
+:root[data-theme="dark"] [data-accent="magenta"] {
+  --ui-color-accent: #ff5c9a;
+  --ui-color-accent-2: #3cc9b4;
+  --ui-color-accent-hover: #ff85b3;
+  --ui-color-ai: #c4a1ff;
+  --ui-color-focus: #ff5c9a;
+  --ui-color-on-accent: #0f1115;
+  --ui-color-selection: #4a1a30;
+}
+
+:root[data-theme="dark"][data-accent="orange"],
+:root[data-theme="dark"] [data-accent="orange"] {
+  --ui-color-accent: #fb923c;
+  --ui-color-accent-2: #60a5fa;
+  --ui-color-accent-hover: #fdba74;
+  --ui-color-ai: #c4a1ff;
+  --ui-color-focus: #fb923c;
+  --ui-color-on-accent: #0f1115;
+  --ui-color-selection: #4a2a14;
+}
+
+:root[data-theme="dark"][data-accent="slate"],
+:root[data-theme="dark"] [data-accent="slate"] {
+  --ui-color-accent: #cbd5e1;
+  --ui-color-accent-2: #3cc9b4;
+  --ui-color-accent-hover: #e2e8f0;
+  --ui-color-ai: #c4a1ff;
+  --ui-color-focus: #cbd5e1;
+  --ui-color-on-accent: #0f1115;
+  --ui-color-selection: #334155;
+}
+
+:root[data-theme="dark"][data-accent="teal"],
+:root[data-theme="dark"] [data-accent="teal"] {
+  --ui-color-accent: #2dd4bf;
+  --ui-color-accent-2: #8b93ff;
+  --ui-color-accent-hover: #5eead4;
+  --ui-color-ai: #c4a1ff;
+  --ui-color-focus: #2dd4bf;
+  --ui-color-on-accent: #0f1115;
+  --ui-color-selection: #133f3b;
+}
+
+:root[data-theme="dark"][data-accent="violet"],
+:root[data-theme="dark"] [data-accent="violet"] {
+  --ui-color-accent: #a78bfa;
+  --ui-color-accent-2: #fb923c;
+  --ui-color-accent-hover: #c4b5fd;
+  --ui-color-ai: #2dd4d0;
+  --ui-color-focus: #a78bfa;
+  --ui-color-on-accent: #0f1115;
+  --ui-color-selection: #35275f;
+}
+
+[data-density="compact"] {
+  --ui-ctl-lg: 32px;
+  --ui-ctl-md: 28px;
+  --ui-fs-lg: 15px;
+  --ui-fs-md: 13px;
+  --ui-fs-sm: 12px;
+  --ui-lh-ui: 1.35;
+  --ui-space-3: 6px;
+  --ui-space-4: 8px;
+  --ui-space-5: 12px;
+  --ui-space-6: 16px;
+  --ui-space-7: 24px;
+}
+
+[data-density="comfortable"] {
+  --ui-ctl-lg: 44px;
+  --ui-ctl-md: 36px;
+  --ui-ctl-sm: 28px;
+  --ui-fs-lg: 17px;
+  --ui-fs-md: 15px;
+  --ui-fs-sm: 14px;
+  --ui-lh-ui: 1.5;
+  --ui-space-4: 16px;
+  --ui-space-5: 20px;
+  --ui-space-6: 32px;
+  --ui-space-7: 40px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ui-dur-base: 0ms;
+    --ui-dur-fast: 0ms;
+    --ui-dur-slow: 0ms;
+  }
+}
