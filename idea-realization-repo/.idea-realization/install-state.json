@@ -3,7 +3,7 @@
   "plugin": "idea-realization",
   "plugin_version": "0.1.0",
   "installed_at": "2026-10-14T23:06:45Z",
-  "updated_at": "2026-10-15T05:55:01Z",
+  "updated_at": "2026-10-15T14:31:15Z",
   "features": [
     "backlog",
     "brain",
@@ -120,7 +120,7 @@
     },
     {
       "path": ".idea-realization/schemas/review-verdict.schema.json",
-      "sha256": "6fa627457c9a84dec6c117c5a9200e1b79f6fb144d6fa4a017090ffd27a87db2",
+      "sha256": "3ddbb03f17fcf3f66d6cba752950c0ac7b1d137fa842a28feced9fa8f69683a0",
       "feature": "reviews",
       "owner": "plugin"
     },

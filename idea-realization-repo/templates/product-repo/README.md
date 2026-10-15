@@ -53,9 +53,22 @@ The same commands CI runs in the `verify` job:
 
 ```bash
 npm run lint && npm test        # Node
+uvx ruff@<version> check .      # Python lint; use the version product-ci.yml pins
 uv run pytest                   # Python
 (cd infra && npx cdk synth)     # infrastructure: synthesizes only, deploys nothing
 python3 tools/check_confidential.py
+```
+
+No ruff configuration ships, so ruff applies its default rules. To add rules, put a section in the
+product's `pyproject.toml`, for example:
+
+```toml
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]   # pycodestyle errors, pyflakes, import sorting, pyupgrade
 ```
 
 On a machine that runs agents, synthesize through the control repository's wrapper instead, which

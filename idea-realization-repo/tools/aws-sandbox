@@ -6,7 +6,8 @@ Every AWS command an agent runs goes through this wrapper. A PreToolUse hook
 `.claude/settings.json` denies the bare `aws` command as a second layer.
 
 **The IAM roles are the boundary.** The sandbox has two roles (`aws/README.md`): a read-only role
-and a deploy role with no IAM, Organizations, account or billing permissions. Each machine has one
+and a deploy role whose only IAM permission is managing `/app/` roles that carry the permission
+boundary, and which has no Organizations, account or billing permissions. Each machine has one
 named profile for each. The wrapper picks the profile by mode, so a `read` command runs with the
 read-only role and cannot change anything, whatever it asks for:
 
@@ -122,8 +123,9 @@ def configured(env: dict[str, str]) -> dict[str, str]:
                 values[key.strip()] = value.strip()
     for key, var in CONFIG_ENV.items():
         if not values[key]:
-            raise Refused(f"{key} is not configured: set {var} or the {key} plugin option on "
-                          "this machine (see aws/README.md)")
+            raise Refused(f"{key} is not configured: set {key} in .idea-realization/local.yaml, "
+                          f"or {var}, or the {key} plugin option on this machine "
+                          "(see aws/README.md)")
     for key in ("aws_read_profile", "aws_deploy_profile"):
         if values[key] == "default":
             raise Refused(f"{key} is 'default'; name the dedicated sandbox profile for that role")

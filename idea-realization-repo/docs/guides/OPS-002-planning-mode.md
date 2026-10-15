@@ -31,7 +31,7 @@ day is organised around it is in the team workflow (`OPS-005`).
 
 ## Starting
 
-Run `/idea-realization:start` and choose Planning. Then, in the control repository's primary checkout on `dev`:
+Run `/start` and choose Planning. Then, in the control repository's primary checkout on `dev`:
 
 1. `git pull --rebase origin dev`, before any work (`OPS-001`, section 2).
 2. Load what is already decided: the `brain` skill, or
@@ -56,7 +56,7 @@ working directory that `paths.py` prints.
 | What | Where it goes |
 |---|---|
 | Idea log entries (new ideas, status moves, findings) | Directly on control `dev` and pushed at once. Idea commits are bookkeeping (`OPS-001`, section 3). |
-| Accepted partition record, requirement, plan, new phases in `backlog/backlog.yaml`, batch record in `backlog/batches.yaml`, regenerated catalog | A control worktree on a branch `agent/<handle>-<slug>`, reaching control `dev` through a pull request merged with a merge commit (`OPS-001`, sections 1 and 4). |
+| Accepted partition record, requirement, plan, new phases in `backlog/backlog.yaml`, batch record in `backlog/batches.yaml`, regenerated catalog | A control worktree on a branch `agent/<handle>-<slug>`, reaching control `dev` through a pull request merged with a merge commit (`OPS-001`, sections 1 and 4). The owner merges planning pull requests. |
 
 ## The steps
 

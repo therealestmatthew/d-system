@@ -71,6 +71,13 @@ def test_any_missing_value_refused_in_every_mode(missing: str) -> None:
         assert "is not configured" in refused(mode, "s3", "ls", env=env)
 
 
+def test_the_missing_value_refusal_names_local_yaml_first() -> None:
+    env = {k: v for k, v in ENV.items() if k != "IDEA_REALIZATION_AWS_READ_PROFILE"}
+    message = refused("read", "s3", "ls", env=env)
+    assert "aws_read_profile in .idea-realization/local.yaml" in message
+    assert message.index("local.yaml") < message.index("IDEA_REALIZATION_AWS_READ_PROFILE")
+
+
 @pytest.mark.parametrize("variable", ["IDEA_REALIZATION_AWS_READ_PROFILE",
                                       "IDEA_REALIZATION_AWS_DEPLOY_PROFILE"])
 def test_default_profile_refused(variable: str) -> None:

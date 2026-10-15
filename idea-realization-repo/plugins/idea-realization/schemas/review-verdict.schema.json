@@ -64,7 +64,7 @@
         "definition_sha256": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
-          "description": "sha256 of the agent definition file the reviewer ran with, so a later change to it is visible against its verdicts."
+          "description": "sha256 of the agent definition file the reviewer ran with. Recorded for a reader; no check compares it with the file."
         }
       }
     },

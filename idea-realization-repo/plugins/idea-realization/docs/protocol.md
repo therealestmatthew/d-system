@@ -193,8 +193,9 @@ exits 0 before any hand-off.
 
 - Every session works in its own worktree on its own branch, whatever the work touches, and the
   primary checkout's branch is never switched. The only work in the primary checkout is the claim
-  commit plus the catalog regeneration it forces, committed together; recording ideas; a local
-  merge in a repository with no remote; and the completion edit that follows a merge
+  commit plus the catalog regeneration it forces, committed together; recording ideas; a workstream
+  claim and a developer's own entry in the systems registry (`workstreams.md`); a local merge in a
+  repository with no remote; and the completion edit that follows a merge
   (`backlog-protocol.md`, section 10).
   While sessions run under `multi-session.md`, its turn purposes are the complete list.
 - The branch is `agent/<phase-id>` and the worktree is `<worktree directory>/<phase-id>`. The

@@ -1,6 +1,7 @@
 # The phase catalog and the lock table every developer reads. Claim with session-start.
 schema_version: 1
-updated: '2026-10-14'
+updated: '2026-10-15'
+decision_record: doc-team-decisions
 max_active: 15
 next_up: []
 items:

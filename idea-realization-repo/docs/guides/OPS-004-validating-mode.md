@@ -18,7 +18,7 @@ How plans, phase branches, infrastructure and spend are reviewed, which reviewer
 a reviewer's verdict decides. Reviewers change nothing: every reviewer agent below is read-and-run
 only and spawns no subagents. The one-page command list is in the mode cheat sheets (`OPS-009`).
 
-Run `/idea-realization:start` and choose Validating. Then `git pull --rebase origin dev` in the control primary checkout
+Run `/start` and choose Validating. Then `git pull --rebase origin dev` in the control primary checkout
 before any work.
 
 ## The rules every review follows

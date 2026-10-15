@@ -18,7 +18,7 @@ One page per mode: the skills, agents and commands in the order they are used, o
 full procedure for each mode is in its guide: planning (`OPS-002`), implementing (`OPS-003`),
 validating (`OPS-004`). Where this page and a guide differ, the guide wins. Prompts to paste for each mode are in `OPS-010`.
 
-**Entry point for every mode: `/idea-realization:start`.** It asks which mode you are in and points to that mode's
+**Entry point for every mode: `/start`** (long form `/start`). It asks which mode you are in and points to that mode's
 first step.
 
 Plugin skills are invoked as `/idea-realization:<skill>`. Agents are dispatched by name, never as a
@@ -32,7 +32,7 @@ repository").
 
 From a captured idea to approved plans, registered phases and validated, assigned batches.
 
-1. `/idea-realization:start`, choose Planning.
+1. `/start`, choose Planning.
 2. `uv run plugins/idea-realization/scripts/brain.py load --kind decision` — read what is already decided.
 3. `/idea-realization:idea` — record each new idea as given.
 4. `/idea-realization:idea-triage <id>` — scout one open idea for related material; moves it to triaged.
@@ -53,7 +53,7 @@ validated and assigned.
 
 From a claimed phase to merged code and a completion record.
 
-1. `/idea-realization:start`, choose Implementing.
+1. `/start`, choose Implementing.
 2. `git pull --rebase origin dev` on control `dev` — always, before any work.
 3. `/idea-realization:brain` — load the context the phase needs.
 4. `/idea-realization:backlog` — run the check, see the ready queue and its Conflicts column, orient on one phase.
@@ -75,7 +75,7 @@ Done when: the phase is complete and merged in both repositories, or handed back
 
 Reviewing plans, branches, infrastructure and spend. Reviewers change nothing.
 
-1. `/idea-realization:start`, choose Validating.
+1. `/start`, choose Validating.
 2. `phase-adversary` agent — the gating review of a phase's product diff; `session-close` dispatches it with the phase's acceptance.
 3. `validator-code` agent — gating review instead, for a narrow code change judged against one requirement.
 4. `review-judge` agent — shadow judge of the same diff, dispatched by a session other than the one that built the phase (`session-close` does not run it); its verdict is recorded and decides nothing.

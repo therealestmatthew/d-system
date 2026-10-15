@@ -12,6 +12,7 @@ the `check` command regenerates it in memory and fails on any difference.
 | ARCH-002 | architecture | draft | repository-owner | docs/architecture/ARCH-002-bidirectional-integrity-architecture.md |
 | GOV-001 | governance | draft | repository-owner | docs/governance/GOV-001-standing-rules.md |
 | GOV-002 | governance | draft | repository-owner | docs/governance/GOV-002-anti-pattern-procedures.md |
+| GOV-003 | governance | draft | repository-owner | docs/governance/GOV-003-team-decisions.md |
 | OPS-001 | operation | draft | repository-owner | docs/guides/OPS-001-branching-and-ci.md |
 | OPS-002 | operation | draft | repository-owner | docs/guides/OPS-002-planning-mode.md |
 | OPS-003 | operation | draft | repository-owner | docs/guides/OPS-003-implementing-mode.md |
@@ -41,4 +42,4 @@ the `check` command regenerates it in memory and fails on any difference.
 |---|---|---|
 | — | — | — |
 
-19 documents — adr: 1, architecture: 2, governance: 2, operation: 10, plan: 3, requirement: 1.
+20 documents — adr: 1, architecture: 2, governance: 3, operation: 10, plan: 3, requirement: 1.

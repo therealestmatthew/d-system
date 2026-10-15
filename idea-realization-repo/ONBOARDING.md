@@ -22,9 +22,9 @@ under `docs/guides/`; where this page and those differ, they win.
   **Implementing** or **Validating**.
 - Demo: 2026-11-05. Code freeze: 2026-11-03.
 
-**Skill names.** The plugin's skills are invoked as `/idea-realization:<skill>`, for example
-`/idea-realization:start`. Some setups also list them by the short name (`/start`); both run the
-same skill. The guides use the full form.
+**Skill names.** Each of the plugin's skills runs by its short name, such as `/start`, unless
+another command already uses that name. The long form `/idea-realization:<skill>`, such as
+`/start`, always works.
 
 **Terms used on this page.**
 
@@ -110,7 +110,8 @@ that one command only (`OPS-008`, "check.py reports files from the wrong reposit
    - `git config user.email <your work email>`.
    - Add yourself to the `owners` map in `docs/systems.yaml`: the key is your handle (lower-case
      letters and digits, starting with a letter, at most 16 characters), the value lists your git
-     email. The handle is how every claim, idea and brain entry names you.
+     email. The handle is how every claim, idea and brain entry names you. A work email here is
+     expected; it is not a confidential identifier.
 
      ```yaml
      owners:
@@ -211,13 +212,13 @@ with `--ours` or `--theirs`.
 In the first two days each workstream writes the interface documents the others build against.
 The team workflow guide (`OPS-005`, sections 1 and 2) has the details.
 
-## 5. Pick a mode with `/idea-realization:start`
+## 5. Pick a mode with `/start`
 
 Before every session, in the primary checkout of each repository: `git pull --rebase origin dev`.
 The `--rebase` keeps an unpushed bookkeeping commit on top instead of making a merge commit on
 `dev`.
 
-Then run `/idea-realization:start` and choose a mode:
+Then run `/start` and choose a mode:
 
 | Mode | What you do | Guide |
 |---|---|---|
@@ -231,7 +232,7 @@ The one-page versions are in `docs/guides/OPS-009-mode-cheat-sheets.md`; prompts
 
 The implementing-mode guide (`OPS-003`) is the full procedure. In short:
 
-1. `/idea-realization:start`, choose Implementing. Pull `dev` first.
+1. `/start`, choose Implementing. Pull `dev` first.
 2. `/idea-realization:backlog`: see the ready queue. Take the first ready phase in `next_up` order,
    preferring one assigned to you (`owner: <your handle>`).
 3. `/idea-realization:session-start`: it asks before claiming, then commits the claim directly on
@@ -262,7 +263,9 @@ phase, record learnings in the brain, push every branch). The table is in `OPS-0
   unpushed claim lets two people claim the same phase.
 - **Every session works in its own worktree.** The primary checkout's branch is never switched.
 - **Never write a confidential identifier into a tracked file**: no organization or client name,
-  account id, email or repository URL in code, documents or commit messages.
+  account id or repository URL in code, documents or commit messages. Your work email is not
+  confidential: it belongs in your own `docs/systems.yaml` entry (section 3, step 5) and nowhere
+  else.
 - **Never commit with `--no-verify`, never force-push `dev` or `main`, never route around a hook.**
   A failing check is a result to fix or report.
 - **Every AWS command goes through `tools/aws-sandbox`.** No `default` profile, no `AWS_`

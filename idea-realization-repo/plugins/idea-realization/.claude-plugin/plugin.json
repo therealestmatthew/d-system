@@ -109,7 +109,7 @@
     "aws_deploy_profile": {
       "type": "string",
       "title": "AWS deploy profile",
-      "description": "The named AWS CLI profile for the sandbox's deploy role, which has no IAM, Organizations or billing rights; used only by the deploying agent. Never the default profile. The deploying agent refuses to run while it is empty.",
+      "description": "The named AWS CLI profile for the sandbox's deploy role, whose only IAM rights cover /app/ roles that carry the permission boundary and which has no Organizations or billing rights; used only by the deploying agent. Never the default profile. The deploying agent refuses to run while it is empty.",
       "default": ""
     },
     "aws_region": {

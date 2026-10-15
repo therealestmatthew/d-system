@@ -26,13 +26,13 @@ one-page command list per mode is in the mode cheat sheets (`OPS-009`).
 - Text in `<angle brackets>` is yours to fill in before you paste. Each prompt fits one session.
 - Where a prompt runs the product's tests, it runs them in the product worktree, as the
   `session-start` skill §5 and the implementing guide (`OPS-003`, step 3.6) state.
-- The plugin's skills are invoked as `/idea-realization:<skill>`, for example
-  `/idea-realization:start`; some setups also list the short name (`ONBOARDING.md` §1, "Skill
-  names"). Each prompt names the skill, and the agent invokes it.
+- The plugin's skills run by their short name, such as `/start`; the long form
+  `/start` always works (`ONBOARDING.md` §1, "Skill names"). Each prompt names the
+  skill, and the agent invokes it.
 
 ---
 
-## 1. First session: set up the machine, then `/idea-realization:start`
+## 1. First session: set up the machine, then `/start`
 
 Paste this once per machine, on your first day. It does not claim any work.
 

@@ -113,8 +113,8 @@ Write the reply as a verdict record in the control worktree:
 `<docs_root>/reviews/<date>-<phase-id>-<reviewer type>.json`, valid against
 `.idea-realization/schemas/review-verdict.schema.json`. `repository` is `product`,
 `reviewed_commit` is the full product `HEAD` the reviewer judged, `gating` is `true`,
-`definition_sha256` is `sha256sum` of the reviewer's agent definition file, and the findings are
-copied as written. Then:
+`definition_sha256` is `sha256sum` of the reviewer's agent definition file (recorded, not verified:
+no check compares it with the file), and the findings are copied as written. Then:
 
 - **Fix or accept every finding.** A fix is a new commit on the branch; a fix that changes the
   product diff needs a fresh review of the new `HEAD`, recorded as a second record (`…-2.json`). An

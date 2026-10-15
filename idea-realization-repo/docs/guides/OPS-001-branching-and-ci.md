@@ -61,7 +61,8 @@ Control bookkeeping is committed directly on control `dev` and pushed, with no p
 - claim commits (session-start),
 - completion commits (session-close: `status: complete`, `product_merge`, regenerated catalog),
 - idea commits,
-- workstream claims.
+- workstream claims,
+- a developer's own entry in `docs/systems.yaml` (`ONBOARDING.md`, section 3, step 5).
 
 If the push is rejected because someone else pushed first: `git pull --rebase origin dev`, run the
 repository check again, then push. Never force-push.

@@ -40,7 +40,7 @@ Neither primary checkout ever leaves `dev`.
 
 ### 1. Start
 
-Run `/idea-realization:start` and choose Implementing. In the control primary checkout,
+Run `/start` and choose Implementing. In the control primary checkout,
 `git pull --rebase origin dev`
 before anything else, and load the context the phase needs with the `brain` skill.
 
