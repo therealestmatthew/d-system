@@ -1,0 +1,46 @@
+# DRAFT proposal for the owner (unit U6, 2026-10-14). NOT docs/workstreams.yaml: the owner writes
+# the real list. Shape follows .idea-realization/schemas/workstreams.schema.json; every entry is
+# open with an empty owner, for a developer to claim with workstreams.py claim <id>.
+# Paths are placeholders for a product layout that does not exist yet; the owner sets the real ones.
+# Paths must not overlap (the workstreams check refuses overlaps). A path outside every workstream
+# is shared ground. interfaces lists the documents each workstream owes the others in the first two
+# days; they are left empty because no document exists yet and codes are allocated when written.
+schema_version: 1
+workstreams:
+  - id: ui
+    title: User interface
+    owner: ""
+    status: open
+    paths:
+      - product:web/
+    interfaces: []
+  - id: api
+    title: API and backend
+    owner: ""
+    status: open
+    paths:
+      - product:api/
+    interfaces: []
+  - id: agents
+    title: Agent orchestration on Bedrock
+    owner: ""
+    status: open
+    paths:
+      - product:agents/
+    interfaces: []
+  - id: infra-data
+    title: Infrastructure and data
+    owner: ""
+    status: open
+    paths:
+      - product:infra/
+      - product:data/
+    interfaces: []
+  - id: demo-qa
+    title: Demo, integration and QA
+    owner: ""
+    status: open
+    paths:
+      - product:e2e/
+      - product:demo/
+    interfaces: []
