@@ -6,7 +6,7 @@ the plugin) and the **product repository** (the product's code and CI). It is wr
 repository owner, who does this once. Do the steps in order; each one says what success looks like
 and what to do if it fails.
 
-Built from dev commit 322d78f6
+Built from dev commit 322d78f6 (step 0.2a added 2026-10-16)
 
 ## Placeholders used below
 
@@ -132,6 +132,39 @@ repository check, the guidebook check and the private-content check again on the
   (step 6.1). Do not put it in the deny-list, or the hooks refuse those commits. The organization
   name is different: it stays out of tracked files, and the repositories' URLs are kept only in the
   gitignored `.idea-realization/local.yaml` (step 3.3).
+
+### 0.2a Create the deny-list, and the shell to use on Windows
+
+**On Windows, run every step of this guide in Git Bash** (installed with Git for Windows), not in
+PowerShell or cmd. The commands here are bash: PowerShell has no `<` input redirection (so
+`gh secret set DENY_LIST ... < <deny-list>` fails), does not accept `VAR=value command` (as in
+`PRIVATE_DENY_LIST=<deny-list> uv run ...`), and treats `cp`, `mkdir -p` and `printf` differently.
+In Git Bash, write Windows paths with forward slashes, for example `/c/Users/<you>/work`.
+
+**What goes in the deny-list.** One identifier per line, nothing else: the names that must never
+appear in any tracked file of either repository. At minimum, the case-management firm named in the
+product architecture's integration surface (the name kept out of every file in this export). Add
+any other name your team must never commit, such as a client or agency name, an internal codename,
+or a colleague's personal address. Do not add your own work email (step 0.2).
+
+**Create it outside both repositories**, in Git Bash:
+
+```bash
+mkdir -p ~/hackathon-secrets
+printf '%s\n' 'FirmName' > ~/hackathon-secrets/deny-list.txt
+```
+
+Replace `FirmName` with the real name, and add one quoted argument per extra identifier
+(`printf '%s\n' 'FirmName' 'OtherName' > ...`). Use `<deny-list>` = `~/hackathon-secrets/deny-list.txt`
+for the rest of this guide. If you write the file from PowerShell instead, use
+`[IO.File]::WriteAllLines("$HOME\hackathon-secrets\deny-list.txt", @("FirmName"))`, not
+`Set-Content`: Windows PowerShell 5 adds a byte-order mark that corrupts the first entry.
+
+Success: `wc -l < ~/hackathon-secrets/deny-list.txt` prints the number of identifiers you wrote.
+The check in step 1.7 later reports the same number as `identifiers checked`.
+
+The file is a secret. It travels to teammates only through a trusted channel (step 6.4), never in a
+repository, an issue, or an archived chat.
 
 ### 0.3 Choose the repository and directory names
 
